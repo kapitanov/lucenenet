@@ -514,7 +514,7 @@ namespace Lucene.Net.Search
                         {
                             // Purge all caches & resume, once all
                             // threads get here:
-                            Restart.@await();
+                            Restart.Wait();
                             if (Iters.Get() >= NUM_ITER)
                             {
                                 break;

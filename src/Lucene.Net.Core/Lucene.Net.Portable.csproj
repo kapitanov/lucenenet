@@ -601,6 +601,7 @@
     <Compile Include="Support\AtomicBoolean.cs" />
     <Compile Include="Support\AtomicInteger.cs" />
     <Compile Include="Support\AtomicLong.cs" />
+    <Compile Include="Support\AtomicObject.cs" />
     <Compile Include="Support\Buffer.cs" />
     <Compile Include="Support\AttributeImplItem.cs" />
     <Compile Include="Support\BitSetSupport.cs" />
@@ -614,6 +615,11 @@
     <Compile Include="Support\Compatibility\Collections.cs" />
     <Compile Include="Support\ConcurrentHashMapWrapper.cs" />
     <Compile Include="Support\ConcurrentHashSet.cs" />
+    <Compile Include="Support\Configuration\ConfigFileConfigurationExtensions.cs" />
+    <Compile Include="Support\Configuration\ConfigFileConfigurationProvider.cs" />
+    <Compile Include="Support\Configuration\ConfigurationExtensions.cs" />
+    <Compile Include="Support\Configuration\IConfigurationParser.cs" />
+    <Compile Include="Support\Configuration\KeyValueParser.cs" />
     <Compile Include="Support\ErrorHandling.cs" />
     <Compile Include="Support\FileStreamExtensions.cs" />
     <Compile Include="Support\HashCodeMerge.cs" />

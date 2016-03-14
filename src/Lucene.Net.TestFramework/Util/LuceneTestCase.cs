@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Lucene.Net.Util
 {
@@ -950,7 +951,7 @@ namespace Lucene.Net.Util
             }
             else if (r.Next(5) == 0)
             {
-                return NewAlcoholicMergePolicy(r, ClassEnvRule.TimeZone);
+                return NewAlcoholicMergePolicy(r);
             }
             return NewLogMergePolicy(r);
         }
@@ -972,12 +973,12 @@ namespace Lucene.Net.Util
 
         public static AlcoholicMergePolicy NewAlcoholicMergePolicy()
         {
-            return NewAlcoholicMergePolicy(Random(), ClassEnvRule.TimeZone);
+            return NewAlcoholicMergePolicy(Random());
         }
 
-        public static AlcoholicMergePolicy NewAlcoholicMergePolicy(Random r, TimeZone tz)
+        public static AlcoholicMergePolicy NewAlcoholicMergePolicy(Random r)
         {
-            return new AlcoholicMergePolicy(tz, new Random(r.Next()));
+            return new AlcoholicMergePolicy(new Random(r.Next()));
         }
 
         public static LogMergePolicy NewLogMergePolicy(Random r)
@@ -1380,7 +1381,7 @@ namespace Lucene.Net.Util
 
             Type clazz = CommandLineUtil.LoadDirectoryClass(clazzName);
             // If it is a FSDirectory type, try its ctor(File)
-            if (clazz.IsSubclassOf(typeof(FSDirectory)))
+            if (clazz.GetTypeInfo().IsSubclassOf(typeof(FSDirectory)))
             {
                 DirectoryInfo dir = CreateTempDir("index-" + clazzName);
                 dir.Create(); // ensure it's created so we 'have' it.
@@ -2627,12 +2628,9 @@ namespace Lucene.Net.Util
         }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        protected string GetFullMethodName()
+        protected string GetFullMethodName([CallerMemberName] string memberName = "")
         {
-            var st = new StackTrace();
-            var sf = st.GetFrame(1);
-
-            return string.Format("{0}+{1}", this.GetType().Name, sf.GetMethod().Name);
+            return string.Format("{0}+{1}", this.GetType().Name, memberName);
         }
 
         private void CleanupTemporaryFiles()

@@ -418,7 +418,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public void TestEmptyDocs()
         {
             Directory dir = NewDirectory();
@@ -447,7 +447,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public void TestConcurrentReads()
         {
             Directory dir = NewDirectory();
@@ -668,7 +668,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Test, LongRunningTest, MaxTime(int.MaxValue)]
         public void TestBigDocuments()
         {
             // "big" as "much bigger than the chunk size"

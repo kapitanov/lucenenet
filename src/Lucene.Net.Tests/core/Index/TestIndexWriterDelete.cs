@@ -1298,7 +1298,7 @@ namespace Lucene.Net.Index
 
         // Make sure buffered (pushed) deletes don't use up so
         // much RAM that it forces long tail of tiny segments:
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Test, LongRunningTest, MaxTime(int.MaxValue)]
         public virtual void TestApplyDeletesOnFlush()
         {
             Directory dir = NewDirectory();

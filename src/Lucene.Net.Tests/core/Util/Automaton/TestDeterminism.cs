@@ -41,7 +41,7 @@ namespace Lucene.Net.Util.Automaton
 
         /// <summary>
         /// test against a simple, unoptimized det </summary>
-        [Ignore]
+        [Ignore("failing testcase")]
         [Test]
         public virtual void TestAgainstSimple()
         {

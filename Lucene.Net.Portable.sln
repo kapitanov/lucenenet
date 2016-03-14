@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Portable", "src\Lucene.Net.Core\Lucene.Net.Portable.csproj", "{DBC3B677-805C-430E-AF78-A9ABF3975D17}"
 EndProject
@@ -14,6 +14,7 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Queries.Portable", "src\Lucene.Net.Queries\Lucene.Net.Queries.Portable.csproj", "{69D7956C-C2CC-4708-B399-A188FEC384C4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Analysis.Common.Portable", "src\Lucene.Net.Analysis.Common\Lucene.Net.Analysis.Common.Portable.csproj", "{F5AB15D4-F83A-4F93-B698-AC39843D7142}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.TestFramework.Portable", "src\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj", "{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}"
 EndProject
 Global

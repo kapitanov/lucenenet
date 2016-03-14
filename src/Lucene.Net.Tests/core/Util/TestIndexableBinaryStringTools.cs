@@ -181,7 +181,7 @@ namespace Lucene.Net.Util
                 {
                     buf.Append('0');
                 }
-                buf.Append(hex.ToUpper(CultureInfo.InvariantCulture));
+                buf.Append(hex.ToUpper());
                 if (byteNum < numBytes - 1)
                 {
                     buf.Append(' ');
@@ -200,7 +200,7 @@ namespace Lucene.Net.Util
                 {
                     buf.Append('0');
                 }
-                buf.Append(hex.ToUpper(CultureInfo.InvariantCulture));
+                buf.Append(hex.ToUpper());
                 if (charNum < numBytes - 1)
                 {
                     buf.Append(' ');

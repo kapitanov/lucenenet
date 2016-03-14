@@ -24,7 +24,7 @@ namespace Lucene.Net.Index
     using Document = Documents.Document;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [Ignore]
+    [Ignore("testcase to be run manually")]
     [TestFixture]
     public class Test2BDocs : LuceneTestCase
     {

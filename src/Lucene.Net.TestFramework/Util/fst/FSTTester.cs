@@ -363,9 +363,10 @@ namespace Lucene.Net.Util.Fst
 
             if (LuceneTestCase.VERBOSE && Pairs.Count <= 20 && fst != null)
             {
-                TextWriter w = new StreamWriter(new FileStream("out.dot", FileMode.Open), IOUtils.CHARSET_UTF_8);
-                Util.toDot(fst, w, false, false);
-                w.Close();
+                using (TextWriter w = new StreamWriter(new FileStream("out.dot", FileMode.Open), IOUtils.CHARSET_UTF_8))
+                {
+                    Util.toDot(fst, w, false, false);
+                }
                 Console.WriteLine("SAVED out.dot");
             }
 

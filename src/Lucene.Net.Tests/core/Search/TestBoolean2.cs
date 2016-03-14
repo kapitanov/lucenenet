@@ -280,7 +280,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Ignore]
+        [Ignore("Failing testcase")]
         [Test]
         public virtual void TestRandomQueries()
         {

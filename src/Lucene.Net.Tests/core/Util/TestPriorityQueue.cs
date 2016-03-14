@@ -565,7 +565,7 @@ namespace Lucene.Net.Util
             PopAndTestElements(pq, elements);
         }
 
-        [Test, Timeout(0)]
+        [Test, MaxTime(0)]
         public static void TestStress()
         {
             int atLeast = 1000000;

@@ -1927,7 +1927,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Make sure we skip wicked long terms.
         /// </summary>
-        [Ignore]
+        [Ignore("Failing test")]
         [Test]
         public virtual void TestWickedLongTerm()
         {

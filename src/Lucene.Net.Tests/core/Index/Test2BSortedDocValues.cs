@@ -33,7 +33,7 @@ namespace Lucene.Net.Index
     /*using Ignore = org.junit.Ignore;
     using TimeoutSuite = com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;*/
 
-    [Ignore]
+    [Ignore("long running testcase")]
     [TestFixture]
     public class Test2BSortedDocValues : LuceneTestCase
     {

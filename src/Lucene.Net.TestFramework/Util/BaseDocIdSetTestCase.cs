@@ -122,7 +122,7 @@ namespace Lucene.Net.Util
         /// <summary>
         /// Compare the content of the set against a <seealso cref="BitSet"/>.
         /// </summary>
-        [Test, Timeout(150000)]
+        [Test, MaxTime(150000)]
         [LongRunningTest]
         public void TestAgainstBitSet()
         {

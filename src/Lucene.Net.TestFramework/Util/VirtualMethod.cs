@@ -77,7 +77,7 @@ namespace Lucene.Net.Util
             this.Parameters = parameters;
             try
             {
-                MethodInfo mi = baseClass.GetMethod(method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, null, parameters, null);
+                MethodInfo mi = GetMethodInfo(baseClass, method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, parameters);
                 if (mi == null)
                 {
                     throw new System.ArgumentException(baseClass.Name + " has no such method.");
@@ -91,6 +91,30 @@ namespace Lucene.Net.Util
             {
                 throw new System.ArgumentException(baseClass.Name + " has no such method: " + nsme.Message);
             }
+        }
+
+        private MethodInfo GetMethodInfo(Type baseClass, string method, BindingFlags flags, params Type[] expectedParametersTypes)
+        {           
+            MethodInfo mi = baseClass.GetMethod(method, flags);
+
+            if (mi != null)
+            {
+                //Check parameters for method are of same length and type as excepted.
+                ParameterInfo[] methodParameters = mi.GetParameters();
+                if (methodParameters.Length != expectedParametersTypes.Length)
+                {
+                    return null;
+                }
+                for (int i = 0; i < methodParameters.Length; i++)
+                {
+                    if (!methodParameters[i].GetType().Equals(expectedParametersTypes))
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return mi;
         }
 
         /// <summary>
@@ -127,14 +151,12 @@ namespace Lucene.Net.Util
             }
             bool overridden = false;
             int distance = 0;
-            for (Type clazz = subclazz; clazz != BaseClass && clazz != null; clazz = clazz.BaseType)
+            for (Type clazz = subclazz; clazz != BaseClass && clazz != null; clazz = clazz.GetTypeInfo().BaseType)
             {
                 // lookup method, if success mark as overridden
                 if (!overridden)
                 {
-                    MethodInfo mi = clazz.GetMethod(Method, 
-                        BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly, 
-                        null, Parameters, null);
+                    MethodInfo mi = GetMethodInfo(clazz, Method, BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly, Parameters);
 
                     if (mi != null)
                         overridden = true;

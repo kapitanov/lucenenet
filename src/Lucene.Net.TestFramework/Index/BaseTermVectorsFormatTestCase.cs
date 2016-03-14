@@ -733,7 +733,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Test, LongRunningTest, MaxTime(int.MaxValue)]
         public virtual void TestLotsOfFields()
         {
             RandomDocumentFactory docFactory = new RandomDocumentFactory(this, 500, 10);
@@ -751,7 +751,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         // different options for the same field
         public virtual void TestMixedOptions()
         {

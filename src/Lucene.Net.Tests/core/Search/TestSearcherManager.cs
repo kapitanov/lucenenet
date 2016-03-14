@@ -293,7 +293,7 @@ namespace Lucene.Net.Search
             {
                 Console.WriteLine("THREAD started");
             }
-            awaitEnterWarmWait();
+            awaitEnterWarm.Wait();
             if (VERBOSE)
             {
                 Console.WriteLine("NOW call close");
