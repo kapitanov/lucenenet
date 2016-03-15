@@ -2,7 +2,6 @@
 using System.Collections;
 using System.Collections.Generic;
 
-
 namespace Lucene.Net.Facet.Taxonomy.WriterCache
 {
 
@@ -261,7 +260,7 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
                 Entry e = this.next_Renamed;
                 if (e == null)
                 {
-					throw new InvalidOperationException(this.GetType() + " cannot get next entry");;
+                    throw new EntryNotFoundException();
                 }
 
                 Entry n = e.next;
@@ -306,6 +305,11 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
             }
         }
 
+        public class EntryNotFoundException : Exception {
+            public EntryNotFoundException() : base() { }
+            public EntryNotFoundException(string message) : base(message) { }
+            public EntryNotFoundException(string message, Exception innerException): base(message, innerException) { }
+        }
     }
 
 }
