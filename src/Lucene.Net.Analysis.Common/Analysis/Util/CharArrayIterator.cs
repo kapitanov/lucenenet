@@ -1,5 +1,5 @@
 ﻿using System;
-using ICU4NET;
+using Icu;
 
 namespace Lucene.Net.Analysis.Util
 {
