@@ -1,8 +1,7 @@
-﻿using System;
-
+﻿
 namespace Lucene.Net.Analysis.Util
 {
-    public interface ICharacterIterator : ICloneable
+    public interface ICharacterIterator
     {
         char First();
         char Last();

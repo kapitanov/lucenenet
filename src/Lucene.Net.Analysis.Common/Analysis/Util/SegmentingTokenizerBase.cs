@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using ICU4NET;
+using Icu;
 using Lucene.Net.Analysis.Tokenattributes;
 using Reader = System.IO.TextReader;
 using Version = Lucene.Net.Util.LuceneVersion;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lucene.Net.Analysis.Util
 {
@@ -56,7 +59,9 @@ namespace Lucene.Net.Analysis.Util
         /// accumulated offset of previous buffers for this reader, for offsetAtt </summary>
         protected internal int offset = 0;
 
-        private readonly BreakIterator iterator;
+        private readonly Locale locale;
+        private readonly BreakIterator.UBreakIteratorType iteratorType;
+        private IEnumerator<string> enumerator;
         private readonly CharArrayIterator wrapper = CharArrayIterator.NewSentenceInstance();
 
         private readonly IOffsetAttribute offsetAtt;
@@ -70,19 +75,21 @@ namespace Lucene.Net.Analysis.Util
         /// be provided to this constructor.
         /// </para>
         /// </summary>
-        protected SegmentingTokenizerBase(Reader reader, BreakIterator iterator)
-            : this(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, reader, iterator)
+        protected SegmentingTokenizerBase(Reader reader, Locale locale, BreakIterator.UBreakIteratorType iteratorType)
+            : this(AttributeFactory.DEFAULT_ATTRIBUTE_FACTORY, reader, locale, iteratorType)
         {
         }
 
         /// <summary>
         /// Construct a new SegmenterBase, also supplying the AttributeFactory
         /// </summary>
-        protected SegmentingTokenizerBase(AttributeFactory factory, Reader reader, BreakIterator iterator)
+        protected SegmentingTokenizerBase(AttributeFactory factory, Reader reader, Locale locale, BreakIterator.UBreakIteratorType iteratorType)
             : base(factory, reader)
         {
             offsetAtt = AddAttribute<IOffsetAttribute>();
-            this.iterator = iterator;
+            this.iteratorType = iteratorType;
+            this.locale = locale;
+            enumerator = Enumerable.Empty<string>().GetEnumerator();
         }
 
         public override bool IncrementToken()
@@ -106,7 +113,7 @@ namespace Lucene.Net.Analysis.Util
         {
             base.Reset();
             wrapper.SetText(buffer, 0, 0);
-            iterator.SetText(new string(buffer, 0, 0));
+            enumerator = Enumerable.Empty<string>().GetEnumerator();
             length = usableLength = offset = 0;
         }
 
@@ -177,7 +184,9 @@ namespace Lucene.Net.Analysis.Util
             }
 
             wrapper.SetText(buffer, 0, Math.Max(0, usableLength));
-            iterator.SetText(new string(wrapper.Text, 0, Math.Max(0, usableLength)));
+            var text = new string(wrapper.Text, 0, Math.Max(0, usableLength));
+
+            enumerator = BreakIterator.Split(iteratorType, locale, text).GetEnumerator();
         }
 
         // TODO: refactor to a shared readFully somewhere
@@ -215,22 +224,12 @@ namespace Lucene.Net.Analysis.Util
 
             while (true)
             {
-                int start = iterator.Current();
-
-                if (start == BreakIterator.DONE)
+                if (!enumerator.MoveNext())
                 {
-                    return false; // BreakIterator exhausted
+                    return false;
                 }
 
-                // find the next set of boundaries
-                int end_Renamed = iterator.Next();
-
-                if (end_Renamed == BreakIterator.DONE)
-                {
-                    return false; // BreakIterator exhausted
-                }
-
-                SetNextSentence(start, end_Renamed);
+                SetNextSentence(enumerator.Current);
                 if (IncrementWord())
                 {
                     return true;
@@ -240,7 +239,7 @@ namespace Lucene.Net.Analysis.Util
 
         /// <summary>
         /// Provides the next input sentence for analysis </summary>
-        protected internal abstract void SetNextSentence(int sentenceStart, int sentenceEnd);
+        protected internal abstract void SetNextSentence(string sentence);
 
         /// <summary>
         /// Returns true if another word is available </summary>
