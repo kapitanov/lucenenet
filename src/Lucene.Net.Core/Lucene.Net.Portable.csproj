@@ -35,6 +35,9 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
     <None Include="Lucene.Net.Portable.project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->

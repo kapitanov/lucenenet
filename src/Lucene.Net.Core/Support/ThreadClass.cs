@@ -132,32 +132,33 @@ namespace Lucene.Net.Support
             _threadField.IsBackground = isDaemon;
         }
 
+#if !NETCORE
         /// <summary>
         /// Gets or sets a value indicating the scheduling priority of a thread
         /// </summary>
-        //TODO: conniey
-            //public ThreadPriority Priority
-        //{
-        //    get
-        //    {
-        //        try
-        //        {
-        //            return _threadField.Priority;
-        //        }
-        //        catch
-        //        {
-        //            return ThreadPriority.Normal;
-        //        }
-        //    }
-        //    set
-        //    {
-        //        try
-        //        {
-        //            _threadField.Priority = value;
-        //        }
-        //        catch { }
-        //    }
-        //}
+        public ThreadPriority Priority
+        {
+           get
+           {
+               try
+               {
+                   return _threadField.Priority;
+               }
+               catch
+               {
+                   return ThreadPriority.Normal;
+               }
+           }
+           set
+           {
+               try
+               {
+                   _threadField.Priority = value;
+               }
+               catch { }
+           }
+        }
+#endif
 
         /// <summary>
         /// Gets a value indicating the execution status of the current thread
