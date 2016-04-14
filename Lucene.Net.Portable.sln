@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Grouping.Portabl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Queries.Portable", "src\Lucene.Net.Queries\Lucene.Net.Queries.Portable.csproj", "{69D7956C-C2CC-4708-B399-A188FEC384C4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Analysis.Common.Portable", "src\Lucene.Net.Analysis.Common\Lucene.Net.Analysis.Common.Portable.csproj", "{F5AB15D4-F83A-4F93-B698-AC39843D7142}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,14 @@ Global
 		{69D7956C-C2CC-4708-B399-A188FEC384C4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{69D7956C-C2CC-4708-B399-A188FEC384C4}.Release|x86.ActiveCfg = Release|Any CPU
 		{69D7956C-C2CC-4708-B399-A188FEC384C4}.Release|x86.Build.0 = Release|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Debug|x86.Build.0 = Debug|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Release|x86.ActiveCfg = Release|Any CPU
+		{F5AB15D4-F83A-4F93-B698-AC39843D7142}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
