@@ -1,6 +1,7 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Text;
-using ICU4NET;
+using Icu;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Analysis.Util;
@@ -121,6 +122,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /// silly tokenizer that just returns whole sentences as tokens </summary>
         sealed class WholeSentenceTokenizer : SegmentingTokenizerBase
         {
+            internal string sentence;
             internal int sentenceStart, sentenceEnd;
             internal bool hasSentence;
 
@@ -128,16 +130,15 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             internal IOffsetAttribute offsetAtt;
 
             public WholeSentenceTokenizer(TextReader reader)
-                : base(reader, BreakIterator.CreateSentenceInstance(Locale.GetUS()))
+                : base(reader, new Locale("en-US"), BreakIterator.UBreakIteratorType.SENTENCE)
             {
                 termAtt = AddAttribute<ICharTermAttribute>();
                 offsetAtt = AddAttribute<IOffsetAttribute>();
             }
 
-            protected override void SetNextSentence(int sentenceStart, int sentenceEnd)
+            protected override void SetNextSentence(string sentence)
             {
-                this.sentenceStart = sentenceStart;
-                this.sentenceEnd = sentenceEnd;
+                this.sentence = sentence;
                 hasSentence = true;
             }
 
@@ -164,6 +165,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /// </summary>
         sealed class SentenceAndWordTokenizer : SegmentingTokenizerBase
         {
+            internal string sentence;
             internal int sentenceStart, sentenceEnd;
             internal int wordStart, wordEnd;
             internal int posBoost = -1; // initially set to -1 so the first word in the document doesn't get a pos boost
@@ -173,17 +175,16 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             internal IPositionIncrementAttribute posIncAtt;
 
             public SentenceAndWordTokenizer(TextReader reader)
-                : base(reader, BreakIterator.CreateSentenceInstance(Locale.GetUS()))
+                : base(reader, new Locale("en-US"), BreakIterator.UBreakIteratorType.SENTENCE)
             {
                 termAtt = AddAttribute<ICharTermAttribute>();
                 offsetAtt = AddAttribute<IOffsetAttribute>();
                 posIncAtt = AddAttribute<IPositionIncrementAttribute>();
             }
 
-            protected override void SetNextSentence(int sentenceStart, int sentenceEnd)
+            protected override void SetNextSentence(string sentence)
             {
-                this.wordStart = this.wordEnd = this.sentenceStart = sentenceStart;
-                this.sentenceEnd = sentenceEnd;
+                this.sentence = sentence;
                 posBoost++;
             }
 
