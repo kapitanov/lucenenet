@@ -12,6 +12,11 @@ Please join the Apache Lucene.Net-User mailing list by sending a message to:
 
 *** This is the main branch where development happens, please don't use any other branches unless you know what you are doing! ***
 
+|Build Type|Status|
+|---|---|
+| .NET Core |![](https://devdivsamples.visualstudio.com/DefaultCollection/_apis/public/build/definitions/a974be68-2506-48b5-bbab-b6b385114093/4/badge)|
+| Full Framework|![](https://devdivsamples.visualstudio.com/DefaultCollection/_apis/public/build/definitions/a974be68-2506-48b5-bbab-b6b385114093/5/badge)|
+
 ## Files
 
 src/Contrib
