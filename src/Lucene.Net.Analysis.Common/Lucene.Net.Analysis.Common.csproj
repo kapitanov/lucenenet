@@ -31,7 +31,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="icu.net.pcl, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\icu-dotnet.1.0.0-alpha\lib\net451\icu.net.pcl.dll</HintPath>
+      <HintPath>..\..\packages\icu-dotnet.1.0.2-alpha\lib\net451\icu.net.pcl.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICU4NET, Version=1.0.5593.31013, Culture=neutral, processorArchitecture=x86">
@@ -136,9 +136,22 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icudt56.dll" />
-    <Content Include="icuin56.dll" />
-    <Content Include="icuuc56.dll" />
+    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icudt56.dll">
+      <Link>icudt56.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icuin56.dll">
+      <Link>icuin56.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icuuc56.dll">
+      <Link>icuuc56.dll</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

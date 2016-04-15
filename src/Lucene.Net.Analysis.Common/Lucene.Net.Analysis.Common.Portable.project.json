@@ -4,7 +4,7 @@
     "dnxcore50.app": {}
   },
   "dependencies": {
-    "icu-dotnet": "1.0.0-alpha",
+    "icu-dotnet": "1.0.2-alpha",
     "Microsoft.NETCore": "5.0.1-beta-23516",
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1-beta-23516"
   },
