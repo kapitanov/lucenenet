@@ -630,10 +630,13 @@ namespace Lucene.Net.Index
         // an IndexWriter (hit during DW.ThreadState.Init()) is
         // OK:
         [Test]
-        public virtual void TestImmediateDiskFull()
+        public virtual void TestImmediateDiskFull([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
         {
             MockDirectoryWrapper dir = NewMockDirectory();
-            IndexWriter writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(2).SetMergeScheduler(new ConcurrentMergeScheduler()));
+            var config = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))
+                            .SetMaxBufferedDocs(2)
+                            .SetMergeScheduler(scheduler);
+            IndexWriter writer = new IndexWriter(dir, config);
             dir.MaxSizeInBytes = Math.Max(1, dir.RecomputedActualSizeInBytes);
             Document doc = new Document();
             FieldType customType = new FieldType(TextField.TYPE_STORED);
@@ -643,7 +646,7 @@ namespace Lucene.Net.Index
                 writer.AddDocument(doc);
                 Assert.Fail("did not hit disk full");
             }
-            catch (IOException ioe)
+            catch (IOException)
             {
             }
             // Without fix for LUCENE-1130: this call will hang:
@@ -652,7 +655,7 @@ namespace Lucene.Net.Index
                 writer.AddDocument(doc);
                 Assert.Fail("did not hit disk full");
             }
-            catch (IOException ioe)
+            catch (IOException)
             {
             }
             try
@@ -660,7 +663,7 @@ namespace Lucene.Net.Index
                 writer.Dispose(false);
                 Assert.Fail("did not hit disk full");
             }
-            catch (IOException ioe)
+            catch (IOException)
             {
             }
 
