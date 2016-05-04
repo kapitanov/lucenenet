@@ -8,6 +8,9 @@
     <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Lucene.Net</RootNamespace>
+    <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
