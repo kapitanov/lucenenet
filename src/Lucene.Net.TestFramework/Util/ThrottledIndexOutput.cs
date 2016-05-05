@@ -148,7 +148,7 @@ namespace Lucene.Net.Util
             try
             {
 #endif 
-                Thread.Sleep(new TimeSpan(ms));
+                Thread.Sleep(TimeSpan.FromMilliseconds(ms));
 #if !NETCORE
             }
             catch (ThreadInterruptedException e)
