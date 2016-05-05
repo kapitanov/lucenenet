@@ -10,10 +10,10 @@ namespace Lucene.Net.Util
 {
     public static class StackTraceHelper
     {
-        public static bool StackTraceContainsMethod(string methodName)
+        public static bool DoesStackTraceContainsMethod(string methodName)
         {
 #if FEATURE_DEBUG_STACKTRACE
-            IList<string> allMethods = StackTraceRegexMatch(@"\s*at .*\.(?<method>.*)\(");
+            IEnumerable<string> allMethods = StackTraceRegexMatches(@"\s*at .*\.(?<method>.*)\(");
             return allMethods.Contains(methodName);
 #else
             StackTrace trace = new StackTrace();
@@ -29,10 +29,10 @@ namespace Lucene.Net.Util
 
         }
 
-        public static bool StackTraceContainsNamespaceAndMethod(string methodNamespace, string methodName)
+        public static bool DoesStackTraceContainsNamespaceAndMethod(string methodNamespace, string methodName)
         {
 #if FEATURE_DEBUG_STACKTRACE
-            IList<string> allMethods = StackTraceRegexMatch(@"\s*at (?<method>.*)\(");
+            IEnumerable<string> allMethods = StackTraceRegexMatches(@"\s*at (?<method>.*)\(");
             return allMethods.Contains(methodNamespace + '.' + methodName);
 #else
             StackTrace trace = new StackTrace();
@@ -48,10 +48,10 @@ namespace Lucene.Net.Util
 #endif
         }
 
-        private static IList<string> StackTraceRegexMatch(string regExPattern)
+        private static IEnumerable<string> StackTraceRegexMatches(string regExPattern)
         {
             var regex = new Regex(regExPattern);
-            IList<string> matches =
+            IEnumerable<string> matches =
                 Environment.StackTrace
                 .Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line =>
