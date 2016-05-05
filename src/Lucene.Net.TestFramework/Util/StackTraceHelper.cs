@@ -13,7 +13,7 @@ namespace Lucene.Net.Util
         public static bool DoesStackTraceContainsMethod(string methodName)
         {
 #if FEATURE_DEBUG_STACKTRACE
-            IEnumerable<string> allMethods = StackTraceRegexMatches(@"\s*at .*\.(?<method>.*)\(");
+            IEnumerable<string> allMethods = GetStackTraceRegexMatches(@"\s*at .*\.(?<method>.*)\(");
             return allMethods.Contains(methodName);
 #else
             StackTrace trace = new StackTrace();
@@ -32,7 +32,7 @@ namespace Lucene.Net.Util
         public static bool DoesStackTraceContainsNamespaceAndMethod(string methodNamespace, string methodName)
         {
 #if FEATURE_DEBUG_STACKTRACE
-            IEnumerable<string> allMethods = StackTraceRegexMatches(@"\s*at (?<method>.*)\(");
+            IEnumerable<string> allMethods = GetStackTraceRegexMatches(@"\s*at (?<method>.*)\(");
             return allMethods.Contains(methodNamespace + '.' + methodName);
 #else
             StackTrace trace = new StackTrace();
@@ -48,7 +48,7 @@ namespace Lucene.Net.Util
 #endif
         }
 
-        private static IEnumerable<string> StackTraceRegexMatches(string regExPattern)
+        private static IEnumerable<string> GetStackTraceRegexMatches(string regExPattern)
         {
             var regex = new Regex(regExPattern);
             IEnumerable<string> matches =
