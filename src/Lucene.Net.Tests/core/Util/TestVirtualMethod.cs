@@ -40,7 +40,7 @@ namespace Lucene.Net.Util
         {
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         internal class TestClass1 : TestVirtualMethod
         {
             public override void PublicTest(string test)
@@ -52,7 +52,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         internal class TestClass2 : TestClass1
         {
             protected override void ProtectedTest(int test) // make it public here
@@ -60,7 +60,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         internal class TestClass3 : TestClass2
         {
             public override void PublicTest(string test)
@@ -68,12 +68,12 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         internal class TestClass4 : TestVirtualMethod
         {
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         internal class TestClass5 : TestClass4
         {
         }

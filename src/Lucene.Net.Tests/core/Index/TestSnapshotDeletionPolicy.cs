@@ -118,7 +118,7 @@ namespace Lucene.Net.Index
             this.Snapshots = new List<IndexCommit>();
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestSnapshotDeletionPolicy_Mem()
         {
@@ -223,14 +223,18 @@ namespace Lucene.Net.Index
                             }
                         }
                     }
+#if !NETCORE
                     try
                     {
+#endif 
                         Thread.Sleep(1);
+#if !NETCORE
                     }
                     catch (ThreadInterruptedException ie)
                     {
                         throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
                     }
+#endif
                 } while (Environment.TickCount < StopTime);
             }
         }

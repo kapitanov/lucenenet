@@ -109,7 +109,7 @@ namespace Lucene.Net.Util
             }
         } 
 
-        [Ignore] // Increase heap size to run this test
+        [Ignore("Ignored test")] // Increase heap size to run this test
         [Test]
         public static void TestMaxSizeBounds()
         {

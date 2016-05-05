@@ -28,7 +28,7 @@ namespace Lucene.Net.Util
             Assert.AreEqual(Number.BitCount(x), BroadWord.BitCount(x), "rank(" + x + ")");
         }
 
-        [Ignore("Failing testcase")]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestRank1()
         {

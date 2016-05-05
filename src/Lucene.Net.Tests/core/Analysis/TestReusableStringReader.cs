@@ -51,7 +51,7 @@ namespace Lucene.Net.Analysis
             Assert.AreEqual("ba", new string(buf, 2, 2));
             Assert.AreEqual('r', (char)reader.Read());
             Assert.AreEqual(-1, reader.Read(buf, 2, 0));
-            reader.Close();
+            reader.Dispose();
 
             reader.Value = "foobar";
             StringBuilder sb = new StringBuilder();

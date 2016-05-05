@@ -342,18 +342,22 @@ namespace Lucene.Net.Search
 
             public override IndexSearcher NewSearcher(IndexReader r)
             {
+#if !NETCORE
                 try
                 {
+#endif
                     if (TriedReopen.Get())
                     {
                         AwaitEnterWarm.Signal();
                         AwaitClose.Wait();
                     }
+#if !NETCORE
                 }
                 catch (ThreadInterruptedException e)
                 {
                     //
                 }
+#endif
                 return new IndexSearcher(r, Es);
             }
         }

@@ -1291,6 +1291,7 @@ namespace Lucene.Net.Index
                             AllowInterrupt = true;
                         }
                     }
+#if !NETCORE
                     catch (ThreadInterruptedException re)
                     {
                         // NOTE: important to leave this verbosity/noise
@@ -1306,6 +1307,7 @@ namespace Lucene.Net.Index
                             break;
                         }
                     }
+#endif
                     catch (Exception t)
                     {
                         Console.WriteLine("FAILED; unexpected exception");
