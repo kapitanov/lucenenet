@@ -4,7 +4,6 @@ using Microsoft.Extensions.Configuration;
 #else
 using System.Configuration;
 #endif
-using System;
 
 namespace Lucene.Net.TestFramework.Support
 {
@@ -24,11 +23,7 @@ namespace Lucene.Net.TestFramework.Support
         public static string GetProperty(string key, string defaultValue)
         {
             string setting = GetProperty(key);
-
-            if (string.IsNullOrEmpty(setting))
-                return defaultValue;
-
-            return setting;
+            return string.IsNullOrEmpty(setting) ? defaultValue : setting;
         }
 
         /// <summary>
