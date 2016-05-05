@@ -10,13 +10,9 @@ namespace Lucene.Net.TestFramework.Support
             return SystemProperties.GetProperty<bool>(key, defaultValue,
                 (str) =>
                 {
-                    bool v;
-                    if (bool.TryParse(str, out v))
-                        return v;
-                    else
-                        return defaultValue;
-                }
-                );
+                    bool value;
+                    return bool.TryParse(str, out value) ? value : defaultValue;
+                });
         }
 
         public static int SystemPropertyAsInt(string key, int defaultValue)
@@ -24,11 +20,8 @@ namespace Lucene.Net.TestFramework.Support
             return SystemProperties.GetProperty<int>(key, defaultValue,
               (str) =>
               {
-                  int v;
-                  if (int.TryParse(str, out v))
-                      return v;
-                  else
-                      return defaultValue;
+                  int value;
+                  return int.TryParse(str, out value) ? value : defaultValue;
               }
             );
         }
