@@ -39,11 +39,7 @@ namespace Lucene.Net.TestFramework.Support
         public static T GetProperty<T>(string key,  T defaultValue, System.Func<string, T> conversionFunction)
         {
             string setting = GetProperty(key);
-
-            if (string.IsNullOrEmpty(setting))
-                return defaultValue;
-            else
-                return conversionFunction(setting);           
+            return string.IsNullOrEmpty(setting) ? defaultValue : conversionFunction(setting);
         }
     }
 }
