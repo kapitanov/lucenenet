@@ -4,8 +4,7 @@
     "dnxcore50.app": {}
   },
   "dependencies": {
-    "Lucene.Net.Portable": "",
-    "Lucene.Net.Queries.Portable": "",
+    "antlr3.runtime.netcore": "3.6.0-rc2",
     "Microsoft.NETCore": "5.0.1-beta-23516",
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1-beta-23516"
   },

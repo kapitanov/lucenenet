@@ -17,6 +17,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Analysis.Common.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.TestFramework.Portable", "src\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj", "{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Join.Portable", "src\Lucene.Net.Join\Lucene.Net.Join.Portable.csproj", "{C6568F19-8277-4EF0-AD89-8B480DB78C2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Codecs.Portable", "src\Lucene.Net.Codecs\Lucene.Net.Codecs.Portable.csproj", "{2796EBEB-8F48-4728-9221-A2C361781BFC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Expressions.Portable", "src\Lucene.Net.Expressions\Lucene.Net.Expressions.Portable.csproj", "{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +87,30 @@ Global
 		{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}.Release|x86.ActiveCfg = Release|Any CPU
 		{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}.Release|x86.Build.0 = Release|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Debug|x86.Build.0 = Debug|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Release|x86.ActiveCfg = Release|Any CPU
+		{C6568F19-8277-4EF0-AD89-8B480DB78C2D}.Release|x86.Build.0 = Release|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Debug|x86.Build.0 = Debug|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Release|x86.ActiveCfg = Release|Any CPU
+		{2796EBEB-8F48-4728-9221-A2C361781BFC}.Release|x86.Build.0 = Release|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Debug|x86.Build.0 = Debug|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|x86.ActiveCfg = Release|Any CPU
+		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
