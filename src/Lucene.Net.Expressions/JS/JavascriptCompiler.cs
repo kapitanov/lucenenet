@@ -17,7 +17,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -25,6 +24,15 @@ using Antlr.Runtime;
 using Antlr.Runtime.Tree;
 using Lucene.Net.Queries.Function;
 using Lucene.Net.Support;
+
+#if NETCORE
+using System.IO;
+using Lucene.Net.Portable.Support.Configuration;
+using Lucene.Net.Support.Configuration;
+using Microsoft.Extensions.Configuration;
+#else
+using System.Configuration;
+#endif
 
 namespace Lucene.Net.Expressions.JS
 {
@@ -95,7 +103,7 @@ namespace Lucene.Net.Expressions.JS
         private readonly string sourceText;
 
         private readonly IDictionary<string, int> externalsMap = new HashMap<string, int>();
-        
+
         private TypeBuilder dynamicType;
 
         private readonly IDictionary<string, MethodInfo> functions;
@@ -212,7 +220,7 @@ namespace Lucene.Net.Expressions.JS
                 EndCompile();
                 return
                     (Expression)
-                        Activator.CreateInstance(dynamicType.CreateType(), sourceText, externalsMap.Keys.ToArray());
+                        Activator.CreateInstance(dynamicType.CreateTypeInfo().AsType(), sourceText, externalsMap.Keys.ToArray());
 
             }
 
@@ -231,10 +239,10 @@ namespace Lucene.Net.Expressions.JS
         private void BeginCompile()
         {
             var assemblyName = new AssemblyName("Lucene.Net.Expressions.Dynamic" + new Random().Next());
-            asmBuilder = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
-            
-            modBuilder = asmBuilder.DefineDynamicModule(assemblyName.Name + ".dll", true);
-            
+            asmBuilder = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.RunAndCollect);
+
+            modBuilder = asmBuilder.DefineDynamicModule(assemblyName.Name + ".dll");
+
             dynamicType = modBuilder.DefineType(COMPILED_EXPRESSION_CLASS,
                 TypeAttributes.AnsiClass | TypeAttributes.AutoClass | TypeAttributes.Public | TypeAttributes.Class |
                 TypeAttributes.BeforeFieldInit | TypeAttributes.AutoLayout, EXPRESSION_TYPE);
@@ -635,10 +643,9 @@ namespace Lucene.Net.Expressions.JS
             IDictionary<string, MethodInfo> map = new Dictionary<string, MethodInfo>();
             try
             {
-                var props = Properties.Settings.Default;
-                foreach (SettingsProperty property in props.Properties)
+                foreach (var property in GetDefaultSettings())
                 {
-                    string[] vals = props[property.Name].ToString().Split(',');
+                    string[] vals = property.Value.Split(',');
                     if (vals.Length != 3)
                     {
                         throw new Exception("Error reading Javascript functions from settings");
@@ -655,7 +662,7 @@ namespace Lucene.Net.Expressions.JS
                     Arrays.Fill(args, typeof(double));
                     MethodInfo method = clazz.GetMethod(methodName, args);
                     CheckFunction(method);
-                    map[property.Name] = method;
+                    map[property.Key] = method;
                 }
 
 
@@ -665,6 +672,23 @@ namespace Lucene.Net.Expressions.JS
                 throw new Exception("Cannot resolve function", e);
             }
             DEFAULT_FUNCTIONS = map;
+        }
+
+        private static IEnumerable<KeyValuePair<string, string>> GetDefaultSettings()
+        {
+#if NETCORE
+            var settingsFile = Path.Combine("Properties", "Settings.settings");
+            var configuration = new ConfigurationBuilder().AddSettingsFile(settingsFile, optional: false).Build();
+
+            return configuration.GetChildren().Select(section => new KeyValuePair<string, string>(section.Key, section.GetValue("(Default)")));
+#else
+            var props = Properties.Settings.Default;
+
+            return props.Properties
+                .Cast<SettingsProperty>()
+                .Select(property => new KeyValuePair<string, string>(property.Name, props[property.Name].ToString()));
+#endif
+
         }
 
         private static void CheckFunction(MethodInfo method)

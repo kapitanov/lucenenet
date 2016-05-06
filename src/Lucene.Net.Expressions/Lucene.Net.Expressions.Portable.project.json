@@ -1,12 +1,14 @@
 ﻿{
   "supports": {
-    "net46.app": {},
-    "dnxcore50.app": {}
+    "net46.app": { },
+    "dnxcore50.app": { }
   },
   "dependencies": {
     "antlr3.runtime.netcore": "3.6.0-rc2",
     "Microsoft.NETCore": "5.0.1-beta-23516",
-    "Microsoft.NETCore.Portable.Compatibility": "1.0.1-beta-23516"
+    "Microsoft.NETCore.Portable.Compatibility": "1.0.1-beta-23516",
+    "System.Reflection.Emit": "4.0.1-beta-23516",
+    "System.Reflection.Emit.ILGeneration": "4.0.1-beta-23516"
   },
   "frameworks": {
     "dotnet5.4": {
