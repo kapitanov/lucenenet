@@ -381,7 +381,6 @@
     <Compile Include="core\Util\Fst\Test2BFST.cs" />
     <Compile Include="core\Util\Packed\TestEliasFanoDocIdSet.cs" />
     <Compile Include="core\Util\Packed\TestEliasFanoSequence.cs" />
-    <Compile Include="core\Util\Packed\TestPackedInts.cs" />
     <Compile Include="core\Util\Test2BPagedBytes.cs" />
     <Compile Include="core\Util\TestArrayUtil.cs" />
     <Compile Include="core\Util\TestAttributeSource.cs" />
@@ -431,6 +430,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="core\Util\Cache\" />
+    <Folder Include="core\Util\Junitcompat\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lucene.Net.Core\Lucene.Net.Portable.csproj">
