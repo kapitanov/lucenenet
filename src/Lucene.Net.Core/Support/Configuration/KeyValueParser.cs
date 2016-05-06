@@ -4,6 +4,7 @@
 
 //Code modified to work with latest version of framework.
 
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -114,7 +115,7 @@ namespace Lucene.Net.Portable.Support.Configuration
 
         private static string GetKey(Stack<string> context, string name)
         {
-            return string.Join(":", context.Reverse().Concat(new[] { name }));
+            return string.Join(Constants.KeyDelimiter, context.Reverse().Concat(new[] { name }));
         }
     }
 }
