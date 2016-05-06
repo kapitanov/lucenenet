@@ -620,6 +620,7 @@
     <Compile Include="Support\Configuration\ConfigurationExtensions.cs" />
     <Compile Include="Support\Configuration\IConfigurationParser.cs" />
     <Compile Include="Support\Configuration\KeyValueParser.cs" />
+    <Compile Include="Support\Configuration\SettingsFileConfigurationProvider.cs" />
     <Compile Include="Support\ErrorHandling.cs" />
     <Compile Include="Support\FileStreamExtensions.cs" />
     <Compile Include="Support\HashCodeMerge.cs" />
