@@ -679,10 +679,10 @@ namespace Lucene.Net.Expressions.JS
             {
                 throw new ArgumentException(method + " is not public.");
             }
-            if (!method.DeclaringType.IsPublic)
+            if (!method.DeclaringType.GetTypeInfo().IsPublic)
             {
                 //.NET Port. Inner class is being returned as not public even when declared public
-                if (method.DeclaringType.IsNestedAssembly)
+                if (method.DeclaringType.GetTypeInfo().IsNestedAssembly)
                 {
                     throw new ArgumentException(method.DeclaringType.FullName + " is not public.");
                 }
