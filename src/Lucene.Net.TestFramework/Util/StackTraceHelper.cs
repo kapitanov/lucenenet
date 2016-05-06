@@ -12,7 +12,7 @@ namespace Lucene.Net.Util
     {
         public static bool DoesStackTraceContainsMethod(string methodName)
         {
-#if FEATURE_DEBUG_STACKTRACE
+#if FEATURE_STACKTRACE
             IEnumerable<string> allMethods = GetStackTraceRegexMatches(@"\s*at .*\.(?<method>.*)\(");
             return allMethods.Contains(methodName);
 #else
@@ -31,7 +31,7 @@ namespace Lucene.Net.Util
 
         public static bool DoesStackTraceContainsNamespaceAndMethod(string methodNamespace, string methodName)
         {
-#if FEATURE_DEBUG_STACKTRACE
+#if FEATURE_STACKTRACE
             IEnumerable<string> allMethods = GetStackTraceRegexMatches(@"\s*at (?<method>.*)\(");
             return allMethods.Contains(methodNamespace + '.' + methodName);
 #else

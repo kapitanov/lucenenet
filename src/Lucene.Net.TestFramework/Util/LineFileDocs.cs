@@ -93,13 +93,13 @@ namespace Lucene.Net.Util
         {
             lock (this)
             {
-                Stream stream;
+                Stream @is;
                 bool needSkip = true, failed = false;
                 long size = 0L, seekTo = 0L;
 
                 try
                 {
-                    stream = new FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                    @is = new FileStream(Path, FileMode.Open, FileAccess.Read, FileShare.Read);
                 }
                 catch (Exception)
                 {
@@ -110,7 +110,7 @@ namespace Lucene.Net.Util
                     if (Path.EndsWith(".gz"))
                     {
                         // if it is a gzip file, we need to use InputStream and slowly skipTo:
-                        stream = new FileStream(file.FullName, FileMode.Append, FileAccess.Write, FileShare.Read);
+                        @is = new FileStream(file.FullName, FileMode.Append, FileAccess.Write, FileShare.Read);
                     }
                     else
                     {
@@ -122,26 +122,26 @@ namespace Lucene.Net.Util
                             Console.WriteLine("TEST: LineFileDocs: file seek to fp=" + seekTo + " on open");
                         }
                         channel.Position = seekTo;
-                        stream = new FileStream(channel.ToString(), FileMode.Append, FileAccess.Write, FileShare.Read);
+                        @is = new FileStream(channel.ToString(), FileMode.Append, FileAccess.Write, FileShare.Read);
                         needSkip = false;
                     }
                 }
                 if (!failed)
                 {
                     // if the file comes from Classpath:
-                    size = stream.Length;// available();
+                    size = @is.Length;// available();
                 }
 
                 if (Path.EndsWith(".gz"))
                 {
-                    using (var gzs = new GZipStream(stream, CompressionMode.Decompress))
+                    using (var gzs = new GZipStream(@is, CompressionMode.Decompress))
                     {
                         var temp = new MemoryStream();
                         gzs.CopyTo(temp);
                         // Free up the previous stream
-                        stream.Dispose();
+                        @is.Dispose();
                         // Use the decompressed stream now
-                        stream = temp;
+                        @is = temp;
                     }
                     // guestimate:
                     size = (long)(size * 2.8);
@@ -156,7 +156,7 @@ namespace Lucene.Net.Util
                     {
                         Console.WriteLine("TEST: LineFileDocs: stream skip to fp=" + seekTo + " on open");
                     }
-                    stream.Position = seekTo;
+                    @is.Position = seekTo;
                 }
 
                 // if we seeked somewhere, read until newline char
@@ -166,14 +166,14 @@ namespace Lucene.Net.Util
                     byte[] bytes = new byte[sizeof(int)];
                     do
                     {
-                        stream.Read(bytes, 0, sizeof(int));
+                        @is.Read(bytes, 0, sizeof(int));
                         b = BitConverter.ToInt32(bytes, 0);
                     } while (b >= 0 && b != 13 && b != 10);
                 }
 
                 //CharsetDecoder decoder = StandardCharsets.UTF_8.newDecoder().onMalformedInput(CodingErrorAction.REPORT).onUnmappableCharacter(CodingErrorAction.REPORT);
                 MemoryStream ms = new MemoryStream();
-                stream.CopyTo(ms);
+                @is.CopyTo(ms);
                 Reader = new StringReader(Encoding.UTF8.GetString(ms.ToArray()));//, BUFFER_SIZE);
 
                 if (seekTo > 0L)
@@ -182,7 +182,7 @@ namespace Lucene.Net.Util
                     Reader.ReadLine();
                 }
 
-                stream.Dispose();
+                @is.Dispose();
             }
         }
 

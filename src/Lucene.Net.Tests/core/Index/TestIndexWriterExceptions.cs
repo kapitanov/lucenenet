@@ -1059,7 +1059,7 @@ namespace Lucene.Net.Index
                 if (DoFail)
                 {
                     bool foundMethod =
-                        StackTraceHelper.StackTraceContainsNamespaceAndMethod(typeof(MockDirectoryWrapper).Name, "Sync");
+                        StackTraceHelper.DoesStackTraceContainsNamespaceAndMethod(typeof(MockDirectoryWrapper).Name, "Sync");
 
                     if(DoFail && foundMethod)
                     {
