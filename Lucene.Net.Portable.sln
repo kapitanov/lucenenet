@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Codecs.Portable"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Expressions.Portable", "src\Lucene.Net.Expressions\Lucene.Net.Expressions.Portable.csproj", "{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lucene.Net.Tests.Portable", "src\Lucene.Net.Tests\Lucene.Net.Tests.Portable.csproj", "{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,14 @@ Global
 		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|x86.ActiveCfg = Release|Any CPU
 		{6668140A-5E37-4C15-A0CA-6AAF9C9C287A}.Release|x86.Build.0 = Release|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Debug|x86.Build.0 = Debug|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Release|x86.ActiveCfg = Release|Any CPU
+		{91AD3FB7-8BC0-4008-852B-9972CD47E6C0}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
