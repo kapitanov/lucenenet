@@ -38,7 +38,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestBinaryTerms : LuceneTestCase
     {
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestBinary()
         {

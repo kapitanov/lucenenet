@@ -509,14 +509,18 @@ namespace Lucene.Net.Index
             {
                 for (int i = 0; i < OuterInstance.NumThreads; i++)
                 {
+#if !NETCORE
                     try
                     {
-                        Threads[i].Join();
+#endif
+                    Threads[i].Join();
+#if !NETCORE
                     }
                     catch (ThreadInterruptedException ie)
                     {
                         throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
                     }
+#endif
                 }
             }
 

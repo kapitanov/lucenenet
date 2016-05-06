@@ -45,7 +45,7 @@ namespace Lucene.Net.Index
     //
     //   java -server -Xmx8g -d64 -cp .:lib/junit-4.10.jar:./build/classes/test:./build/classes/test-framework:./build/classes/java -Dlucene.version=4.0-dev -Dtests.directory=MMapDirectory -DtempDir=build -ea org.junit.runner.JUnitCore Lucene.Net.Index.Test2BTerms
     //
-    [Ignore]
+    [Ignore ("Ignored test")]
     [TestFixture]
     public class Test2BTerms : LuceneTestCase
     {
@@ -166,7 +166,7 @@ namespace Lucene.Net.Index
         }
 
         //ORIGINAL LINE: @Ignore("Very slow. Enable manually by removing @Ignore.") public void test2BTerms() throws java.io.IOException
-        [Ignore]
+        [Ignore("long running testcase")]
         [Test]
         public virtual void Test2BTerms_Mem()
         {

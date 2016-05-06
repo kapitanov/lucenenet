@@ -60,7 +60,7 @@ namespace Lucene.Net.Index
                 //      if (name.equals("startCommit")) {
                 if (Random().Next(4) == 2)
                 {
-                    Thread.@Yield();
+                    Thread.Sleep(0);
                 }
             }
         }
@@ -81,7 +81,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestRandom()
         {

@@ -38,10 +38,6 @@ namespace Lucene.Net.Store
             {
                 Thread.Sleep(50);
             }
-            catch (ThreadInterruptedException ie)
-            {
-                throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-            }
             finally
             {
                 base.Dispose();

@@ -127,7 +127,7 @@ namespace Lucene.Net.Search
             return query;
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestBasics()
         {

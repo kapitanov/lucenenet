@@ -67,29 +67,12 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                if (DoFail && TestThread())
+                if (DoFail && TestThread() && Random().NextBoolean())
                 {
-                    bool isDoFlush = false;
-                    bool isClose = false;
-                    var trace = new StackTrace();
-                    foreach (var frame in trace.GetFrames())
-                    {
-                        var method = frame.GetMethod();
-                        if (isDoFlush && isClose)
-                        {
-                            break;
-                        }
-                        if ("flush".Equals(method.Name))
-                        {
-                            isDoFlush = true;
-                        }
-                        if ("close".Equals(method.Name))
-                        {
-                            isClose = true;
-                        }
-                    }
+                    bool isDoFlush = Util.StackTraceHelper.DoesStackTraceContainsMethod("Flush");
+                    bool isClose = Util.StackTraceHelper.DoesStackTraceContainsMethod("Close");    
 
-                    if (isDoFlush && !isClose && Random().NextBoolean())
+                    if (isDoFlush && !isClose )
                     {
                         HitExc = true;
                         throw new IOException(Thread.CurrentThread.Name + ": now failing during flush");
@@ -100,7 +83,7 @@ namespace Lucene.Net.Index
 
         // Make sure running BG merges still work fine even when
         // we are hitting exceptions during flushing.
-        [Ignore]
+        [Ignore("long running testcase")]
         [Test]
         public virtual void TestFlushExceptions()
         {
@@ -214,7 +197,7 @@ namespace Lucene.Net.Index
             directory.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public virtual void TestNoExtraFiles()
         {
             Directory directory = NewDirectory();
@@ -246,7 +229,7 @@ namespace Lucene.Net.Index
             directory.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public virtual void TestNoWaitClose()
         {
             Directory directory = NewDirectory();
@@ -408,7 +391,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public virtual void TestTotalBytesSize()
         {
             Directory d = NewDirectory();

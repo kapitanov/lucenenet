@@ -36,7 +36,7 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
 
-    [Ignore]
+    [Ignore("long running testcase")]
     [TestFixture]
     public class Test2BBinaryDocValues : LuceneTestCase
     {

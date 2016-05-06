@@ -34,7 +34,7 @@ namespace Lucene.Net.Index
     using TimeoutSuite = com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;*/
 
     //@TimeoutSuite(millis = 80 * TimeUnits.HOUR) @Ignore("takes ~ 30 minutes") @SuppressCodecs("Lucene3x") public class Test2BNumericDocValues extends Lucene.Net.Util.LuceneTestCase
-    [Ignore]
+    [Ignore("long running testcase")]
     [TestFixture]
     public class Test2BNumericDocValues : LuceneTestCase
     {

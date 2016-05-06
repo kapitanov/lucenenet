@@ -10,7 +10,7 @@ namespace Lucene.Net.Index
     using Lucene.Net.Support;
     using NUnit.Framework;
     using System.IO;
-
+    using Util;
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -302,7 +302,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        private class TestPoint1Exception : ApplicationException
+        private class TestPoint1Exception : Exception
         {
             public TestPoint1Exception(string message) : base(message)
             {
@@ -1058,20 +1058,18 @@ namespace Lucene.Net.Index
             {
                 if (DoFail)
                 {
-                    var trace = new StackTrace();
-                    foreach (var frame in trace.GetFrames())
+                    bool foundMethod =
+                        StackTraceHelper.DoesStackTraceContainsNamespaceAndMethod(typeof(MockDirectoryWrapper).Name, "Sync");
+
+                    if(DoFail && foundMethod)
                     {
-                        var method = frame.GetMethod();
-                        if (DoFail && typeof(MockDirectoryWrapper).Name.Equals(method.DeclaringType.Name) && "Sync".Equals(method.Name))
+                        DidFail = true;
+                        if (VERBOSE)
                         {
-                            DidFail = true;
-                            if (VERBOSE)
-                            {
-                                Console.WriteLine("TEST: now throw exc:");
-                                Console.WriteLine((new Exception()).StackTrace);
-                            }
-                            throw new IOException("now failing on purpose during sync");
+                            Console.WriteLine("TEST: now throw exc:");
+                            Console.WriteLine(Environment.StackTrace);
                         }
+                        throw new IOException("now failing on purpose during sync");
                     }
                 }
             }

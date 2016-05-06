@@ -7,9 +7,10 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
     <ProjectGuid>{940EFD2B-D875-4A6F-ADB2-AD711B8440F4}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Lucene.Net.Portable</AssemblyName>
+    <AssemblyName>Lucene.Net.TestFramework.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -22,30 +23,31 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>Lucene.Net</RootNamespace>
+    <RootNamespace>Lucene.Net.TestFramework</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NETCORE;FEATURE_STACKTRACE</DefineConstants>
+  </PropertyGroup>
   <ItemGroup>
-    <None Include="Lucene.Net.Portable.project.json" />
+    <None Include="Lucene.Net.TestFramework.Portable.project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   

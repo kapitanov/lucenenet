@@ -336,7 +336,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             }
         }
 
-        [Test, Timeout(300000)]
+        [Test, MaxTime(300000)]
         public virtual void TestSurrogatesOrder()
         {
             Directory dir = NewDirectory();

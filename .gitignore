@@ -33,3 +33,6 @@ obj/
 doc/
 src/demo/
 packages/
+.vs/
+*.lock.json
+TestResults/

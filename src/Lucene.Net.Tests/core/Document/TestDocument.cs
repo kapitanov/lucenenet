@@ -5,6 +5,7 @@ using System.Text;
 namespace Lucene.Net.Document
 {
     using NUnit.Framework;
+    using System;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -350,15 +351,7 @@ namespace Lucene.Net.Document
         [Test]
         public virtual void TestInvalidFields()
         {
-            try
-            {
-                new Field("foo", new MockTokenizer(new StreamReader("")), StringField.TYPE_STORED);
-                Assert.Fail("did not hit expected exc");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            Assert.Throws<ArgumentException>(() => { new Field("foo", new MockTokenizer(new StreamReader(File.Open("", FileMode.Open))), StringField.TYPE_STORED); });
         }
 
         // LUCENE-3682

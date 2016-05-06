@@ -22,7 +22,7 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [Ignore]
+    [Ignore("Ignored test")]
     [TestFixture]
     public class TestWAH8DocIdSet : BaseDocIdSetTestCase<WAH8DocIdSet>
     {
@@ -43,7 +43,7 @@ namespace Lucene.Net.Util
             Assert.AreEqual(ds1.Cardinality(), ds2.Cardinality());
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestUnion()
         {
@@ -72,7 +72,7 @@ namespace Lucene.Net.Util
             AssertEquals(numBits, expected, union);
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestIntersection()
         {
@@ -100,7 +100,7 @@ namespace Lucene.Net.Util
                     int endIdx;
                     if (doc == -1)
                     {
-                        endIdx = startIdx + set.Count;
+                        endIdx = startIdx + set.Length;
                         //expected.Clear(previousDoc + 1, set.Count);
                         for (int i = startIdx; i < endIdx; i++)
                         {

@@ -618,7 +618,7 @@ namespace Lucene.Net.Search
             Assert.IsTrue(rewritten is TermQuery);
         }
 
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestRandomPhrases()
         {

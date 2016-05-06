@@ -80,7 +80,7 @@ namespace Lucene.Net.Index
                 ctrl.UpdateStalled(false);
                 if (Random().NextBoolean())
                 {
-                    Thread.@Yield();
+                    Thread.Sleep(0);
                 }
                 else
                 {
@@ -263,15 +263,19 @@ namespace Lucene.Net.Index
                         Ctrl.WaitIfStalled();
                         if (CheckPoint.Get())
                         {
+#if !NETCORE
                             try
                             {
+#endif
                                 Assert.IsTrue(Sync.await());
+#if !NETCORE
                             }
                             catch (ThreadInterruptedException e)
                             {
                                 Console.WriteLine("[Waiter] got interrupted - wait count: " + Sync.Waiter.CurrentCount);
                                 throw new ThreadInterruptedException("Thread Interrupted Exception", e);
                             }
+#endif
                         }
                     }
                 }
@@ -318,20 +322,24 @@ namespace Lucene.Net.Index
                         if (CheckPoint.Get())
                         {
                             Sync.UpdateJoin.Signal();
+#if !NETCORE
                             try
                             {
+#endif
                                 Assert.IsTrue(Sync.await());
+#if !NETCORE
                             }
                             catch (ThreadInterruptedException e)
                             {
                                 Console.WriteLine("[Updater] got interrupted - wait count: " + Sync.Waiter.CurrentCount);
                                 throw new ThreadInterruptedException("Thread Interrupted Exception", e);
                             }
+#endif
                             Sync.LeftCheckpoint.Signal();
                         }
                         if (Random().NextBoolean())
                         {
-                            Thread.@Yield();
+                            Thread.Sleep(0);
                         }
                     }
                 }
@@ -422,7 +430,7 @@ namespace Lucene.Net.Index
                 }
                 if (Random().NextBoolean())
                 {
-                    Thread.@Yield();
+                    Thread.Sleep(0);
                 }
                 else
                 {

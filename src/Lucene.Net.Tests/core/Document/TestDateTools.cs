@@ -82,7 +82,7 @@ namespace Lucene.Net.Document
             // we use default locale since LuceneTestCase randomizes it
             //Calendar cal = new GregorianCalendar(TimeZone.GetTimeZone("GMT"), Locale.Default);
             //cal.Clear();
-
+           
             DateTime cal = new DateTime(1970, 1, 1, 0, 0, 0, 0, new GregorianCalendar()); // hour, minute, second -  year=1970, month=january, day=1
             //cal.set(DateTime.MILLISECOND, 0);
             Assert.AreEqual(cal.Ticks, time);

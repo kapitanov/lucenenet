@@ -60,10 +60,5 @@ namespace Lucene.Net.Randomized
         {
             this.traceAsString = inner.StackTrace;
         }
-
-        protected IllegalStateException(
-          System.Runtime.Serialization.SerializationInfo info,
-          System.Runtime.Serialization.StreamingContext context)
-            : base(info, context) { }
     }
 }
