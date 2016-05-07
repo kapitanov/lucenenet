@@ -136,7 +136,7 @@ namespace Lucene.Net.Index
                 Assert.Fail("Unwanted exception");
             }
             infoPrintStream.Flush();
-            string infoStream = Encoding.UTF8.GetString(infoBytes.GetBuffer());
+            string infoStream = Encoding.UTF8.GetString(infoBytes.ToArray());
             Assert.IsFalse(infoStream.Contains("boringFieldName"));
 
             writer.Dispose();

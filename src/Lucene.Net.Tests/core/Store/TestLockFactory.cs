@@ -9,6 +9,7 @@ using System.Threading;
 
 namespace Lucene.Net.Store
 {
+    using System.Reflection;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
     using Field = Field;
@@ -39,7 +40,6 @@ namespace Lucene.Net.Store
     using Query = Lucene.Net.Search.Query;
     using Term = Lucene.Net.Index.Term;
     using TermQuery = Lucene.Net.Search.TermQuery;
-    using TestUtil = Lucene.Net.Util.TestUtil;
 
     [TestFixture]
     public class TestLockFactory : LuceneTestCase
