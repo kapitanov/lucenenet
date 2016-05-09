@@ -40,6 +40,15 @@
   </PropertyGroup>
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    <RootNamespace>Lucene.Net</RootNamespace>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup>
+    <StartupObject />
   </PropertyGroup>
   <ItemGroup>
     <None Include="Lucene.Net.Portable.project.json" />
@@ -846,11 +855,13 @@
     <Compile Include="Util\RollingBuffer.cs" />
     <Compile Include="Util\SentinelIntSet.cs" />
     <Compile Include="Util\SetOnce.cs" />
+    <Compile Include="Util\SimpleStringInterner.cs" />
     <Compile Include="Util\SloppyMath.cs" />
     <Compile Include="Util\SmallFloat.cs" />
     <Compile Include="Util\Sorter.cs" />
     <Compile Include="Util\SPIClassIterator.cs" />
     <Compile Include="Util\StringHelper.cs" />
+    <Compile Include="Util\StringInterner.cs" />
     <Compile Include="Util\TimSorter.cs" />
     <Compile Include="Util\ToStringUtils.cs" />
     <Compile Include="Util\UnicodeUtil.cs" />

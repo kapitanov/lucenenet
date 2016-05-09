@@ -86,8 +86,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 {
                     Debug.Assert(fieldInfos.FieldInfo(CurrentFieldNumber) != null, CurrentFieldNumber.ToString());
                     
-                    //TODO: conniey
-                    //Field = String.Intern(fieldInfos.FieldInfo(CurrentFieldNumber).Name);
+                    Field = StringHelper.Intern(fieldInfos.FieldInfo(CurrentFieldNumber).Name);
                 }
             }
             else
@@ -104,8 +103,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 return;
             }
             Bytes.CopyBytes(term.Bytes);
-            //TODO: conniey
-            //Field = String.Intern(term.Field);
+            Field = StringHelper.Intern(term.Field);
 
             CurrentFieldNumber = -1;
             this.Term = term;

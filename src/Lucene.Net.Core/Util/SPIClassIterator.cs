@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+#if NETCORE
+using Microsoft.Extensions.PlatformAbstractions;
+#endif
 
 namespace Lucene.Net.Util
 {
@@ -45,54 +49,79 @@ namespace Lucene.Net.Util
             // it is unavailable. So we go to the next level on each and check each referenced
             // assembly.
 
-            //TODO: conniey
-            //foreach (var loadedAssembly in AppDomain.CurrentDomain.GetAssemblies())
-            //{
-            //    try
-            //    {
-            //        foreach (var type in loadedAssembly.GetTypes())
-            //        {
-            //            try
-            //            {
-            //                if (typeof(S).IsAssignableFrom(type) && !type.GetTypeInfo().IsAbstract && !type.GetTypeInfo().IsInterface && type.GetConstructor(Type.EmptyTypes) != null)
-            //                    types.Add(type);
-            //            }
-            //            catch
-            //            {
-            //                // swallow
-            //            }
-            //        }
-            //    }
-            //    catch
-            //    {
-            //        // swallow
-            //    }
 
-            //    foreach (var assemblyName in loadedAssembly.GetReferencedAssemblies())
-            //    {
-            //        try
-            //        {
-            //            var assembly = Assembly.Load(assemblyName);
+#if NETCORE
+            var allLibraries = PlatformServices.Default.LibraryManager.GetLibraries();
+            var loadedAssemblies = allLibraries.SelectMany(lib => lib.Assemblies.Select(x => Assembly.Load(x))).ToArray();
+#else
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
 
-            //            foreach (var type in assembly.GetTypes())
-            //            {
-            //                try
-            //                {
-            //                    if (typeof(S).IsAssignableFrom(type) && !type.GetTypeInfo().IsAbstract && !type.GetTypeInfo().IsInterface && type.GetConstructor(Type.EmptyTypes) != null)
-            //                        types.Add(type);
-            //                }
-            //                catch
-            //                {
-            //                    // swallow
-            //                }
-            //            }
-            //        }
-            //        catch
-            //        {
-            //            // swallow
-            //        }
-            //    }
-            //}
+            foreach (var loadedAssembly in loadedAssemblies)
+            {
+                try
+                {
+                    foreach (var type in loadedAssembly.GetTypes())
+                    {
+                        try
+                        {
+                            if (typeof(S).IsAssignableFrom(type) && !type.GetTypeInfo().IsAbstract && !type.GetTypeInfo().IsInterface && type.GetConstructor(Type.EmptyTypes) != null)
+                                types.Add(type);
+                        }
+                        catch
+                        {
+                            // swallow
+                        }
+                    }
+                }
+                catch
+                {
+                    // swallow
+                }
+                var referencedAssemblies =
+#if NETCORE
+                    PlatformServices.Default.LibraryManager
+                    .GetReferencingLibraries(loadedAssembly.FullName)
+                    .SelectMany(library => library.Assemblies.Select(x =>
+                    {
+                        try
+                        {
+                            return Assembly.Load(x);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    }));
+#else
+                    loadedAssembly.GetReferencedAssemblies().Select(x =>
+                    {
+                        try
+                        {
+                            return Assembly.Load(x);
+                        }
+                        catch
+                        {
+                            return null;
+                        }
+                    });
+#endif
+                foreach (var assembly in referencedAssemblies.Where(x => x != null))
+                {
+                    foreach (var type in assembly.GetTypes())
+                    {
+                        try
+                        {
+                            if (typeof(S).IsAssignableFrom(type) && !type.GetTypeInfo().IsAbstract && !type.GetTypeInfo().IsInterface && type.GetConstructor(Type.EmptyTypes) != null)
+                                types.Add(type);
+                        }
+                        catch
+                        {
+                            // swallow
+                        }
+                    }
+                }
+            }
         }
 
         public static SPIClassIterator<S> Get()

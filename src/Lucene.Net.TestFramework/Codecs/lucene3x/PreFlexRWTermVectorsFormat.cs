@@ -56,7 +56,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 // we are part of a "merge", we must sort by UTF16:
                 bool unicodeSortOrder = true;
 
-                if (Util.StackTraceHelper.DoesStackTraceContainsMethod("Merge"))
+                if (Util.StackTraceHelper.DoesStackTraceContainMethod("Merge"))
                 {
                         unicodeSortOrder = false;
                         if (LuceneTestCase.VERBOSE)

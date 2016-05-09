@@ -7,7 +7,6 @@ namespace Lucene.Net.Index
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
     using NUnit.Framework;
-
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements. See the NOTICE file distributed with this
@@ -128,7 +127,7 @@ namespace Lucene.Net.Index
             int numWaiters = AtLeast(1);
             var sync = new Synchronizer(numStallers + numReleasers, numStallers + numReleasers + numWaiters);
             var threads = new ThreadClass[numReleasers + numStallers + numWaiters];
-            IList<Exception> exceptions = new SynchronizedCollection<Exception>();
+            IList<Exception> exceptions = new SynchronizedList<Exception>();
             for (int i = 0; i < numReleasers; i++)
             {
                 threads[i] = new Updater(stop, checkPoint, ctrl, sync, true, exceptions);

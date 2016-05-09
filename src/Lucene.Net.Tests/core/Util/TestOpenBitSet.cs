@@ -94,7 +94,7 @@ namespace Lucene.Net.Util
 
         internal virtual void DoPrevSetBit(BitArray a, OpenBitSet b)
         {
-            int aa = a.Count + Random().Next(100);
+            int aa = a.Length + Random().Next(100);
             int bb = aa;
             do
             {
@@ -250,7 +250,7 @@ namespace Lucene.Net.Util
 
                 fromIndex = Random().Next(sz + 80);
                 toIndex = fromIndex + Random().Next((sz >> 1) + 1);
-                aa = (BitArray)a.Clone();
+                aa = new BitArray(a);
                 if (toIndex > aa.Length)
                 {
                     aa.Length = toIndex;

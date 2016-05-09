@@ -702,25 +702,8 @@ namespace Lucene.Net.Index
             {
                 if (DoFail)
                 {
-                    var trace = new StackTrace();
-                    bool sawAppend = false;
-                    bool sawFlush = false;
-                    foreach (var frame in trace.GetFrames())
-                    {
-                        var method = frame.GetMethod();
-                        if (sawAppend && sawFlush)
-                        {
-                            break;
-                        }
-                        if (typeof(FreqProxTermsWriterPerField).Name.Equals(method.DeclaringType.Name) && "Flush".Equals(method.Name))
-                        {
-                            sawAppend = true;
-                        }
-                        if ("Flush".Equals(method.Name))
-                        {
-                            sawFlush = true;
-                        }
-                    }
+                    bool sawAppend = StackTraceHelper.DoesStackTraceContainMethod(typeof(FreqProxTermsWriterPerField).Name, "Flush");
+                    bool sawFlush = StackTraceHelper.DoesStackTraceContainMethod("Flush");
 
                     if (sawAppend && sawFlush && Count++ >= 30)
                     {
@@ -1059,9 +1042,9 @@ namespace Lucene.Net.Index
                 if (DoFail)
                 {
                     bool foundMethod =
-                        StackTraceHelper.DoesStackTraceContainsNamespaceAndMethod(typeof(MockDirectoryWrapper).Name, "Sync");
+                        StackTraceHelper.DoesStackTraceContainMethod(typeof(MockDirectoryWrapper).Name, "Sync");
 
-                    if(DoFail && foundMethod)
+                    if (DoFail && foundMethod)
                     {
                         DidFail = true;
                         if (VERBOSE)
@@ -1137,31 +1120,9 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                var trace = new StackTrace();
-                bool isCommit = false;
-                bool isDelete = false;
-                bool isInGlobalFieldMap = false;
-                foreach (var frame in trace.GetFrames())
-                {
-                    var method = frame.GetMethod();
-                    if (isCommit && isDelete && isInGlobalFieldMap)
-                    {
-                        break;
-                    }
-
-                    if (typeof(SegmentInfos).Name.Equals(method.DeclaringType.Name) && Stage.Equals(method.Name))
-                    {
-                        isCommit = true;
-                    }
-                    if (typeof(MockDirectoryWrapper).Name.Equals(method.DeclaringType.Name) && "DeleteFile".Equals(method.Name))
-                    {
-                        isDelete = true;
-                    }
-                    if (typeof(SegmentInfos).Name.Equals(method.DeclaringType.Name) && "WriteGlobalFieldMap".Equals(method.Name))
-                    {
-                        isInGlobalFieldMap = true;
-                    }
-                }
+                bool isCommit = StackTraceHelper.DoesStackTraceContainMethod(typeof(SegmentInfos).Name, Stage);
+                bool isDelete = StackTraceHelper.DoesStackTraceContainMethod(typeof(MockDirectoryWrapper).Name, "DeleteFile");
+                bool isInGlobalFieldMap = StackTraceHelper.DoesStackTraceContainMethod(typeof(SegmentInfos).Name, "WriteGlobalFieldMap");
 
                 if (isInGlobalFieldMap && DontFailDuringGlobalFieldMap)
                 {
@@ -1678,17 +1639,7 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                var trace = new StackTrace();
-                bool fail = false;
-                foreach (var frame in trace.GetFrames())
-                {
-                    var method = frame.GetMethod();
-                    if (typeof(TermVectorsConsumer).Name.Equals(method.DeclaringType.Name) && Stage.Equals(method.Name))
-                    {
-                        fail = true;
-                        break;
-                    }
-                }
+                bool fail = StackTraceHelper.DoesStackTraceContainMethod(typeof(TermVectorsConsumer).Name, Stage);
 
                 if (fail)
                 {
@@ -1859,18 +1810,13 @@ namespace Lucene.Net.Index
 
             public override IndexInput OpenInput(string name, IOContext context)
             {
-                if (DoFail && name.StartsWith("segments_"))
+                if (DoFail
+                    && name.StartsWith("segments_")
+                    && StackTraceHelper.DoesStackTraceContainMethod("Read"))
                 {
-                    var trace = new StackTrace();
-                    foreach (var frame in trace.GetFrames())
-                    {
-                        var method = frame.GetMethod();
-                        if ("Read".Equals(method.Name))
-                        {
-                            throw new System.NotSupportedException("expected UOE");
-                        }
-                    }
+                    throw new NotSupportedException("expected UOE");
                 }
+
                 return base.OpenInput(name, context);
             }
         }
@@ -2372,31 +2318,18 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                var trace = new StackTrace();
                 if (ShouldFail.Get() == false)
                 {
                     return;
                 }
 
-                bool sawSeal = false;
-                bool sawWrite = false;
-                foreach (var frame in trace.GetFrames())
-                {
-                    var method = frame.GetMethod();
-                    if ("SealFlushedSegment".Equals(method.Name))
-                    {
-                        sawSeal = true;
-                        break;
-                    }
-                    if ("WriteLiveDocs".Equals(method.Name) || "WriteFieldUpdates".Equals(method.Name))
-                    {
-                        sawWrite = true;
-                    }
-                }
+                bool sawSeal = StackTraceHelper.DoesStackTraceContainMethod("SealFlushedSegment");
+                bool sawWrite = StackTraceHelper.DoesStackTraceContainMethod("WriteLiveDocs")
+                        || StackTraceHelper.DoesStackTraceContainMethod("WriteFieldUpdates");
 
                 // Don't throw exc if we are "flushing", else
                 // the segment is aborted and docs are lost:
-                if (sawWrite && sawSeal == false && Random().Next(3) == 2)
+                if (sawWrite && !sawSeal && Random().Next(3) == 2)
                 {
                     // Only sometimes throw the exc, so we get
                     // it sometimes on creating the file, on
@@ -2583,17 +2516,7 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                bool maybeFail = false;
-                var trace = new StackTrace();
-                foreach (var frame in trace.GetFrames())
-                {
-                    var method = frame.GetMethod();
-                    if ("RollbackInternal".Equals(method.Name))
-                    {
-                        maybeFail = true;
-                        break;
-                    }
-                }
+                bool maybeFail = StackTraceHelper.DoesStackTraceContainMethod("RollbackInternal");
 
                 if (maybeFail && Random().Next(10) == 0)
                 {
