@@ -69,8 +69,8 @@ namespace Lucene.Net.Index
             {
                 if (DoFail && TestThread() && Random().NextBoolean())
                 {
-                    bool isDoFlush = Util.StackTraceHelper.DoesStackTraceContainsMethod("Flush");
-                    bool isClose = Util.StackTraceHelper.DoesStackTraceContainsMethod("Close");    
+                    bool isDoFlush = Util.StackTraceHelper.DoesStackTraceContainMethod("Flush");
+                    bool isClose = Util.StackTraceHelper.DoesStackTraceContainMethod("Close");    
 
                     if (isDoFlush && !isClose )
                     {

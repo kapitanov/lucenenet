@@ -954,8 +954,8 @@ namespace Lucene.Net.Index
                 if (sawMaybe && !failed)
                 {
                     bool seen = 
-                        StackTraceHelper.DoesStackTraceContainsMethod("ApplyDeletesAndUpdates") ||
-                        StackTraceHelper.DoesStackTraceContainsMethod("SlowFileExists");                 
+                        StackTraceHelper.DoesStackTraceContainMethod("ApplyDeletesAndUpdates") ||
+                        StackTraceHelper.DoesStackTraceContainMethod("SlowFileExists");                 
 
                     if (!seen)
                     {
@@ -971,7 +971,7 @@ namespace Lucene.Net.Index
                 }
                 if (!failed)
                 {
-                    if (StackTraceHelper.DoesStackTraceContainsMethod("ApplyDeletesAndUpdates"))
+                    if (StackTraceHelper.DoesStackTraceContainMethod("ApplyDeletesAndUpdates"))
                     {
                         if (VERBOSE)
                         {

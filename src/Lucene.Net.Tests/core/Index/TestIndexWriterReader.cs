@@ -10,6 +10,8 @@ namespace Lucene.Net.Index
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
     using NUnit.Framework;
+    using System.Collections.Concurrent;
+    using Util;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Codec = Lucene.Net.Codecs.Codec;
@@ -46,7 +48,7 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
     using TopDocs = Lucene.Net.Search.TopDocs;
-    
+
     [TestFixture]
     public class TestIndexWriterReader : LuceneTestCase
     {
@@ -869,7 +871,7 @@ namespace Lucene.Net.Index
             const float SECONDS = 0.5f;
 
             long endTime = (long)(Environment.TickCount + 1000.0 * SECONDS);
-            IList<Exception> excs = new SynchronizedCollection<Exception>();
+            IList<Exception> excs = new SynchronizedList<Exception>();
 
             // Only one thread can addIndexes at a time, because
             // IndexWriter acquires a write lock in each directory:
@@ -984,7 +986,7 @@ namespace Lucene.Net.Index
             const float SECONDS = 0.5f;
 
             long endTime = (long)(Environment.TickCount + 1000.0 * SECONDS);
-            IList<Exception> excs = new SynchronizedCollection<Exception>();
+            ConcurrentQueue<Exception> excs = new ConcurrentQueue<Exception>();
 
             var threads = new ThreadClass[NumThreads];
             for (int i = 0; i < NumThreads; i++)
@@ -1036,9 +1038,9 @@ namespace Lucene.Net.Index
             private IndexWriter Writer;
             private DirectoryReader r;
             private long EndTime;
-            private IList<Exception> Excs;
+            private ConcurrentQueue<Exception> Excs;
 
-            public ThreadAnonymousInnerClassHelper2(IndexWriter writer, DirectoryReader r, long endTime, IList<Exception> excs)
+            public ThreadAnonymousInnerClassHelper2(IndexWriter writer, DirectoryReader r, long endTime, ConcurrentQueue<Exception> excs)
             {
                 this.Writer = writer;
                 this.r = r;
@@ -1070,7 +1072,7 @@ namespace Lucene.Net.Index
                     }
                     catch (Exception t)
                     {
-                        Excs.Add(t);
+                        Excs.Enqueue(t);
                         throw new Exception(t.Message, t);
                     }
                 } while (Environment.TickCount < EndTime);
@@ -1365,23 +1367,15 @@ namespace Lucene.Net.Index
 
             public override void Eval(MockDirectoryWrapper dir)
             {
-                var trace = new StackTrace();
-                if (ShouldFail.Get())
+                if (ShouldFail.Get() && StackTraceHelper.DoesStackTraceContainMethod("GetReadOnlyClone"))
                 {
-                    foreach (var frame in trace.GetFrames())
+                    if (VERBOSE)
                     {
-                        var method = frame.GetMethod();
-                        if ("GetReadOnlyClone".Equals(method.Name))
-                        {
-                            if (VERBOSE)
-                            {
-                                Console.WriteLine("TEST: now fail; exc:");
-                                Console.WriteLine((new Exception()).StackTrace);
-                            }
-                            ShouldFail.Set(false);
-                            throw new FakeIOException();
-                        }
+                        Console.WriteLine("TEST: now fail; exc:");
+                        Console.WriteLine((new Exception()).StackTrace);
                     }
+                    ShouldFail.Set(false);
+                    throw new FakeIOException();
                 }
             }
         }

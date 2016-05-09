@@ -103,10 +103,10 @@ namespace Lucene.Net.Index
                 writer.AddDocument(doc);
                 Assert.Fail("Failed to fail.");
             }
-            catch (BadNews badNews)
+            catch (BadNews)
             {
                 infoPrintStream.Flush();
-                string infoStream = Encoding.UTF8.GetString(infoBytes.GetBuffer());
+                string infoStream = Encoding.UTF8.GetString(infoBytes.ToArray());
                 Assert.IsTrue(infoStream.Contains("distinctiveFieldName"));
             }
 
