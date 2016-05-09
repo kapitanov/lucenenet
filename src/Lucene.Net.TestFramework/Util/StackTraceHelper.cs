@@ -1,15 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+
+#if !FEATURE_STACKTRACE
+using System.Diagnostics;
+#endif
 
 namespace Lucene.Net.Util
 {
     public static class StackTraceHelper
     {
-        private static Regex s_fullyQualifiedMethodRegex = new Regex(@"\s*at (?<fullyQualifiedMethod>.*)\(");
-        private static Regex s_namePartsRegex = new Regex(@"((?<part>[\w`]+)\.|(?<part>[\w`]+))");
+        private static Regex s_methodNameRegex = new Regex(@"at\s+(?<fullyQualifiedMethod>.*\.(?<method>[\w`]+))\(");
 
         /// <summary>
         /// Matches the StackTrace for a method name.
@@ -25,7 +27,7 @@ namespace Lucene.Net.Util
             {
                 if (frame.GetMethod().Name.equals(methodName))
                 {
-                    return true;                  
+                    return true;
                 }
             }
             return false;
@@ -62,28 +64,16 @@ namespace Lucene.Net.Util
                 .Split(new string[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                 .Select(line =>
                 {
-                    var match = s_fullyQualifiedMethodRegex.Match(line);
+                    var match = s_methodNameRegex.Match(line);
 
                     if (!match.Success)
                     {
                         return null;
                     }
 
-                    var fullyQualifiedMethod = match.Groups["fullyQualifiedMethod"].Value;
-
-                    if (includeFullyQualifiedName)
-                    {
-                        return fullyQualifiedMethod;
-                    }
-
-                    var allParts = s_namePartsRegex.Matches(fullyQualifiedMethod)
-                            .Cast<Match>()
-                            .Where(x => x.Success)
-                            .Select(x => x.Groups["part"].Value);
-
-                    // Last part will be the method name because it is the 
-                    // last . in the fully qualified name.
-                    return allParts.Count() > 0 ? allParts.Last() : null;
+                    return includeFullyQualifiedName
+                        ? match.Groups["fullyQualifiedMethod"].Value
+                        : match.Groups["method"].Value;
                 })
                 .Where(line => !string.IsNullOrEmpty(line));
 
