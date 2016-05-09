@@ -49,10 +49,9 @@ namespace Lucene.Net.Util
             // it is unavailable. So we go to the next level on each and check each referenced
             // assembly.
 
-
 #if NETCORE
             var allLibraries = PlatformServices.Default.LibraryManager.GetLibraries();
-            var loadedAssemblies = allLibraries.SelectMany(lib => lib.Assemblies.Select(x => Assembly.Load(x))).ToArray();
+            var loadedAssemblies = allLibraries.SelectMany(lib => lib.Assemblies.Select(x => Assembly.Load(x)));
 #else
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
@@ -81,33 +80,23 @@ namespace Lucene.Net.Util
                 var referencedAssemblies =
 #if NETCORE
                     PlatformServices.Default.LibraryManager
-                    .GetReferencingLibraries(loadedAssembly.FullName)
-                    .SelectMany(library => library.Assemblies.Select(x =>
-                    {
-                        try
-                        {
-                            return Assembly.Load(x);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    }));
+                        .GetReferencingLibraries(loadedAssembly.FullName)
+                        .SelectMany(library => library.Assemblies);
 #else
-                    loadedAssembly.GetReferencedAssemblies().Select(x =>
-                    {
-                        try
-                        {
-                            return Assembly.Load(x);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    });
+                    loadedAssembly.GetReferencedAssemblies();
 #endif
-                foreach (var assembly in referencedAssemblies.Where(x => x != null))
+                foreach (var assemblyName in referencedAssemblies)
                 {
+                    Assembly assembly;
+                    try
+                    {
+                        assembly = Assembly.Load(assemblyName);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
                     foreach (var type in assembly.GetTypes())
                     {
                         try
