@@ -893,19 +893,10 @@ namespace Lucene.Net.Util
 
         public object Clone()
         {
-            try
-            {
-                //OpenBitSet obs = (OpenBitSet)base.Clone();
-                //obs.bits = (long[])obs.bits.Clone(); // hopefully an array clone is as fast(er) than arraycopy
-                OpenBitSet obs = new OpenBitSet((long[])bits.Clone(), Wlen);
-                return obs;
-            }
-            catch (Exception e)
-            {
-                //TODO: conniey
-                //throw new SystemException(e.Message, e);
-                return null;
-            }
+            //OpenBitSet obs = (OpenBitSet)base.Clone();
+            //obs.bits = (long[])obs.bits.Clone(); // hopefully an array clone is as fast(er) than arraycopy
+            OpenBitSet obs = new OpenBitSet((long[])bits.Clone(), Wlen);
+            return obs;
         }
 
         /// <summary>
