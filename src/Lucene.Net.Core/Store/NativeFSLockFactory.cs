@@ -161,9 +161,7 @@ namespace Lucene.Net.Store
                 var success = false;
                 try
                 {
-                    //TODO: conniey
-                    //Channel = new FileStream(Path.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
-                    //Channel.Lock(0, Channel.Length);
+                    Channel = new FileStream(Path.FullName, FileMode.Create, FileAccess.Write, FileShare.None);
 
                     success = true;
                 }
@@ -205,9 +203,6 @@ namespace Lucene.Net.Store
                 {
                     try
                     {
-                        //TODO: conniey
-                        //Channel.Unlock(0, Channel.Length);
-
                         NativeFSLock _;
                         _creatingInstance._locks.TryRemove(Path.FullName, out _);
                     }
