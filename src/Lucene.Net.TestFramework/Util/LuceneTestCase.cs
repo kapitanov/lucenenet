@@ -34,6 +34,7 @@ using System.Reflection;
 namespace Lucene.Net.Util
 {
     using Lucene.Net.TestFramework.Support;
+    using Support.Configuration;
     using System.IO;
     using System.Reflection;
     using AlcoholicMergePolicy = Lucene.Net.Index.AlcoholicMergePolicy;
@@ -321,23 +322,23 @@ namespace Lucene.Net.Util
 
         /// <summary>
         /// Gets the codec to run tests with. </summary>
-        public static string TEST_CODEC = SystemProperties.GetProperty("tests.codec", "random");
+        public static string TEST_CODEC = Configuration.GetAppSetting("tests.codec", "random");
 
         /// <summary>
         /// Gets the postingsFormat to run tests with. </summary>
-        public static string TEST_POSTINGSFORMAT = SystemProperties.GetProperty("tests.postingsformat", "random");
+        public static string TEST_POSTINGSFORMAT = Configuration.GetAppSetting("tests.postingsformat", "random");
 
         /// <summary>
         /// Gets the docValuesFormat to run tests with </summary>
-        public static string TEST_DOCVALUESFORMAT = SystemProperties.GetProperty("tests.docvaluesformat", "random");
+        public static string TEST_DOCVALUESFORMAT = Configuration.GetAppSetting("tests.docvaluesformat", "random");
 
         /// <summary>
         /// Gets the directory to run tests with </summary>
-        public static string TEST_DIRECTORY = SystemProperties.GetProperty("tests.directory", "random");
+        public static string TEST_DIRECTORY = Configuration.GetAppSetting("tests.directory", "random");
 
         /// <summary>
         /// the line file used by LineFileDocs </summary>
-        public static string TEST_LINE_DOCS_FILE = SystemProperties.GetProperty("tests.linedocsfile", DEFAULT_LINE_DOCS_FILE);
+        public static string TEST_LINE_DOCS_FILE = Configuration.GetAppSetting("tests.linedocsfile", DEFAULT_LINE_DOCS_FILE);
 
         /// <summary>
         /// Whether or not <seealso cref="Nightly"/> tests should run. </summary>

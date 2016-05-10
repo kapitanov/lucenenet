@@ -42,11 +42,9 @@
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
     <RootNamespace>Lucene.Net</RootNamespace>
   </PropertyGroup>
-
   <PropertyGroup>
     <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
   </PropertyGroup>
-  
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
@@ -630,6 +628,7 @@
     <Compile Include="Support\Configuration\IConfigurationParser.cs" />
     <Compile Include="Support\Configuration\KeyValueParser.cs" />
     <Compile Include="Support\Configuration\SettingsFileConfigurationProvider.cs" />
+    <Compile Include="Support\Configuration\Configuration.cs" />
     <Compile Include="Support\ErrorHandling.cs" />
     <Compile Include="Support\FileStreamExtensions.cs" />
     <Compile Include="Support\HashCodeMerge.cs" />
@@ -647,7 +646,6 @@
     <Compile Include="Support\PriorityQueue.cs" />
     <Compile Include="Support\ReentrantLock.cs" />
     <Compile Include="Support\SetExtensions.cs" />
-    <Compile Include="Support\StreamUtils.cs" />
     <Compile Include="Support\StringBuilderExtensions.cs" />
     <Compile Include="Support\StringCharSequenceWrapper.cs" />
     <Compile Include="Support\StringSupport.cs" />
@@ -668,18 +666,15 @@
     <Compile Include="Support\Compatibility\WrappedHashSet.cs" />
     <Compile Include="Support\CRC32.cs" />
     <Compile Include="Support\Cryptography.cs" />
-    <Compile Include="Support\Deflater.cs" />
     <Compile Include="Support\Double.cs" />
     <Compile Include="Support\EquatableList.cs" />
     <Compile Include="Support\FileSupport.cs" />
     <Compile Include="Support\GeneralKeyedCollection.cs" />
     <Compile Include="Support\HashMap.cs" />
     <Compile Include="Support\IChecksum.cs" />
-    <Compile Include="Support\Inflater.cs" />
     <Compile Include="Support\IThreadRunnable.cs" />
     <Compile Include="Support\Number.cs" />
     <Compile Include="Support\OS.cs" />
-    <Compile Include="Support\SharpZipLib.cs" />
     <Compile Include="Support\Single.cs" />
     <Compile Include="Support\TextSupport.cs" />
     <Compile Include="Support\ThreadClass.cs" />

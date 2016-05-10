@@ -50,7 +50,6 @@
     <None Include="Lucene.Net.TestFramework.Portable.project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
-  
   <ItemGroup>
     <Compile Include="Analysis\BaseTokenStreamTestCase.cs" />
     <Compile Include="Analysis\CannedBinaryTokenStream.cs" />
@@ -179,7 +178,6 @@
     <Compile Include="Store\TestHelper.cs" />
     <Compile Include="Support\FloatUtils.cs" />
     <Compile Include="Support\RandomizedTest.cs" />
-    <Compile Include="Support\SystemProperties.cs" />
     <Compile Include="Util\automaton\AutomatonTestUtil.cs" />
     <Compile Include="Util\BaseDocIdSetTestCase.cs" />
     <Compile Include="Util\FailOnNonBulkMergesInfoStream.cs" />

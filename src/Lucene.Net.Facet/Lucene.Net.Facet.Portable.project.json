@@ -4,6 +4,7 @@
     "dnxcore50.app": {}
   },
   "dependencies": {
+    "Newtonsoft.Json": "8.0.3",
     "Microsoft.NETCore": "5.0.1-beta-23516",
     "Microsoft.NETCore.Portable.Compatibility": "1.0.1-beta-23516"
   },

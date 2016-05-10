@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Lucene.Net.Portable.Support.Configuration
+namespace Lucene.Net.Support.Configuration
 {
 
     internal enum ConfigurationAction

@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using Lucene.Net.Support.Configuration;
+using NUnit.Framework;
 
 
 namespace Lucene.Net.TestFramework.Support
@@ -7,7 +8,7 @@ namespace Lucene.Net.TestFramework.Support
     {
         public static bool SystemPropertyAsBoolean(string key, bool defaultValue)
         {
-            return SystemProperties.GetProperty<bool>(key, defaultValue,
+            return Configuration.GetProperty<bool>(key, defaultValue,
                 (str) =>
                 {
                     bool value;
@@ -17,7 +18,7 @@ namespace Lucene.Net.TestFramework.Support
 
         public static int SystemPropertyAsInt(string key, int defaultValue)
         {
-            return SystemProperties.GetProperty<int>(key, defaultValue,
+            return Configuration.GetProperty<int>(key, defaultValue,
               (str) =>
               {
                   int value;

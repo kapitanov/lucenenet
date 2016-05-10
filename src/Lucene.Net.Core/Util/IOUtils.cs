@@ -289,9 +289,7 @@ namespace Lucene.Net.Util
         /// <returns> a wrapping reader </returns>
         public static TextReader GetDecodingReader(Stream stream, Encoding charSet)
         {
-            //TODO: conniey
-            //return new StreamReader(new BufferedStream(stream), charSet);
-            throw new NotImplementedException("");
+            return new StreamReader(stream, charSet);
         }
 
         /// <summary>

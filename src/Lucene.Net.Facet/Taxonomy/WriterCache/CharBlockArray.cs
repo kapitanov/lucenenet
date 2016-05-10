@@ -4,6 +4,9 @@ using System.IO;
 using System.Text;
 using Lucene.Net.Store;
 using Lucene.Net.Support;
+#if NETCORE
+using Newtonsoft.Json;
+#endif
 
 namespace Lucene.Net.Facet.Taxonomy.WriterCache
 {
@@ -30,12 +33,13 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
     /// 
     /// @lucene.experimental
     /// </summary>
-#if !NETCORE
+#if NETCORE
+    [JsonConverter(typeof(CharBlockArrayConverter))]
+#else
     [Serializable]
-#endif 
+#endif
     public class CharBlockArray : ICharSequence
     {
-
         private const long serialVersionUID = 1L;
 
         private const int DefaultBlockSize = 32 * 1024; // 32 KB default size
@@ -205,9 +209,6 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
             return new StringCharSequenceWrapper(sb.ToString());
         }
 
-
-
-
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -220,17 +221,29 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
 
         internal virtual void Flush(OutputStreamDataOutput @out)
         {
-            
+            byte[] bytes = null;
+#if NETCORE
+            var json = JsonConvert.SerializeObject(this, new CharBlockArrayConverter());
+            bytes = Encoding.UTF8.GetBytes(json);
+#else
             using (var ms = StreamUtils.SerializeToStream(this))
             {
-                var bytes = ms.ToArray();
-                @out.WriteBytes(bytes, 0, bytes.Length);
+                bytes = ms.ToArray();
             }
+#endif
+            @out.WriteBytes(bytes, 0, bytes.Length);
         }
 
         public static CharBlockArray Open(BinaryReader @in)
         {
+#if NETCORE
+            var json = Encoding.UTF8.GetString(@in.ReadBytes((int)@in.BaseStream.Length));
+            var deserialized = JsonConvert.DeserializeObject<CharBlockArray>(json);
+
+            return deserialized;
+#else
             return StreamUtils.DeserializeFromStream(@in) as CharBlockArray;
+#endif
         }
 
     }

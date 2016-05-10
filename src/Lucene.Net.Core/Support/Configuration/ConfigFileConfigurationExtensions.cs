@@ -8,7 +8,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 
-namespace Lucene.Net.Portable.Support.Configuration
+namespace Lucene.Net.Support.Configuration
 {
     public static class ConfigFileConfigurationExtensions
     {

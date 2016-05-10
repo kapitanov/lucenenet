@@ -51,13 +51,10 @@ namespace Lucene.Net.Store
                 Environment.FailFast("1");
             }
 
-            //TODO: conniey
-            IPAddress verifierIp = new IPAddress(123441);
-            IPEndPoint addr = new IPEndPoint(verifierIp, 2131);
-            //IPHostEntry verifierHost = Dns.GetHostEntry(args[arg++]);
-            //int verifierPort = Convert.ToInt32(args[arg++]);
-            //IPAddress verifierIp = verifierHost.AddressList[0];
-            //IPEndPoint addr = new IPEndPoint(verifierIp, verifierPort);
+            IPHostEntry verifierHost = Dns.GetHostEntryAsync(args[arg++]).Result;
+            int verifierPort = Convert.ToInt32(args[arg++]);
+            IPAddress verifierIp = verifierHost.AddressList[0];
+            IPEndPoint addr = new IPEndPoint(verifierIp, verifierPort);
 
             string lockFactoryClassName = args[arg++];
             string lockDirName = args[arg++];
@@ -99,59 +96,58 @@ namespace Lucene.Net.Store
                 ((FSLockFactory)lockFactory).LockDir = lockDir;
             }
 
-            //TODO: conniey
-            //Console.WriteLine("Connecting to server " + addr + " and registering as client " + myID + "...");
-            //using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
-            //{
-            //    using (Stream @out = new NetworkStream(socket, FileAccess.ReadWrite), @in = new NetworkStream(socket, FileAccess.Read))
-            //    {
-            //        socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
-            //        socket.Connect(verifierIp, 500);
+            Console.WriteLine("Connecting to server " + addr + " and registering as client " + myID + "...");
+            using (Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp))
+            {
+                using (Stream @out = new NetworkStream(socket), @in = new NetworkStream(socket))
+                {
+                    socket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.ReuseAddress, 1);
+                    socket.Connect(verifierIp, 500);
 
-            //        BinaryReader intReader = new BinaryReader(@in);
-            //        BinaryWriter intWriter = new BinaryWriter(@out);
+                    BinaryReader intReader = new BinaryReader(@in);
+                    BinaryWriter intWriter = new BinaryWriter(@out);
 
-            //        intWriter.Write(myID);
-            //        @out.Flush();
+                    intWriter.Write(myID);
+                    @out.Flush();
 
-            //        lockFactory.LockPrefix = "test";
-            //        LockFactory verifyLF = new VerifyingLockFactory(lockFactory, @in, @out);
-            //        Lock l = verifyLF.MakeLock("test.lock");
-            //        Random rnd = new Random();
+                    lockFactory.LockPrefix = "test";
+                    LockFactory verifyLF = new VerifyingLockFactory(lockFactory, @in, @out);
+                    Lock l = verifyLF.MakeLock("test.lock");
+                    Random rnd = new Random();
 
-            //        // wait for starting gun
-            //        if (intReader.ReadInt32() != 43)
-            //        {
-            //            throw new System.IO.IOException("Protocol violation");
-            //        }
+                    // wait for starting gun
+                    if (intReader.ReadInt32() != 43)
+                    {
+                        throw new System.IO.IOException("Protocol violation");
+                    }
 
-            //        for (int i = 0; i < count; i++)
-            //        {
-            //            bool obtained = false;
+                    for (int i = 0; i < count; i++)
+                    {
+                        bool obtained = false;
 
-            //            try
-            //            {
-            //                obtained = l.Obtain(rnd.Next(100) + 10);
-            //            }
-            //            catch (LockObtainFailedException e)
-            //            {
-            //            }
+                        try
+                        {
+                            obtained = l.Obtain(rnd.Next(100) + 10);
+                        }
+                        catch (LockObtainFailedException e)
+                        {
+                        }
 
-            //            if (obtained)
-            //            {
-            //                Thread.Sleep(sleepTimeMS);
-            //                l.Release();
-            //            }
+                        if (obtained)
+                        {
+                            Thread.Sleep(sleepTimeMS);
+                            l.Release();
+                        }
 
-            //            if (i % 500 == 0)
-            //            {
-            //                Console.WriteLine((i * 100.0 / count) + "% done.");
-            //            }
+                        if (i % 500 == 0)
+                        {
+                            Console.WriteLine((i * 100.0 / count) + "% done.");
+                        }
 
-            //            Thread.Sleep(sleepTimeMS);
-            //        }
-            //    }
-            //}
+                        Thread.Sleep(sleepTimeMS);
+                    }
+                }
+            }
 
             Console.WriteLine("Finished " + count + " tries.");
         }

@@ -27,7 +27,6 @@ using Lucene.Net.Support;
 
 #if NETCORE
 using System.IO;
-using Lucene.Net.Portable.Support.Configuration;
 using Lucene.Net.Support.Configuration;
 using Microsoft.Extensions.Configuration;
 #else

@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
-namespace Lucene.Net.Portable.Support.Configuration
+namespace Lucene.Net.Support.Configuration
 {
     public class ConfigFileConfigurationProvider : ConfigurationProvider
     {

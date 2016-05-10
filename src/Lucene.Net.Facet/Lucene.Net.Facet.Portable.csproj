@@ -89,6 +89,7 @@
     <Compile Include="Taxonomy\TaxonomyWriter.cs" />
     <Compile Include="Taxonomy\WriterCache\CategoryPathUtils.cs" />
     <Compile Include="Taxonomy\WriterCache\CharBlockArray.cs" />
+    <Compile Include="Taxonomy\WriterCache\CharBlockArrayConverter.cs" />
     <Compile Include="Taxonomy\WriterCache\Cl2oTaxonomyWriterCache.cs" />
     <Compile Include="Taxonomy\WriterCache\CollisionMap.cs" />
     <Compile Include="Taxonomy\WriterCache\CompactLabelToOrdinal.cs" />

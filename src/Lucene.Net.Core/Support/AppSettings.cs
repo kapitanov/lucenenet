@@ -83,9 +83,7 @@ namespace Lucene.Net.Support
                 return (int)settings[key];
             }
 
-            //TODO: conniey
-            var theValue = "";
-            //System.String theValue = ConfigurationManager.AppSettings.Get(key);
+            var theValue = Configuration.Configuration.GetAppSetting(key);
 
             if (theValue == null)
             {
@@ -109,9 +107,7 @@ namespace Lucene.Net.Support
                 return (long)settings[key];
             }
 
-            //TODO: conniey
-            //System.String theValue = ConfigurationManager.AppSettings.Get(key);
-            var theValue = "";
+            var theValue = Configuration.Configuration.GetAppSetting(key);
 
             if (theValue == null)
             {
@@ -135,9 +131,7 @@ namespace Lucene.Net.Support
                 return (System.String)settings[key];
             }
 
-            //TODO: conniey
-            //System.String theValue = ConfigurationManager.AppSettings.Get(key);
-            var theValue = "";
+            System.String theValue = Configuration.Configuration.GetAppSetting(key);
 
             if (theValue == null)
             {
@@ -154,9 +148,7 @@ namespace Lucene.Net.Support
                 return (bool)settings[key];
             }
 
-            //TODO: conniey
-            //System.String theValue = ConfigurationManager.AppSettings.Get(key);
-            var theValue = "";
+            var theValue = Configuration.Configuration.GetAppSetting(key);
 
             if (theValue == null)
             {

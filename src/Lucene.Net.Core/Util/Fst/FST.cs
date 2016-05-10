@@ -562,53 +562,50 @@ namespace Lucene.Net.Util.Fst
         /// </summary>
         public void Save(FileInfo file)
         {
-            //TODO: conniey
-            //bool success = false;
-            //var bs = new BufferedStream(file.OpenWrite());
-            //try
-            //{
-            //    Save(new OutputStreamDataOutput(bs));
-            //    success = true;
-            //}
-            //finally
-            //{
-            //    if (success)
-            //    {
-            //        IOUtils.Close(bs);
-            //    }
-            //    else
-            //    {
-            //        IOUtils.CloseWhileHandlingException(bs);
-            //    }
-            //}
+            bool success = false;
+            var bs = file.OpenWrite();
+            try
+            {
+                Save(new OutputStreamDataOutput(bs));
+                success = true;
+            }
+            finally
+            {
+                if (success)
+                {
+                    IOUtils.Close(bs);
+                }
+                else
+                {
+                    IOUtils.CloseWhileHandlingException(bs);
+                }
+            }
         }
 
         /// <summary>
         /// Reads an automaton from a file.
         /// </summary>
-        public static FST<T> Read<T>(FileInfo file, Outputs<T> outputs)
+        public static FST<T> Read(FileInfo file, Outputs<T> outputs)
         {
-            //TODO: conniey
-            throw new NotImplementedException("");
-            //var bs = new BufferedStream(file.OpenRead());
-            //bool success = false;
-            //try
-            //{
-            //    FST<T> fst = new FST<T>(new InputStreamDataInput(bs), outputs);
-            //    success = true;
-            //    return fst;
-            //}
-            //finally
-            //{
-            //    if (success)
-            //    {
-            //        IOUtils.Close(bs);
-            //    }
-            //    else
-            //    {
-            //        IOUtils.CloseWhileHandlingException(bs);
-            //    }
-            //}
+            var bs = file.OpenRead();
+            bool success = false;
+            try
+            {
+                FST<T> fst = new FST<T>(new InputStreamDataInput(bs), outputs);
+                success = true;
+                return fst;
+            }
+            finally
+            {
+                if (success)
+                {
+                    IOUtils.Close(bs);
+                }
+                else
+                {
+                    IOUtils.CloseWhileHandlingException(bs);
+                }
+            }
         }
 
         private void WriteLabel(DataOutput @out, int v)
