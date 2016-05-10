@@ -290,17 +290,20 @@ namespace Lucene.Net.Index
 
                     while (Paused)
                     {
-                        //TODO: conniey
-                        //try
-                        //{
-                        //    // In theory we could wait() indefinitely, but we
-                        //    // do 1000 msec, defensively
-                        //    Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
-                        //}
-                        //catch (ThreadInterruptedException ie)
-                        //{
-                        //    throw new Exception(ie.Message, ie);
-                        //}
+#if !NETCORE
+                        try
+                        {
+#endif
+                            // In theory we could wait() indefinitely, but we
+                            // do 1000 msec, defensively
+                            Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
+#if !NETCORE
+                        }
+                        catch (ThreadInterruptedException ie)
+                        {
+                            throw new Exception(ie.Message, ie);
+                        }
+#endif
                         if (Aborted_Renamed)
                         {
                             throw new MergeAbortedException("merge is aborted: " + SegString(dir));

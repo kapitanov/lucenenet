@@ -336,50 +336,55 @@ namespace Lucene.Net.Index
         /// Wait for any running merge threads to finish. this call is not interruptible as used by <seealso cref="#close()"/>. </summary>
         public virtual void Sync()
         {
-            //TODO: conniey
-            //bool interrupted = false;
-            //try
-            //{
-            //    while (true)
-            //    {
-            //        MergeThread toSync = null;
-            //        lock (this)
-            //        {
-            //            foreach (MergeThread t in MergeThreads)
-            //            {
-            //                if (t.IsAlive)
-            //                {
-            //                    toSync = t;
-            //                    break;
-            //                }
-            //            }
-            //        }
-            //        if (toSync != null)
-            //        {
-            //            try
-            //            {
-            //                toSync.Join();
-            //            }
-            //            catch (ThreadInterruptedException ie)
-            //            {
-            //                // ignore this Exception, we will retry until all threads are dead
-            //                interrupted = true;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            break;
-            //        }
-            //    }
-            //}
-            //finally
-            //{
-            //    // finally, restore interrupt status:
-            //    if (interrupted)
-            //    {
-            //        Thread.CurrentThread.Interrupt();
-            //    }
-            //}
+            bool interrupted = false;
+            try
+            {
+                while (true)
+                {
+                    MergeThread toSync = null;
+                    lock (this)
+                    {
+                        foreach (MergeThread t in MergeThreads)
+                        {
+                            if (t.IsAlive)
+                            {
+                                toSync = t;
+                                break;
+                            }
+                        }
+                    }
+                    if (toSync != null)
+                    {
+#if !NETCORE
+                        try
+                        {
+#endif                            
+                            toSync.Join();
+#if !NETCORE
+                        }
+                        catch (ThreadInterruptedException ie)
+                        {
+                            // ignore this Exception, we will retry until all threads are dead
+                            interrupted = true;
+                        }
+#endif
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+#if !NETCORE
+                // finally, restore interrupt status:
+                if (interrupted)
+                {
+                    Thread.CurrentThread.Interrupt();
+                }
+#endif
+            }
         }
 
         /// <summary>
@@ -449,15 +454,18 @@ namespace Lucene.Net.Index
                             Message("    too many merges; stalling...");
                         }
 
-                        //TODO: conniey
-                        //try
-                        //{
-                        //    Monitor.Wait(this);
-                        //}
-                        //catch (ThreadInterruptedException ie)
-                        //{
-                        //    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-                        //}
+#if !NETCORE
+                        try
+                        {
+#endif
+                            Monitor.Wait(this);
+#if !NETCORE
+                        }
+                        catch (ThreadInterruptedException ie)
+                        {
+                            throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                        }
+#endif
                     }
 
                     if (Verbose())
@@ -710,21 +718,24 @@ namespace Lucene.Net.Index
         /// </summary>
         protected internal virtual void HandleMergeException(Exception exc)
         {
-            //TODO: conniey
-            //try
-            //{
-            //    // When an exception is hit during merge, IndexWriter
-            //    // removes any partial files and then allows another
-            //    // merge to run.  If whatever caused the error is not
-            //    // transient then the exception will keep happening,
-            //    // so, we sleep here to avoid saturating CPU in such
-            //    // cases:
-            //    Thread.Sleep(250);
-            //}
-            //catch (ThreadInterruptedException ie)
-            //{
-            //    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-            //}
+#if !NETCORE
+            try
+            {
+#endif
+                // When an exception is hit during merge, IndexWriter
+                // removes any partial files and then allows another
+                // merge to run.  If whatever caused the error is not
+                // transient then the exception will keep happening,
+                // so, we sleep here to avoid saturating CPU in such
+                // cases:
+                Thread.Sleep(250);
+#if !NETCORE
+            }
+            catch (ThreadInterruptedException ie)
+            {
+                throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+            }
+#endif
             throw new MergePolicy.MergeException(exc, Dir);
         }
 

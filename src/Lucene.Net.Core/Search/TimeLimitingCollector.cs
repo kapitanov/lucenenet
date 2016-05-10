@@ -312,14 +312,18 @@ namespace Lucene.Net.Search
                     // TODO: Use System.nanoTime() when Lucene moves to Java SE 5.
                     Counter.AddAndGet(resolution);
                     //TODO: conniey
-                    //try
-                    //{
-                    //    Thread.Sleep(TimeSpan.FromMilliseconds(Interlocked.Read(ref resolution)));
-                    //}
-                    //catch (ThreadInterruptedException ie)
-                    //{
-                    //    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-                    //}
+#if !NETCORE
+                    try
+                    {
+#endif
+                        Thread.Sleep(TimeSpan.FromMilliseconds(Interlocked.Read(ref resolution)));
+#if !NETCORE
+                    }
+                    catch (ThreadInterruptedException ie)
+                    {
+                        throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                    }
+#endif
                 }
             }
 
