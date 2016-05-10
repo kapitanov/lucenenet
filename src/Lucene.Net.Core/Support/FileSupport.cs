@@ -96,9 +96,14 @@ namespace Lucene.Net.Support
 
             if (OS.IsWindows)
             {
-                //TODO: conniey
-                //if (!FlushFileBuffers(fileStream.Handle))
-                //    throw new IOException();
+#if NETCORE
+                // Getting the SafeFileHandle property automatically flushes the
+                // stream: https://msdn.microsoft.com/en-us/library/system.io.filestream.safefilehandle(v=vs.110).aspx
+                var handle = fileStream.SafeFileHandle;
+#else
+                if (!FlushFileBuffers(fileStream.Handle))
+                    throw new IOException();
+#endif
             }
             //else if (OS.IsUnix)
             //{

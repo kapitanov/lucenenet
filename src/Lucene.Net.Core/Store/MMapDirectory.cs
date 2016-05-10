@@ -246,6 +246,7 @@ namespace Lucene.Net.Store
         public sealed class MMapIndexInput : ByteBufferIndexInput
         {
             internal readonly bool UseUnmapHack;
+            internal string mapName;
             internal MemoryMappedFile memoryMappedFile; // .NET port: this is equivalent to FileChannel.map
             internal MMapDirectory outerInstance;
 
@@ -347,8 +348,8 @@ namespace Lucene.Net.Store
 
             if (input.memoryMappedFile == null)
             {
-                //TODO: conniey
-                //input.memoryMappedFile = MemoryMappedFile.CreateFromFile(fc, null, length == 0 ? 100 : length, MemoryMappedFileAccess.Read, null, HandleInheritability.Inheritable, false);
+                input.mapName = Guid.NewGuid().ToString();
+                input.memoryMappedFile = MemoryMappedFile.CreateFromFile(fc, input.mapName, length == 0 ? 100 : length, MemoryMappedFileAccess.Read, HandleInheritability.Inheritable, false);
             }
 
             long bufferStart = 0L;
