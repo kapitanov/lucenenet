@@ -349,7 +349,11 @@ namespace Lucene.Net.Store
             if (input.memoryMappedFile == null)
             {
                 input.mapName = Guid.NewGuid().ToString();
+#if NETCORE
                 input.memoryMappedFile = MemoryMappedFile.CreateFromFile(fc, input.mapName, length == 0 ? 100 : length, MemoryMappedFileAccess.Read, HandleInheritability.Inheritable, false);
+#else
+                input.memoryMappedFile = MemoryMappedFile.CreateFromFile(fc, input.mapName, length == 0 ? 100 : length, MemoryMappedFileAccess.Read, null, HandleInheritability.Inheritable, false);
+#endif
             }
 
             long bufferStart = 0L;

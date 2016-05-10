@@ -4,7 +4,9 @@ using System.IO;
 using System.Text;
 using Lucene.Net.Store;
 using Lucene.Net.Support;
+#if NETCORE
 using Newtonsoft.Json;
+#endif
 
 namespace Lucene.Net.Facet.Taxonomy.WriterCache
 {

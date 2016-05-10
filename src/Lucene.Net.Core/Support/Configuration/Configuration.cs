@@ -8,6 +8,7 @@ namespace Lucene.Net.Support.Configuration
 {
     public static class Configuration
     {
+#if NETCORE
         private static IConfigurationRoot _configuration;
 
         static Configuration()
@@ -15,6 +16,7 @@ namespace Lucene.Net.Support.Configuration
             var builder = new ConfigurationBuilder().AddConfigFile("App.config", true, new KeyValueParser());
             _configuration = builder.Build();
         }
+#endif
 
         public static string GetAppSetting(string key)
         {

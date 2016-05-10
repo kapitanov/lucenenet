@@ -34,6 +34,7 @@ namespace Lucene.Net.Support
 
         static OS()
         {
+#if NETCORE
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 isWindows = true;
@@ -42,6 +43,16 @@ namespace Lucene.Net.Support
             {
                 isUnix = true;
             }
+#else
+            PlatformID pid = Environment.OSVersion.Platform;
+            isWindows = pid == PlatformID.Win32NT || pid == PlatformID.Win32Windows;
+
+            // we use integers instead of enum tags because "MacOS"
+            // requires 2.0 SP2, 3.0 SP2 or 3.5 SP1.
+            // 128 is mono's old platform tag for Unix.
+            int id = (int)pid;
+            isUnix = id == 4 || id == 6 || id == 128;
+#endif
         }
 
         /// <summary>
