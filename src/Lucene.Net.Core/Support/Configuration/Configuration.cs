@@ -1,28 +1,34 @@
 ﻿#if NETCORE
-using Lucene.Net.Portable.Support.Configuration;
 using Microsoft.Extensions.Configuration;
 #else
 using System.Configuration;
 #endif
 
-namespace Lucene.Net.TestFramework.Support
+namespace Lucene.Net.Support.Configuration
 {
-    public static class SystemProperties
+    public static class Configuration
     {
-        public static string GetProperty(string key)
+        private static IConfigurationRoot _configuration;
+
+        static Configuration()
         {
-#if NETCORE                     
-            IConfigurationBuilder builder = new ConfigurationBuilder().AddConfigFile("App.config", true, new KeyValueParser());
-            IConfigurationRoot configuration = builder.Build();
-            return configuration.GetAppSetting(key);
+            var builder = new ConfigurationBuilder().AddConfigFile("App.config", true, new KeyValueParser());
+            _configuration = builder.Build();
+        }
+
+        public static string GetAppSetting(string key)
+        {
+#if NETCORE
+            
+            return _configuration.GetAppSetting(key);
 #else
             return ConfigurationManager.AppSettings[key];
 #endif
         }
 
-        public static string GetProperty(string key, string defaultValue)
+        public static string GetAppSetting(string key, string defaultValue)
         {
-            string setting = GetProperty(key);
+            string setting = GetAppSetting(key);
             return string.IsNullOrEmpty(setting) ? defaultValue : setting;
         }
 
@@ -36,9 +42,9 @@ namespace Lucene.Net.TestFramework.Support
         /// <param name="conversionFunction"></param>
         /// <param name="defaultValue"></param>
         /// <returns></returns>
-        public static T GetProperty<T>(string key,  T defaultValue, System.Func<string, T> conversionFunction)
+        public static T GetProperty<T>(string key, T defaultValue, System.Func<string, T> conversionFunction)
         {
-            string setting = GetProperty(key);
+            string setting = GetAppSetting(key);
             return string.IsNullOrEmpty(setting) ? defaultValue : conversionFunction(setting);
         }
     }

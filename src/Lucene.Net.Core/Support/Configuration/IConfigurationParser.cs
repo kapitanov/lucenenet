@@ -7,7 +7,7 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Lucene.Net.Portable.Support.Configuration
+namespace Lucene.Net.Support.Configuration
 {
     public interface IConfigurationParser
     {
