@@ -99,15 +99,18 @@ namespace Lucene.Net.Store
                     throw e;
                 }
 
-                //TODO: conniey
-                //try
-                //{
-                //    Thread.Sleep(TimeSpan.FromMilliseconds(LOCK_POLL_INTERVAL));
-                //}
-                //catch (ThreadInterruptedException ie)
-                //{
-                //    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-                //}
+#if !NETCORE
+                try
+                {
+#endif
+                    Thread.Sleep(TimeSpan.FromMilliseconds(LOCK_POLL_INTERVAL));
+#if !NETCORE                
+                }
+                catch (ThreadInterruptedException ie)
+                {
+                    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                }
+#endif
                 locked = Obtain();
             }
             return locked;

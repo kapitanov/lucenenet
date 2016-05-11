@@ -118,16 +118,18 @@ namespace Lucene.Net.Store
                     var pauseNS = targetNS - curNS;
                     if (pauseNS > 0)
                     {
-                        //TODO: conniey
-                        //try
-                        //{
-                        //    Thread.Sleep((int)(pauseNS / 1000000));
-                        //}
-                        //catch (ThreadInterruptedException ie)
-                        //{
-                        //    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-                        //}
-
+#if !NETCORE
+                        try
+                        {
+#endif
+                            Thread.Sleep((int)(pauseNS / 1000000));
+#if !NETCORE
+                        }
+                        catch (ThreadInterruptedException ie)
+                        {
+                            throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                        }
+#endif
                         curNS = DateTime.UtcNow.Ticks * 100;
                         continue;
                     }

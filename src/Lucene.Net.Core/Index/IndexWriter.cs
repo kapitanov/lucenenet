@@ -1190,47 +1190,53 @@ namespace Lucene.Net.Index
                         //LUCENE TO-DO
                         interrupted = false;
 
-                        //TODO: conniey
-                        //if (waitForMerges)
-                        //{
-                        //    try
-                        //    {
-                        //        // Give merge scheduler last chance to run, in case
-                        //        // any pending merges are waiting:
-                        //        mergeScheduler.Merge(this, MergeTrigger.CLOSING, false);
-                        //    }
-                        //    catch (ThreadInterruptedException)
-                        //    {
-                        //        // ignore any interruption, does not matter
-                        //        interrupted = true;
-                        //        if (infoStream.IsEnabled("IW"))
-                        //        {
-                        //            infoStream.Message("IW", "interrupted while waiting for final merges");
-                        //        }
-                        //    }
-                        //}
+                        if (waitForMerges)
+                        {
+#if !NETCORE
+                            try
+                            {
+#endif    
+                            // Give merge scheduler last chance to run, in case
+                                // any pending merges are waiting:
+                                mergeScheduler.Merge(this, MergeTrigger.CLOSING, false);
+#if !NETCORE
+                            }
+                            catch (ThreadInterruptedException)
+                            {
+                                // ignore any interruption, does not matter
+                                interrupted = true;
+                                if (infoStream.IsEnabled("IW"))
+                                {
+                                    infoStream.Message("IW", "interrupted while waiting for final merges");
+                                }
+                            }
+#endif
+                        }
 
                         lock (this)
                         {
                             for (; ; )
                             {
-                                //TODO: conniey
-                                //try
-                                //{
-                                //    FinishMerges(waitForMerges && !interrupted);
-                                //    break;
-                                //}
-                                //catch (ThreadInterruptedException)
-                                //{
-                                //    // by setting the interrupted status, the
-                                //    // next call to finishMerges will pass false,
-                                //    // so it will not wait
-                                //    interrupted = true;
-                                //    if (infoStream.IsEnabled("IW"))
-                                //    {
-                                //        infoStream.Message("IW", "interrupted while waiting for merges to finish");
-                                //    }
-                                //}
+#if !NETCORE
+                                try
+                                {
+#endif
+                                    FinishMerges(waitForMerges && !interrupted);
+                                    break;
+#if !NETCORE
+                                }
+                                catch (ThreadInterruptedException)
+                                {
+                                    // by setting the interrupted status, the
+                                    // next call to finishMerges will pass false,
+                                    // so it will not wait
+                                    interrupted = true;
+                                    if (infoStream.IsEnabled("IW"))
+                                    {
+                                        infoStream.Message("IW", "interrupted while waiting for merges to finish");
+                                    }
+                                }
+#endif
                             }
                             StopMerges = true;
                         }
@@ -5358,24 +5364,27 @@ namespace Lucene.Net.Index
 
         private void DoWait()
         {
-            //TODO: conniey
-            //lock (this)
-            //{
-            //    // NOTE: the callers of this method should in theory
-            //    // be able to do simply wait(), but, as a defense
-            //    // against thread timing hazards where notifyAll()
-            //    // fails to be called, we wait for at most 1 second
-            //    // and then return so caller can check if wait
-            //    // conditions are satisfied:
-            //    try
-            //    {
-            //        Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
-            //    }
-            //    catch (ThreadInterruptedException ie)
-            //    {
-            //        throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
-            //    }
-            //}
+            lock (this)
+            {
+                // NOTE: the callers of this method should in theory
+                // be able to do simply wait(), but, as a defense
+                // against thread timing hazards where notifyAll()
+                // fails to be called, we wait for at most 1 second
+                // and then return so caller can check if wait
+                // conditions are satisfied:
+#if !NETCORE
+                try
+                {
+#endif
+                    Monitor.Wait(this, TimeSpan.FromMilliseconds(1000));
+#if !NETCORE
+                }
+                catch (ThreadInterruptedException ie)
+                {
+                    throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+                }
+#endif
+            }
         }
 
         private bool KeepFullyDeletedSegments_Renamed;
