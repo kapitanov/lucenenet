@@ -29,14 +29,25 @@ namespace Lucene.Net.Store
         public SlowOpeningMockIndexInputWrapper(MockDirectoryWrapper dir, string name, IndexInput @delegate)
             : base(dir, name, @delegate)
         {
+#if !NETCORE
             try
             {
+#endif
                 Thread.Sleep(50);
+#if !NETCORE
             }
-            finally
+            catch (ThreadInterruptedException ie)
             {
-                base.Dispose();
-            }         
+                try
+                {
+                    base.Dispose();
+                } // we didnt open successfully
+                catch (Exception)
+                {
+                }
+                throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
+            }
+#endif
         }
     }
 }
