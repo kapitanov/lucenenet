@@ -2114,7 +2114,7 @@ namespace Lucene.Net.Index
                     IMergeScheduler ms = iwc.MergeScheduler;
                     if (ms is IConcurrentMergeScheduler)
                     {
-                        ConcurrentMergeScheduler suppressFakeIOE = new ConcurrentMergeSchedulerAnonymousInnerClassHelper(this);
+                        var suppressFakeIOE = new ConcurrentMergeSchedulerAnonymousInnerClassHelper(this);
                         IConcurrentMergeScheduler cms = (IConcurrentMergeScheduler)ms;
                         suppressFakeIOE.SetMaxMergesAndThreads(cms.MaxMergeCount, cms.MaxThreadCount);
                         suppressFakeIOE.MergeThreadPriority = cms.MergeThreadPriority;
@@ -2362,7 +2362,12 @@ namespace Lucene.Net.Index
             }
         }
 
-        private class ConcurrentMergeSchedulerAnonymousInnerClassHelper : ConcurrentMergeScheduler
+        private class ConcurrentMergeSchedulerAnonymousInnerClassHelper :
+#if NETCORE
+            TaskMergeScheduler
+#else
+            ConcurrentMergeScheduler
+#endif
         {
             private readonly TestIndexWriterExceptions OuterInstance;
 

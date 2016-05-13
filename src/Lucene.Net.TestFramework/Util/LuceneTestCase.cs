@@ -52,7 +52,6 @@ namespace Lucene.Net.Util
     using Codec = Lucene.Net.Codecs.Codec;
     using CompiledAutomaton = Lucene.Net.Util.Automaton.CompiledAutomaton;
     using CompositeReader = Lucene.Net.Index.CompositeReader;
-    using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
@@ -876,6 +875,9 @@ namespace Lucene.Net.Util
                 int maxMergeCount = TestUtil.NextInt(Random(), maxThreadCount, maxThreadCount + 4);
                 IConcurrentMergeScheduler mergeScheduler;
 
+#if NETCORE
+                mergeScheduler = new TaskMergeScheduler();
+#else
                 if (r.NextBoolean())
                 {
                     mergeScheduler = new ConcurrentMergeScheduler();
@@ -884,6 +886,7 @@ namespace Lucene.Net.Util
                 {
                     mergeScheduler = new TaskMergeScheduler();
                 }
+#endif
 
                 mergeScheduler.SetMaxMergesAndThreads(maxMergeCount, maxThreadCount);
                 c.SetMergeScheduler(mergeScheduler);
@@ -2691,7 +2694,9 @@ namespace Lucene.Net.Util
         public class ConcurrentMergeSchedulers
         {
             public readonly IConcurrentMergeScheduler[] Values = new IConcurrentMergeScheduler[] {
+#if !NETCORE
                 new ConcurrentMergeScheduler(),
+#endif
                 new TaskMergeScheduler()
             };
         }

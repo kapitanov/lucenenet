@@ -10,7 +10,6 @@ namespace Lucene.Net.Search
     using Lucene.Net.Support;
     using NUnit.Framework;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
-    using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;

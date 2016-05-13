@@ -43,7 +43,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class Test2BPostings : LuceneTestCase
     {
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Test, LongRunningTest, MaxTime(int.MaxValue)]
         public virtual void Test([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BPostings"));
