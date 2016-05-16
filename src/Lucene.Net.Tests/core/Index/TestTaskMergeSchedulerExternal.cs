@@ -1,11 +1,25 @@
-using System;
-using System.Diagnostics;
-using System.IO;
-using Lucene.Net.Documents;
+﻿using Lucene.Net.Documents;
 using NUnit.Framework;
+using System;
+using System.IO;
 
 namespace Lucene.Net.Tests
 {
+    using Index;
+    using Util;
+    using Directory = Lucene.Net.Store.Directory;
+    using Document = Documents.Document;
+    using Field = Field;
+    using IndexWriter = Lucene.Net.Index.IndexWriter;
+    using IndexWriterConfig = Lucene.Net.Index.IndexWriterConfig;
+    using LogMergePolicy = Lucene.Net.Index.LogMergePolicy;
+    using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
+    using MergePolicy = Lucene.Net.Index.MergePolicy;
+    using MergeScheduler = Lucene.Net.Index.MergeScheduler;
+    using MergeTrigger = Lucene.Net.Index.MergeTrigger;
+    using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
+    using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
+    using RAMDirectory = Lucene.Net.Store.RAMDirectory;
 
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -23,62 +37,23 @@ namespace Lucene.Net.Tests
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
-    using Document = Documents.Document;
-    using Field = Field;
-    using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
-    using IndexWriter = Lucene.Net.Index.IndexWriter;
-    using IndexWriterConfig = Lucene.Net.Index.IndexWriterConfig;
-    using LogMergePolicy = Lucene.Net.Index.LogMergePolicy;
-    using MergePolicy = Lucene.Net.Index.MergePolicy;
-    using OneMerge = Lucene.Net.Index.MergePolicy.OneMerge;
-    using MergeScheduler = Lucene.Net.Index.MergeScheduler;
-    using MergeTrigger = Lucene.Net.Index.MergeTrigger;
-    using Directory = Lucene.Net.Store.Directory;
-    using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
-    using RAMDirectory = Lucene.Net.Store.RAMDirectory;
-    using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
-    using Util;
+
     /// <summary>
     /// Holds tests cases to verify external APIs are accessible
     /// while not being in Lucene.Net.Index package.
     /// </summary>
-    public class TestMergeSchedulerExternal : LuceneTestCase
+    public class TestTaskMergeSchedulerExternal : LuceneTestCase
     {
-
         internal volatile bool MergeCalled;
-        internal volatile bool MergeThreadCreated;
         internal volatile bool ExcCalled;
 
-        private class MyMergeScheduler : ConcurrentMergeScheduler
+        private class MyMergeScheduler : TaskMergeScheduler
         {
-            private readonly TestMergeSchedulerExternal OuterInstance;
+            private readonly TestTaskMergeSchedulerExternal OuterInstance;
 
-            public MyMergeScheduler(TestMergeSchedulerExternal outerInstance)
+            public MyMergeScheduler(TestTaskMergeSchedulerExternal outerInstance)
             {
                 this.OuterInstance = outerInstance;
-            }
-
-
-            private class MyMergeThread : ConcurrentMergeScheduler.MergeThread
-            {
-                private readonly TestMergeSchedulerExternal.MyMergeScheduler OuterInstance;
-
-                public MyMergeThread(TestMergeSchedulerExternal.MyMergeScheduler outerInstance, IndexWriter writer, MergePolicy.OneMerge merge)
-                    : base(outerInstance, writer, merge)
-                {
-                    this.OuterInstance = outerInstance;
-                    outerInstance.OuterInstance.MergeThreadCreated = true;
-                }
-            }
-
-            protected override MergeThread GetMergeThread(IndexWriter writer, MergePolicy.OneMerge merge)
-            {
-                MergeThread thread = new MyMergeThread(this, writer, merge);
-                thread.ThreadPriority = MergeThreadPriority;
-                thread.SetDaemon(true);
-                thread.Name = "MyMergeThread";
-                return thread;
             }
 
             protected override void HandleMergeException(Exception t)
@@ -86,10 +61,10 @@ namespace Lucene.Net.Tests
                 OuterInstance.ExcCalled = true;
             }
 
-            protected override void DoMerge(MergePolicy.OneMerge merge)
+            public override void Merge(IndexWriter writer, MergeTrigger trigger, bool newMergesFound)
             {
                 OuterInstance.MergeCalled = true;
-                base.DoMerge(merge);
+                base.Merge(writer, trigger, newMergesFound);
             }
         }
 
@@ -101,11 +76,11 @@ namespace Lucene.Net.Tests
                 {
                     throw new IOException("now failing during merge");
                 }
-		    }
+            }
         }
 
         [Test]
-        public void TestSubclassConcurrentMergeScheduler()
+        public void TestSubclassTaskMergeScheduler()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
             dir.FailOn(new FailOnlyOnMerge());
@@ -125,15 +100,12 @@ namespace Lucene.Net.Tests
             ((MyMergeScheduler)writer.Config.MergeScheduler).Sync();
             writer.Dispose();
 
-            Assert.IsTrue(MergeThreadCreated);
             Assert.IsTrue(MergeCalled);
-            Assert.IsTrue(ExcCalled);
             dir.Dispose();
         }
 
         private class ReportingMergeScheduler : MergeScheduler
         {
-
             public override void Merge(IndexWriter writer, MergeTrigger trigger, bool newMergesFound)
             {
                 MergePolicy.OneMerge merge = null;
@@ -150,7 +122,6 @@ namespace Lucene.Net.Tests
             public override void Dispose()
             {
             }
-
         }
 
         [Test]

@@ -272,6 +272,7 @@
     <Compile Include="core\Index\TestStressIndexing2.cs" />
     <Compile Include="core\Index\TestStressNRT.cs" />
     <Compile Include="core\Index\TestSumDocFreq.cs" />
+    <Compile Include="core\Index\TestTaskMergeSchedulerExternal.cs" />
     <Compile Include="core\Index\TestTerm.cs" />
     <Compile Include="core\Index\TestTermdocPerf.cs" />
     <Compile Include="core\Index\TestTermsEnum.cs" />
