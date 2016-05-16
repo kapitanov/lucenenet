@@ -8,9 +8,6 @@
     <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
     <OutputType>Library</OutputType>
     <RootNamespace>Lucene.Net</RootNamespace>
-    <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>Lucene.Net</RootNamespace>
     <AssemblyName>Lucene.Net.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
@@ -39,14 +36,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
-    <RootNamespace>Lucene.Net</RootNamespace>
-  </PropertyGroup>
-  <PropertyGroup>
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
-  </PropertyGroup>
-  <PropertyGroup>
-    <StartupObject />
+    <DefineConstants>$(DefineConstants);NETCORE;FEATURE_TASKMERGESCHEDULER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="Lucene.Net.Portable.project.json" />
@@ -251,7 +241,6 @@
     <Compile Include="Index\CoalescedUpdates.cs" />
     <Compile Include="Index\CompositeReader.cs" />
     <Compile Include="Index\CompositeReaderContext.cs" />
-    <Compile Include="Index\ConcurrentMergeScheduler.cs" />
     <Compile Include="Index\CorruptIndexException.cs" />
     <Compile Include="Index\DirectoryReader.cs" />
     <Compile Include="Index\DocConsumer.cs" />
@@ -654,6 +643,7 @@
     <Compile Include="Support\StringSupport.cs" />
     <Compile Include="Support\StringTokenizer.cs" />
     <Compile Include="Support\TaskSchedulerCompletionService.cs" />
+    <Compile Include="Support\ThreadClass.cs" />
     <Compile Include="Support\ThreadFactory.cs" />
     <Compile Include="Support\TimeHelper.cs" />
     <Compile Include="Support\UnmodifiableDictionary.cs" />
@@ -680,7 +670,6 @@
     <Compile Include="Support\OS.cs" />
     <Compile Include="Support\Single.cs" />
     <Compile Include="Support\TextSupport.cs" />
-    <Compile Include="Support\ThreadClass.cs" />
     <Compile Include="Support\ThreadLock.cs" />
     <Compile Include="Support\WeakDictionary.cs" />
     <Compile Include="Util\Accountable.cs" />
