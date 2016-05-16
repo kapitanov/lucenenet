@@ -224,6 +224,8 @@ namespace Lucene.Net.Support
             Monitor.PulseAll(_threadField);
         }
 
+#if !NETCORE
+
         /// <summary>
         /// Raises a ThreadAbortException in the thread on which it is invoked,
         /// to begin the process of terminating the thread. Calling this method
@@ -231,9 +233,7 @@ namespace Lucene.Net.Support
         /// </summary>
         public void Abort()
         {
-#if !NETCORE
             _threadField.Abort();
-#endif
         }
 
         /// <summary>
@@ -245,10 +245,9 @@ namespace Lucene.Net.Support
         /// <param name="stateInfo">An object that contains application-specific information, such as state, which can be used by the thread being aborted</param>
         public void Abort(object stateInfo)
         {
-#if !NETCORE
             _threadField.Abort(stateInfo);
-#endif
         }
+#endif
 
         /// <summary>
         /// Suspends the thread, if the thread is already suspended it has no effect
