@@ -1305,8 +1305,9 @@ namespace Lucene.Net.Index
                 // finally, restore interrupt status:
                 if (interrupted)
                 {
-                    //TODO: conniey
-                    //Thread.CurrentThread.Interrupt();
+#if !NETCORE
+                    Thread.CurrentThread.Interrupt();
+#endif
                 }
             }
         }
