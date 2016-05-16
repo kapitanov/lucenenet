@@ -167,16 +167,15 @@ namespace Lucene.Net.Index
             }
             set
             {
-                //TODO: conniey
-                //lock (this)
-                //{
-                //    if (value > (int)ThreadPriority.Highest || value < (int)ThreadPriority.Lowest)
-                //    {
-                //        throw new System.ArgumentException("priority must be in range " + (int)ThreadPriority.Highest + " .. " + (int)ThreadPriority.Lowest + " inclusive");
-                //    }
-                //    MergeThreadPriority_Renamed = value;
-                //    UpdateMergeThreads();
-                //}
+                lock (this)
+                {
+                    if (value > (int)ThreadPriority.Highest || value < (int)ThreadPriority.Lowest)
+                    {
+                        throw new System.ArgumentException("priority must be in range " + (int)ThreadPriority.Highest + " .. " + (int)ThreadPriority.Lowest + " inclusive");
+                    }
+                    MergeThreadPriority_Renamed = value;
+                    UpdateMergeThreads();
+                }
             }
         }
 
@@ -275,11 +274,8 @@ namespace Lucene.Net.Index
                         {
                             Message("set priority of merge thread " + mergeThread.Name + " to " + pri);
                         }
-
-                        //TODO: conniey
-                        //mergeThread.ThreadPriority = pri;
-                        //pri = Math.Min((int)ThreadPriority.Highest, 1 + pri);
-
+                        mergeThread.ThreadPriority = pri;
+                        pri = Math.Min((int)ThreadPriority.Highest, 1 + pri);
                     }
                 }
             }
@@ -311,20 +307,19 @@ namespace Lucene.Net.Index
 
         private void InitMergeThreadPriority()
         {
-            //TODO: conniey
-            //lock (this)
-            //{
-            //    if (MergeThreadPriority_Renamed == -1)
-            //    {
-            //        // Default to slightly higher priority than our
-            //        // calling thread
-            //        MergeThreadPriority_Renamed = 1 + (int)ThreadClass.Current().Priority;
-            //        if (MergeThreadPriority_Renamed > (int)ThreadPriority.Highest)
-            //        {
-            //            MergeThreadPriority_Renamed = (int)ThreadPriority.Highest;
-            //        }
-            //    }
-            //}
+            lock (this)
+            {
+                if (MergeThreadPriority_Renamed == -1)
+                {
+                    // Default to slightly higher priority than our
+                    // calling thread
+                    MergeThreadPriority_Renamed = 1 + (int)ThreadClass.Current().Priority;
+                    if (MergeThreadPriority_Renamed > (int)ThreadPriority.Highest)
+                    {
+                        MergeThreadPriority_Renamed = (int)ThreadPriority.Highest;
+                    }
+                }
+            }
         }
 
         public override void Dispose()
@@ -355,19 +350,15 @@ namespace Lucene.Net.Index
                     }
                     if (toSync != null)
                     {
-#if !NETCORE
                         try
                         {
-#endif                            
                             toSync.Join();
-#if !NETCORE
                         }
                         catch (ThreadInterruptedException ie)
                         {
                             // ignore this Exception, we will retry until all threads are dead
                             interrupted = true;
                         }
-#endif
                     }
                     else
                     {
@@ -377,13 +368,11 @@ namespace Lucene.Net.Index
             }
             finally
             {
-#if !NETCORE
                 // finally, restore interrupt status:
                 if (interrupted)
                 {
                     Thread.CurrentThread.Interrupt();
                 }
-#endif
             }
         }
 
@@ -453,19 +442,14 @@ namespace Lucene.Net.Index
                         {
                             Message("    too many merges; stalling...");
                         }
-
-#if !NETCORE
                         try
                         {
-#endif
                             Monitor.Wait(this);
-#if !NETCORE
                         }
                         catch (ThreadInterruptedException ie)
                         {
                             throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
                         }
-#endif
                     }
 
                     if (Verbose())
@@ -618,21 +602,20 @@ namespace Lucene.Net.Index
             {
                 set
                 {
-                    //TODO: conniey
-                    //try
-                    //{
-                    //    Priority = (ThreadPriority)value;
-                    //}
-                    //catch (System.NullReferenceException npe)
-                    //{
-                    //    // Strangely, Sun's JDK 1.5 on Linux sometimes
-                    //    // throws NPE out of here...
-                    //}
-                    //catch (System.Security.SecurityException se)
-                    //{
-                    //    // Ignore this because we will still run fine with
-                    //    // normal thread priority
-                    //}
+                    try
+                    {
+                        Priority = (ThreadPriority)value;
+                    }
+                    catch (System.NullReferenceException npe)
+                    {
+                        // Strangely, Sun's JDK 1.5 on Linux sometimes
+                        // throws NPE out of here...
+                    }
+                    catch (System.Security.SecurityException se)
+                    {
+                        // Ignore this because we will still run fine with
+                        // normal thread priority
+                    }
                 }
             }
 
@@ -718,10 +701,8 @@ namespace Lucene.Net.Index
         /// </summary>
         protected internal virtual void HandleMergeException(Exception exc)
         {
-#if !NETCORE
             try
             {
-#endif
                 // When an exception is hit during merge, IndexWriter
                 // removes any partial files and then allows another
                 // merge to run.  If whatever caused the error is not
@@ -729,13 +710,11 @@ namespace Lucene.Net.Index
                 // so, we sleep here to avoid saturating CPU in such
                 // cases:
                 Thread.Sleep(250);
-#if !NETCORE
             }
             catch (ThreadInterruptedException ie)
             {
                 throw new ThreadInterruptedException("Thread Interrupted Exception", ie);
             }
-#endif
             throw new MergePolicy.MergeException(exc, Dir);
         }
 
