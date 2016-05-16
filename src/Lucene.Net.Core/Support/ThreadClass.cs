@@ -92,8 +92,9 @@ namespace Lucene.Net.Support
         /// </summary>
         public virtual void Interrupt()
         {
-            //TODO: conniey
-            //_threadField.Interrupt();
+#if !NETCORE
+            _threadField.Interrupt();
+#endif
         }
 
         /// <summary>
@@ -200,8 +201,7 @@ namespace Lucene.Net.Support
         /// <param name="MiliSeconds">Time of wait in milliseconds</param>
         public void Join(long MiliSeconds)
         {
-            //TODO: conniey
-            //_threadField.Join(new System.TimeSpan(MiliSeconds * 10000));
+            _threadField.Join(Convert.ToInt32(MiliSeconds));
         }
 
         /// <summary>
@@ -211,8 +211,9 @@ namespace Lucene.Net.Support
         /// <param name="NanoSeconds">Time of wait in nanoseconds</param>
         public void Join(long MiliSeconds, int NanoSeconds)
         {
-            //TODO: conniey
-            //_threadField.Join(new System.TimeSpan(MiliSeconds * 10000 + NanoSeconds * 100));
+            int totalTime = Convert.ToInt32(MiliSeconds + (NanoSeconds*0.000001));
+
+            _threadField.Join(totalTime);
         }
 
         /// <summary>
@@ -223,6 +224,8 @@ namespace Lucene.Net.Support
             Monitor.PulseAll(_threadField);
         }
 
+#if !NETCORE
+
         /// <summary>
         /// Raises a ThreadAbortException in the thread on which it is invoked,
         /// to begin the process of terminating the thread. Calling this method
@@ -230,8 +233,7 @@ namespace Lucene.Net.Support
         /// </summary>
         public void Abort()
         {
-            //TODO: conniey
-            //_threadField.Abort();
+            _threadField.Abort();
         }
 
         /// <summary>
@@ -243,9 +245,9 @@ namespace Lucene.Net.Support
         /// <param name="stateInfo">An object that contains application-specific information, such as state, which can be used by the thread being aborted</param>
         public void Abort(object stateInfo)
         {
-            //TODO: conniey
-            //_threadField.Abort(stateInfo);
+            _threadField.Abort(stateInfo);
         }
+#endif
 
         /// <summary>
         /// Suspends the thread, if the thread is already suspended it has no effect
@@ -261,9 +263,11 @@ namespace Lucene.Net.Support
         /// <returns>A String that represents the current object</returns>
         public override System.String ToString()
         {
-            //TODO: conniey
-            return string.Empty;
-            //return "Thread[" + Name + "," + Priority.ToString() + "]";
+#if !NETCORE
+            return "Thread[" + Name + "," + Priority.ToString() + "]";
+#else
+            return "Thread[" + Name + "]";
+#endif
         }
 
         [ThreadStatic]

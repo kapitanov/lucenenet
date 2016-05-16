@@ -52,7 +52,6 @@ namespace Lucene.Net.Util
     using Codec = Lucene.Net.Codecs.Codec;
     using CompiledAutomaton = Lucene.Net.Util.Automaton.CompiledAutomaton;
     using CompositeReader = Lucene.Net.Index.CompositeReader;
-    using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
@@ -874,9 +873,23 @@ namespace Lucene.Net.Util
             {
                 int maxThreadCount = TestUtil.NextInt(Random(), 1, 4);
                 int maxMergeCount = TestUtil.NextInt(Random(), maxThreadCount, maxThreadCount + 4);
-                ConcurrentMergeScheduler cms = new ConcurrentMergeScheduler();
-                cms.SetMaxMergesAndThreads(maxMergeCount, maxThreadCount);
-                c.SetMergeScheduler(cms);
+                IConcurrentMergeScheduler mergeScheduler;
+
+#if NETCORE
+                mergeScheduler = new TaskMergeScheduler();
+#else
+                if (r.NextBoolean())
+                {
+                    mergeScheduler = new ConcurrentMergeScheduler();
+                }
+                else
+                {
+                    mergeScheduler = new TaskMergeScheduler();
+                }
+#endif
+
+                mergeScheduler.SetMaxMergesAndThreads(maxMergeCount, maxThreadCount);
+                c.SetMergeScheduler(mergeScheduler);
             }
             if (r.NextBoolean())
             {
@@ -985,7 +998,7 @@ namespace Lucene.Net.Util
         public static LogMergePolicy NewLogMergePolicy(Random r)
         {
             LogMergePolicy logmp = r.NextBoolean() ? (LogMergePolicy)new LogDocMergePolicy() : new LogByteSizeMergePolicy();
-            
+
             logmp.CalibrateSizeByDeletes = r.NextBoolean();
             if (Rarely(r))
             {
@@ -2673,6 +2686,19 @@ namespace Lucene.Net.Util
                     Console.Error.WriteLine("NOTE: leaving temporary files on disk at: " + tempDirBasePath);
                 }
             }
+        }
+
+        /// <summary>
+        /// Contains a list of all the IConcurrentMergeSchedulers to be tested.
+        /// </summary>
+        public class ConcurrentMergeSchedulers
+        {
+            public readonly IConcurrentMergeScheduler[] Values = new IConcurrentMergeScheduler[] {
+#if !NETCORE
+                new ConcurrentMergeScheduler(),
+#endif
+                new TaskMergeScheduler()
+            };
         }
     }
 

@@ -41,7 +41,7 @@
     <StartupObject />
   </PropertyGroup>
   <PropertyGroup>
-    <DefineConstants>$(DefineConstants);NETCORE</DefineConstants>
+    <DefineConstants>$(DefineConstants);NETCORE;FEATURE_TASKMERGESCHEDULER</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <None Include="core\App.config" />
@@ -122,7 +122,6 @@
     <Compile Include="core\Index\TestCodecHoldsOpenFiles.cs" />
     <Compile Include="core\Index\TestCodecs.cs" />
     <Compile Include="core\Index\TestCompoundFile.cs" />
-    <Compile Include="core\Index\TestConcurrentMergeScheduler.cs" />
     <Compile Include="core\Index\TestConsistentFieldNumbers.cs" />
     <Compile Include="core\Index\TestCrash.cs" />
     <Compile Include="core\Index\TestCrashCausesCorruptIndex.cs" />
@@ -219,6 +218,7 @@
     <Compile Include="core\Index\TestStressIndexing2.cs" />
     <Compile Include="core\Index\TestStressNRT.cs" />
     <Compile Include="core\Index\TestSumDocFreq.cs" />
+    <Compile Include="core\Index\TestTaskMergeSchedulerExternal.cs" />
     <Compile Include="core\Index\TestTerm.cs" />
     <Compile Include="core\Index\TestTermdocPerf.cs" />
     <Compile Include="core\Index\TestTermsEnum.cs" />
@@ -366,7 +366,6 @@
     <Compile Include="core\Store\TestWindowsMMap.cs" />
     <Compile Include="core\SupportClassException.cs" />
     <Compile Include="core\TestAssertions.cs" />
-    <Compile Include="core\TestMergeSchedulerExternal.cs" />
     <Compile Include="core\Util\Automaton\TestBasicOperations.cs" />
     <Compile Include="core\Util\Automaton\TestCompiledAutomaton.cs" />
     <Compile Include="core\Util\Automaton\TestDeterminism.cs" />

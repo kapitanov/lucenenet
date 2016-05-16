@@ -19,7 +19,6 @@
  *
 */
 
-using System;
 using System.Reflection;
 
 namespace Lucene.Net.Support
@@ -32,26 +31,21 @@ namespace Lucene.Net.Support
         {
             try
             {
-                //TODO: conniey
-                //asm = Assembly.Load("ICSharpCode.SharpZipLib");
+                asm = Assembly.Load("ICSharpCode.SharpZipLib");
             }
             catch { }
         }
 
         public static Deflater CreateDeflater()
         {
-            //TODO: conniey
-            //if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
-            //return new Deflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Deflater"));
-            throw new NotImplementedException();
+            if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
+            return new Deflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Deflater"));
         }
 
         public static Inflater CreateInflater()
         {
-            //TODO: conniey
-            //if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
-            //return new Inflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Inflater"));
-            throw new NotImplementedException();
+            if (asm == null) throw new System.IO.FileNotFoundException("Can not load ICSharpCode.SharpZipLib.dll");
+            return new Inflater(asm.CreateInstance("ICSharpCode.SharpZipLib.Zip.Compression.Inflater"));
         }
     }
 }

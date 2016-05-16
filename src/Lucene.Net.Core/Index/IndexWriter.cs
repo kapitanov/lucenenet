@@ -260,7 +260,7 @@ namespace Lucene.Net.Index
         private readonly HashSet<SegmentCommitInfo> mergingSegments = new HashSet<SegmentCommitInfo>();
 
         private readonly MergePolicy mergePolicy;
-        private readonly MergeScheduler mergeScheduler;
+        private readonly IMergeScheduler mergeScheduler;
         private readonly LinkedList<MergePolicy.OneMerge> PendingMerges = new LinkedList<MergePolicy.OneMerge>();
         private readonly HashSet<MergePolicy.OneMerge> RunningMerges = new HashSet<MergePolicy.OneMerge>();
         private IList<MergePolicy.OneMerge> MergeExceptions = new List<MergePolicy.OneMerge>();
@@ -1305,8 +1305,9 @@ namespace Lucene.Net.Index
                 // finally, restore interrupt status:
                 if (interrupted)
                 {
-                    //TODO: conniey
-                    //Thread.CurrentThread.Interrupt();
+#if !NETCORE
+                    Thread.CurrentThread.Interrupt();
+#endif
                 }
             }
         }
