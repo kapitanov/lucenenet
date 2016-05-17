@@ -12,30 +12,19 @@ using System.Xml.Linq;
 
 namespace Lucene.Net.Support.Configuration
 {
-    public class ConfigFileConfigurationProvider : ConfigurationProvider
+    public class ConfigFileConfigurationProvider : FileConfigurationProvider
     {
-        private readonly string _configuration;
-        private readonly bool _loadFromFile;
-        private readonly bool _isOptional;
-
         private readonly IEnumerable<IConfigurationParser> _parsers;
 
-        public ConfigFileConfigurationProvider(string configuration, bool loadFromFile, bool optional,IEnumerable<IConfigurationParser> parsers)
+        public ConfigFileConfigurationProvider(ConfigFileConfigurationSource source) 
+            : base(source)
         {
-            _loadFromFile = loadFromFile;
-            _configuration = configuration;
-            _isOptional = optional;
-            _parsers = parsers;
+            _parsers = source.Parsers;
         }
 
-        public override void Load()
+        public override void Load(Stream stream)
         {
-            if (_loadFromFile && !_isOptional && !File.Exists(_configuration))
-            {
-                throw new FileNotFoundException("Could not find configuration file to load.", _configuration);
-            }
-
-            var document = _loadFromFile ? XDocument.Load(_configuration) : XDocument.Parse(_configuration);
+            var document = XDocument.Load(stream);
 
             var context = new Stack<string>();
             var dictionary = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
