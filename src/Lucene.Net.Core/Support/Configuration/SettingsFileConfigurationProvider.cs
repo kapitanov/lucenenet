@@ -30,13 +30,25 @@ namespace Lucene.Net.Support.Configuration
     /// { Bob:AnotherProfile, Johanna }
     /// { Foo:(Default), Joe }
     /// </example>
-    public class SettingsFileConfigurationProvider : FileConfigurationProvider
+    public class SettingsFileConfigurationProvider : ConfigurationProvider
     {
-        public SettingsFileConfigurationProvider(FileConfigurationSource source) : base(source) { }
+        private readonly bool _isOptional;
+        private readonly string _configuration;
 
-        public override void Load(Stream stream)
+        public SettingsFileConfigurationProvider(string settingsFile, bool optional)
         {
-            var document = XDocument.Load(stream);
+            _isOptional = optional;
+            _configuration = settingsFile;
+        }
+
+        public override void Load()
+        {
+            if (!_isOptional && !File.Exists(_configuration))
+            {
+                throw new FileNotFoundException("Could not find configuration file to load.", _configuration);
+            }
+
+            var document = XDocument.Load(_configuration);
             var context = new Stack<string>();
             var dictionary = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
@@ -93,7 +105,7 @@ namespace Lucene.Net.Support.Configuration
 
         private static string GetKey(Stack<string> context, string name)
         {
-            return string.Join(ConfigurationPath.KeyDelimiter, context.Reverse().Concat(new[] { name }));
+            return string.Join(Constants.KeyDelimiter, context.Reverse().Concat(new[] { name }));
         }
     }
 
@@ -124,13 +136,7 @@ namespace Lucene.Net.Support.Configuration
                 throw new FileNotFoundException($"Could not find configuration file. File: [{path}]", path);
             }
 
-            var source = new SettingsFileConfigurationSource()
-            {
-                Path = path,
-                Optional = optional,
-            };
-
-            return builder.Add(source);
+            return builder.Add(new SettingsFileConfigurationProvider(path, optional));
         }
     }
 }

@@ -19,12 +19,12 @@ namespace Lucene.Net.Support.Configuration
             return configuration?.GetSection(AppSettings)[name];
         }
         
-        public static ImmutableDictionary<string, IConfigurationSection> GetSection(this IConfiguration configuration, params string[] sectionNames)
+         public static ImmutableDictionary<string, IConfigurationSection> GetSection(this IConfiguration configuration, params string[] sectionNames)
         {
             if (sectionNames.Length == 0)
                 return ImmutableDictionary<string, IConfigurationSection>.Empty;
-
-            var fullKey = ConfigurationPath.Combine(sectionNames);
+            
+            var fullKey = string.Join(Constants.KeyDelimiter, sectionNames);
 
             return configuration?.GetSection(fullKey).GetChildren()?.ToImmutableDictionary(x => x.Key, x => x);
         }
@@ -35,8 +35,8 @@ namespace Lucene.Net.Support.Configuration
             {
                 throw new ArgumentException("Need to provide keys", nameof(keys));
             }
-
-            var fullKey = ConfigurationPath.Combine(keys);
+           
+            var fullKey = string.Join(Constants.KeyDelimiter, keys);
 
             return configuration?[fullKey];
         }
