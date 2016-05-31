@@ -4,10 +4,9 @@
 
 //Code modified to work with latest version of framework.
 
-using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Immutable;
 using System.IO;
+using Microsoft.Extensions.Configuration;
 
 namespace Lucene.Net.Support.Configuration
 {
@@ -36,19 +35,7 @@ namespace Lucene.Net.Support.Configuration
                 throw new FileNotFoundException($"Could not find configuration file. File: [{path}]", path);
             }
 
-            return AddConfigFile(builder, parsers.ToImmutableArray(), source => {
-                source.Path = path;
-                source.Optional = optional;
-            });
-        }
-
-        private static IConfigurationBuilder AddConfigFile(this IConfigurationBuilder builder, ImmutableArray<IConfigurationParser> parsers, Action<FileConfigurationSource> configureSource)
-        {
-            var source = new ConfigFileConfigurationSource(parsers.ToImmutableArray());
-
-            configureSource(source);
-
-            return builder.Add(source);
+            return builder.Add(new ConfigFileConfigurationProvider(path, true, optional, parsers));
         }
     }
 }

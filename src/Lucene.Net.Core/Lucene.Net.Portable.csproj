@@ -616,13 +616,11 @@
     <Compile Include="Support\ConcurrentHashSet.cs" />
     <Compile Include="Support\Configuration\ConfigFileConfigurationExtensions.cs" />
     <Compile Include="Support\Configuration\ConfigFileConfigurationProvider.cs" />
-    <Compile Include="Support\Configuration\ConfigFileConfigurationSource.cs" />
     <Compile Include="Support\Configuration\ConfigurationExtensions.cs" />
     <Compile Include="Support\Configuration\IConfigurationParser.cs" />
     <Compile Include="Support\Configuration\KeyValueParser.cs" />
     <Compile Include="Support\Configuration\SettingsFileConfigurationProvider.cs" />
     <Compile Include="Support\Configuration\Configuration.cs" />
-    <Compile Include="Support\Configuration\SettingsFileConfigurationSource.cs" />
     <Compile Include="Support\ErrorHandling.cs" />
     <Compile Include="Support\FileStreamExtensions.cs" />
     <Compile Include="Support\HashCodeMerge.cs" />
@@ -871,6 +869,6 @@
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
   <PropertyGroup>
-    <NuGetTargetMoniker>.NETStandard,Version=v1.5</NuGetTargetMoniker>
+    <NuGetTargetMoniker>.NETPlatform,Version=v5.4</NuGetTargetMoniker>
   </PropertyGroup>
 </Project>
