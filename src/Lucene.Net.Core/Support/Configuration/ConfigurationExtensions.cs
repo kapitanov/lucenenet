@@ -24,7 +24,7 @@ namespace Lucene.Net.Support.Configuration
             if (sectionNames.Length == 0)
                 return ImmutableDictionary<string, IConfigurationSection>.Empty;
             
-            var fullKey = string.Join(Constants.KeyDelimiter, sectionNames);
+            var fullKey = string.Join(ConfigurationPath.KeyDelimiter, sectionNames);
 
             return configuration?.GetSection(fullKey).GetChildren()?.ToImmutableDictionary(x => x.Key, x => x);
         }
@@ -36,7 +36,7 @@ namespace Lucene.Net.Support.Configuration
                 throw new ArgumentException("Need to provide keys", nameof(keys));
             }
            
-            var fullKey = string.Join(Constants.KeyDelimiter, keys);
+            var fullKey = string.Join(ConfigurationPath.KeyDelimiter, keys);
 
             return configuration?[fullKey];
         }

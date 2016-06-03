@@ -35,7 +35,7 @@ namespace Lucene.Net.Support.Configuration
                 throw new FileNotFoundException($"Could not find configuration file. File: [{path}]", path);
             }
 
-            return builder.Add(new ConfigFileConfigurationProvider(path, true, optional, parsers));
+            return builder.Add(new ConfigFileConfigurationSource(path, true, optional, parsers));
         }
     }
 }

@@ -677,7 +677,7 @@ namespace Lucene.Net.Expressions.JS
         {
 #if NETCORE
             var settingsFile = Path.Combine("Properties", "Settings.settings");
-            var configuration = new ConfigurationBuilder().AddSettingsFile(settingsFile, optional: false).Build();
+            var configuration = new ConfigurationBuilder().AddConfigFile(settingsFile, optional: false).Build();
 
             return configuration.GetChildren().Select(section => new KeyValuePair<string, string>(section.Key, section.GetValue("(Default)")));
 #else

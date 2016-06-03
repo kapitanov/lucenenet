@@ -20,7 +20,7 @@
   },
   "frameworks": {
     "netstandard1.5": {
-      "imports":  "dotnet"
+      "imports": "dotnet"
     }
   }
 }

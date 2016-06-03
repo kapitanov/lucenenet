@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 #if NETCORE
-using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Extensions.DependencyModel;
 #endif
 
 namespace Lucene.Net.Util
@@ -50,8 +50,8 @@ namespace Lucene.Net.Util
             // assembly.
 
 #if NETCORE
-            var allLibraries = PlatformServices.Default.LibraryManager.GetLibraries();
-            var loadedAssemblies = allLibraries.SelectMany(lib => lib.Assemblies.Select(x => Assembly.Load(x)));
+            var loadedAssemblies = DependencyContext.Default.RuntimeLibraries
+                .SelectMany(lib => lib.Assemblies.Select(x => Assembly.Load(x.Name)));
 #else
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies();
 #endif
@@ -78,13 +78,8 @@ namespace Lucene.Net.Util
                     // swallow
                 }
                 var referencedAssemblies =
-#if NETCORE
-                    PlatformServices.Default.LibraryManager
-                        .GetReferencingLibraries(loadedAssembly.FullName)
-                        .SelectMany(library => library.Assemblies);
-#else
-                    loadedAssembly.GetReferencedAssemblies();
-#endif
+                   loadedAssembly.GetReferencedAssemblies();
+
                 foreach (var assemblyName in referencedAssemblies)
                 {
                     Assembly assembly;
