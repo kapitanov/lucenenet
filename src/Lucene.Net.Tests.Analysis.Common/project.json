@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "NETStandard.Library": "1.5.0-rc2-24027",
+    "NUnit": "3.2.1",
+    "dotnet-test-nunit": "3.3.0.60-CI",
+    "icu-dotnet": "1.0.3-alpha"
+  },
+  "testRunner": "nunit",
+
+  "frameworks": {
+    "netstandard1.5": {
+      "imports": [
+        "dnxcore50",
+        "netcoreapp1.0",
+        "portable-net45+win8"
+      ]
+    }
+  },
+
+  "runtimes": {
+    "win10-x86": { },
+    "win10-x64": { }
+  }
+}

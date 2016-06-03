@@ -110,7 +110,7 @@
     <Compile Include="TermsFilter.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Lucene.Net.Queries.Portable.project.json" />
+    <None Include="project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>

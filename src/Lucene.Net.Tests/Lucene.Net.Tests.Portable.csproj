@@ -46,7 +46,7 @@
   <ItemGroup>
     <None Include="core\App.config" />
     <None Include="core\Lucene.Net.snk" />
-    <None Include="Lucene.Net.Tests.Portable.project.json" />
+    <None Include="project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
   </ItemGroup>
   <ItemGroup>

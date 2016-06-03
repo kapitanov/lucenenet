@@ -42,12 +42,33 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-   <ItemGroup>
-    <None Include="Lucene.Net.Tests.Analysis.Common.Portable.project.json" />
+  <ItemGroup>
+    <None Include="project.json" />
     <!-- A reference to the entire .NET Framework is automatically included -->
-   </ItemGroup>
- <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Analysis\Util\TestCharacterUtils.cs" />
+    <Compile Include="Analysis\Util\TestCharArrayIterator.cs" />
+    <Compile Include="Analysis\Util\TestCharTokenizers.cs" />
+    <Compile Include="Analysis\Util\TestRollingCharBuffer.cs" />
+    <Compile Include="Analysis\Util\TestSegmentingTokenizerBase.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lucene.Net.Analysis.Common\Lucene.Net.Analysis.Common.Portable.csproj">
+      <Project>{f5ab15d4-f83a-4f93-b698-ac39843d7142}</Project>
+      <Name>Lucene.Net.Analysis.Common.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Core\Lucene.Net.Portable.csproj">
+      <Project>{dbc3b677-805c-430e-af78-a9abf3975d17}</Project>
+      <Name>Lucene.Net.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj">
+      <Project>{940efd2b-d875-4a6f-adb2-ad711b8440f4}</Project>
+      <Name>Lucene.Net.TestFramework.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
   </Target>
