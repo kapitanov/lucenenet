@@ -59,9 +59,13 @@ namespace Lucene.Net.Analysis.Util
         /// accumulated offset of previous buffers for this reader, for offsetAtt </summary>
         protected internal int offset = 0;
 
-        private readonly Locale locale;
-        private readonly BreakIterator.UBreakIteratorType iteratorType;
-        private IEnumerator<string> enumerator;
+        protected readonly Locale locale;
+        protected readonly BreakIterator.UBreakIteratorType iteratorType;
+        private IEnumerator<string> sentenceIterator;
+        private string iteratorText;
+        private int currentSentenceStart;
+        private int currentSentenceEnd;
+
         private readonly CharArrayIterator wrapper = CharArrayIterator.NewSentenceInstance();
 
         private readonly IOffsetAttribute offsetAtt;
@@ -89,7 +93,7 @@ namespace Lucene.Net.Analysis.Util
             offsetAtt = AddAttribute<IOffsetAttribute>();
             this.iteratorType = iteratorType;
             this.locale = locale;
-            enumerator = Enumerable.Empty<string>().GetEnumerator();
+            sentenceIterator = Enumerable.Empty<string>().GetEnumerator();
         }
 
         public override bool IncrementToken()
@@ -113,7 +117,8 @@ namespace Lucene.Net.Analysis.Util
         {
             base.Reset();
             wrapper.SetText(buffer, 0, 0);
-            enumerator = Enumerable.Empty<string>().GetEnumerator();
+
+            sentenceIterator.Reset();
             length = usableLength = offset = 0;
         }
 
@@ -184,9 +189,8 @@ namespace Lucene.Net.Analysis.Util
             }
 
             wrapper.SetText(buffer, 0, Math.Max(0, usableLength));
-            var text = new string(wrapper.Text, 0, Math.Max(0, usableLength));
-
-            enumerator = BreakIterator.Split(iteratorType, locale, text).GetEnumerator();
+            iteratorText = new string(wrapper.Text, 0, Math.Max(0, usableLength));
+            sentenceIterator = BreakIterator.Split(iteratorType, locale, iteratorText).GetEnumerator();
         }
 
         // TODO: refactor to a shared readFully somewhere
@@ -224,12 +228,29 @@ namespace Lucene.Net.Analysis.Util
 
             while (true)
             {
-                if (!enumerator.MoveNext())
+                // find the next set of boundaries
+                if (!sentenceIterator.MoveNext())
                 {
-                    return false;
+                    currentSentenceStart = 0;
+                    currentSentenceEnd = 0;
+
+                    return false; // BreakIterator exhausted
                 }
 
-                SetNextSentence(enumerator.Current);
+                var sentence = sentenceIterator.Current;
+                var startIndex = iteratorText.IndexOf(sentence, currentSentenceStart);
+
+                if (startIndex < 0)
+                {
+                    var message = string.Format("There should have been a startIndex found for the sentence [{0}] in text [{1}]", sentence, iteratorText);
+                    throw new InvalidOperationException(message);
+                }
+
+                currentSentenceStart = startIndex;
+                currentSentenceEnd = startIndex + sentence.Length;
+
+                SetNextSentence(currentSentenceStart, currentSentenceEnd);
+
                 if (IncrementWord())
                 {
                     return true;
@@ -239,7 +260,7 @@ namespace Lucene.Net.Analysis.Util
 
         /// <summary>
         /// Provides the next input sentence for analysis </summary>
-        protected internal abstract void SetNextSentence(string sentence);
+        protected internal abstract void SetNextSentence(int sentenceStart, int sentenceEnd);
 
         /// <summary>
         /// Returns true if another word is available </summary>

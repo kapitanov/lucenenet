@@ -1,9 +1,9 @@
-{
+﻿{
   "dependencies": {
+    "icu-dotnet": "1.0.4-alpha",
     "NETStandard.Library": "1.5.0-rc2-24027",
     "NUnit": "3.0.0-rc-2",
     "NUnitLite": "3.0.0-rc-2",
-    "icu-dotnet": "1.0.3-alpha",
     "System.Runtime.InteropServices": "4.1.0-rc2-24027",
     "System.Threading.Thread": "4.0.0-rc2-24027"
   },

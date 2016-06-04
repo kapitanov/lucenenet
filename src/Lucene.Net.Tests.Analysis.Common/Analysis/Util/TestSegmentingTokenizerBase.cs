@@ -7,6 +7,8 @@ using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Support;
 using NUnit.Framework;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
@@ -55,6 +57,8 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         [Test]
         public virtual void TestBasics()
         {
+            var sentenceToUse = "\uDAD1²\uDF8F 㽜|";
+            AssertAnalyzesTo(sentence, sentenceToUse, new[] { sentenceToUse });
             AssertAnalyzesTo(sentence, "The acronym for United States is U.S. but this doesn't end a sentence", new[] { "The acronym for United States is U.S. but this doesn't end a sentence" });
             AssertAnalyzesTo(sentence, "He said, \"Are you going?\" John shook his head.", new[] { "He said, \"Are you going?\" ", "John shook his head." });
         }
@@ -122,10 +126,9 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /// silly tokenizer that just returns whole sentences as tokens </summary>
         sealed class WholeSentenceTokenizer : SegmentingTokenizerBase
         {
-            internal string sentence;
+            // Index that shows where the current index is last at.
             internal int sentenceStart, sentenceEnd;
             internal bool hasSentence;
-
             internal ICharTermAttribute termAtt;
             internal IOffsetAttribute offsetAtt;
 
@@ -136,9 +139,10 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
                 offsetAtt = AddAttribute<IOffsetAttribute>();
             }
 
-            protected override void SetNextSentence(string sentence)
+            protected override void SetNextSentence(int sentenceStart, int sentenceEnd)
             {
-                this.sentence = sentence;
+                this.sentenceStart = sentenceStart;
+                this.sentenceEnd = sentenceEnd;
                 hasSentence = true;
             }
 
@@ -165,7 +169,6 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /// </summary>
         sealed class SentenceAndWordTokenizer : SegmentingTokenizerBase
         {
-            internal string sentence;
             internal int sentenceStart, sentenceEnd;
             internal int wordStart, wordEnd;
             internal int posBoost = -1; // initially set to -1 so the first word in the document doesn't get a pos boost
@@ -182,9 +185,10 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
                 posIncAtt = AddAttribute<IPositionIncrementAttribute>();
             }
 
-            protected override void SetNextSentence(string sentence)
+            protected override void SetNextSentence(int sentenceStart, int sentenceEnd)
             {
-                this.sentence = sentence;
+                this.wordStart = this.wordEnd = this.sentenceStart = sentenceStart;
+                this.sentenceEnd = sentenceEnd;
                 posBoost++;
             }
 

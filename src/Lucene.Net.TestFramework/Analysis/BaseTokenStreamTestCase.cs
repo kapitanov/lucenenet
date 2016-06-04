@@ -193,7 +193,8 @@ namespace Lucene.Net.Analysis
                 }
 
                 bool reset = checkClearAtt.AndResetClearCalled; // reset it, because we called clearAttribute() before
-                Assert.IsTrue(ts.IncrementToken(), "token " + i + " does not exist");
+                bool incrementToken = ts.IncrementToken();
+                Assert.IsTrue(incrementToken, "token " + i + " does not exist");
                 Assert.IsTrue(reset, "ClearAttributes() was not called correctly in TokenStream chain");
 
                 Assert.AreEqual(output[i], termAtt.ToString(), "term " + i + ", output[i] = " + output[i] + ", termAtt = " + termAtt.ToString());

@@ -30,8 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="icu.net.pcl, Version=1.2.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\icu-dotnet.1.0.2-alpha\lib\net451\icu.net.pcl.dll</HintPath>
+    <Reference Include="icu.net, Version=1.2.0.0, Culture=neutral, PublicKeyToken=416fdd914afa6b66, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\icu-dotnet.1.0.4-alpha\lib\net40\icu.net.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="ICU4NET, Version=1.0.5593.31013, Culture=neutral, processorArchitecture=x86">
@@ -136,19 +136,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icudt56.dll">
+    <None Include="..\..\packages\icu-dotnet.1.0.4-alpha\contentFiles\any\any\lib\icudt56.dll">
       <Link>icudt56.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icuin56.dll">
+    <None Include="..\..\packages\icu-dotnet.1.0.4-alpha\contentFiles\any\any\lib\icuin56.dll">
       <Link>icuin56.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\packages\icu-dotnet.1.0.2-alpha\contentFiles\any\any\lib\icuuc56.dll">
+    <None Include="..\..\packages\icu-dotnet.1.0.4-alpha\contentFiles\any\any\lib\icuuc56.dll">
       <Link>icuuc56.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
