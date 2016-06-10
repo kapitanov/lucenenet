@@ -5,7 +5,7 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
+    <ProjectGuid>{0CCF93B7-C394-4A7D-8BB8-E2C199AC9EC6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Lucene.Net.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
@@ -42,11 +42,6 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="Lucene.Net.Portable.project.json" />
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -60,5 +55,43 @@
   </ProjectExtensions>
   <PropertyGroup>
     <NuGetTargetMoniker>.NETPlatform,Version=v5.4</NuGetTargetMoniker>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lucene.Net.Core\Lucene.Net.Portable.csproj">
+      <Project>{dbc3b677-805c-430e-af78-a9abf3975d17}</Project>
+      <Name>Lucene.Net.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Queries\Lucene.Net.Queries.Portable.csproj">
+      <Project>{69d7956c-c2cc-4708-b399-a188fec384c4}</Project>
+      <Name>Lucene.Net.Queries.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj">
+      <Project>{940efd2b-d875-4a6f-adb2-ad711b8440f4}</Project>
+      <Name>Lucene.Net.TestFramework.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BooleanFilterTest.cs" />
+    <Compile Include="BoostingQueryTest.cs" />
+    <Compile Include="ChainedFilterTest.cs" />
+    <Compile Include="CommonTermsQueryTest.cs" />
+    <Compile Include="Function\FunctionTestSetup.cs" />
+    <Compile Include="Function\TestBoostedQuery.cs" />
+    <Compile Include="Function\TestDocValuesFieldSources.cs" />
+    <Compile Include="Function\TestFieldScoreQuery.cs" />
+    <Compile Include="Function\TestFunctionQuerySort.cs" />
+    <Compile Include="Function\TestLongNormValueSource.cs" />
+    <Compile Include="Function\TestOrdValues.cs" />
+    <Compile Include="Function\TestValueSources.cs" />
+    <Compile Include="Mlt\TestMoreLikeThis.cs" />
+    <Compile Include="TermFilterTest.cs" />
+    <Compile Include="TermsFilterTest.cs" />
+    <Compile Include="TestCustomScoreQuery.cs" />
+  </ItemGroup>
+  <PropertyGroup>
+    <NuGetTargetMoniker>.NETStandard,Version=v1.5</NuGetTargetMoniker>
   </PropertyGroup>
 </Project>

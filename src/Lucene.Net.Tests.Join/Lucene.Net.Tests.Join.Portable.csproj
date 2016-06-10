@@ -5,7 +5,7 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
+    <ProjectGuid>{11CEC0DC-5E3E-4445-BA78-7D7CF54C1AE7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AssemblyName>Lucene.Net.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
@@ -42,11 +42,6 @@
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="Lucene.Net.Portable.project.json" />
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -60,5 +55,35 @@
   </ProjectExtensions>
   <PropertyGroup>
     <NuGetTargetMoniker>.NETPlatform,Version=v5.4</NuGetTargetMoniker>
+  </PropertyGroup>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lucene.Net.Core\Lucene.Net.Portable.csproj">
+      <Project>{dbc3b677-805c-430e-af78-a9abf3975d17}</Project>
+      <Name>Lucene.Net.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Grouping\Lucene.Net.Grouping.Portable.csproj">
+      <Project>{202d4160-72bd-4646-8892-30477bdc6fbf}</Project>
+      <Name>Lucene.Net.Grouping.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Join\Lucene.Net.Join.Portable.csproj">
+      <Project>{c6568f19-8277-4ef0-ad89-8b480db78c2d}</Project>
+      <Name>Lucene.Net.Join.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj">
+      <Project>{940efd2b-d875-4a6f-adb2-ad711b8440f4}</Project>
+      <Name>Lucene.Net.TestFramework.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="TestBlockJoin.cs" />
+    <Compile Include="TestBlockJoinSorting.cs" />
+    <Compile Include="TestBlockJoinValidation.cs" />
+    <Compile Include="TestJoinUtil.cs" />
+  </ItemGroup>
+  <PropertyGroup>
+    <NuGetTargetMoniker>.NETStandard,Version=v1.5</NuGetTargetMoniker>
   </PropertyGroup>
 </Project>

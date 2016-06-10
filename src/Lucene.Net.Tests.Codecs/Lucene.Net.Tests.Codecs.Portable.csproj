@@ -5,9 +5,9 @@
     <MinimumVisualStudioVersion>14.0</MinimumVisualStudioVersion>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{DBC3B677-805C-430E-AF78-A9ABF3975D17}</ProjectGuid>
+    <ProjectGuid>{CC547DAE-CE11-48F1-BEAF-0725CD074095}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <AssemblyName>Lucene.Net.Portable</AssemblyName>
+    <AssemblyName>Lucene.Net.Tests.Codecs.Portable</AssemblyName>
     <DefaultLanguage>en-US</DefaultLanguage>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -37,16 +37,11 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
-    <RootNamespace>Lucene.Net</RootNamespace>
+    <RootNamespace>Lucene.Net.Tests.Codecs</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
     <StartupObject />
   </PropertyGroup>
-  <ItemGroup>
-    <None Include="Lucene.Net.Portable.project.json" />
-    <!-- A reference to the entire .NET Framework is automatically included -->
-  </ItemGroup>
-  
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
@@ -58,7 +53,31 @@
   <ProjectExtensions>
     <VisualStudio AllowExistingFolder="true" />
   </ProjectExtensions>
+  <ItemGroup>
+    <None Include="project.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="DiskDv\TestDiskDocValuesFormat.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Lucene.Net.Codecs\Lucene.Net.Codecs.Portable.csproj">
+      <Project>{2796ebeb-8f48-4728-9221-a2c361781bfc}</Project>
+      <Name>Lucene.Net.Codecs.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Core\Lucene.Net.Portable.csproj">
+      <Project>{dbc3b677-805c-430e-af78-a9abf3975d17}</Project>
+      <Name>Lucene.Net.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.TestFramework\Lucene.Net.TestFramework.Portable.csproj">
+      <Project>{940efd2b-d875-4a6f-adb2-ad711b8440f4}</Project>
+      <Name>Lucene.Net.TestFramework.Portable</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Lucene.Net.Tests\Lucene.Net.Tests.Portable.csproj">
+      <Project>{91ad3fb7-8bc0-4008-852b-9972cd47e6c0}</Project>
+      <Name>Lucene.Net.Tests.Portable</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
-    <NuGetTargetMoniker>.NETPlatform,Version=v5.4</NuGetTargetMoniker>
+    <NuGetTargetMoniker>.NETStandard,Version=v1.5</NuGetTargetMoniker>
   </PropertyGroup>
 </Project>
