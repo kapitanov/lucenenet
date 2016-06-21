@@ -428,6 +428,7 @@
     <Compile Include="Store\TestHelper.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Support\AssertionException.cs" />
     <Compile Include="Support\FloatUtils.cs" />
     <Compile Include="Support\RandomizedTest.cs">
       <SubType>Code</SubType>
