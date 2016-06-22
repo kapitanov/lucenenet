@@ -6,9 +6,8 @@ using System.Text;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using System.IO;
-
+    using Xunit;
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements.  See the NOTICE file distributed with
@@ -73,8 +72,8 @@ namespace Lucene.Net.Search
                 }
 
                 Explanation exp = searcher.Explain(q, doc);
-                Assert.IsNotNull(exp, "Explanation of [[" + d + "]] for #" + doc + " is null");
-                Assert.IsFalse(exp.IsMatch, "Explanation of [[" + d + "]] for #" + doc + " doesn't indicate non-match: " + exp.ToString());
+                Assert.NotNull(exp); //, "Explanation of [[" + d + "]] for #" + doc + " is null");
+                Assert.False(exp.IsMatch, "Explanation of [[" + d + "]] for #" + doc + " doesn't indicate non-match: " + exp.ToString());
             }
         }
 
@@ -107,14 +106,14 @@ namespace Lucene.Net.Search
 
             searcher.Search(query, c);
 
-            Assert.AreEqual(correct, actual, "Simple: " + query.ToString(defaultFieldName));
+            Assert.Equal(correct, actual);//, "Simple: " + query.ToString(defaultFieldName));
 
             for (int i = -1; i < 2; i++)
             {
                 actual.Clear();
                 IndexSearcher s = QueryUtils.WrapUnderlyingReader(random, searcher, i);
                 s.Search(query, c);
-                Assert.AreEqual(correct, actual, "Wrap Reader " + i + ": " + query.ToString(defaultFieldName));
+                Assert.Equal(correct, actual); //, "Wrap Reader " + i + ": " + query.ToString(defaultFieldName));
             }
         }
 
@@ -186,7 +185,7 @@ namespace Lucene.Net.Search
                 actual.Add(Convert.ToInt32(hits[i].Doc));
             }
 
-            Assert.AreEqual(correct, actual, query.ToString(defaultFieldName));
+            Assert.Equal(correct, actual); //, query.ToString(defaultFieldName));
 
             QueryUtils.Check(random, query, searcher, LuceneTestCase.Rarely(random));
         }
@@ -195,10 +194,10 @@ namespace Lucene.Net.Search
         /// Tests that a Hits has an expected order of documents </summary>
         public static void CheckDocIds(string mes, int[] results, ScoreDoc[] hits)
         {
-            Assert.AreEqual(hits.Length, results.Length, mes + " nr of hits");
+            Assert.Equal(hits.Length, results.Length); //, mes + " nr of hits");
             for (int i = 0; i < results.Length; i++)
             {
-                Assert.AreEqual(results[i], hits[i].Doc, mes + " doc nrs for hit " + i);
+                Assert.Equal(results[i], hits[i].Doc); //, mes + " doc nrs for hit " + i);
             }
         }
 
@@ -218,18 +217,18 @@ namespace Lucene.Net.Search
             const float scoreTolerance = 1.0e-6f;
             if (hits1.Length != hits2.Length)
             {
-                Assert.Fail("Unequal lengths: hits1=" + hits1.Length + ",hits2=" + hits2.Length);
+                Assert.True(false, "Unequal lengths: hits1=" + hits1.Length + ",hits2=" + hits2.Length);
             }
             for (int i = 0; i < hits1.Length; i++)
             {
                 if (hits1[i].Doc != hits2[i].Doc)
                 {
-                    Assert.Fail("Hit " + i + " docnumbers don't match\n" + Hits2str(hits1, hits2, 0, 0) + "for query:" + query.ToString());
+                    Assert.True(false, "Hit " + i + " docnumbers don't match\n" + Hits2str(hits1, hits2, 0, 0) + "for query:" + query.ToString());
                 }
 
                 if ((hits1[i].Doc != hits2[i].Doc) || Math.Abs(hits1[i].Score - hits2[i].Score) > scoreTolerance)
                 {
-                    Assert.Fail("Hit " + i + ", doc nrs " + hits1[i].Doc + " and " + hits2[i].Doc + "\nunequal       : " + hits1[i].Score + "\n           and: " + hits2[i].Score + "\nfor query:" + query.ToString());
+                    Assert.True(false, "Hit " + i + ", doc nrs " + hits1[i].Doc + " and " + hits2[i].Doc + "\nunequal       : " + hits1[i].Score + "\n           and: " + hits2[i].Score + "\nfor query:" + query.ToString());
                 }
             }
         }
@@ -345,7 +344,10 @@ namespace Lucene.Net.Search
         public static void VerifyExplanation(string q, int doc, float score, bool deep, Explanation expl)
         {
             float value = expl.Value;
-            Assert.AreEqual(score, value, ExplainToleranceDelta(score, value), q + ": score(doc=" + doc + ")=" + score + " != explanationScore=" + value + " Explanation: " + expl);
+            float tolerance = ExplainToleranceDelta(score, value);
+            float minValue = value - tolerance;
+            float maxValue = value + tolerance;
+            Assert.InRange(score, minValue, maxValue); //, q + ": score(doc=" + doc + ")=" + score + " != explanationScore=" + value + " Explanation: " + expl);
 
             if (!deep)
             {
@@ -402,7 +404,7 @@ namespace Lucene.Net.Search
                         }
                     }
                     // TODO: this is a TERRIBLE assertion!!!!
-                    Assert.IsTrue(productOf || sumOf || maxOf || maxTimesOthers, q + ": multi valued explanation description=\"" + descr + "\" must be 'max of plus x times others' or end with 'product of'" + " or 'sum of:' or 'max of:' - " + expl);
+                    Assert.True(productOf || sumOf || maxOf || maxTimesOthers, q + ": multi valued explanation description=\"" + descr + "\" must be 'max of plus x times others' or end with 'product of'" + " or 'sum of:' or 'max of:' - " + expl);
                     float sum = 0;
                     float product = 1;
                     float max = 0;
@@ -433,9 +435,13 @@ namespace Lucene.Net.Search
                     }
                     else
                     {
-                        Assert.IsTrue(false, "should never get here!");
+                        Assert.True(false, "should never get here!");
                     }
-                    Assert.AreEqual(combined, value, ExplainToleranceDelta(combined, value), q + ": actual subDetails combined==" + combined + " != value=" + value + " Explanation: " + expl);
+
+                    tolerance = ExplainToleranceDelta(combined, value);
+                    minValue = value - tolerance;
+                    maxValue = value + tolerance;
+                    Assert.InRange(combined, minValue, maxValue); //, q + ": actual subDetails combined==" + combined + " != value=" + value + " Explanation: " + expl);
                 }
             }
         }
@@ -536,9 +542,9 @@ namespace Lucene.Net.Search
                     throw new Exception("exception in hitcollector of [[" + d + "]] for #" + doc, e);
                 }
 
-                Assert.IsNotNull(exp, "Explanation of [[" + d + "]] for #" + doc + " is null");
+                Assert.NotNull(exp); //, "Explanation of [[" + d + "]] for #" + doc + " is null");
                 VerifyExplanation(d, doc, Scorer_Renamed.Score(), Deep, exp);
-                Assert.IsTrue(exp.IsMatch, "Explanation of [[" + d + "]] for #" + doc + " does not indicate match: " + exp.ToString());
+                Assert.True(exp.IsMatch, "Explanation of [[" + d + "]] for #" + doc + " does not indicate match: " + exp.ToString());
             }
 
             public override AtomicReaderContext NextReader

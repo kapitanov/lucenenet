@@ -1,7 +1,6 @@
 using Lucene.Net.Analysis.Tokenattributes;
+using Xunit;
 using System;
-using System.Diagnostics;
-using NUnit.Framework;
 
 namespace Lucene.Net.Analysis
 {

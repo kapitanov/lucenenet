@@ -9,8 +9,7 @@ using Lucene.Net.Search;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
-
+    using Xunit;
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -84,7 +83,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestOneNumber()
         {
             Directory directory = NewDirectory();
@@ -101,25 +100,25 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 NumericDocValues dv = ((AtomicReader)((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader))).GetNumericDocValues("dv");
-                Assert.AreEqual(5, dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv.Get(hits.ScoreDocs[i].Doc));
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestOneFloat()
         {
             Directory directory = NewDirectory();
@@ -136,25 +135,25 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 NumericDocValues dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetNumericDocValues("dv");
-                Assert.AreEqual(Number.FloatToIntBits(5.7f), dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(Number.FloatToIntBits(5.7f), dv.Get(hits.ScoreDocs[i].Doc));
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoNumbers()
         {
             Directory directory = NewDirectory();
@@ -172,27 +171,27 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 NumericDocValues dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetNumericDocValues("dv1");
-                Assert.AreEqual(5, dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv.Get(hits.ScoreDocs[i].Doc));
                 dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetNumericDocValues("dv2");
-                Assert.AreEqual(17, dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(17, dv.Get(hits.ScoreDocs[i].Doc));
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoBinaryValues()
         {
             Directory directory = NewDirectory();
@@ -210,30 +209,30 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 BinaryDocValues dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetBinaryDocValues("dv1");
                 BytesRef scratch = new BytesRef();
                 dv.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef(longTerm), scratch);
+                Assert.Equal(new BytesRef(longTerm), scratch);
                 dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetBinaryDocValues("dv2");
                 dv.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef(text), scratch);
+                Assert.Equal(new BytesRef(text), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoFieldsMixed()
         {
             Directory directory = NewDirectory();
@@ -251,29 +250,29 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 NumericDocValues dv = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetNumericDocValues("dv1");
-                Assert.AreEqual(5, dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv.Get(hits.ScoreDocs[i].Doc));
                 BinaryDocValues dv2 = ((AtomicReader)((AtomicReader)ireader.Leaves[0].Reader)).GetBinaryDocValues("dv2");
                 dv2.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestThreeFieldsMixed()
         {
             Directory directory = NewDirectory();
@@ -292,33 +291,33 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv1");
                 int ord = dv.GetOrd(0);
                 dv.LookupOrd(ord, scratch);
-                Assert.AreEqual(new BytesRef("hello hello"), scratch);
+                Assert.Equal(new BytesRef("hello hello"), scratch);
                 NumericDocValues dv2 = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv2");
-                Assert.AreEqual(5, dv2.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv2.Get(hits.ScoreDocs[i].Doc));
                 BinaryDocValues dv3 = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv3");
                 dv3.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestThreeFieldsMixed2()
         {
             Directory directory = NewDirectory();
@@ -337,33 +336,33 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv2");
                 int ord = dv.GetOrd(0);
                 dv.LookupOrd(ord, scratch);
-                Assert.AreEqual(new BytesRef("hello hello"), scratch);
+                Assert.Equal(new BytesRef("hello hello"), scratch);
                 NumericDocValues dv2 = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv3");
-                Assert.AreEqual(5, dv2.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv2.Get(hits.ScoreDocs[i].Doc));
                 BinaryDocValues dv3 = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv1");
                 dv3.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoDocumentsNumeric()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -385,14 +384,14 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             Debug.Assert(ireader.Leaves.Count == 1);
             NumericDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv");
-            Assert.AreEqual(1, dv.Get(0));
-            Assert.AreEqual(2, dv.Get(1));
+            Assert.Equal(1, dv.Get(0));
+            Assert.Equal(2, dv.Get(1));
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoDocumentsMerged()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -429,14 +428,14 @@ namespace Lucene.Net.Index
                 {
                     expected = 99;
                 }
-                Assert.AreEqual(expected, dv.Get(i));
+                Assert.Equal(expected, dv.Get(i));
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBigNumericRange()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -458,14 +457,14 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             Debug.Assert(ireader.Leaves.Count == 1);
             NumericDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv");
-            Assert.AreEqual(long.MinValue, dv.Get(0));
-            Assert.AreEqual(long.MaxValue, dv.Get(1));
+            Assert.Equal(long.MinValue, dv.Get(0));
+            Assert.Equal(long.MaxValue, dv.Get(1));
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBigNumericRange2()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -487,14 +486,14 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             Debug.Assert(ireader.Leaves.Count == 1);
             NumericDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv");
-            Assert.AreEqual(-8841491950446638677L, dv.Get(0));
-            Assert.AreEqual(9062230939892376225L, dv.Get(1));
+            Assert.Equal(-8841491950446638677L, dv.Get(0));
+            Assert.Equal(9062230939892376225L, dv.Get(1));
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -514,27 +513,27 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv");
                 dv.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBytesTwoDocumentsMerged()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -573,14 +572,14 @@ namespace Lucene.Net.Index
                     expected = "hello 2";
                 }
                 dv.Get(i, scratch);
-                Assert.AreEqual(expected, scratch.Utf8ToString());
+                Assert.Equal(expected, scratch.Utf8ToString());
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -600,27 +599,27 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = new IndexSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
                 dv.LookupOrd(dv.GetOrd(hits.ScoreDocs[i].Doc), scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedBytesTwoDocuments()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -644,15 +643,15 @@ namespace Lucene.Net.Index
             SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.LookupOrd(dv.GetOrd(0), scratch);
-            Assert.AreEqual("hello world 1", scratch.Utf8ToString());
+            Assert.Equal("hello world 1", scratch.Utf8ToString());
             dv.LookupOrd(dv.GetOrd(1), scratch);
-            Assert.AreEqual("hello world 2", scratch.Utf8ToString());
+            Assert.Equal("hello world 2", scratch.Utf8ToString());
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedBytesThreeDocuments()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -677,21 +676,21 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             Debug.Assert(ireader.Leaves.Count == 1);
             SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
-            Assert.AreEqual(2, dv.ValueCount);
+            Assert.Equal(2, dv.ValueCount);
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(0, dv.GetOrd(0));
+            Assert.Equal(0, dv.GetOrd(0));
             dv.LookupOrd(0, scratch);
-            Assert.AreEqual("hello world 1", scratch.Utf8ToString());
-            Assert.AreEqual(1, dv.GetOrd(1));
+            Assert.Equal("hello world 1", scratch.Utf8ToString());
+            Assert.Equal(1, dv.GetOrd(1));
             dv.LookupOrd(1, scratch);
-            Assert.AreEqual("hello world 2", scratch.Utf8ToString());
-            Assert.AreEqual(0, dv.GetOrd(2));
+            Assert.Equal("hello world 2", scratch.Utf8ToString());
+            Assert.Equal(0, dv.GetOrd(2));
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedBytesTwoDocumentsMerged()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -716,12 +715,12 @@ namespace Lucene.Net.Index
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             Debug.Assert(ireader.Leaves.Count == 1);
             SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
-            Assert.AreEqual(2, dv.ValueCount); // 2 ords
+            Assert.Equal(2, dv.ValueCount); // 2 ords
             BytesRef scratch = new BytesRef();
             dv.LookupOrd(0, scratch);
-            Assert.AreEqual(new BytesRef("hello world 1"), scratch);
+            Assert.Equal(new BytesRef("hello world 1"), scratch);
             dv.LookupOrd(1, scratch);
-            Assert.AreEqual(new BytesRef("hello world 2"), scratch);
+            Assert.Equal(new BytesRef("hello world 2"), scratch);
             for (int i = 0; i < 2; i++)
             {
                 Document doc2 = ((AtomicReader)ireader.Leaves[0].Reader).Document(i);
@@ -735,14 +734,14 @@ namespace Lucene.Net.Index
                     expected = "hello world 2";
                 }
                 dv.LookupOrd(dv.GetOrd(i), scratch);
-                Assert.AreEqual(expected, scratch.Utf8ToString());
+                Assert.Equal(expected, scratch.Utf8ToString());
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedMergeAwayAllValues()
         {
             Directory directory = NewDirectory();
@@ -768,23 +767,23 @@ namespace Lucene.Net.Index
             SortedDocValues dv = GetOnlySegmentReader(ireader).GetSortedDocValues("field");
             if (DefaultCodecSupportsDocsWithField())
             {
-                Assert.AreEqual(-1, dv.GetOrd(0));
-                Assert.AreEqual(0, dv.ValueCount);
+                Assert.Equal(-1, dv.GetOrd(0));
+                Assert.Equal(0, dv.ValueCount);
             }
             else
             {
-                Assert.AreEqual(0, dv.GetOrd(0));
-                Assert.AreEqual(1, dv.ValueCount);
+                Assert.Equal(0, dv.GetOrd(0));
+                Assert.Equal(1, dv.ValueCount);
                 BytesRef @ref = new BytesRef();
                 dv.LookupOrd(0, @ref);
-                Assert.AreEqual(new BytesRef(), @ref);
+                Assert.Equal(new BytesRef(), @ref);
             }
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBytesWithNewline()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -804,13 +803,13 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual(new BytesRef("hello\nworld\r1"), scratch);
+            Assert.Equal(new BytesRef("hello\nworld\r1"), scratch);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestMissingSortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -832,18 +831,18 @@ namespace Lucene.Net.Index
             SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.LookupOrd(dv.GetOrd(0), scratch);
-            Assert.AreEqual(new BytesRef("hello world 2"), scratch);
+            Assert.Equal(new BytesRef("hello world 2"), scratch);
             if (DefaultCodecSupportsDocsWithField())
             {
-                Assert.AreEqual(-1, dv.GetOrd(1));
+                Assert.Equal(-1, dv.GetOrd(1));
             }
             dv.Get(1, scratch);
-            Assert.AreEqual(new BytesRef(""), scratch);
+            Assert.Equal(new BytesRef(""), scratch);
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedTermsEnum()
         {
             Directory directory = NewDirectory();
@@ -869,54 +868,54 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedDocValues dv = GetOnlySegmentReader(ireader).GetSortedDocValues("field");
-            Assert.AreEqual(3, dv.ValueCount);
+            Assert.Equal(3, dv.ValueCount);
 
             TermsEnum termsEnum = dv.TermsEnum();
 
             // next()
-            Assert.AreEqual("beer", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.AreEqual("hello", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.AreEqual("world", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
+            Assert.Equal("beer", termsEnum.Next().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.Equal("hello", termsEnum.Next().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.Equal("world", termsEnum.Next().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
 
             // seekCeil()
-            Assert.AreEqual(SeekStatus.NOT_FOUND, termsEnum.SeekCeil(new BytesRef("ha!")));
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.AreEqual(SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("beer")));
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.AreEqual(SeekStatus.END, termsEnum.SeekCeil(new BytesRef("zzz")));
+            Assert.Equal(SeekStatus.NOT_FOUND, termsEnum.SeekCeil(new BytesRef("ha!")));
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.Equal(SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("beer")));
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.Equal(SeekStatus.END, termsEnum.SeekCeil(new BytesRef("zzz")));
 
             // seekExact()
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("beer")));
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("hello")));
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("world")));
-            Assert.AreEqual("world", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
-            Assert.IsFalse(termsEnum.SeekExact(new BytesRef("bogus")));
+            Assert.True(termsEnum.SeekExact(new BytesRef("beer")));
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.True(termsEnum.SeekExact(new BytesRef("hello")));
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.True(termsEnum.SeekExact(new BytesRef("world")));
+            Assert.Equal("world", termsEnum.Term().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
+            Assert.False(termsEnum.SeekExact(new BytesRef("bogus")));
 
             // seek(ord)
             termsEnum.SeekExact(0);
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
             termsEnum.SeekExact(1);
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
             termsEnum.SeekExact(2);
-            Assert.AreEqual("world", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
+            Assert.Equal("world", termsEnum.Term().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestEmptySortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -939,16 +938,16 @@ namespace Lucene.Net.Index
             Debug.Assert(ireader.Leaves.Count == 1);
             SortedDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(0, dv.GetOrd(0));
-            Assert.AreEqual(0, dv.GetOrd(1));
+            Assert.Equal(0, dv.GetOrd(0));
+            Assert.Equal(0, dv.GetOrd(1));
             dv.LookupOrd(dv.GetOrd(0), scratch);
-            Assert.AreEqual("", scratch.Utf8ToString());
+            Assert.Equal("", scratch.Utf8ToString());
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestEmptyBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -972,15 +971,15 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual("", scratch.Utf8ToString());
+            Assert.Equal("", scratch.Utf8ToString());
             dv.Get(1, scratch);
-            Assert.AreEqual("", scratch.Utf8ToString());
+            Assert.Equal("", scratch.Utf8ToString());
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestVeryLargeButLegalBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1003,13 +1002,13 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual(new BytesRef(bytes), scratch);
+            Assert.Equal(new BytesRef(bytes), scratch);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestVeryLargeButLegalSortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1032,12 +1031,12 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual(new BytesRef(bytes), scratch);
+            Assert.Equal(new BytesRef(bytes), scratch);
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestCodecUsesOwnBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1058,14 +1057,14 @@ namespace Lucene.Net.Index
             var mybytes = new byte[20];
             BytesRef scratch = new BytesRef(mybytes);
             dv.Get(0, scratch);
-            Assert.AreEqual("boo!", scratch.Utf8ToString());
-            Assert.IsFalse(scratch.Bytes == mybytes);
+            Assert.Equal("boo!", scratch.Utf8ToString());
+            Assert.False(scratch.Bytes == mybytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestCodecUsesOwnSortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1086,14 +1085,14 @@ namespace Lucene.Net.Index
             var mybytes = new byte[20];
             BytesRef scratch = new BytesRef(mybytes);
             dv.Get(0, scratch);
-            Assert.AreEqual("boo!", scratch.Utf8ToString());
-            Assert.IsFalse(scratch.Bytes == mybytes);
+            Assert.Equal("boo!", scratch.Utf8ToString());
+            Assert.False(scratch.Bytes == mybytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestCodecUsesOwnBytesEachTime()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1116,19 +1115,19 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual("foo!", scratch.Utf8ToString());
+            Assert.Equal("foo!", scratch.Utf8ToString());
 
             BytesRef scratch2 = new BytesRef();
             dv.Get(1, scratch2);
-            Assert.AreEqual("bar!", scratch2.Utf8ToString());
+            Assert.Equal("bar!", scratch2.Utf8ToString());
             // check scratch is still valid
-            Assert.AreEqual("foo!", scratch.Utf8ToString());
+            Assert.Equal("foo!", scratch.Utf8ToString());
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestCodecUsesOwnSortedBytesEachTime()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -1151,13 +1150,13 @@ namespace Lucene.Net.Index
             BinaryDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetSortedDocValues("dv");
             BytesRef scratch = new BytesRef();
             dv.Get(0, scratch);
-            Assert.AreEqual("foo!", scratch.Utf8ToString());
+            Assert.Equal("foo!", scratch.Utf8ToString());
 
             BytesRef scratch2 = new BytesRef();
             dv.Get(1, scratch2);
-            Assert.AreEqual("bar!", scratch2.Utf8ToString());
+            Assert.Equal("bar!", scratch2.Utf8ToString());
             // check scratch is still valid
-            Assert.AreEqual("foo!", scratch.Utf8ToString());
+            Assert.Equal("foo!", scratch.Utf8ToString());
 
             ireader.Dispose();
             directory.Dispose();
@@ -1166,7 +1165,7 @@ namespace Lucene.Net.Index
         /*
          * Simple test case to show how to use the API
          */
-        [Test]
+        [Fact]
         public void TestDocValuesSimple()
         {
             Directory dir = NewDirectory();
@@ -1187,7 +1186,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             DirectoryReader reader = DirectoryReader.Open(dir, 1);
-            Assert.AreEqual(1, reader.Leaves.Count);
+            Assert.Equal(1, reader.Leaves.Count);
 
             IndexSearcher searcher = new IndexSearcher(reader);
 
@@ -1199,19 +1198,19 @@ namespace Lucene.Net.Index
             query.Add(new TermQuery(new Term("docId", "4")), BooleanClause.Occur.SHOULD);
 
             TopDocs search = searcher.Search(query, 10);
-            Assert.AreEqual(5, search.TotalHits);
+            Assert.Equal(5, search.TotalHits);
             ScoreDoc[] scoreDocs = search.ScoreDocs;
             NumericDocValues docValues = GetOnlySegmentReader(reader).GetNumericDocValues("docId");
             for (int i = 0; i < scoreDocs.Length; i++)
             {
-                Assert.AreEqual(i, scoreDocs[i].Doc);
-                Assert.AreEqual(i, docValues.Get(scoreDocs[i].Doc));
+                Assert.Equal(i, scoreDocs[i].Doc);
+                Assert.Equal(i, docValues.Get(scoreDocs[i].Doc));
             }
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestRandomSortedBytes()
         {
             Directory dir = NewDirectory();
@@ -1282,14 +1281,14 @@ namespace Lucene.Net.Index
             int[] sort = hash.Sort(BytesRef.UTF8SortedAsUnicodeComparer);
             BytesRef expected = new BytesRef();
             BytesRef actual = new BytesRef();
-            Assert.AreEqual(hash.Size(), docValues.ValueCount);
+            Assert.Equal(hash.Size(), docValues.ValueCount);
             for (int i = 0; i < hash.Size(); i++)
             {
                 hash.Get(sort[i], expected);
                 docValues.LookupOrd(i, actual);
-                Assert.AreEqual(expected.Utf8ToString(), actual.Utf8ToString());
+                Assert.Equal(expected.Utf8ToString(), actual.Utf8ToString());
                 int ord = docValues.LookupTerm(expected);
-                Assert.AreEqual(i, ord);
+                Assert.Equal(i, ord);
             }
             AtomicReader slowR = SlowCompositeReaderWrapper.Wrap(reader);
             ISet<KeyValuePair<string, string>> entrySet = docToString.EntrySet();
@@ -1301,7 +1300,7 @@ namespace Lucene.Net.Index
                 int docId = termDocsEnum.NextDoc();
                 expected = new BytesRef(entry.Value);
                 docValues.Get(docId, actual);
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
 
             reader.Dispose();
@@ -1393,7 +1392,7 @@ namespace Lucene.Net.Index
                 for (int i = 0; i < r.MaxDoc; i++)
                 {
                     long storedValue = Convert.ToInt64(r.Document(i).Get("stored"));
-                    Assert.AreEqual(storedValue, docValues.Get(i));
+                    Assert.Equal(storedValue, docValues.Get(i));
                 }
             }
             ir.Dispose();
@@ -1488,7 +1487,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBooleanNumericsVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1498,7 +1497,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestByteNumericsVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1508,7 +1507,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestByteMissingVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1518,7 +1517,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestShortNumericsVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1528,7 +1527,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestShortMissingVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1538,7 +1537,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestIntNumericsVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1548,7 +1547,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestIntMissingVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1558,7 +1557,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestLongNumericsVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1568,7 +1567,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestLongMissingVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1636,14 +1635,14 @@ namespace Lucene.Net.Index
                     BytesRef binaryValue = r.Document(i).GetBinaryValue("stored");
                     BytesRef scratch = new BytesRef();
                     docValues.Get(i, scratch);
-                    Assert.AreEqual(binaryValue, scratch);
+                    Assert.Equal(binaryValue, scratch);
                 }
             }
             ir.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBinaryFixedLengthVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1654,7 +1653,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestBinaryVariableLengthVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1722,7 +1721,7 @@ namespace Lucene.Net.Index
                     BytesRef binaryValue = r.Document(i).GetBinaryValue("stored");
                     BytesRef scratch = new BytesRef();
                     docValues.Get(i, scratch);
-                    Assert.AreEqual(binaryValue, scratch);
+                    Assert.Equal(binaryValue, scratch);
                 }
             }
             ir.Dispose();
@@ -1788,7 +1787,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedFixedLengthVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1799,7 +1798,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedFixedLengthVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1810,7 +1809,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedVariableLengthVsFieldCache()
         {
             int numIterations = AtLeast(1);
@@ -1820,7 +1819,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedVariableLengthVsStoredFields()
         {
             int numIterations = AtLeast(1);
@@ -1830,7 +1829,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetOneValue()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -1847,18 +1846,18 @@ namespace Lucene.Net.Index
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoFields()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -1876,27 +1875,27 @@ namespace Lucene.Net.Index
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field2");
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("world"), bytes);
+            Assert.Equal(new BytesRef("world"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoDocumentsMerged()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -1920,28 +1919,28 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(2, dv.ValueCount);
+            Assert.Equal(2, dv.ValueCount);
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             dv.Document = 1;
-            Assert.AreEqual(1, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(1, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             dv.LookupOrd(1, bytes);
-            Assert.AreEqual(new BytesRef("world"), bytes);
+            Assert.Equal(new BytesRef("world"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoValues()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -1959,22 +1958,22 @@ namespace Lucene.Net.Index
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(1, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(1, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             dv.LookupOrd(1, bytes);
-            Assert.AreEqual(new BytesRef("world"), bytes);
+            Assert.Equal(new BytesRef("world"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoValuesUnordered()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -1992,22 +1991,22 @@ namespace Lucene.Net.Index
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(1, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(1, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             dv.LookupOrd(1, bytes);
-            Assert.AreEqual(new BytesRef("world"), bytes);
+            Assert.Equal(new BytesRef("world"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetThreeValuesTwoDocs()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2033,33 +2032,33 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(3, dv.ValueCount);
+            Assert.Equal(3, dv.ValueCount);
 
             dv.Document = 0;
-            Assert.AreEqual(1, dv.NextOrd());
-            Assert.AreEqual(2, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(1, dv.NextOrd());
+            Assert.Equal(2, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             dv.Document = 1;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(1, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(1, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("beer"), bytes);
+            Assert.Equal(new BytesRef("beer"), bytes);
 
             dv.LookupOrd(1, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             dv.LookupOrd(2, bytes);
-            Assert.AreEqual(new BytesRef("world"), bytes);
+            Assert.Equal(new BytesRef("world"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoDocumentsLastMissing()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2080,21 +2079,21 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(1, dv.ValueCount);
+            Assert.Equal(1, dv.ValueCount);
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoDocumentsLastMissingMerge()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2117,21 +2116,21 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(1, dv.ValueCount);
+            Assert.Equal(1, dv.ValueCount);
 
             dv.Document = 0;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoDocumentsFirstMissing()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2153,21 +2152,21 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(1, dv.ValueCount);
+            Assert.Equal(1, dv.ValueCount);
 
             dv.Document = 1;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTwoDocumentsFirstMissingMerge()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2190,21 +2189,21 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(1, dv.ValueCount);
+            Assert.Equal(1, dv.ValueCount);
 
             dv.Document = 1;
-            Assert.AreEqual(0, dv.NextOrd());
-            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
+            Assert.Equal(0, dv.NextOrd());
+            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, dv.NextOrd());
 
             BytesRef bytes = new BytesRef();
             dv.LookupOrd(0, bytes);
-            Assert.AreEqual(new BytesRef("hello"), bytes);
+            Assert.Equal(new BytesRef("hello"), bytes);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetMergeAwayAllValues()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2229,13 +2228,13 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(0, dv.ValueCount);
+            Assert.Equal(0, dv.ValueCount);
 
             ireader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetTermsEnum()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2255,49 +2254,49 @@ namespace Lucene.Net.Index
             iwriter.Dispose();
 
             SortedSetDocValues dv = GetOnlySegmentReader(ireader).GetSortedSetDocValues("field");
-            Assert.AreEqual(3, dv.ValueCount);
+            Assert.Equal(3, dv.ValueCount);
 
             TermsEnum termsEnum = dv.TermsEnum();
 
             // next()
-            Assert.AreEqual("beer", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.AreEqual("hello", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.AreEqual("world", termsEnum.Next().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
+            Assert.Equal("beer", termsEnum.Next().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.Equal("hello", termsEnum.Next().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.Equal("world", termsEnum.Next().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
 
             // seekCeil()
-            Assert.AreEqual(SeekStatus.NOT_FOUND, termsEnum.SeekCeil(new BytesRef("ha!")));
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.AreEqual(SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("beer")));
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.AreEqual(SeekStatus.END, termsEnum.SeekCeil(new BytesRef("zzz")));
+            Assert.Equal(SeekStatus.NOT_FOUND, termsEnum.SeekCeil(new BytesRef("ha!")));
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.Equal(SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("beer")));
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.Equal(SeekStatus.END, termsEnum.SeekCeil(new BytesRef("zzz")));
 
             // seekExact()
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("beer")));
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("hello")));
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("world")));
-            Assert.AreEqual("world", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
-            Assert.IsFalse(termsEnum.SeekExact(new BytesRef("bogus")));
+            Assert.True(termsEnum.SeekExact(new BytesRef("beer")));
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
+            Assert.True(termsEnum.SeekExact(new BytesRef("hello")));
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
+            Assert.True(termsEnum.SeekExact(new BytesRef("world")));
+            Assert.Equal("world", termsEnum.Term().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
+            Assert.False(termsEnum.SeekExact(new BytesRef("bogus")));
 
             // seek(ord)
             termsEnum.SeekExact(0);
-            Assert.AreEqual("beer", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(0, termsEnum.Ord());
+            Assert.Equal("beer", termsEnum.Term().Utf8ToString());
+            Assert.Equal(0, termsEnum.Ord());
             termsEnum.SeekExact(1);
-            Assert.AreEqual("hello", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(1, termsEnum.Ord());
+            Assert.Equal("hello", termsEnum.Term().Utf8ToString());
+            Assert.Equal(1, termsEnum.Ord());
             termsEnum.SeekExact(2);
-            Assert.AreEqual("world", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(2, termsEnum.Ord());
+            Assert.Equal("world", termsEnum.Term().Utf8ToString());
+            Assert.Equal(2, termsEnum.Ord());
             ireader.Dispose();
             directory.Dispose();
         }
@@ -2382,7 +2381,7 @@ namespace Lucene.Net.Index
                         long ord = docValues.NextOrd();
                         Debug.Assert(ord != SortedSetDocValues.NO_MORE_ORDS);
                         docValues.LookupOrd(ord, scratch);
-                        Assert.AreEqual(stringValues[j], scratch.Utf8ToString());
+                        Assert.Equal(stringValues[j], scratch.Utf8ToString());
                     }
                     Debug.Assert(docValues == null || docValues.NextOrd() == SortedSetDocValues.NO_MORE_ORDS);
                 }
@@ -2391,7 +2390,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetFixedLengthVsStoredFields()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2403,7 +2402,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetVariableLengthVsStoredFields()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2414,7 +2413,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetFixedLengthSingleValuedVsStoredFields()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2426,7 +2425,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetVariableLengthSingleValuedVsStoredFields()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2439,10 +2438,10 @@ namespace Lucene.Net.Index
 
         private void AssertEquals(Bits expected, Bits actual)
         {
-            Assert.AreEqual(expected.Length(), actual.Length());
+            Assert.Equal(expected.Length(), actual.Length());
             for (int i = 0; i < expected.Length(); i++)
             {
-                Assert.AreEqual(expected.Get(i), actual.Get(i));
+                Assert.Equal(expected.Get(i), actual.Get(i));
             }
         }
 
@@ -2457,10 +2456,10 @@ namespace Lucene.Net.Index
             // in this case FC.getDocTermsOrds returns EMPTY
             if (actual == null)
             {
-                Assert.AreEqual(DocValues.EMPTY_SORTED_SET, expected);
+                Assert.Equal(DocValues.EMPTY_SORTED_SET, expected);
                 return;
             }
-            Assert.AreEqual(expected.ValueCount, actual.ValueCount);
+            Assert.Equal(expected.ValueCount, actual.ValueCount);
             // compare ord lists
             for (int i = 0; i < maxDoc; i++)
             {
@@ -2469,9 +2468,9 @@ namespace Lucene.Net.Index
                 long expectedOrd;
                 while ((expectedOrd = expected.NextOrd()) != SortedSetDocValues.NO_MORE_ORDS)
                 {
-                    Assert.AreEqual(expectedOrd, actual.NextOrd());
+                    Assert.Equal(expectedOrd, actual.NextOrd());
                 }
-                Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, actual.NextOrd());
+                Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, actual.NextOrd());
             }
 
             // compare ord dictionary
@@ -2481,7 +2480,7 @@ namespace Lucene.Net.Index
             {
                 expected.LookupTerm(expectedBytes);
                 actual.LookupTerm(actualBytes);
-                Assert.AreEqual(expectedBytes, actualBytes);
+                Assert.Equal(expectedBytes, actualBytes);
             }
 
             // compare termsenum
@@ -2495,37 +2494,37 @@ namespace Lucene.Net.Index
             // sequential next() through all terms
             while ((@ref = expected.Next()) != null)
             {
-                Assert.AreEqual(@ref, actual.Next());
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.Equal(@ref, actual.Next());
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
-            Assert.IsNull(actual.Next());
+            Assert.Null(actual.Next());
 
             // sequential seekExact(ord) through all terms
             for (long i = 0; i < numOrds; i++)
             {
                 expected.SeekExact(i);
                 actual.SeekExact(i);
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
 
             // sequential seekExact(BytesRef) through all terms
             for (long i = 0; i < numOrds; i++)
             {
                 expected.SeekExact(i);
-                Assert.IsTrue(actual.SeekExact(expected.Term()));
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.True(actual.SeekExact(expected.Term()));
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
 
             // sequential seekCeil(BytesRef) through all terms
             for (long i = 0; i < numOrds; i++)
             {
                 expected.SeekExact(i);
-                Assert.AreEqual(SeekStatus.FOUND, actual.SeekCeil(expected.Term()));
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.Equal(SeekStatus.FOUND, actual.SeekCeil(expected.Term()));
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
 
             // random seekExact(ord)
@@ -2534,8 +2533,8 @@ namespace Lucene.Net.Index
                 long randomOrd = TestUtil.NextLong(Random(), 0, numOrds - 1);
                 expected.SeekExact(randomOrd);
                 actual.SeekExact(randomOrd);
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
 
             // random seekExact(BytesRef)
@@ -2544,8 +2543,8 @@ namespace Lucene.Net.Index
                 long randomOrd = TestUtil.NextLong(Random(), 0, numOrds - 1);
                 expected.SeekExact(randomOrd);
                 actual.SeekExact(expected.Term());
-                Assert.AreEqual(expected.Ord(), actual.Ord());
-                Assert.AreEqual(expected.Term(), actual.Term());
+                Assert.Equal(expected.Ord(), actual.Ord());
+                Assert.Equal(expected.Term(), actual.Term());
             }
 
             // random seekCeil(BytesRef)
@@ -2553,11 +2552,11 @@ namespace Lucene.Net.Index
             {
                 BytesRef target = new BytesRef(TestUtil.RandomUnicodeString(Random()));
                 SeekStatus expectedStatus = expected.SeekCeil(target);
-                Assert.AreEqual(expectedStatus, actual.SeekCeil(target));
+                Assert.Equal(expectedStatus, actual.SeekCeil(target));
                 if (expectedStatus != SeekStatus.END)
                 {
-                    Assert.AreEqual(expected.Ord(), actual.Ord());
-                    Assert.AreEqual(expected.Term(), actual.Term());
+                    Assert.Equal(expected.Ord(), actual.Ord());
+                    Assert.Equal(expected.Term(), actual.Term());
                 }
             }
         }
@@ -2648,7 +2647,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetFixedLengthVsUninvertedField()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2660,7 +2659,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSortedSetVariableLengthVsUninvertedField()
         {
             AssumeTrue("Codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -2671,7 +2670,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestGCDCompression()
         {
             int numIterations = AtLeast(1);
@@ -2736,7 +2735,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public void TestTwoNumbersOneMissing()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2755,19 +2754,19 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             NumericDocValues dv = ar.GetNumericDocValues("dv1");
-            Assert.AreEqual(0, dv.Get(0));
-            Assert.AreEqual(0, dv.Get(1));
+            Assert.Equal(0, dv.Get(0));
+            Assert.Equal(0, dv.Get(1));
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoNumbersOneMissingWithMerging()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2787,19 +2786,19 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             NumericDocValues dv = ar.GetNumericDocValues("dv1");
-            Assert.AreEqual(0, dv.Get(0));
-            Assert.AreEqual(0, dv.Get(1));
+            Assert.Equal(0, dv.Get(0));
+            Assert.Equal(0, dv.Get(1));
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestThreeNumbersOneMissingWithMerging()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2823,21 +2822,21 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             NumericDocValues dv = ar.GetNumericDocValues("dv1");
-            Assert.AreEqual(0, dv.Get(0));
-            Assert.AreEqual(0, dv.Get(1));
-            Assert.AreEqual(5, dv.Get(2));
+            Assert.Equal(0, dv.Get(0));
+            Assert.Equal(0, dv.Get(1));
+            Assert.Equal(5, dv.Get(2));
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
-            Assert.IsTrue(docsWithField.Get(2));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(2));
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoBytesOneMissing()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2856,22 +2855,22 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             BinaryDocValues dv = ar.GetBinaryDocValues("dv1");
             BytesRef @ref = new BytesRef();
             dv.Get(0, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             dv.Get(1, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestTwoBytesOneMissingWithMerging()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2891,22 +2890,22 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             BinaryDocValues dv = ar.GetBinaryDocValues("dv1");
             BytesRef @ref = new BytesRef();
             dv.Get(0, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             dv.Get(1, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestThreeBytesOneMissingWithMerging()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -2930,26 +2929,26 @@ namespace Lucene.Net.Index
             iw.Dispose();
 
             IndexReader ir = DirectoryReader.Open(directory);
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader ar = (AtomicReader)ir.Leaves[0].Reader;
             BinaryDocValues dv = ar.GetBinaryDocValues("dv1");
             BytesRef @ref = new BytesRef();
             dv.Get(0, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             dv.Get(1, @ref);
-            Assert.AreEqual(new BytesRef(), @ref);
+            Assert.Equal(new BytesRef(), @ref);
             dv.Get(2, @ref);
-            Assert.AreEqual(new BytesRef("boo"), @ref);
+            Assert.Equal(new BytesRef("boo"), @ref);
             Bits docsWithField = ar.GetDocsWithField("dv1");
-            Assert.IsTrue(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
-            Assert.IsTrue(docsWithField.Get(2));
+            Assert.True(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
+            Assert.True(docsWithField.Get(2));
             ir.Dispose();
             directory.Dispose();
         }
 
         // LUCENE-4853
-        [Test]
+        [Fact]
         public void TestHugeBinaryValues()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -3019,7 +3018,7 @@ namespace Lucene.Net.Index
                     else
                     {
                         // OK: some codecs can't handle binary DV > 32K
-                        Assert.IsFalse(CodecAcceptsHugeBinaryValues("field"));
+                        Assert.False(CodecAcceptsHugeBinaryValues("field"));
                         w.Rollback();
                         d.Dispose();
                         return;
@@ -3040,7 +3039,7 @@ namespace Lucene.Net.Index
                 }
                 else
                 {
-                    Assert.IsFalse(CodecAcceptsHugeBinaryValues("field"));
+                    Assert.False(CodecAcceptsHugeBinaryValues("field"));
 
                     // OK: some codecs can't handle binary DV > 32K
                     w.Rollback();
@@ -3059,18 +3058,18 @@ namespace Lucene.Net.Index
                 BytesRef bytes = new BytesRef();
                 s.Get(docID, bytes);
                 var expected = docBytes[Convert.ToInt32(doc.Get("id"))];
-                Assert.AreEqual(expected.Length, bytes.Length);
-                Assert.AreEqual(new BytesRef(expected), bytes);
+                Assert.Equal(expected.Length, bytes.Length);
+                Assert.Equal(new BytesRef(expected), bytes);
             }
 
-            Assert.IsTrue(CodecAcceptsHugeBinaryValues("field"));
+            Assert.True(CodecAcceptsHugeBinaryValues("field"));
 
             ar.Dispose();
             d.Dispose();
         }
 
         // TODO: get this out of here and into the deprecated codecs (4.0, 4.2)
-        [Test]
+        [Fact]
         public void TestHugeBinaryValueLimit()
         {
             // We only test DVFormats that have a limit
@@ -3144,8 +3143,8 @@ namespace Lucene.Net.Index
                 BytesRef bytes = new BytesRef();
                 s.Get(docID, bytes);
                 var expected = docBytes[Convert.ToInt32(doc.Get("id"))];
-                Assert.AreEqual(expected.Length, bytes.Length);
-                Assert.AreEqual(new BytesRef(expected), bytes);
+                Assert.Equal(expected.Length, bytes.Length);
+                Assert.Equal(new BytesRef(expected), bytes);
             }
 
             ar.Dispose();
@@ -3155,7 +3154,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Tests dv against stored fields with threads (binary/numeric/sorted, no missing)
         /// </summary>
-        [Test]
+        [Fact]
         public void TestThreads()
         {
             Directory dir = NewDirectory();
@@ -3255,11 +3254,11 @@ namespace Lucene.Net.Index
                             BytesRef binaryValue = r.Document(j).GetBinaryValue("storedBin");
                             BytesRef scratch = new BytesRef();
                             binaries.Get(j, scratch);
-                            Assert.AreEqual(binaryValue, scratch);
+                            Assert.Equal(binaryValue, scratch);
                             sorted.Get(j, scratch);
-                            Assert.AreEqual(binaryValue, scratch);
+                            Assert.Equal(binaryValue, scratch);
                             string expected = r.Document(j).Get("storedNum");
-                            Assert.AreEqual(Convert.ToInt64(expected), numerics.Get(j));
+                            Assert.Equal(Convert.ToInt64(expected), numerics.Get(j));
                         }
                     }
                     TestUtil.CheckReader(Ir);
@@ -3274,7 +3273,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Tests dv against stored fields with threads (all types + missing)
         /// </summary>
-        [Test]
+        [Fact]
         public void TestThreads2()
         {
             AssumeTrue("Codec does not support GetDocsWithField", DefaultCodecSupportsDocsWithField());
@@ -3402,18 +3401,18 @@ namespace Lucene.Net.Index
                                 {
                                     BytesRef scratch = new BytesRef();
                                     binaries.Get(j, scratch);
-                                    Assert.AreEqual(binaryValue, scratch);
+                                    Assert.Equal(binaryValue, scratch);
                                     sorted.Get(j, scratch);
-                                    Assert.AreEqual(binaryValue, scratch);
-                                    Assert.IsTrue(binaryBits.Get(j));
-                                    Assert.IsTrue(sortedBits.Get(j));
+                                    Assert.Equal(binaryValue, scratch);
+                                    Assert.True(binaryBits.Get(j));
+                                    Assert.True(sortedBits.Get(j));
                                 }
                             }
                             else if (binaries != null)
                             {
-                                Assert.IsFalse(binaryBits.Get(j));
-                                Assert.IsFalse(sortedBits.Get(j));
-                                Assert.AreEqual(-1, sorted.GetOrd(j));
+                                Assert.False(binaryBits.Get(j));
+                                Assert.False(sortedBits.Get(j));
+                                Assert.Equal(-1, sorted.GetOrd(j));
                             }
 
                             string number = r.Document(j).Get("storedNum");
@@ -3421,36 +3420,36 @@ namespace Lucene.Net.Index
                             {
                                 if (numerics != null)
                                 {
-                                    Assert.AreEqual(Convert.ToInt64(number), numerics.Get(j));
+                                    Assert.Equal(Convert.ToInt64(number), numerics.Get(j));
                                 }
                             }
                             else if (numerics != null)
                             {
-                                Assert.IsFalse(numericBits.Get(j));
-                                Assert.AreEqual(0, numerics.Get(j));
+                                Assert.False(numericBits.Get(j));
+                                Assert.Equal(0, numerics.Get(j));
                             }
 
                             string[] values = r.Document(j).GetValues("storedSortedSet");
                             if (values.Length > 0)
                             {
-                                Assert.IsNotNull(sortedSet);
+                                Assert.NotNull(sortedSet);
                                 sortedSet.Document = j;
                                 for (int k = 0; k < values.Length; k++)
                                 {
                                     long ord = sortedSet.NextOrd();
-                                    Assert.IsTrue(ord != SortedSetDocValues.NO_MORE_ORDS);
+                                    Assert.True(ord != SortedSetDocValues.NO_MORE_ORDS);
                                     BytesRef value = new BytesRef();
                                     sortedSet.LookupOrd(ord, value);
-                                    Assert.AreEqual(values[k], value.Utf8ToString());
+                                    Assert.Equal(values[k], value.Utf8ToString());
                                 }
-                                Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, sortedSet.NextOrd());
-                                Assert.IsTrue(sortedSetBits.Get(j));
+                                Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, sortedSet.NextOrd());
+                                Assert.True(sortedSetBits.Get(j));
                             }
                             else if (sortedSet != null)
                             {
                                 sortedSet.Document = j;
-                                Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, sortedSet.NextOrd());
-                                Assert.IsFalse(sortedSetBits.Get(j));
+                                Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, sortedSet.NextOrd());
+                                Assert.False(sortedSetBits.Get(j));
                             }
                         }
                     }
@@ -3464,7 +3463,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-5218
-        [Test]
+        [Fact]
         public void TestEmptyBinaryValueOnPageSizes()
         {
             // Test larger and larger power-of-two sized values,
@@ -3499,7 +3498,7 @@ namespace Lucene.Net.Index
                 for (int j = 0; j < 5; j++)
                 {
                     values.Get(0, result);
-                    Assert.IsTrue(result.Length == 0 || result.Length == 1 << i);
+                    Assert.True(result.Length == 0 || result.Length == 1 << i);
                 }
                 ar.Dispose();
                 dir.Dispose();

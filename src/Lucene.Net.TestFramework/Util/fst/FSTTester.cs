@@ -7,9 +7,8 @@ namespace Lucene.Net.Util.Fst
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
-
+    using Xunit;
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -427,7 +426,7 @@ namespace Lucene.Net.Util.Fst
 
             if (Pairs.Count == 0)
             {
-                Assert.IsNull(fst);
+                Assert.Null(fst);
                 return;
             }
 
@@ -436,14 +435,14 @@ namespace Lucene.Net.Util.Fst
                 Console.WriteLine("TEST: now verify " + Pairs.Count + " terms");
                 foreach (InputOutput<T> pair in Pairs)
                 {
-                    Assert.IsNotNull(pair);
-                    Assert.IsNotNull(pair.Input);
-                    Assert.IsNotNull(pair.Output);
+                    Assert.NotNull(pair);
+                    Assert.NotNull(pair.Input);
+                    Assert.NotNull(pair.Output);
                     Console.WriteLine("  " + InputToString(inputMode, pair.Input) + ": " + Outputs.OutputToString(pair.Output));
                 }
             }
 
-            Assert.IsNotNull(fst);
+            Assert.NotNull(fst);
 
             // visit valid pairs in order -- make sure all words
             // are accepted, and FSTEnum's next() steps through
@@ -462,16 +461,16 @@ namespace Lucene.Net.Util.Fst
                         Console.WriteLine("TEST: check term=" + InputToString(inputMode, term) + " output=" + fst.Outputs.OutputToString(pair.Output));
                     }
                     T output = Run(fst, term, null);
-                    Assert.IsNotNull(output, "term " + InputToString(inputMode, term) + " is not accepted");
-                    Assert.IsTrue(OutputsEqual(pair.Output, output));
+                    Assert.NotNull(output); // , "term " + InputToString(inputMode, term) + " is not accepted");
+                    Assert.True(OutputsEqual(pair.Output, output));
 
                     // verify enum's next
                     IntsRefFSTEnum<T>.InputOutput<T> t = fstEnum.Next();
-                    Assert.IsNotNull(t);
-                    Assert.AreEqual(term, t.Input, "expected input=" + InputToString(inputMode, term) + " but fstEnum returned " + InputToString(inputMode, t.Input));
-                    Assert.IsTrue(OutputsEqual(pair.Output, t.Output));
+                    Assert.NotNull(t);
+                    Assert.Equal(term, t.Input); //, "expected input=" + InputToString(inputMode, term) + " but fstEnum returned " + InputToString(inputMode, t.Input));
+                    Assert.True(OutputsEqual(pair.Output, t.Output));
                 }
-                Assert.IsNull(fstEnum.Next());
+                Assert.Null(fstEnum.Next());
             }
 
             IDictionary<IntsRef, T> termsMap = new Dictionary<IntsRef, T>();
@@ -484,15 +483,15 @@ namespace Lucene.Net.Util.Fst
             {
                 // Do random lookups so we test null (output doesn't
                 // exist) case:
-                Assert.IsNull(Util.GetByOutput(fstLong, minLong - 7));
-                Assert.IsNull(Util.GetByOutput(fstLong, maxLong + 7));
+                Assert.Null(Util.GetByOutput(fstLong, minLong - 7));
+                Assert.Null(Util.GetByOutput(fstLong, maxLong + 7));
 
                 int num = LuceneTestCase.AtLeast(Random, 100);
                 for (int iter = 0; iter < num; iter++)
                 {
                     long v = TestUtil.NextLong(Random, minLong, maxLong);
                     IntsRef input = Util.GetByOutput(fstLong, v);
-                    Assert.IsTrue(validOutputs.Contains(v) || input == null);
+                    Assert.True(validOutputs.Contains(v) || input == null);
                 }
             }
 
@@ -506,16 +505,16 @@ namespace Lucene.Net.Util.Fst
             for (int iter = 0; iter < num_; iter++)
             {
                 T output = RandomAcceptedWord(fst, scratch);
-                Assert.IsTrue(termsMap.ContainsKey(scratch), "accepted word " + InputToString(inputMode, scratch) + " is not valid");
-                Assert.IsTrue(OutputsEqual(termsMap[scratch], output));
+                Assert.True(termsMap.ContainsKey(scratch), "accepted word " + InputToString(inputMode, scratch) + " is not valid");
+                Assert.True(OutputsEqual(termsMap[scratch], output));
 
                 if (DoReverseLookup)
                 {
                     //System.out.println("lookup output=" + output + " outs=" + fst.Outputs);
                     IntsRef input = Util.GetByOutput(fstLong, (output as long?).Value);
-                    Assert.IsNotNull(input);
+                    Assert.NotNull(input);
                     //System.out.println("  got " + Util.toBytesRef(input, new BytesRef()).utf8ToString());
-                    Assert.AreEqual(scratch, input);
+                    Assert.Equal(scratch, input);
                 }
             }
 
@@ -575,19 +574,19 @@ namespace Lucene.Net.Util.Fst
                             if (pos != -1 && pos < Pairs.Count)
                             {
                                 //System.out.println("    got " + inputToString(inputMode,seekResult.input) + " output=" + fst.Outputs.outputToString(seekResult.Output));
-                                Assert.IsNotNull(seekResult, "got null but expected term=" + InputToString(inputMode, Pairs[pos].Input));
+                                Assert.NotNull(seekResult); // , "got null but expected term=" + InputToString(inputMode, Pairs[pos].Input));
                                 if (LuceneTestCase.VERBOSE)
                                 {
                                     Console.WriteLine("    got " + InputToString(inputMode, seekResult.Input));
                                 }
-                                Assert.AreEqual(Pairs[pos].Input, seekResult.Input, "expected " + InputToString(inputMode, Pairs[pos].Input) + " but got " + InputToString(inputMode, seekResult.Input));
-                                Assert.IsTrue(OutputsEqual(Pairs[pos].Output, seekResult.Output));
+                                Assert.Equal(Pairs[pos].Input, seekResult.Input); // , "expected " + InputToString(inputMode, Pairs[pos].Input) + " but got " + InputToString(inputMode, seekResult.Input));
+                                Assert.True(OutputsEqual(Pairs[pos].Output, seekResult.Output));
                             }
                             else
                             {
                                 // seeked before start or beyond end
                                 //System.out.println("seek=" + seekTerm);
-                                Assert.IsNull(seekResult, "expected null but got " + (seekResult == null ? "null" : InputToString(inputMode, seekResult.Input)));
+                                Assert.Null(seekResult); //, "expected null but got " + (seekResult == null ? "null" : InputToString(inputMode, seekResult.Input)));
                                 if (LuceneTestCase.VERBOSE)
                                 {
                                     Console.WriteLine("    got null");
@@ -627,9 +626,9 @@ namespace Lucene.Net.Util.Fst
                         }
                         seekResult = fstEnum_.SeekCeil(pair.Input);
                     }
-                    Assert.IsNotNull(seekResult);
-                    Assert.AreEqual(pair.Input, seekResult.Input, "got " + InputToString(inputMode, seekResult.Input) + " but expected " + InputToString(inputMode, pair.Input));
-                    Assert.IsTrue(OutputsEqual(pair.Output, seekResult.Output));
+                    Assert.NotNull(seekResult);
+                    Assert.Equal(pair.Input, seekResult.Input); //, "got " + InputToString(inputMode, seekResult.Input) + " but expected " + InputToString(inputMode, pair.Input));
+                    Assert.True(OutputsEqual(pair.Output, seekResult.Output));
                 }
             }
 
@@ -677,7 +676,7 @@ namespace Lucene.Net.Util.Fst
                                 if (Random.NextBoolean())
                                 {
                                     upto--;
-                                    Assert.IsTrue(upto != -1);
+                                    Assert.True(upto != -1);
                                     if (LuceneTestCase.VERBOSE)
                                     {
                                         Console.WriteLine("  do non-exist seekFloor(" + InputToString(inputMode, term) + ")");
@@ -741,14 +740,14 @@ namespace Lucene.Net.Util.Fst
 
                     if (upto == Pairs.Count)
                     {
-                        Assert.IsTrue(isDone);
+                        Assert.True(isDone);
                         break;
                     }
                     else
                     {
-                        Assert.IsFalse(isDone);
-                        Assert.AreEqual(Pairs[upto].Input, fstEnum_.Current().Input);
-                        Assert.IsTrue(OutputsEqual(Pairs[upto].Output, fstEnum_.Current().Output));
+                        Assert.False(isDone);
+                        Assert.Equal(Pairs[upto].Input, fstEnum_.Current().Input);
+                        Assert.True(OutputsEqual(Pairs[upto].Output, fstEnum_.Current().Output));
 
                         /*
                           if (upto < pairs.size()-1) {
@@ -760,7 +759,7 @@ namespace Lucene.Net.Util.Fst
                           if (LuceneTestCase.VERBOSE) {
                           System.out.println("TEST: call beforeNext(" + inputToString(inputMode, t) + "); current=" + inputToString(inputMode, pairs.get(upto).input) + " next=" + inputToString(inputMode, pairs.get(upto+1).input) + " expected=" + expected);
                           }
-                          Assert.AreEqual(expected, fstEnum.beforeNext(t));
+                          Assert.Equal(expected, fstEnum.beforeNext(t));
                           break;
                           }
                           tryCount++;
@@ -928,11 +927,11 @@ namespace Lucene.Net.Util.Fst
 
             if (prefixes.Count <= 1)
             {
-                Assert.IsNull(fst);
+                Assert.Null(fst);
                 return;
             }
 
-            Assert.IsNotNull(fst);
+            Assert.NotNull(fst);
 
             // make sure FST only enums valid prefixes
             if (LuceneTestCase.VERBOSE)
@@ -948,16 +947,16 @@ namespace Lucene.Net.Util.Fst
                     Console.WriteLine("  fstEnum.next prefix=" + InputToString(inputMode, current.Input, false) + " output=" + Outputs.OutputToString(current.Output));
                 }
                 CountMinOutput<T> cmo = prefixes[current.Input];
-                Assert.IsNotNull(cmo);
-                Assert.IsTrue(cmo.IsLeaf || cmo.IsFinal);
+                Assert.NotNull(cmo);
+                Assert.True(cmo.IsLeaf || cmo.IsFinal);
                 //if (cmo.isFinal && !cmo.isLeaf) {
                 if (cmo.IsFinal)
                 {
-                    Assert.AreEqual(cmo.FinalOutput, current.Output);
+                    Assert.Equal(cmo.FinalOutput, current.Output);
                 }
                 else
                 {
-                    Assert.AreEqual(cmo.Output, current.Output);
+                    Assert.Equal(cmo.Output, current.Output);
                 }
             }
 
@@ -980,13 +979,13 @@ namespace Lucene.Net.Util.Fst
                     // if (cmo.isFinal && !cmo.isLeaf) {
                     if (cmo.IsFinal)
                     {
-                        Assert.AreEqual(cmo.FinalOutput, output);
+                        Assert.Equal(cmo.FinalOutput, output);
                     }
                     else
                     {
-                        Assert.AreEqual(cmo.Output, output);
+                        Assert.Equal(cmo.Output, output);
                     }
-                    Assert.AreEqual(ent.Key.Length, stopNode[0]);
+                    Assert.Equal(ent.Key.Length, stopNode[0]);
                 }
             }
         }

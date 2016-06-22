@@ -1,6 +1,6 @@
 using Lucene.Net.Util;
-using NUnit.Framework;
 using System.IO;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -35,7 +35,7 @@ namespace Lucene.Net.Analysis
             while ((inputWord = vocReader.ReadLine()) != null)
             {
                 string expectedWord = outputReader.ReadLine();
-                Assert.IsNotNull(expectedWord);
+                Assert.NotNull(expectedWord);
                 BaseTokenStreamTestCase.CheckOneTerm(a, inputWord, expectedWord);
             }
         }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
+	using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
 
@@ -82,7 +82,7 @@ namespace Lucene.Net.Index
             iwriter.ForceMerge(1);
             long size2 = DirSize(dir);
             // make sure the new longs did not cost 8 bytes each
-            Assert.IsTrue(size2 < size1 + 8 * 20);
+            Assert.True(size2 < size1 + 8 * 20);
         }
 
         public virtual void TestDateCompression()
@@ -112,7 +112,7 @@ namespace Lucene.Net.Index
             iwriter.ForceMerge(1);
             long size2 = DirSize(dir);
             // make sure the new longs costed less than if they had only been packed
-            Assert.IsTrue(size2 < size1 + (PackedInts.BitsRequired(day) * 50) / 8);
+            Assert.True(size2 < size1 + (PackedInts.BitsRequired(day) * 50) / 8);
         }
 
         public virtual void TestSingleBigValueCompression()
@@ -136,7 +136,7 @@ namespace Lucene.Net.Index
             iwriter.ForceMerge(1);
             long size2 = DirSize(dir);
             // make sure the new value did not grow the bpv for every other value
-            Assert.IsTrue(size2 < size1 + (20000 * (63 - 10)) / 8);
+            Assert.True(size2 < size1 + (20000 * (63 - 10)) / 8);
         }
     }
 }

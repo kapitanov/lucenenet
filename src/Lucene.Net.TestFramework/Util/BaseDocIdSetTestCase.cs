@@ -1,4 +1,3 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Support;
 using System;
 using System.Collections;
@@ -7,7 +6,7 @@ using System.Diagnostics;
 namespace Lucene.Net.Util
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -77,7 +76,7 @@ namespace Lucene.Net.Util
         /// <summary>
         /// Test length=0.
         /// </summary>
-        [Test]
+        [Fact]
         public void TestNoBit()
         {
             BitArray bs = new BitArray(1);
@@ -88,7 +87,7 @@ namespace Lucene.Net.Util
         /// <summary>
         /// Test length=1.
         /// </summary>
-        [Test]
+        [Fact]
         public void Test1Bit()
         {
             BitArray bs = new BitArray(1);
@@ -103,7 +102,7 @@ namespace Lucene.Net.Util
         /// <summary>
         /// Test length=2.
         /// </summary>
-        [Test]
+        [Fact]
         public void Test2Bits()
         {
             BitArray bs = new BitArray(2);
@@ -122,8 +121,9 @@ namespace Lucene.Net.Util
         /// <summary>
         /// Compare the content of the set against a <seealso cref="BitSet"/>.
         /// </summary>
-        [Test, Timeout(150000)]
-        [LongRunningTest]
+        //[Test, Timeout(150000)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public void TestAgainstBitSet()
         {
             int numBits = TestUtil.NextInt(Random(), 100, 1 << 20);
@@ -165,25 +165,25 @@ namespace Lucene.Net.Util
             DocIdSetIterator it2 = ds2.GetIterator();
             if (it2 == null)
             {
-                Assert.AreEqual(-1, ds1.NextSetBit(0));
+                Assert.Equal(-1, ds1.NextSetBit(0));
             }
             else
             {
-                Assert.AreEqual(-1, it2.DocID());
+                Assert.Equal(-1, it2.DocID());
                 for (int doc = ds1.NextSetBit(0); doc != -1; doc = ds1.NextSetBit(doc + 1))
                 {
-                    Assert.AreEqual(doc, it2.NextDoc());
-                    Assert.AreEqual(doc, it2.DocID());
+                    Assert.Equal(doc, it2.NextDoc());
+                    Assert.Equal(doc, it2.DocID());
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, it2.NextDoc());
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, it2.DocID());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, it2.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, it2.DocID());
             }
 
             // nextDoc / advance
             it2 = ds2.GetIterator();
             if (it2 == null)
             {
-                Assert.AreEqual(-1, ds1.NextSetBit(0));
+                Assert.Equal(-1, ds1.NextSetBit(0));
             }
             else
             {
@@ -196,8 +196,8 @@ namespace Lucene.Net.Util
                         {
                             doc = DocIdSetIterator.NO_MORE_DOCS;
                         }
-                        Assert.AreEqual(doc, it2.NextDoc());
-                        Assert.AreEqual(doc, it2.DocID());
+                        Assert.Equal(doc, it2.NextDoc());
+                        Assert.Equal(doc, it2.DocID());
                     }
                     else
                     {
@@ -207,8 +207,8 @@ namespace Lucene.Net.Util
                         {
                             doc = DocIdSetIterator.NO_MORE_DOCS;
                         }
-                        Assert.AreEqual(doc, it2.Advance(target));
-                        Assert.AreEqual(doc, it2.DocID());
+                        Assert.Equal(doc, it2.Advance(target));
+                        Assert.Equal(doc, it2.DocID());
                     }
                 }
             }
@@ -224,13 +224,13 @@ namespace Lucene.Net.Util
                     int max = doc == DocIdSetIterator.NO_MORE_DOCS ? bits.Length() : doc;
                     for (int i = previousDoc + 1; i < max; ++i)
                     {
-                        Assert.AreEqual(false, bits.Get(i));
+                        Assert.Equal(false, bits.Get(i));
                     }
                     if (doc == DocIdSetIterator.NO_MORE_DOCS)
                     {
                         break;
                     }
-                    Assert.AreEqual(true, bits.Get(doc));
+                    Assert.Equal(true, bits.Get(doc));
                 }
             }
         }

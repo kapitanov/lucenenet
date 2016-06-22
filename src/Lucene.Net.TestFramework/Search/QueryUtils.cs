@@ -5,8 +5,9 @@ using System.Text;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using System.IO;
+    using TestFramework.Support;
+    using Xunit;
     using AllDeletedFilterReader = Lucene.Net.Index.AllDeletedFilterReader;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
@@ -74,7 +75,7 @@ namespace Lucene.Net.Search
             CheckUnequal(q, whacky);
 
             // null test
-            Assert.IsFalse(q.Equals(null));
+            Assert.False(q.Equals(null));
         }
 
         private class QueryAnonymousInnerClassHelper : Query
@@ -91,19 +92,19 @@ namespace Lucene.Net.Search
 
         public static void CheckEqual(Query q1, Query q2)
         {
-            Assert.IsTrue(q1.Equals(q2));
-            Assert.AreEqual(q1, q2);
-            Assert.AreEqual(q1.GetHashCode(), q2.GetHashCode());
+            Assert.True(q1.Equals(q2));
+            Assert.Equal(q1, q2);
+            Assert.Equal(q1.GetHashCode(), q2.GetHashCode());
         }
 
         public static void CheckUnequal(Query q1, Query q2)
         {
-            Assert.IsFalse(q1.Equals(q2), q1 + " equal to " + q2);
-            Assert.IsFalse(q2.Equals(q1), q2 + " equal to " + q1);
+            Assert.False(q1.Equals(q2), q1 + " equal to " + q2);
+            Assert.False(q2.Equals(q1), q2 + " equal to " + q1);
 
             // possible this test can fail on a hash collision... if that
             // happens, please change test to use a different example.
-            Assert.IsTrue(q1.GetHashCode() != q2.GetHashCode());
+            Assert.True(q1.GetHashCode() != q2.GetHashCode());
         }
 
         /// <summary>
@@ -291,7 +292,7 @@ namespace Lucene.Net.Search
                     if (scorer != null)
                     {
                         bool more = scorer.Advance(lastDoc[0] + 1) != DocIdSetIterator.NO_MORE_DOCS;
-                        Assert.IsFalse(more, "query's last doc was " + lastDoc[0] + " but skipTo(" + (lastDoc[0] + 1) + ") got to " + scorer.DocID());
+                        Assert.False(more, "query's last doc was " + lastDoc[0] + " but skipTo(" + (lastDoc[0] + 1) + ") got to " + scorer.DocID());
                     }
                 }
             }
@@ -389,7 +390,7 @@ namespace Lucene.Net.Search
                         if (scorer != null)
                         {
                             bool more = scorer.Advance(LastDoc[0] + 1) != DocIdSetIterator.NO_MORE_DOCS;
-                            Assert.IsFalse(more, "query's last doc was " + LastDoc[0] + " but skipTo(" + (LastDoc[0] + 1) + ") got to " + scorer.DocID());
+                            Assert.False(more, "query's last doc was " + LastDoc[0] + " but skipTo(" + (LastDoc[0] + 1) + ") got to " + scorer.DocID());
                         }
                         leafPtr++;
                     }
@@ -429,7 +430,7 @@ namespace Lucene.Net.Search
                 if (scorer != null)
                 {
                     bool more = scorer.Advance(lastDoc[0] + 1) != DocIdSetIterator.NO_MORE_DOCS;
-                    Assert.IsFalse(more, "query's last doc was " + lastDoc[0] + " but skipTo(" + (lastDoc[0] + 1) + ") got to " + scorer.DocID());
+                    Assert.False(more, "query's last doc was " + lastDoc[0] + " but skipTo(" + (lastDoc[0] + 1) + ") got to " + scorer.DocID());
                 }
             }
         }
@@ -475,11 +476,13 @@ namespace Lucene.Net.Search
                     {
                         Weight w = s.CreateNormalizedWeight(q);
                         Scorer scorer_ = w.Scorer(Context[leafPtr], liveDocs);
-                        Assert.IsTrue(scorer_.Advance(i) != DocIdSetIterator.NO_MORE_DOCS, "query collected " + doc + " but skipTo(" + i + ") says no more docs!");
-                        Assert.AreEqual(doc, scorer_.DocID(), "query collected " + doc + " but skipTo(" + i + ") got to " + scorer_.DocID());
+                        Assert.True(scorer_.Advance(i) != DocIdSetIterator.NO_MORE_DOCS, "query collected " + doc + " but skipTo(" + i + ") says no more docs!");
+                        Assert.Equal(doc, scorer_.DocID()); //, "query collected " + doc + " but skipTo(" + i + ") got to " + scorer_.DocID());
                         float skipToScore = scorer_.Score();
-                        Assert.AreEqual(skipToScore, scorer_.Score(), MaxDiff, "unstable skipTo(" + i + ") score!");
-                        Assert.AreEqual(score, skipToScore, MaxDiff, "query assigned doc " + doc + " a score of <" + score + "> but skipTo(" + i + ") has <" + skipToScore + ">!");
+                        float min = scorer_.Score() - MaxDiff;
+                        float max = scorer_.Score() + MaxDiff;
+                        Assert.InRange(skipToScore, min, max); //, "unstable skipTo(" + i + ") score!");
+                        Assert.InRange(score, skipToScore, skipToScore + MaxDiff); //, "query assigned doc " + doc + " a score of <" + score + "> but skipTo(" + i + ") has <" + skipToScore + ">!");
 
                         // Hurry things along if they are going slow (eg
                         // if you got SimpleText codec this will kick in):
@@ -512,7 +515,7 @@ namespace Lucene.Net.Search
                         if (scorer != null)
                         {
                             bool more = scorer.Advance(LastDoc[0] + 1) != DocIdSetIterator.NO_MORE_DOCS;
-                            Assert.IsFalse(more, "query's last doc was " + LastDoc[0] + " but skipTo(" + (LastDoc[0] + 1) + ") got to " + scorer.DocID());
+                            Assert.False(more, "query's last doc was " + LastDoc[0] + " but skipTo(" + (LastDoc[0] + 1) + ") got to " + scorer.DocID());
                         }
                         leafPtr++;
                     }

@@ -1,11 +1,9 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Codecs;
 using Lucene.Net.Documents;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Search;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,6 +11,7 @@ using System.Threading;
 
 namespace Lucene.Net.Index
 {
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Codec = Lucene.Net.Codecs.Codec;
     using Directory = Lucene.Net.Store.Directory;
@@ -173,12 +172,12 @@ namespace Lucene.Net.Index
                             Console.WriteLine("TEST: test id=" + testID);
                         }
                         TopDocs hits = s.Search(new TermQuery(new Term("id", testID)), 1);
-                        Assert.AreEqual(1, hits.TotalHits);
+                        Assert.Equal(1, hits.TotalHits);
                         Document doc = r.Document(hits.ScoreDocs[0].Doc);
                         Document docExp = docs[testID];
                         for (int i = 0; i < fieldCount; i++)
                         {
-                            Assert.AreEqual("doc " + testID + ", field f" + fieldCount + " is wrong", docExp.Get("f" + i), doc.Get("f" + i));
+                            Assert.Equal("doc " + testID + ", field f" + fieldCount + " is wrong", docExp.Get("f" + i)); //, doc.Get("f" + i));
                         }
                     }
                     r.Dispose();
@@ -189,7 +188,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         // LUCENE-1727: make sure doc fields are stored in order
         public void TestStoredFieldsOrder()
         {
@@ -206,27 +205,27 @@ namespace Lucene.Net.Index
             IndexReader r = w.Reader;
             Document doc2 = r.Document(0);
             IEnumerator<IndexableField> it = doc2.Fields.GetEnumerator();
-            Assert.IsTrue(it.MoveNext());
+            Assert.True(it.MoveNext());
             Field f = (Field)it.Current;
-            Assert.AreEqual(f.Name(), "zzz");
-            Assert.AreEqual(f.StringValue, "a b c");
+            Assert.Equal(f.Name(), "zzz");
+            Assert.Equal(f.StringValue, "a b c");
 
-            Assert.IsTrue(it.MoveNext());
+            Assert.True(it.MoveNext());
             f = (Field)it.Current;
-            Assert.AreEqual(f.Name(), "aaa");
-            Assert.AreEqual(f.StringValue, "a b c");
+            Assert.Equal(f.Name(), "aaa");
+            Assert.Equal(f.StringValue, "a b c");
 
-            Assert.IsTrue(it.MoveNext());
+            Assert.True(it.MoveNext());
             f = (Field)it.Current;
-            Assert.AreEqual(f.Name(), "zzz");
-            Assert.AreEqual(f.StringValue, "1 2 3");
-            Assert.IsFalse(it.MoveNext());
+            Assert.Equal(f.Name(), "zzz");
+            Assert.Equal(f.StringValue, "1 2 3");
+            Assert.False(it.MoveNext());
             r.Dispose();
             w.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         // LUCENE-1219
         public void TestBinaryFieldOffsetLength()
         {
@@ -241,10 +240,10 @@ namespace Lucene.Net.Index
             Document doc = new Document();
             Field f = new StoredField("binary", b, 10, 17);
             var bx = f.BinaryValue().Bytes;
-            Assert.IsTrue(bx != null);
-            Assert.AreEqual(50, bx.Length);
-            Assert.AreEqual(10, f.BinaryValue().Offset);
-            Assert.AreEqual(17, f.BinaryValue().Length);
+            Assert.True(bx != null);
+            Assert.Equal(50, bx.Length);
+            Assert.Equal(10, f.BinaryValue().Offset);
+            Assert.Equal(17, f.BinaryValue().Length);
             doc.Add(f);
             w.AddDocument(doc);
             w.Dispose();
@@ -253,9 +252,9 @@ namespace Lucene.Net.Index
             Document doc2 = ir.Document(0);
             IndexableField f2 = doc2.GetField("binary");
             b = f2.BinaryValue().Bytes;
-            Assert.IsTrue(b != null);
-            Assert.AreEqual(17, b.Length, 17);
-            Assert.AreEqual(87, b[0]);
+            Assert.True(b != null);
+            Assert.Equal(17, b.Length);
+            Assert.Equal(87, b[0]);
             ir.Dispose();
             dir.Dispose();
         }
@@ -326,7 +325,7 @@ namespace Lucene.Net.Index
             DirectoryReader r = w.Reader;
             w.Dispose();
 
-            Assert.AreEqual(numDocs, r.NumDocs);
+            Assert.Equal(numDocs, r.NumDocs);
 
             foreach (AtomicReaderContext ctx in r.Leaves)
             {
@@ -336,15 +335,15 @@ namespace Lucene.Net.Index
                 {
                     Document doc = sub.Document(docID);
                     Field f = (Field)doc.GetField("nf");
-                    Assert.IsTrue(f is StoredField, "got f=" + f);
-                    Assert.AreEqual(answers[ids.Get(docID)], f.NumericValue);
+                    Assert.True(f is StoredField, "got f=" + f);
+                    Assert.Equal(answers[ids.Get(docID)], f.NumericValue);
                 }
             }
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestIndexedBit()
         {
             Directory dir = NewDirectory();
@@ -357,13 +356,13 @@ namespace Lucene.Net.Index
             w.AddDocument(doc);
             IndexReader r = w.Reader;
             w.Dispose();
-            Assert.IsFalse(r.Document(0).GetField("field").FieldType().Indexed);
-            Assert.IsTrue(r.Document(0).GetField("field2").FieldType().Indexed);
+            Assert.False(r.Document(0).GetField("field").FieldType().Indexed);
+            Assert.True(r.Document(0).GetField("field2").FieldType().Indexed);
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestReadSkip()
         {
             Directory dir = NewDirectory();
@@ -405,12 +404,12 @@ namespace Lucene.Net.Index
                 IndexableField sField = sDoc.GetField(fldName);
                 if (typeof(Field) == fld.GetType())
                 {
-                    Assert.AreEqual(fld.BinaryValue(), sField.BinaryValue());
-                    Assert.AreEqual(fld.StringValue, sField.StringValue);
+                    Assert.Equal(fld.BinaryValue(), sField.BinaryValue());
+                    Assert.Equal(fld.StringValue, sField.StringValue);
                 }
                 else
                 {
-                    Assert.AreEqual(fld.NumericValue, sField.NumericValue);
+                    Assert.Equal(fld.NumericValue, sField.NumericValue);
                 }
             }
             reader.Dispose();
@@ -418,7 +417,8 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         public void TestEmptyDocs()
         {
             Directory dir = NewDirectory();
@@ -438,8 +438,8 @@ namespace Lucene.Net.Index
             for (int i = 0; i < numDocs; ++i)
             {
                 Document doc = rd.Document(i);
-                Assert.IsNotNull(doc);
-                Assert.IsTrue(doc.Fields.Count <= 0);
+                Assert.NotNull(doc);
+                Assert.True(doc.Fields.Count <= 0);
             }
             rd.Dispose();
 
@@ -447,7 +447,8 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         public void TestConcurrentReads()
         {
             Directory dir = NewDirectory();
@@ -562,7 +563,7 @@ namespace Lucene.Net.Index
             return result;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWriteReadMerge()
         {
             // get another codec, other than the default: so we are merging segments across different codecs
@@ -637,7 +638,7 @@ namespace Lucene.Net.Index
             iw.Commit();
 
             DirectoryReader ir = DirectoryReader.Open(dir);
-            Assert.IsTrue(ir.NumDocs > 0);
+            Assert.True(ir.NumDocs > 0);
             int numDocs = 0;
             for (int i = 0; i < ir.MaxDoc; ++i)
             {
@@ -648,16 +649,16 @@ namespace Lucene.Net.Index
                 }
                 ++numDocs;
                 int docId = (int)doc.GetField("id").NumericValue;
-                Assert.AreEqual(data[docId].Length + 1, doc.Fields.Count);
+                Assert.Equal(data[docId].Length + 1, doc.Fields.Count);
                 for (int j = 0; j < data[docId].Length; ++j)
                 {
                     var arr = data[docId][j];
                     BytesRef arr2Ref = doc.GetBinaryValue("bytes" + j);
                     var arr2 = Arrays.CopyOfRange(arr2Ref.Bytes, arr2Ref.Offset, arr2Ref.Offset + arr2Ref.Length);
-                    Assert.AreEqual(arr, arr2);
+                    Assert.Equal(arr, arr2);
                 }
             }
-            Assert.IsTrue(ir.NumDocs <= numDocs);
+            Assert.True(ir.NumDocs <= numDocs);
             ir.Dispose();
 
             iw.DeleteAll();
@@ -668,7 +669,9 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public void TestBigDocuments()
         {
             // "big" as "much bigger than the chunk size"
@@ -730,14 +733,14 @@ namespace Lucene.Net.Index
             {
                 Query query = new TermQuery(new Term("id", "" + i));
                 TopDocs topDocs = searcher.Search(query, 1);
-                Assert.AreEqual(1, topDocs.TotalHits, "" + i);
+                Assert.Equal(1, topDocs.TotalHits); //, "" + i);
                 Document doc = rd.Document(topDocs.ScoreDocs[0].Doc);
-                Assert.IsNotNull(doc);
+                Assert.NotNull(doc);
                 IndexableField[] fieldValues = doc.GetFields("fld");
-                Assert.AreEqual(docs[i].GetFields("fld").Length, fieldValues.Length);
+                Assert.Equal(docs[i].GetFields("fld").Length, fieldValues.Length);
                 if (fieldValues.Length > 0)
                 {
-                    Assert.AreEqual(docs[i].GetFields("fld")[0].BinaryValue(), fieldValues[0].BinaryValue());
+                    Assert.Equal(docs[i].GetFields("fld")[0].BinaryValue(), fieldValues[0].BinaryValue());
                 }
             }
             rd.Dispose();
@@ -745,7 +748,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBulkMergeWithDeletes()
         {
             int numDocs = AtLeast(200);

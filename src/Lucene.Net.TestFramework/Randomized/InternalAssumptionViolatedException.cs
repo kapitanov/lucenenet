@@ -20,7 +20,7 @@ using System;
 namespace Lucene.Net.Randomized
 {
     [Serializable]
-    public class InternalAssumptionViolatedException : NUnit.Framework.InconclusiveException
+    public class InternalAssumptionViolatedException : Exception
     {
         public InternalAssumptionViolatedException(string message) :
             base(message ?? "Failed Assumption")

@@ -1,12 +1,12 @@
 using System.Linq;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -115,48 +115,48 @@ namespace Lucene.Net.Analysis
         //     lastStartOffset)
         public static void AssertTokenStreamContents(TokenStream ts, string[] output, int[] startOffsets, int[] endOffsets, string[] types, int[] posIncrements, int[] posLengths, int? finalOffset, int? finalPosInc, bool[] keywordAtts, bool offsetsAreCorrect)
         {
-            Assert.IsNotNull(output);
+            Assert.NotNull(output);
             var checkClearAtt = ts.AddAttribute<ICheckClearAttributesAttribute>();
 
             ICharTermAttribute termAtt = null;
             if (output.Length > 0)
             {
-                Assert.IsTrue(ts.HasAttribute<ICharTermAttribute>(), "has no CharTermAttribute");
+                Assert.True(ts.HasAttribute<ICharTermAttribute>(), "has no CharTermAttribute");
                 termAtt = ts.GetAttribute<ICharTermAttribute>();
             }
 
             IOffsetAttribute offsetAtt = null;
             if (startOffsets != null || endOffsets != null || finalOffset != null)
             {
-                Assert.IsTrue(ts.HasAttribute<IOffsetAttribute>(), "has no OffsetAttribute");
+                Assert.True(ts.HasAttribute<IOffsetAttribute>(), "has no OffsetAttribute");
                 offsetAtt = ts.GetAttribute<IOffsetAttribute>();
             }
 
             ITypeAttribute typeAtt = null;
             if (types != null)
             {
-                Assert.IsTrue(ts.HasAttribute<ITypeAttribute>(), "has no TypeAttribute");
+                Assert.True(ts.HasAttribute<ITypeAttribute>(), "has no TypeAttribute");
                 typeAtt = ts.GetAttribute<ITypeAttribute>();
             }
 
             IPositionIncrementAttribute posIncrAtt = null;
             if (posIncrements != null || finalPosInc != null)
             {
-                Assert.IsTrue(ts.HasAttribute<IPositionIncrementAttribute>(), "has no PositionIncrementAttribute");
+                Assert.True(ts.HasAttribute<IPositionIncrementAttribute>(), "has no PositionIncrementAttribute");
                 posIncrAtt = ts.GetAttribute<IPositionIncrementAttribute>();
             }
 
             IPositionLengthAttribute posLengthAtt = null;
             if (posLengths != null)
             {
-                Assert.IsTrue(ts.HasAttribute<IPositionLengthAttribute>(), "has no PositionLengthAttribute");
+                Assert.True(ts.HasAttribute<IPositionLengthAttribute>(), "has no PositionLengthAttribute");
                 posLengthAtt = ts.GetAttribute<IPositionLengthAttribute>();
             }
 
             IKeywordAttribute keywordAtt = null;
             if (keywordAtts != null)
             {
-                Assert.IsTrue(ts.HasAttribute<IKeywordAttribute>(), "has no KeywordAttribute");
+                Assert.True(ts.HasAttribute<IKeywordAttribute>(), "has no KeywordAttribute");
                 keywordAtt = ts.GetAttribute<IKeywordAttribute>();
             }
 
@@ -194,33 +194,33 @@ namespace Lucene.Net.Analysis
                 }
 
                 bool reset = checkClearAtt.AndResetClearCalled; // reset it, because we called clearAttribute() before
-                Assert.IsTrue(ts.IncrementToken(), "token " + i + " does not exist");
-                Assert.IsTrue(reset, "ClearAttributes() was not called correctly in TokenStream chain");
+                Assert.True(ts.IncrementToken(), "token " + i + " does not exist");
+                Assert.True(reset, "ClearAttributes() was not called correctly in TokenStream chain");
 
-                Assert.AreEqual(output[i], termAtt.ToString(), "term " + i + ", output[i] = " + output[i] + ", termAtt = " + termAtt.ToString());
+                Assert.Equal(output[i], termAtt.ToString());//, "term " + i + ", output[i] = " + output[i] + ", termAtt = " + termAtt.ToString());
                 if (startOffsets != null)
                 {
-                    Assert.AreEqual(startOffsets[i], offsetAtt.StartOffset(), "startOffset " + i);
+                    Assert.Equal(startOffsets[i], offsetAtt.StartOffset());
                 }
                 if (endOffsets != null)
                 {
-                    Assert.AreEqual(endOffsets[i], offsetAtt.EndOffset(), "endOffset " + i);
+                    Assert.Equal(endOffsets[i], offsetAtt.EndOffset());
                 }
                 if (types != null)
                 {
-                    Assert.AreEqual(types[i], typeAtt.Type, "type " + i);
+                    Assert.Equal(types[i], typeAtt.Type);
                 }
                 if (posIncrements != null)
                 {
-                    Assert.AreEqual(posIncrements[i], posIncrAtt.PositionIncrement, "posIncrement " + i);
+                    Assert.Equal(posIncrements[i], posIncrAtt.PositionIncrement);
                 }
                 if (posLengths != null)
                 {
-                    Assert.AreEqual(posLengths[i], posLengthAtt.PositionLength, "posLength " + i);
+                    Assert.Equal(posLengths[i], posLengthAtt.PositionLength);
                 }
                 if (keywordAtts != null)
                 {
-                    Assert.AreEqual(keywordAtts[i], keywordAtt.Keyword, "keywordAtt " + i);
+                    Assert.Equal(keywordAtts[i], keywordAtt.Keyword);
                 }
 
                 // we can enforce some basic things about a few attributes even if the caller doesn't check:
@@ -230,13 +230,13 @@ namespace Lucene.Net.Analysis
                     int endOffset = offsetAtt.EndOffset();
                     if (finalOffset != null)
                     {
-                        Assert.IsTrue(startOffset <= (int)finalOffset, "startOffset must be <= finalOffset");
-                        Assert.IsTrue(endOffset <= (int)finalOffset, "endOffset must be <= finalOffset: got endOffset=" + endOffset + " vs finalOffset=" + (int)finalOffset);
+                        Assert.True(startOffset <= (int)finalOffset, "startOffset must be <= finalOffset");
+                        Assert.True(endOffset <= (int)finalOffset, "endOffset must be <= finalOffset: got endOffset=" + endOffset + " vs finalOffset=" + (int)finalOffset);
                     }
 
                     if (offsetsAreCorrect)
                     {
-                        Assert.IsTrue(offsetAtt.StartOffset() >= lastStartOffset, "offsets must not go backwards startOffset=" + startOffset + " is < lastStartOffset=" + lastStartOffset);
+                        Assert.True(offsetAtt.StartOffset() >= lastStartOffset, "offsets must not go backwards startOffset=" + startOffset + " is < lastStartOffset=" + lastStartOffset);
                         lastStartOffset = offsetAtt.StartOffset();
                     }
 
@@ -262,7 +262,7 @@ namespace Lucene.Net.Analysis
                             // We've seen a token leaving from this position
                             // before; verify the startOffset is the same:
                             //System.out.println("  + vs " + pos + " -> " + startOffset);
-                            Assert.AreEqual((int)posToStartOffset[pos], startOffset, "pos=" + pos + " posLen=" + posLength + " token=" + termAtt);
+                            Assert.Equal((int)posToStartOffset[pos], startOffset); //, "pos=" + pos + " posLen=" + posLength + " token=" + termAtt);
                         }
 
                         int endPos = pos + posLength;
@@ -278,7 +278,7 @@ namespace Lucene.Net.Analysis
                             // We've seen a token arriving to this position
                             // before; verify the endOffset is the same:
                             //System.out.println("  + ve " + endPos + " -> " + endOffset);
-                            Assert.AreEqual((int)posToEndOffset[endPos], endOffset, "pos=" + pos + " posLen=" + posLength + " token=" + termAtt);
+                            Assert.Equal((int)posToEndOffset[endPos], endOffset); //, "pos=" + pos + " posLen=" + posLength + " token=" + termAtt);
                         }
                     }
                 }
@@ -286,22 +286,22 @@ namespace Lucene.Net.Analysis
                 {
                     if (i == 0)
                     {
-                        Assert.IsTrue(posIncrAtt.PositionIncrement >= 1, "first posIncrement must be >= 1");
+                        Assert.True(posIncrAtt.PositionIncrement >= 1, "first posIncrement must be >= 1");
                     }
                     else
                     {
-                        Assert.IsTrue(posIncrAtt.PositionIncrement >= 0, "posIncrement must be >= 0");
+                        Assert.True(posIncrAtt.PositionIncrement >= 0, "posIncrement must be >= 0");
                     }
                 }
                 if (posLengthAtt != null)
                 {
-                    Assert.IsTrue(posLengthAtt.PositionLength >= 1, "posLength must be >= 1");
+                    Assert.True(posLengthAtt.PositionLength >= 1, "posLength must be >= 1");
                 }
             }
 
             if (ts.IncrementToken())
             {
-                Assert.Fail("TokenStream has more tokens than expected (expected count=" + output.Length + "); extra token=" + termAtt);
+                Assert.True(false, "TokenStream has more tokens than expected (expected count=" + output.Length + "); extra token=" + termAtt);
             }
 
             // repeat our extra safety checks for End()
@@ -330,19 +330,19 @@ namespace Lucene.Net.Analysis
             var reset_ = checkClearAtt.AndResetClearCalled; // reset it, because we called clearAttribute() before
 
             ts.End();
-            Assert.IsTrue(checkClearAtt.AndResetClearCalled, "super.End()/ClearAttributes() was not called correctly in End()");
+            Assert.True(checkClearAtt.AndResetClearCalled, "super.End()/ClearAttributes() was not called correctly in End()");
 
             if (finalOffset != null)
             {
-                Assert.AreEqual((int)finalOffset, offsetAtt.EndOffset(), "finalOffset");
+                Assert.Equal((int)finalOffset, offsetAtt.EndOffset());
             }
             if (offsetAtt != null)
             {
-                Assert.IsTrue(offsetAtt.EndOffset() >= 0, "finalOffset must be >= 0");
+                Assert.True(offsetAtt.EndOffset() >= 0, "finalOffset must be >= 0");
             }
             if (finalPosInc != null)
             {
-                Assert.AreEqual((int)finalPosInc, posIncrAtt.PositionIncrement, "finalPosInc");
+                Assert.Equal((int)finalPosInc, posIncrAtt.PositionIncrement);
             }
 
             ts.Dispose();
@@ -469,23 +469,23 @@ namespace Lucene.Net.Analysis
                 if (ts.IncrementToken())
                 {
                     ts.ReflectAsString(false);
-                    Assert.Fail("didn't get expected exception when reset() not called");
+                    Assert.True(false, "didn't get expected exception when reset() not called");
                 }
             }
             catch (InvalidOperationException expected)
             {
                 //ok
             }
-            catch (AssertionException expected)
-            {
-                // ok: MockTokenizer
-                Assert.IsTrue(expected.Message != null && expected.Message.Contains("wrong state"), expected.Message);
-            }
+            //catch (AssertionException expected)
+            //{
+            //    // ok: MockTokenizer
+            //    Assert.True(expected.Message != null && expected.Message.Contains("wrong state"), expected.Message);
+            //}
             catch (Exception unexpected)
             {
                 //unexpected.printStackTrace(System.err);
                 Console.Error.WriteLine(unexpected.StackTrace);
-                Assert.Fail("got wrong exception when reset() not called: " + unexpected);
+                Assert.True(false, "got wrong exception when reset() not called: " + unexpected);
             }
             finally
             {
@@ -508,7 +508,7 @@ namespace Lucene.Net.Analysis
             try
             {
                 ts = a.TokenStream("bogus", new StringReader(input));
-                Assert.Fail("didn't get expected exception when Close() not called");
+                Assert.True(false, "didn't get expected exception when Close() not called");
             }
             catch (Exception)
             {
@@ -649,12 +649,12 @@ namespace Lucene.Net.Analysis
                     }
                     catch (ThreadInterruptedException e)
                     {
-                        Fail("Thread interrupted");
+                        Assert.True(false, "Thread interrupted");
                     }
                 }
 
                 if (threads.Any(x => x.Failed))
-                    Fail("Thread interrupted");
+                    Assert.True(false, "Thread interrupted");
 
                 success = true;
             }
@@ -898,7 +898,7 @@ namespace Lucene.Net.Analysis
                 // First pass: save away "correct" tokens
                 while (ts.IncrementToken())
                 {
-                    Assert.IsNotNull(termAtt, "has no CharTermAttribute");
+                    Assert.NotNull(termAtt);
                     tokens.Add(termAtt.ToString());
                     if (typeAtt != null)
                     {
@@ -956,11 +956,11 @@ namespace Lucene.Net.Analysis
                             ts = a.TokenStream("dummy", useCharFilter ? (TextReader)new MockCharFilter(evilReader, remainder) : evilReader);
                             ts.Reset();
                             while (ts.IncrementToken()) ;
-                            Assert.Fail("did not hit exception");
+                            Assert.True(false, "did not hit exception");
                         }
                         catch (Exception re)
                         {
-                            Assert.IsTrue(MockReaderWrapper.IsMyEvilException(re));
+                            Assert.True(MockReaderWrapper.IsMyEvilException(re));
                         }
 
                         try
@@ -999,7 +999,7 @@ namespace Lucene.Net.Analysis
                         ts.Reset();
                         for (int tokenCount = 0; tokenCount < numTokensToRead; tokenCount++)
                         {
-                            Assert.IsTrue(ts.IncrementToken());
+                            Assert.True(ts.IncrementToken());
                         }
 
                         try

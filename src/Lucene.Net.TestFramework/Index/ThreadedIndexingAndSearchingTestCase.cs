@@ -10,8 +10,8 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
+    using Xunit;
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -454,12 +454,12 @@ namespace Lucene.Net.Index
                             {
                                 SegmentReader segReader = (SegmentReader)sub.Reader;
                                 IDictionary<string, string> diagnostics = segReader.SegmentInfo.Info.Diagnostics;
-                                Assert.IsNotNull(diagnostics);
+                                Assert.NotNull(diagnostics);
                                 string source = diagnostics["source"];
-                                Assert.IsNotNull(source);
+                                Assert.NotNull(source);
                                 if (source.Equals("merge"))
                                 {
-                                    Assert.IsTrue(!OuterInstance.AssertMergedSegmentsWarmed || OuterInstance.Warmed.ContainsKey((SegmentCoreReaders)segReader.CoreCacheKey), "sub reader " + sub + " wasn't warmed: warmed=" + OuterInstance.Warmed + " diagnostics=" + diagnostics + " si=" + segReader.SegmentInfo);
+                                    Assert.True(!OuterInstance.AssertMergedSegmentsWarmed || OuterInstance.Warmed.ContainsKey((SegmentCoreReaders)segReader.CoreCacheKey), "sub reader " + sub + " wasn't warmed: warmed=" + OuterInstance.Warmed + " diagnostics=" + diagnostics + " si=" + segReader.SegmentInfo);
                                 }
                             }
                             if (s.IndexReader.NumDocs > 0)
@@ -639,7 +639,7 @@ namespace Lucene.Net.Index
                 Console.WriteLine("TEST: finalSearcher=" + s);
             }
 
-            Assert.IsFalse(Failed.Get());
+            Assert.False(Failed.Get());
 
             bool doFail = false;
 
@@ -686,7 +686,7 @@ namespace Lucene.Net.Index
                             int docID = scoreDoc.Doc;
                             if (lastDocID != -1)
                             {
-                                Assert.AreEqual(1 + lastDocID, docID);
+                                Assert.Equal(1 + lastDocID, docID);
                             }
                             else
                             {
@@ -694,18 +694,18 @@ namespace Lucene.Net.Index
                             }
                             lastDocID = docID;
                             Document doc = s.Doc(docID);
-                            Assert.AreEqual(subDocs.PackID, doc.Get("packID"));
+                            Assert.Equal(subDocs.PackID, doc.Get("packID"));
                         }
 
                         lastDocID = startDocID - 1;
                         foreach (string subID in subDocs.SubIDs)
                         {
                             hits = s.Search(new TermQuery(new Term("docid", subID)), 1);
-                            Assert.AreEqual(1, hits.TotalHits);
+                            Assert.Equal(1, hits.TotalHits);
                             int docID = hits.ScoreDocs[0].Doc;
                             if (lastDocID != -1)
                             {
-                                Assert.AreEqual(1 + lastDocID, docID);
+                                Assert.Equal(1 + lastDocID, docID);
                             }
                             lastDocID = docID;
                         }
@@ -718,7 +718,7 @@ namespace Lucene.Net.Index
                     // because we can re-use packID for update:
                     foreach (string subID in subDocs.SubIDs)
                     {
-                        Assert.AreEqual(0, s.Search(new TermQuery(new Term("docid", subID)), 1).TotalHits);
+                        Assert.Equal(0, s.Search(new TermQuery(new Term("docid", subID)), 1).TotalHits);
                     }
                 }
             }
@@ -741,14 +741,14 @@ namespace Lucene.Net.Index
                     }
                 }
             }
-            Assert.IsFalse(doFail);
+            Assert.False(doFail);
 
-            Assert.AreEqual(AddCount.Get() - DelCount.Get(), s.IndexReader.NumDocs, "index=" + Writer.SegString() + " addCount=" + AddCount + " delCount=" + DelCount);
+            Assert.Equal(AddCount.Get() - DelCount.Get(), s.IndexReader.NumDocs); //, "index=" + Writer.SegString() + " addCount=" + AddCount + " delCount=" + DelCount);
             ReleaseSearcher(s);
 
             Writer.Commit();
 
-            Assert.AreEqual(AddCount.Get() - DelCount.Get(), Writer.NumDocs(), "index=" + Writer.SegString() + " addCount=" + AddCount + " delCount=" + DelCount);
+            Assert.Equal(AddCount.Get() - DelCount.Get(), Writer.NumDocs()); //, "index=" + Writer.SegString() + " addCount=" + AddCount + " delCount=" + DelCount);
 
             DoClose();
             Writer.Dispose(false);
@@ -839,7 +839,7 @@ namespace Lucene.Net.Index
             {
                 Sort dvSort = new Sort(new SortField("title", SortField.Type_e.STRING));
                 int hitCount2 = s.Search(q, null, 10, dvSort).TotalHits;
-                Assert.AreEqual(hitCount, hitCount2);
+                Assert.Equal(hitCount, hitCount2);
             }
             return hitCount;
         }

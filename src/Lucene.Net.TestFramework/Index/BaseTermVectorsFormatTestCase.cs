@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Lucene.Net.Attributes;
 using Lucene.Net.Codecs;
 using Lucene.Net.Documents;
 
@@ -11,7 +10,7 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using Attribute = Lucene.Net.Util.Attribute;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using CharTermAttribute = Lucene.Net.Analysis.Tokenattributes.CharTermAttribute;
@@ -477,8 +476,8 @@ namespace Lucene.Net.Index
         protected internal virtual void AssertEquals(RandomDocument doc, Fields fields)
         {
             // compare field names
-            Assert.AreEqual(doc == null, fields == null);
-            Assert.AreEqual(doc.FieldNames.Length, fields.Size);
+            Assert.Equal(doc == null, fields == null);
+            Assert.Equal(doc.FieldNames.Length, fields.Size);
             HashSet<string> fields1 = new HashSet<string>();
             HashSet<string> fields2 = new HashSet<string>();
             for (int i = 0; i < doc.FieldNames.Length; ++i)
@@ -489,7 +488,7 @@ namespace Lucene.Net.Index
             {
                 fields2.Add(field);
             }
-            Assert.IsTrue(fields1.SetEquals(fields2));
+            Assert.True(fields1.SetEquals(fields2));
 
             for (int i = 0; i < doc.FieldNames.Length; ++i)
             {
@@ -517,13 +516,13 @@ namespace Lucene.Net.Index
 
         protected internal virtual void AssertEquals(RandomTokenStream tk, FieldType ft, Terms terms)
         {
-            Assert.AreEqual(1, terms.DocCount);
+            Assert.Equal(1, terms.DocCount);
             int termCount = (new HashSet<string>(Arrays.AsList(tk.Terms))).Count;
-            Assert.AreEqual(termCount, terms.Size());
-            Assert.AreEqual(termCount, terms.SumDocFreq);
-            Assert.AreEqual(ft.StoreTermVectorPositions, terms.HasPositions());
-            Assert.AreEqual(ft.StoreTermVectorOffsets, terms.HasOffsets());
-            Assert.AreEqual(ft.StoreTermVectorPayloads && tk.HasPayloads(), terms.HasPayloads());
+            Assert.Equal(termCount, terms.Size());
+            Assert.Equal(termCount, terms.SumDocFreq);
+            Assert.Equal(ft.StoreTermVectorPositions, terms.HasPositions());
+            Assert.Equal(ft.StoreTermVectorOffsets, terms.HasOffsets());
+            Assert.Equal(ft.StoreTermVectorPayloads && tk.HasPayloads(), terms.HasPayloads());
             HashSet<BytesRef> uniqueTerms = new HashSet<BytesRef>();
             foreach (string term in tk.Freqs.Keys)
             {
@@ -536,39 +535,39 @@ namespace Lucene.Net.Index
             for (int i = 0; i < sortedTerms.Length; ++i)
             {
                 BytesRef nextTerm = termsEnum.Next();
-                Assert.AreEqual(sortedTerms[i], nextTerm);
-                Assert.AreEqual(sortedTerms[i], termsEnum.Term());
-                Assert.AreEqual(1, termsEnum.DocFreq());
+                Assert.Equal(sortedTerms[i], nextTerm);
+                Assert.Equal(sortedTerms[i], termsEnum.Term());
+                Assert.Equal(1, termsEnum.DocFreq());
 
                 FixedBitSet bits = new FixedBitSet(1);
                 DocsEnum docsEnum = termsEnum.Docs(bits, Random().NextBoolean() ? null : this.docsEnum.Value);
-                Assert.AreEqual(DocsEnum.NO_MORE_DOCS, docsEnum.NextDoc());
+                Assert.Equal(DocsEnum.NO_MORE_DOCS, docsEnum.NextDoc());
                 bits.Set(0);
 
                 docsEnum = termsEnum.Docs(Random().NextBoolean() ? bits : null, Random().NextBoolean() ? null : docsEnum);
-                Assert.IsNotNull(docsEnum);
-                Assert.AreEqual(0, docsEnum.NextDoc());
-                Assert.AreEqual(0, docsEnum.DocID());
-                Assert.AreEqual(tk.Freqs[termsEnum.Term().Utf8ToString()], (int?)docsEnum.Freq());
-                Assert.AreEqual(DocsEnum.NO_MORE_DOCS, docsEnum.NextDoc());
+                Assert.NotNull(docsEnum);
+                Assert.Equal(0, docsEnum.NextDoc());
+                Assert.Equal(0, docsEnum.DocID());
+                Assert.Equal(tk.Freqs[termsEnum.Term().Utf8ToString()], (int?)docsEnum.Freq());
+                Assert.Equal(DocsEnum.NO_MORE_DOCS, docsEnum.NextDoc());
                 this.docsEnum.Value = docsEnum;
 
                 bits.Clear(0);
                 DocsAndPositionsEnum docsAndPositionsEnum = termsEnum.DocsAndPositions(bits, Random().NextBoolean() ? null : this.docsAndPositionsEnum.Value);
-                Assert.AreEqual(ft.StoreTermVectorOffsets || ft.StoreTermVectorPositions, docsAndPositionsEnum != null);
+                Assert.Equal(ft.StoreTermVectorOffsets || ft.StoreTermVectorPositions, docsAndPositionsEnum != null);
                 if (docsAndPositionsEnum != null)
                 {
-                    Assert.AreEqual(DocsEnum.NO_MORE_DOCS, docsAndPositionsEnum.NextDoc());
+                    Assert.Equal(DocsEnum.NO_MORE_DOCS, docsAndPositionsEnum.NextDoc());
                 }
                 bits.Set(0);
 
                 docsAndPositionsEnum = termsEnum.DocsAndPositions(Random().NextBoolean() ? bits : null, Random().NextBoolean() ? null : docsAndPositionsEnum);
-                Assert.AreEqual(ft.StoreTermVectorOffsets || ft.StoreTermVectorPositions, docsAndPositionsEnum != null);
+                Assert.Equal(ft.StoreTermVectorOffsets || ft.StoreTermVectorPositions, docsAndPositionsEnum != null);
                 if (terms.HasPositions() || terms.HasOffsets())
                 {
-                    Assert.AreEqual(0, docsAndPositionsEnum.NextDoc());
+                    Assert.Equal(0, docsAndPositionsEnum.NextDoc());
                     int freq = docsAndPositionsEnum.Freq();
-                    Assert.AreEqual(tk.Freqs[termsEnum.Term().Utf8ToString()], (int?)freq);
+                    Assert.Equal(tk.Freqs[termsEnum.Term().Utf8ToString()], (int?)freq);
                     if (docsAndPositionsEnum != null)
                     {
                         for (int k = 0; k < freq; ++k)
@@ -578,12 +577,12 @@ namespace Lucene.Net.Index
                             if (terms.HasPositions())
                             {
                                 indexes = tk.PositionToTerms[position];
-                                Assert.IsNotNull(indexes);
+                                Assert.NotNull(indexes);
                             }
                             else
                             {
                                 indexes = tk.StartOffsetToTerms[docsAndPositionsEnum.StartOffset()];
-                                Assert.IsNotNull(indexes);
+                                Assert.NotNull(indexes);
                             }
                             if (terms.HasPositions())
                             {
@@ -596,7 +595,7 @@ namespace Lucene.Net.Index
                                         break;
                                     }
                                 }
-                                Assert.IsTrue(foundPosition);
+                                Assert.True(foundPosition);
                             }
                             if (terms.HasOffsets())
                             {
@@ -609,7 +608,7 @@ namespace Lucene.Net.Index
                                         break;
                                     }
                                 }
-                                Assert.IsTrue(foundOffset);
+                                Assert.True(foundOffset);
                             }
                             if (terms.HasPayloads())
                             {
@@ -622,33 +621,33 @@ namespace Lucene.Net.Index
                                         break;
                                     }
                                 }
-                                Assert.IsTrue(foundPayload);
+                                Assert.True(foundPayload);
                             }
                         }
                         try
                         {
                             docsAndPositionsEnum.NextPosition();
-                            Assert.Fail();
+                            Assert.True(false);
                         }
                         catch (Exception e)
                         {
                             // ok
                         }
                     }
-                    Assert.AreEqual(DocsEnum.NO_MORE_DOCS, docsAndPositionsEnum.NextDoc());
+                    Assert.Equal(DocsEnum.NO_MORE_DOCS, docsAndPositionsEnum.NextDoc());
                 }
                 this.docsAndPositionsEnum.Value = docsAndPositionsEnum;
             }
-            Assert.IsNull(termsEnum.Next());
+            Assert.Null(termsEnum.Next());
             for (int i = 0; i < 5; ++i)
             {
                 if (Random().NextBoolean())
                 {
-                    Assert.IsTrue(termsEnum.SeekExact(RandomInts.RandomFrom(Random(), tk.TermBytes)));
+                    Assert.True(termsEnum.SeekExact(RandomInts.RandomFrom(Random(), tk.TermBytes)));
                 }
                 else
                 {
-                    Assert.AreEqual(SeekStatus.FOUND, termsEnum.SeekCeil(RandomInts.RandomFrom(Random(), tk.TermBytes)));
+                    Assert.Equal(SeekStatus.FOUND, termsEnum.SeekCeil(RandomInts.RandomFrom(Random(), tk.TermBytes)));
                 }
             }
         }
@@ -664,7 +663,7 @@ namespace Lucene.Net.Index
             return (new IndexSearcher(reader)).Search(new TermQuery(new Term("id", id)), 1).ScoreDocs[0].Doc;
         }
 
-        [Test]
+        [Fact]
         // only one doc with vectors
         public virtual void TestRareVectors()
         {
@@ -700,7 +699,7 @@ namespace Lucene.Net.Index
                     }
                     else
                     {
-                        Assert.IsNull(fields);
+                        Assert.Null(fields);
                     }
                 }
                 Fields fields_ = reader.GetTermVectors(docWithVectorsID);
@@ -711,7 +710,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHighFreqs()
         {
             RandomDocumentFactory docFactory = new RandomDocumentFactory(this, 3, 5);
@@ -733,7 +732,8 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestLotsOfFields()
         {
             RandomDocumentFactory docFactory = new RandomDocumentFactory(this, 500, 10);
@@ -751,7 +751,8 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         // different options for the same field
         public virtual void TestMixedOptions()
         {
@@ -786,7 +787,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             RandomDocumentFactory docFactory = new RandomDocumentFactory(this, 5, 20);
@@ -813,7 +814,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMerge()
         {
             RandomDocumentFactory docFactory = new RandomDocumentFactory(this, 5, 20);
@@ -862,7 +863,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         // run random tests from different threads to make sure the per-thread clones
         // don't share mutable data
         public virtual void TestClone()
@@ -906,7 +907,7 @@ namespace Lucene.Net.Index
                 reader.Dispose();
                 writer.Dispose();
                 dir.Dispose();
-                Assert.IsNull(exception.Value, "One thread threw an exception");
+                Assert.Null(exception.Value); //, "One thread threw an exception");
             }
         }
 

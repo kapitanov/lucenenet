@@ -13,8 +13,9 @@ namespace Lucene.Net.Util
 
     //using RandomInts = com.carrotsearch.randomizedtesting.generators.RandomInts;
     //using RandomPicks = com.carrotsearch.randomizedtesting.generators.RandomPicks;
-    using NUnit.Framework;
+
     using System.IO;
+    using Xunit;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using BinaryDocValuesField = BinaryDocValuesField;
@@ -935,7 +936,7 @@ namespace Lucene.Net.Util
             IDictionary<string, object> newReflectedObjects = new Dictionary<string, object>();
             foreach (KeyValuePair<string, object> de in reflectedValues)
                 newReflectedObjects.Add(de.Key, (object)de.Value);
-            Assert.IsTrue(CollectionsHelper.DictEquals(newReflectedObjects, map), "Reflection does not produce same map");
+            Assert.True(CollectionsHelper.DictEquals(newReflectedObjects, map), "Reflection does not produce same map");
         }
 
         private class AttributeReflectorAnonymousInnerClassHelper : IAttributeReflector
@@ -961,23 +962,23 @@ namespace Lucene.Net.Util
 
         public static void AssertEquals(TopDocs expected, TopDocs actual)
         {
-            Assert.AreEqual(expected.TotalHits, actual.TotalHits, "wrong total hits");
-            Assert.AreEqual(expected.MaxScore, actual.MaxScore, "wrong maxScore");
-            Assert.AreEqual(expected.ScoreDocs.Length, actual.ScoreDocs.Length, "wrong hit count");
+            Assert.Equal(expected.TotalHits, actual.TotalHits);
+            Assert.Equal(expected.MaxScore, actual.MaxScore);
+            Assert.Equal(expected.ScoreDocs.Length, actual.ScoreDocs.Length);
             for (int hitIDX = 0; hitIDX < expected.ScoreDocs.Length; hitIDX++)
             {
                 ScoreDoc expectedSD = expected.ScoreDocs[hitIDX];
                 ScoreDoc actualSD = actual.ScoreDocs[hitIDX];
-                Assert.AreEqual(expectedSD.Doc, actualSD.Doc, "wrong hit docID");
-                Assert.AreEqual(expectedSD.Score, actualSD.Score, "wrong hit score");
+                Assert.Equal(expectedSD.Doc, actualSD.Doc);
+                Assert.Equal(expectedSD.Score, actualSD.Score);
                 if (expectedSD is FieldDoc)
                 {
-                    Assert.IsTrue(actualSD is FieldDoc);
-                    Assert.AreEqual(((FieldDoc)expectedSD).Fields, ((FieldDoc)actualSD).Fields, "wrong sort field values");
+                    Assert.True(actualSD is FieldDoc);
+                    Assert.Equal(((FieldDoc)expectedSD).Fields, ((FieldDoc)actualSD).Fields);
                 }
                 else
                 {
-                    Assert.IsFalse(actualSD is FieldDoc);
+                    Assert.False(actualSD is FieldDoc);
                 }
             }
         }
@@ -1236,7 +1237,7 @@ namespace Lucene.Net.Util
                 int offset = NextInt(r, 0, WHITESPACE_CHARACTERS.Length - 1);
                 char c = WHITESPACE_CHARACTERS[offset];
                 // sanity check
-                Assert.IsTrue(char.IsWhiteSpace(c), "Not really whitespace? (@" + offset + "): " + c);
+                Assert.True(char.IsWhiteSpace(c), "Not really whitespace? (@" + offset + "): " + c);
                 @out.Append(c);
             }
             return @out.ToString();
@@ -1299,7 +1300,7 @@ namespace Lucene.Net.Util
                     }
                     else if (evilness < 15)
                     {
-                        Assert.AreEqual(0, sb.Length); // we should always get wordLength back!
+                        Assert.Equal(0, sb.Length); // we should always get wordLength back!
                         sb.Append(TestUtil.RandomRealisticUnicodeString(random, wordLength, wordLength));
                     }
                     else if (evilness == 16)

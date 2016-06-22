@@ -1,5 +1,5 @@
-﻿using NUnit.Framework;
 using System.Configuration;
+using Xunit;
 
 namespace Lucene.Net.TestFramework.Support
 {
@@ -37,12 +37,14 @@ namespace Lucene.Net.TestFramework.Support
 
         public static void AssumeTrue(string msg, bool value)
         {
-            Assume.That(value, msg);
+            Assert.True(value, msg);
+            //Assume.That(value, msg);
         }
 
         public static void AssumeFalse(string msg, bool value)
         {
-            Assume.That(!value, msg);
+            Assert.False(value, msg);
+            //Assume.That(!value, msg);
         }
     }
 }

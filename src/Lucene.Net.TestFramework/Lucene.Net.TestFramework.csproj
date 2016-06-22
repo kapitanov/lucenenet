@@ -433,6 +433,7 @@
     <Compile Include="Support\RandomizedTest.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Support\RepeatAttribute.cs" />
     <Compile Include="Support\SystemProperties.cs">
       <SubType>Code</SubType>
     </Compile>

@@ -23,7 +23,7 @@ using Lucene.Net.Randomized;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Search;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -101,6 +101,7 @@ namespace Lucene.Net.Util
     using TermsEnum = Lucene.Net.Index.TermsEnum;
     using TextField = TextField;
     using TieredMergePolicy = Lucene.Net.Index.TieredMergePolicy;
+    using System.Collections;
 
     /*using After = org.junit.After;
     using AfterClass = org.junit.AfterClass;
@@ -189,16 +190,23 @@ namespace Lucene.Net.Util
     ///   <seealso cref="RandomizedContext#getRunnerSeedAsString()"/>.</li>
     /// </ul>
     /// </summary>
-    [TestFixture]
-    public abstract partial class LuceneTestCase : Assert // Wait long for leaked threads to complete before failure. zk needs this. -  See LUCENE-3995 for rationale.
+    public abstract partial class LuceneTestCase : Assert, IDisposable // Wait long for leaked threads to complete before failure. zk needs this. -  See LUCENE-3995 for rationale.
     {
         public static System.IO.FileInfo TEMP_DIR;
 
-        public LuceneTestCase()
+        /// <summary>
+        /// For subclasses to override. Overrides must call {@code super.setUp()}.
+        /// </summary>
+        public LuceneTestCase() : base()
         {
             String directory = Paths.TempDirectory;
 
             TEMP_DIR = new System.IO.FileInfo(directory);
+
+            // [Setup]
+            // LUCENENET TODO: Not sure how to convert these
+            //ParentChainCallRule.SetupCalled = true;
+            ClassEnvRule = new TestRuleSetupAndRestoreClassEnv();
         }
 
         // --------------------------------------------------------------------
@@ -559,21 +567,9 @@ namespace Lucene.Net.Util
         // -----------------------------------------------------------------
 
         /// <summary>
-        /// For subclasses to override. Overrides must call {@code super.setUp()}.
-        /// </summary>
-        [SetUp]
-        public virtual void SetUp()
-        {
-            // LUCENENET TODO: Not sure how to convert these
-            //ParentChainCallRule.SetupCalled = true;
-            ClassEnvRule = new TestRuleSetupAndRestoreClassEnv();
-        }
-
-        /// <summary>
         /// For subclasses to override. Overrides must call {@code super.tearDown()}.
         /// </summary>
-        [TearDown]
-        public virtual void TearDown()
+        public virtual void Dispose()
         {
             /* LUCENENET TODO: Not sure how to convert these
                 ParentChainCallRule.TeardownCalled = true;
@@ -674,7 +670,7 @@ namespace Lucene.Net.Util
                 throw new System.ArgumentException(reader + " has " + subReaders.Count + " segments instead of exactly one");
             }
             AtomicReader r = (AtomicReader)subReaders[0].Reader;
-            Assert.IsTrue(r is SegmentReader);
+            Assert.True(r is SegmentReader);
             return (SegmentReader)r;
         }
 
@@ -684,7 +680,7 @@ namespace Lucene.Net.Util
         /// </summary>
         public static bool TestThread()
         {
-            /*Assert.IsNotNull(ThreadAndTestNameRule.TestCaseThread, "Test case thread not set?");
+            /*Assert.NotNull(ThreadAndTestNameRule.TestCaseThread, "Test case thread not set?");
             return Thread.CurrentThread == ThreadAndTestNameRule.TestCaseThread;*/
             return true;
         }
@@ -722,7 +718,7 @@ namespace Lucene.Net.Util
                     throw e;
                 }
 
-                Assert.AreEqual(0, insanity.Length, msg + ": Insane FieldCache usage(s) found");
+                Assert.Equal(0, insanity.Length); //, msg + ": Insane FieldCache usage(s) found");
                 insanity = null;
             }
             finally
@@ -1461,7 +1457,7 @@ namespace Lucene.Net.Util
                             break;
 
                         default:
-                            Assert.Fail("should not get here");
+                            Assert.True(false, "should not get here");
                             break;
                     }
                 }
@@ -1725,10 +1721,11 @@ namespace Lucene.Net.Util
         public void AssertReaderStatisticsEquals(string info, IndexReader leftReader, IndexReader rightReader)
         {
             // Somewhat redundant: we never delete docs
-            Assert.AreEqual(leftReader.MaxDoc, rightReader.MaxDoc, info);
-            Assert.AreEqual(leftReader.NumDocs, rightReader.NumDocs, info);
-            Assert.AreEqual(leftReader.NumDeletedDocs, rightReader.NumDeletedDocs, info);
-            Assert.AreEqual(leftReader.HasDeletions, rightReader.HasDeletions, info);
+            Console.WriteLine(info);
+            Assert.Equal(leftReader.MaxDoc, rightReader.MaxDoc);
+            Assert.Equal(leftReader.NumDocs, rightReader.NumDocs);
+            Assert.Equal(leftReader.NumDeletedDocs, rightReader.NumDeletedDocs);
+            Assert.Equal(leftReader.HasDeletions, rightReader.HasDeletions);
         }
 
         /// <summary>
@@ -1736,12 +1733,13 @@ namespace Lucene.Net.Util
         /// </summary>
         public void AssertFieldsEquals(string info, IndexReader leftReader, Fields leftFields, Fields rightFields, bool deep)
         {
+            Console.WriteLine(info);
             // Fields could be null if there are no postings,
             // but then it must be null for both
             if (leftFields == null || rightFields == null)
             {
-                Assert.IsNull(leftFields, info);
-                Assert.IsNull(rightFields, info);
+                Assert.Null(leftFields);
+                Assert.Null(rightFields);
                 return;
             }
             AssertFieldStatisticsEquals(info, leftFields, rightFields);
@@ -1753,10 +1751,10 @@ namespace Lucene.Net.Util
             {
                 string field = leftEnum.Current;
                 rightEnum.MoveNext();
-                Assert.AreEqual(field, rightEnum.Current, info);
+                Assert.Equal(field, rightEnum.Current);
                 AssertTermsEquals(info, leftReader, leftFields.Terms(field), rightFields.Terms(field), deep);
             }
-            Assert.IsFalse(rightEnum.MoveNext());
+            Assert.False(rightEnum.MoveNext());
         }
 
         /// <summary>
@@ -1766,7 +1764,7 @@ namespace Lucene.Net.Util
         {
             if (leftFields.Size != -1 && rightFields.Size != -1)
             {
-                Assert.AreEqual(leftFields.Size, rightFields.Size, info);
+                Assert.Equal(leftFields.Size, rightFields.Size);
             }
         }
 
@@ -1775,16 +1773,17 @@ namespace Lucene.Net.Util
         /// </summary>
         public void AssertTermsEquals(string info, IndexReader leftReader, Terms leftTerms, Terms rightTerms, bool deep)
         {
+            Console.WriteLine(info);
             if (leftTerms == null || rightTerms == null)
             {
-                Assert.IsNull(leftTerms, info);
-                Assert.IsNull(rightTerms, info);
+                Assert.Null(leftTerms);
+                Assert.Null(rightTerms);
                 return;
             }
             AssertTermsStatisticsEquals(info, leftTerms, rightTerms);
-            Assert.AreEqual(leftTerms.HasOffsets(), rightTerms.HasOffsets());
-            Assert.AreEqual(leftTerms.HasPositions(), rightTerms.HasPositions());
-            Assert.AreEqual(leftTerms.HasPayloads(), rightTerms.HasPayloads());
+            Assert.Equal(leftTerms.HasOffsets(), rightTerms.HasOffsets());
+            Assert.Equal(leftTerms.HasPositions(), rightTerms.HasPositions());
+            Assert.Equal(leftTerms.HasPayloads(), rightTerms.HasPayloads());
 
             TermsEnum leftTermsEnum = leftTerms.Iterator(null);
             TermsEnum rightTermsEnum = rightTerms.Iterator(null);
@@ -1815,22 +1814,23 @@ namespace Lucene.Net.Util
         /// </summary>
         public void AssertTermsStatisticsEquals(string info, Terms leftTerms, Terms rightTerms)
         {
+            Console.WriteLine(info);
             Debug.Assert(leftTerms.Comparator == rightTerms.Comparator);
             if (leftTerms.DocCount != -1 && rightTerms.DocCount != -1)
             {
-                Assert.AreEqual(leftTerms.DocCount, rightTerms.DocCount, info);
+                Assert.Equal(leftTerms.DocCount, rightTerms.DocCount);
             }
             if (leftTerms.SumDocFreq != -1 && rightTerms.SumDocFreq != -1)
             {
-                Assert.AreEqual(leftTerms.SumDocFreq, rightTerms.SumDocFreq, info);
+                Assert.Equal(leftTerms.SumDocFreq, rightTerms.SumDocFreq);
             }
             if (leftTerms.SumTotalTermFreq != -1 && rightTerms.SumTotalTermFreq != -1)
             {
-                Assert.AreEqual(leftTerms.SumTotalTermFreq, rightTerms.SumTotalTermFreq, info);
+                Assert.Equal(leftTerms.SumTotalTermFreq, rightTerms.SumTotalTermFreq);
             }
             if (leftTerms.Size() != -1 && rightTerms.Size() != -1)
             {
-                Assert.AreEqual(leftTerms.Size(), rightTerms.Size(), info);
+                Assert.Equal(leftTerms.Size(), rightTerms.Size());
             }
         }
 
@@ -1876,7 +1876,8 @@ namespace Lucene.Net.Util
 
             while ((term = leftTermsEnum.Next()) != null)
             {
-                Assert.AreEqual(term, rightTermsEnum.Next(), info);
+                Console.WriteLine(info);
+                Assert.Equal(term, rightTermsEnum.Next());
                 AssertTermStatsEquals(info, leftTermsEnum, rightTermsEnum);
                 if (deep)
                 {
@@ -1903,7 +1904,7 @@ namespace Lucene.Net.Util
                     AssertDocsSkippingEquals(info, leftReader, leftTermsEnum.DocFreq(), leftDocs = leftTermsEnum.Docs(randomBits, leftDocs, DocsEnum.FLAG_NONE), rightDocs = rightTermsEnum.Docs(randomBits, rightDocs, DocsEnum.FLAG_NONE), false);
                 }
             }
-            Assert.IsNull(rightTermsEnum.Next(), info);
+            Assert.Null(rightTermsEnum.Next());
         }
 
         /// <summary>
@@ -1913,27 +1914,28 @@ namespace Lucene.Net.Util
         {
             if (leftDocs == null || rightDocs == null)
             {
-                Assert.IsNull(leftDocs);
-                Assert.IsNull(rightDocs);
+                Assert.Null(leftDocs);
+                Assert.Null(rightDocs);
                 return;
             }
-            Assert.AreEqual(-1, leftDocs.DocID(), info);
-            Assert.AreEqual(-1, rightDocs.DocID(), info);
+			Console.WriteLine(info);
+            Assert.Equal(-1, leftDocs.DocID());
+            Assert.Equal(-1, rightDocs.DocID());
             int docid;
             while ((docid = leftDocs.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.AreEqual(docid, rightDocs.NextDoc(), info);
+                Assert.Equal(docid, rightDocs.NextDoc());
                 int freq = leftDocs.Freq();
-                Assert.AreEqual(freq, rightDocs.Freq(), info);
+                Assert.Equal(freq, rightDocs.Freq());
                 for (int i = 0; i < freq; i++)
                 {
-                    Assert.AreEqual(leftDocs.NextPosition(), rightDocs.NextPosition(), info);
-                    Assert.AreEqual(leftDocs.Payload, rightDocs.Payload, info);
-                    Assert.AreEqual(leftDocs.StartOffset(), rightDocs.StartOffset(), info);
-                    Assert.AreEqual(leftDocs.EndOffset(), rightDocs.EndOffset(), info);
+                    Assert.Equal(leftDocs.NextPosition(), rightDocs.NextPosition());
+                    Assert.Equal(leftDocs.Payload, rightDocs.Payload);
+                    Assert.Equal(leftDocs.StartOffset(), rightDocs.StartOffset());
+                    Assert.Equal(leftDocs.EndOffset(), rightDocs.EndOffset());
                 }
             }
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, rightDocs.NextDoc(), info);
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, rightDocs.NextDoc());
         }
 
         /// <summary>
@@ -1943,21 +1945,22 @@ namespace Lucene.Net.Util
         {
             if (leftDocs == null)
             {
-                Assert.IsNull(rightDocs);
+                Assert.Null(rightDocs);
                 return;
             }
-            Assert.AreEqual(-1, leftDocs.DocID(), info);
-            Assert.AreEqual(-1, rightDocs.DocID(), info);
+			Console.WriteLine(info);
+            Assert.Equal(-1, leftDocs.DocID());
+            Assert.Equal(-1, rightDocs.DocID());
             int docid;
             while ((docid = leftDocs.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.AreEqual(docid, rightDocs.NextDoc(), info);
+                Assert.Equal(docid, rightDocs.NextDoc());
                 if (hasFreqs)
                 {
-                    Assert.AreEqual(leftDocs.Freq(), rightDocs.Freq(), info);
+                    Assert.Equal(leftDocs.Freq(), rightDocs.Freq());
                 }
             }
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, rightDocs.NextDoc(), info);
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, rightDocs.NextDoc());
         }
 
         /// <summary>
@@ -1967,7 +1970,7 @@ namespace Lucene.Net.Util
         {
             if (leftDocs == null)
             {
-                Assert.IsNull(rightDocs);
+                Assert.Null(rightDocs);
                 return;
             }
             int docid = -1;
@@ -1980,14 +1983,14 @@ namespace Lucene.Net.Util
                 {
                     // nextDoc()
                     docid = leftDocs.NextDoc();
-                    Assert.AreEqual(docid, rightDocs.NextDoc(), info);
+                    Assert.Equal(docid, rightDocs.NextDoc());
                 }
                 else
                 {
                     // advance()
                     int skip = docid + (int)Math.Ceiling(Math.Abs(skipInterval + Random().NextDouble() * averageGap));
                     docid = leftDocs.Advance(skip);
-                    Assert.AreEqual(docid, rightDocs.Advance(skip), info);
+                    Assert.Equal(docid, rightDocs.Advance(skip));
                 }
 
                 if (docid == DocIdSetIterator.NO_MORE_DOCS)
@@ -1996,7 +1999,7 @@ namespace Lucene.Net.Util
                 }
                 if (hasFreqs)
                 {
-                    Assert.AreEqual(leftDocs.Freq(), rightDocs.Freq(), info);
+                    Assert.Equal(leftDocs.Freq(), rightDocs.Freq());
                 }
             }
         }
@@ -2008,8 +2011,8 @@ namespace Lucene.Net.Util
         {
             if (leftDocs == null || rightDocs == null)
             {
-                Assert.IsNull(leftDocs);
-                Assert.IsNull(rightDocs);
+                Assert.Null(leftDocs);
+                Assert.Null(rightDocs);
                 return;
             }
 
@@ -2023,14 +2026,14 @@ namespace Lucene.Net.Util
                 {
                     // nextDoc()
                     docid = leftDocs.NextDoc();
-                    Assert.AreEqual(docid, rightDocs.NextDoc(), info);
+                    Assert.Equal(docid, rightDocs.NextDoc());
                 }
                 else
                 {
                     // advance()
                     int skip = docid + (int)Math.Ceiling(Math.Abs(skipInterval + Random().NextDouble() * averageGap));
                     docid = leftDocs.Advance(skip);
-                    Assert.AreEqual(docid, rightDocs.Advance(skip), info);
+                    Assert.Equal(docid, rightDocs.Advance(skip));
                 }
 
                 if (docid == DocIdSetIterator.NO_MORE_DOCS)
@@ -2038,11 +2041,11 @@ namespace Lucene.Net.Util
                     return;
                 }
                 int freq = leftDocs.Freq();
-                Assert.AreEqual(freq, rightDocs.Freq(), info);
+                Assert.Equal(freq, rightDocs.Freq());
                 for (int i = 0; i < freq; i++)
                 {
-                    Assert.AreEqual(leftDocs.NextPosition(), rightDocs.NextPosition(), info);
-                    Assert.AreEqual(leftDocs.Payload, rightDocs.Payload, info);
+                    Assert.Equal(leftDocs.NextPosition(), rightDocs.NextPosition());
+                    Assert.Equal(leftDocs.Payload, rightDocs.Payload);
                 }
             }
         }
@@ -2130,16 +2133,16 @@ namespace Lucene.Net.Util
 
                 if (seekExact)
                 {
-                    Assert.AreEqual(leftEnum.SeekExact(b), rightEnum.SeekExact(b), info);
+                    Assert.Equal(leftEnum.SeekExact(b), rightEnum.SeekExact(b));
                 }
                 else
                 {
                     TermsEnum.SeekStatus leftStatus = leftEnum.SeekCeil(b);
                     TermsEnum.SeekStatus rightStatus = rightEnum.SeekCeil(b);
-                    Assert.AreEqual(leftStatus, rightStatus, info);
+                    Assert.Equal(leftStatus, rightStatus);
                     if (leftStatus != TermsEnum.SeekStatus.END)
                     {
-                        Assert.AreEqual(leftEnum.Term(), rightEnum.Term(), info);
+                        Assert.Equal(leftEnum.Term(), rightEnum.Term());
                         AssertTermStatsEquals(info, leftEnum, rightEnum);
                     }
                 }
@@ -2151,10 +2154,10 @@ namespace Lucene.Net.Util
         /// </summary>
         public void AssertTermStatsEquals(string info, TermsEnum leftTermsEnum, TermsEnum rightTermsEnum)
         {
-            Assert.AreEqual(leftTermsEnum.DocFreq(), rightTermsEnum.DocFreq(), info);
+            Assert.Equal(leftTermsEnum.DocFreq(), rightTermsEnum.DocFreq());
             if (leftTermsEnum.TotalTermFreq() != -1 && rightTermsEnum.TotalTermFreq() != -1)
             {
-                Assert.AreEqual(leftTermsEnum.TotalTermFreq(), rightTermsEnum.TotalTermFreq(), info);
+                Assert.Equal(leftTermsEnum.TotalTermFreq(), rightTermsEnum.TotalTermFreq());
             }
         }
 
@@ -2169,8 +2172,8 @@ namespace Lucene.Net.Util
             // but then it must be null for both
             if (leftFields == null || rightFields == null)
             {
-                Assert.IsNull(leftFields, info);
-                Assert.IsNull(rightFields, info);
+                Assert.Null(leftFields);
+                Assert.Null(rightFields);
                 return;
             }
 
@@ -2184,8 +2187,8 @@ namespace Lucene.Net.Util
                 }
                 else
                 {
-                    Assert.IsNull(leftNorms, info);
-                    Assert.IsNull(rightNorms, info);
+                    Assert.Null(leftNorms);
+                    Assert.Null(rightNorms);
                 }
             }
         }
@@ -2214,10 +2217,10 @@ namespace Lucene.Net.Util
                 var rightIterator = rightDoc.GetEnumerator();
                 while (leftIterator.MoveNext())
                 {
-                    Assert.IsTrue(rightIterator.MoveNext(), info);
+                    Assert.True(rightIterator.MoveNext());
                     AssertStoredFieldEquals(info, leftIterator.Current, rightIterator.Current);
                 }
-                Assert.IsFalse(rightIterator.MoveNext(), info);
+                Assert.False(rightIterator.MoveNext());
             }
         }
 
@@ -2226,10 +2229,10 @@ namespace Lucene.Net.Util
         /// </summary>
         public void AssertStoredFieldEquals(string info, IndexableField leftField, IndexableField rightField)
         {
-            Assert.AreEqual(leftField.Name(), rightField.Name(), info);
-            Assert.AreEqual(leftField.BinaryValue(), rightField.BinaryValue(), info);
-            Assert.AreEqual(leftField.StringValue, rightField.StringValue, info);
-            Assert.AreEqual(leftField.NumericValue, rightField.NumericValue, info);
+            Assert.Equal(leftField.Name(), rightField.Name());
+            Assert.Equal(leftField.BinaryValue(), rightField.BinaryValue());
+            Assert.Equal(leftField.StringValue, rightField.StringValue);
+            Assert.Equal(leftField.NumericValue, rightField.NumericValue);
             // TODO: should we check the FT at all?
         }
 
@@ -2268,7 +2271,7 @@ namespace Lucene.Net.Util
         {
             ISet<string> leftFields = GetDVFields(leftReader);
             ISet<string> rightFields = GetDVFields(rightReader);
-            Assert.AreEqual(leftFields, rightFields, info);
+            Assert.Equal(leftFields, rightFields);
 
             foreach (string field in leftFields)
             {
@@ -2282,8 +2285,8 @@ namespace Lucene.Net.Util
                     }
                     else
                     {
-                        Assert.IsNull(leftValues, info);
-                        Assert.IsNull(rightValues, info);
+                        Assert.Null(leftValues);
+                        Assert.Null(rightValues);
                     }
                 }
 
@@ -2298,13 +2301,13 @@ namespace Lucene.Net.Util
                         {
                             leftValues.Get(docID, scratchLeft);
                             rightValues.Get(docID, scratchRight);
-                            Assert.AreEqual(scratchLeft, scratchRight, info);
+                            Assert.Equal(scratchLeft, scratchRight);
                         }
                     }
                     else
                     {
-                        Assert.IsNull(leftValues, info);
-                        Assert.IsNull(rightValues, info);
+                        Assert.Null(leftValues);
+                        Assert.Null(rightValues);
                     }
                 }
 
@@ -2314,7 +2317,7 @@ namespace Lucene.Net.Util
                     if (leftValues != null && rightValues != null)
                     {
                         // numOrds
-                        Assert.AreEqual(leftValues.ValueCount, rightValues.ValueCount, info);
+                        Assert.Equal(leftValues.ValueCount, rightValues.ValueCount);
                         // ords
                         BytesRef scratchLeft = new BytesRef();
                         BytesRef scratchRight = new BytesRef();
@@ -2322,20 +2325,20 @@ namespace Lucene.Net.Util
                         {
                             leftValues.LookupOrd(i, scratchLeft);
                             rightValues.LookupOrd(i, scratchRight);
-                            Assert.AreEqual(scratchLeft, scratchRight, info);
+                            Assert.Equal(scratchLeft, scratchRight);
                         }
                         // bytes
                         for (int docID = 0; docID < leftReader.MaxDoc; docID++)
                         {
                             leftValues.Get(docID, scratchLeft);
                             rightValues.Get(docID, scratchRight);
-                            Assert.AreEqual(scratchLeft, scratchRight, info);
+                            Assert.Equal(scratchLeft, scratchRight);
                         }
                     }
                     else
                     {
-                        Assert.IsNull(leftValues, info);
-                        Assert.IsNull(rightValues, info);
+                        Assert.Null(leftValues);
+                        Assert.Null(rightValues);
                     }
                 }
 
@@ -2345,7 +2348,7 @@ namespace Lucene.Net.Util
                     if (leftValues != null && rightValues != null)
                     {
                         // numOrds
-                        Assert.AreEqual(leftValues.ValueCount, rightValues.ValueCount, info);
+                        Assert.Equal(leftValues.ValueCount, rightValues.ValueCount);
                         // ords
                         BytesRef scratchLeft = new BytesRef();
                         BytesRef scratchRight = new BytesRef();
@@ -2353,7 +2356,7 @@ namespace Lucene.Net.Util
                         {
                             leftValues.LookupOrd(i, scratchLeft);
                             rightValues.LookupOrd(i, scratchRight);
-                            Assert.AreEqual(scratchLeft, scratchRight, info);
+                            Assert.Equal(scratchLeft, scratchRight);
                         }
                         // ord lists
                         for (int docID = 0; docID < leftReader.MaxDoc; docID++)
@@ -2363,15 +2366,15 @@ namespace Lucene.Net.Util
                             long ord;
                             while ((ord = leftValues.NextOrd()) != SortedSetDocValues.NO_MORE_ORDS)
                             {
-                                Assert.AreEqual(ord, rightValues.NextOrd(), info);
+                                Assert.Equal(ord, rightValues.NextOrd());
                             }
-                            Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, rightValues.NextOrd(), info);
+                            Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, rightValues.NextOrd());
                         }
                     }
                     else
                     {
-                        Assert.IsNull(leftValues, info);
-                        Assert.IsNull(rightValues, info);
+                        Assert.Null(leftValues);
+                        Assert.Null(rightValues);
                     }
                 }
 
@@ -2380,16 +2383,16 @@ namespace Lucene.Net.Util
                     Bits rightBits = MultiDocValues.GetDocsWithField(rightReader, field);
                     if (leftBits != null && rightBits != null)
                     {
-                        Assert.AreEqual(leftBits.Length(), rightBits.Length(), info);
+                        Assert.Equal(leftBits.Length(), rightBits.Length());
                         for (int i = 0; i < leftBits.Length(); i++)
                         {
-                            Assert.AreEqual(leftBits.Get(i), rightBits.Get(i), info);
+                            Assert.Equal(leftBits.Get(i), rightBits.Get(i));
                         }
                     }
                     else
                     {
-                        Assert.IsNull(leftBits, info);
-                        Assert.IsNull(rightBits, info);
+                        Assert.Null(leftBits);
+                        Assert.Null(rightBits);
                     }
                 }
             }
@@ -2397,11 +2400,11 @@ namespace Lucene.Net.Util
 
         public void AssertDocValuesEquals(string info, int num, NumericDocValues leftDocValues, NumericDocValues rightDocValues)
         {
-            Assert.IsNotNull(leftDocValues, info);
-            Assert.IsNotNull(rightDocValues, info);
+            Assert.NotNull(leftDocValues);
+            Assert.NotNull(rightDocValues);
             for (int docID = 0; docID < num; docID++)
             {
-                Assert.AreEqual(leftDocValues.Get(docID), rightDocValues.Get(docID));
+                Assert.Equal(leftDocValues.Get(docID), rightDocValues.Get(docID));
             }
         }
 
@@ -2414,16 +2417,16 @@ namespace Lucene.Net.Util
 
             if (leftBits == null || rightBits == null)
             {
-                Assert.IsNull(leftBits, info);
-                Assert.IsNull(rightBits, info);
+                Assert.Null(leftBits);
+                Assert.Null(rightBits);
                 return;
             }
 
             Debug.Assert(leftReader.MaxDoc == rightReader.MaxDoc);
-            Assert.AreEqual(leftBits.Length(), rightBits.Length(), info);
+            Assert.Equal(leftBits.Length(), rightBits.Length());
             for (int i = 0; i < leftReader.MaxDoc; i++)
             {
-                Assert.AreEqual(leftBits.Get(i), rightBits.Get(i), info);
+                Assert.Equal(leftBits.Get(i), rightBits.Get(i));
             }
         }
 
@@ -2446,7 +2449,7 @@ namespace Lucene.Net.Util
                 right.Add(fi.Name);
             }
 
-            Assert.AreEqual(left, right, info);
+            Assert.Equal(left, right);
         }
 
         /// <summary>
@@ -2691,12 +2694,22 @@ namespace Lucene.Net.Util
         /// 
         /// LUCENENET specific
         /// </summary>
-        public class ConcurrentMergeSchedulers
+        public class ConcurrentMergeSchedulers : IEnumerable<object[]>
         {
-            public readonly IConcurrentMergeScheduler[] Values = new IConcurrentMergeScheduler[] {
-                new ConcurrentMergeScheduler(),
-                new TaskMergeScheduler()
+            private readonly IEnumerable<object[]> _data = new List<object[]> {
+                new [] { new ConcurrentMergeScheduler() },
+                new [] { new TaskMergeScheduler() }
             };
+
+            public IEnumerator<object[]> GetEnumerator()
+            {
+                return _data.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
     }
 

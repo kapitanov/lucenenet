@@ -1,6 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -8,42 +8,42 @@ namespace Lucene.Net.Util
     {
         public static void assertTrue(bool condition)
         {
-            Assert.IsTrue(condition);
+            Assert.True(condition);
         }
 
         public static void assertTrue(string message, bool condition)
         {
-            Assert.IsTrue(condition, message);
+            Assert.True(condition, message);
         }
 
         public static void assertFalse(bool condition)
         {
-            Assert.IsFalse(condition);
+            Assert.False(condition);
         }
 
         public static void assertFalse(string message, bool condition)
         {
-            Assert.IsFalse(condition, message);
+            Assert.False(condition, message);
         }
 
         public static void assertEquals(object expected, object actual)
         {
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         public static void assertEquals(string message, object expected, object actual)
         {
-            Assert.AreEqual(expected, actual, message);
+            Assert.Equal(expected, actual);//, message);
         }
 
         public static void assertEquals(long expected, long actual)
         {
-            Assert.AreEqual(expected, actual);
+            Assert.Equal(expected, actual);
         }
 
         public static void assertEquals(string message, long expected, long actual)
         {
-            Assert.AreEqual(expected, actual, message);
+            Assert.Equal(expected, actual); //, message);
         }
 
         public static void assertEquals<T>(ISet<T> expected, ISet<T> actual)
@@ -58,31 +58,35 @@ namespace Lucene.Net.Util
 
         public static void assertEquals<T, S>(IDictionary<T, S> expected, IDictionary<T, S> actual)
         {
-            Assert.AreEqual(expected.Count, actual.Count);
+            Assert.Equal(expected.Count, actual.Count);
             foreach (var key in expected.Keys)
             {
-                Assert.AreEqual(expected[key], actual[key]);
+                Assert.Equal(expected[key], actual[key]);
             }
         }
 
         public static void assertNotSame(object unexpected, object actual)
         {
-            Assert.AreNotSame(unexpected, actual);
+            Assert.NotSame(unexpected, actual);
         }
 
         public static void assertNotSame(string message, object unexpected, object actual)
         {
-            Assert.AreNotSame(unexpected, actual, message);
+            Assert.NotSame(unexpected, actual); //, message);
         }
 
         protected static void assertEquals(double d1, double d2, double delta)
         {
-            Assert.AreEqual(d1, d2, delta);
+            double min = d2 - delta;
+            double max = d2 + delta;
+            Assert.InRange(d1, min, max);
         }
 
         protected static void assertEquals(string msg, double d1, double d2, double delta)
         {
-            Assert.AreEqual(d1, d2, delta, msg);
+            double min = d2 - delta;
+            double max = d2 + delta;
+            Assert.InRange(d1, min, max);//, msg);
         }
 
         protected static void assertNotNull(object o)
@@ -92,7 +96,7 @@ namespace Lucene.Net.Util
 
         protected static void assertNotNull(string msg, object o)
         {
-            Assert.NotNull(o, msg);
+            Assert.True(o != null, msg);
         }
 
         protected static void assertNull(object o)
@@ -102,22 +106,22 @@ namespace Lucene.Net.Util
 
         protected static void assertNull(string msg, object o)
         {
-            Assert.Null(o, msg);
+            Assert.True(o == null, msg);
         }
 
         protected static void assertArrayEquals(IEnumerable a1, IEnumerable a2)
         {
-            CollectionAssert.AreEqual(a1, a2);
+            Assert.Equal(a1, a2);
         }
 
         protected static void fail()
         {
-            Assert.Fail();
+            Assert.True(false);
         }
 
         protected static void fail(string message)
         {
-            Assert.Fail(message);
+            Assert.True(false, message);
         }
     }
 }

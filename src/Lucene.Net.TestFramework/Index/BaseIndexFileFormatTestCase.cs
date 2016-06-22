@@ -1,7 +1,7 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
 using System.Collections.Generic;
-
+using Xunit;
+	
 namespace Lucene.Net.Index
 {
     using Codec = Lucene.Net.Codecs.Codec;
@@ -39,20 +39,17 @@ namespace Lucene.Net.Index
 
         private Codec SavedCodec;
 
-        [SetUp]
-        public override void SetUp()
+        public BaseIndexFileFormatTestCase() : base()
         {
-            base.SetUp();
             // set the default codec, so adding test cases to this isn't fragile
             SavedCodec = Codec.Default;
             Codec.Default = Codec;
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Codec.Default = SavedCodec; // restore
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
@@ -90,7 +87,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// The purpose of this test is to make sure that bulk merge doesn't accumulate useless data over runs.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMergeStability()
         {
             Directory dir = NewDirectory();

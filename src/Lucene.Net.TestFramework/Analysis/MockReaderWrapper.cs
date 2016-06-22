@@ -1,6 +1,6 @@
 using System;
 using System.Diagnostics;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -50,7 +50,7 @@ namespace Lucene.Net.Analysis
         {
             ExcAtChar = charUpto;
             // You should only call this on init!:
-            Assert.AreEqual(0, ReadSoFar);
+            Assert.Equal(0, ReadSoFar);
         }
 
         public virtual void ThrowExcNext()

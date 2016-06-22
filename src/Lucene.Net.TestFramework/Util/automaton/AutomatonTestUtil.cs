@@ -1,7 +1,6 @@
 using Lucene.Net.Support;
 using System;
 using System.Collections.Generic;
-using NUnit.Framework;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -23,7 +22,7 @@ namespace Lucene.Net.Util.Automaton
      */
 
     using Lucene.Net.Randomized.Generators;
-
+    using Xunit;
     /// <summary>
     /// Utilities for testing automata.
     /// <p>

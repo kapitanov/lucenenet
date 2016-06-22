@@ -4,10 +4,9 @@ namespace Lucene.Net.Util
 {
     public class LuceneTestCaseWithReducedFloatPrecision :  LuceneTestCase
     {
-        public override void SetUp()
+        public LuceneTestCaseWithReducedFloatPrecision()
+            : base()
         {
-            base.SetUp();
-
             // set precision
             FloatUtils.SetPrecision();
         }

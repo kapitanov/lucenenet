@@ -7,8 +7,8 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Analysis
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
@@ -101,10 +101,10 @@ namespace Lucene.Net.Analysis
             // Collator (or an Arabic one for the case when Farsi searcher not
             // supported).
             ScoreDoc[] result = searcher.Search(query, new TermRangeFilter("content", firstBeg, firstEnd, true, true), 1).ScoreDocs;
-            Assert.AreEqual(0, result.Length, "The index Term should not be included.");
+            Assert.Equal(0, result.Length); //, "The index Term should not be included.");
 
             result = searcher.Search(query, new TermRangeFilter("content", secondBeg, secondEnd, true, true), 1).ScoreDocs;
-            Assert.AreEqual(1, result.Length, "The index Term should be included.");
+            Assert.Equal(1, result.Length); //, "The index Term should be included.");
 
             reader.Dispose();
             dir.Dispose();
@@ -128,11 +128,11 @@ namespace Lucene.Net.Analysis
 
             Query query = new TermRangeQuery("content", firstBeg, firstEnd, true, true);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "The index Term should not be included.");
+            Assert.Equal(0, hits.Length); //, "The index Term should not be included.");
 
             query = new TermRangeQuery("content", secondBeg, secondEnd, true, true);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "The index Term should be included.");
+            Assert.Equal(1, hits.Length); //, "The index Term should be included.");
             reader.Dispose();
             dir.Dispose();
         }
@@ -157,11 +157,11 @@ namespace Lucene.Net.Analysis
             // not supported).
             Query csrq = new TermRangeQuery("content", firstBeg, firstEnd, true, true);
             ScoreDoc[] result = search.Search(csrq, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length, "The index Term should not be included.");
+            Assert.Equal(0, result.Length); //, "The index Term should not be included.");
 
             csrq = new TermRangeQuery("content", secondBeg, secondEnd, true, true);
             result = search.Search(csrq, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, result.Length, "The index Term should be included.");
+            Assert.Equal(1, result.Length); //, "The index Term should be included.");
             reader.Dispose();
             farsiIndex.Dispose();
         }
@@ -249,7 +249,7 @@ namespace Lucene.Net.Analysis
                     buff.Append(v[j].StringValue);
                 }
             }
-            Assert.AreEqual(expectedResult, buff.ToString());
+            Assert.Equal(expectedResult, buff.ToString());
         }
 
         public virtual void AssertThreadSafe(Analyzer analyzer)
@@ -272,11 +272,11 @@ namespace Lucene.Net.Analysis
                     ITermToBytesRefAttribute termAtt = ts.AddAttribute<ITermToBytesRefAttribute>();
                     BytesRef bytes = termAtt.BytesRef;
                     ts.Reset();
-                    Assert.IsTrue(ts.IncrementToken());
+                    Assert.True(ts.IncrementToken());
                     termAtt.FillBytesRef();
                     // ensure we make a copy of the actual bytes too
                     map[term] = BytesRef.DeepCopyOf(bytes);
-                    Assert.IsFalse(ts.IncrementToken());
+                    Assert.False(ts.IncrementToken());
                     ts.End();
                 }
                 catch (IOException e)
@@ -333,10 +333,10 @@ namespace Lucene.Net.Analysis
                             ITermToBytesRefAttribute termAtt = ts.AddAttribute<ITermToBytesRefAttribute>();
                             BytesRef bytes = termAtt.BytesRef;
                             ts.Reset();
-                            Assert.IsTrue(ts.IncrementToken());
+                            Assert.True(ts.IncrementToken());
                             termAtt.FillBytesRef();
-                            Assert.AreEqual(expected, bytes);
-                            Assert.IsFalse(ts.IncrementToken());
+                            Assert.Equal(expected, bytes);
+                            Assert.False(ts.IncrementToken());
                             ts.End();
                         }
                         catch (IOException e)

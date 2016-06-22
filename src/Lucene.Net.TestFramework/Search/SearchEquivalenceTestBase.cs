@@ -7,7 +7,7 @@ using Lucene.Net.Support;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+	using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -57,8 +57,7 @@ namespace Lucene.Net.Search
         protected internal static Analyzer Analyzer;
         protected internal static string Stopword; // we always pick a character as a stopword
 
-        [SetUp]
-        public void BeforeClass()
+        public SearchEquivalenceTestBase() : base()
         {
             Random random = Random();
             Directory = NewDirectory();
@@ -102,8 +101,7 @@ namespace Lucene.Net.Search
             iw.Dispose();
         }
 
-        [TearDown]
-        public void AfterClass()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
@@ -112,6 +110,7 @@ namespace Lucene.Net.Search
             Directory = null;
             Analyzer = null;
             S1 = S2 = null;
+            base.Dispose();
         }
 
         /// <summary>
@@ -202,7 +201,7 @@ namespace Lucene.Net.Search
             // not efficient, but simple!
             TopDocs td1 = S1.Search(q1, filter, Reader.MaxDoc);
             TopDocs td2 = S2.Search(q2, filter, Reader.MaxDoc);
-            Assert.IsTrue(td1.TotalHits <= td2.TotalHits);
+            Assert.True(td1.TotalHits <= td2.TotalHits);
 
             // fill the superset into a bitset
             var bitset = new BitArray(td2.ScoreDocs.Length);
@@ -214,7 +213,7 @@ namespace Lucene.Net.Search
             // check in the subset, that every bit was set by the super
             for (int i = 0; i < td1.ScoreDocs.Length; i++)
             {
-                Assert.IsTrue(bitset.SafeGet(td1.ScoreDocs[i].Doc));
+                Assert.True(bitset.SafeGet(td1.ScoreDocs[i].Doc));
             }
         }
     }
