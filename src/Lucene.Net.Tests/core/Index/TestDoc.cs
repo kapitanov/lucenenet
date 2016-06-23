@@ -1,11 +1,11 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using Codec = Lucene.Net.Codecs.Codec;
     using Constants = Lucene.Net.Util.Constants;
@@ -41,7 +41,6 @@ namespace Lucene.Net.Index
 
     /// <summary>
     /// JUnit adaptation of an older test case DocTest. </summary>
-    [TestFixture]
     public class TestDoc : LuceneTestCase
     {
         private DirectoryInfo WorkDir;
@@ -52,10 +51,8 @@ namespace Lucene.Net.Index
         /// Set the test case. this test case needs
         ///  a few text files created in the current working directory.
         /// </summary>
-        [SetUp]
-        public override void SetUp()
+        public TestDoc() : base()
         {
-            base.SetUp();
             if (VERBOSE)
             {
                 Console.WriteLine("TEST: setUp");
@@ -113,7 +110,7 @@ namespace Lucene.Net.Index
         ///        checkSegment(String name, ...) should be created that would
         ///        assert various things about the segment.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestIndexAndMerge()
         {
             MemoryStream sw = new MemoryStream();
@@ -190,7 +187,7 @@ namespace Lucene.Net.Index
             sw.Dispose();
             string singleFileOutput = sw.ToString();
 
-            Assert.AreEqual(multiFileOutput, singleFileOutput);
+            Assert.Equal(multiFileOutput, singleFileOutput);
         }
 
         private SegmentCommitInfo IndexDoc(IndexWriter writer, string fileName)
@@ -249,7 +246,7 @@ namespace Lucene.Net.Index
             foreach (string field in fields)
             {
                 Terms terms = fields.Terms(field);
-                Assert.IsNotNull(terms);
+                Assert.NotNull(terms);
                 TermsEnum tis = terms.Iterator(null);
                 while (tis.Next() != null)
                 {

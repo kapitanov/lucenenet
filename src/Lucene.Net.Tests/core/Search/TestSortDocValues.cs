@@ -1,9 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -39,13 +38,12 @@ namespace Lucene.Net.Search
     /// These are mostly like TestSort's tests, except each test
     /// indexes the field up-front as docvalues, and checks no fieldcaches were made
     /// </summary>
-    [TestFixture]
     public class TestSortDocValues : LuceneTestCase
     {
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             // ensure there is nothing in fieldcache before test starts
             FieldCache.DEFAULT.PurgeAllCaches();
         }
@@ -53,12 +51,12 @@ namespace Lucene.Net.Search
         private void AssertNoFieldCaches()
         {
             // docvalues sorting should NOT create any fieldcache entries!
-            Assert.AreEqual(0, FieldCache.DEFAULT.CacheEntries.Length);
+            Assert.Equal(0, FieldCache.DEFAULT.CacheEntries.Length);
         }
 
         /// <summary>
         /// Tests sorting on type string </summary>
-        [Test]
+        [Fact]
         public virtual void TestString()
         {
             Directory dir = NewDirectory();
@@ -78,10 +76,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'bar' comes before 'foo'
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -90,7 +88,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests reverse sorting on type string </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringReverse()
         {
             Directory dir = NewDirectory();
@@ -110,10 +108,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'foo' comes after 'bar' in reverse order
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -122,7 +120,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type string_val </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringVal()
         {
             Directory dir = NewDirectory();
@@ -142,10 +140,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING_VAL));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'bar' comes before 'foo'
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -154,7 +152,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests reverse sorting on type string_val </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringValReverse()
         {
             Directory dir = NewDirectory();
@@ -174,10 +172,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING_VAL, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'foo' comes after 'bar' in reverse order
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -186,7 +184,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type string_val, but with a SortedDocValuesField </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringValSorted()
         {
             Directory dir = NewDirectory();
@@ -206,10 +204,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING_VAL));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'bar' comes before 'foo'
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -218,7 +216,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests reverse sorting on type string_val, but with a SortedDocValuesField </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringValReverseSorted()
         {
             Directory dir = NewDirectory();
@@ -238,10 +236,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.STRING_VAL, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // 'foo' comes after 'bar' in reverse order
-            Assert.AreEqual("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("foo", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("bar", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -250,7 +248,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type byte </summary>
-        [Test]
+        [Fact]
         public virtual void TestByte()
         {
             Directory dir = NewDirectory();
@@ -274,11 +272,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.BYTE));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("23", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("23", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -287,7 +285,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type byte in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestByteReverse()
         {
             Directory dir = NewDirectory();
@@ -311,11 +309,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.BYTE, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // reverse numeric order
-            Assert.AreEqual("23", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("23", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -324,7 +322,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type short </summary>
-        [Test]
+        [Fact]
         public virtual void TestShort()
         {
             Directory dir = NewDirectory();
@@ -348,11 +346,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.SHORT));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("300", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("300", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -361,7 +359,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type short in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestShortReverse()
         {
             Directory dir = NewDirectory();
@@ -385,11 +383,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.SHORT, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // reverse numeric order
-            Assert.AreEqual("300", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("300", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -398,7 +396,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type int </summary>
-        [Test]
+        [Fact]
         public virtual void TestInt()
         {
             Directory dir = NewDirectory();
@@ -422,11 +420,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.INT));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("300000", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("300000", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -435,7 +433,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type int in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestIntReverse()
         {
             Directory dir = NewDirectory();
@@ -459,11 +457,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.INT, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // reverse numeric order
-            Assert.AreEqual("300000", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("300000", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -472,7 +470,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type int with a missing value </summary>
-        [Test]
+        [Fact]
         public virtual void TestIntMissing()
         {
             Directory dir = NewDirectory();
@@ -494,11 +492,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.INT));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as a 0
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -506,7 +504,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type int, specifying the missing value should be treated as Integer.MAX_VALUE </summary>
-        [Test]
+        [Fact]
         public virtual void TestIntMissingLast()
         {
             Directory dir = NewDirectory();
@@ -530,11 +528,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(sortField);
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as a Integer.MAX_VALUE
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -542,7 +540,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type long </summary>
-        [Test]
+        [Fact]
         public virtual void TestLong()
         {
             Directory dir = NewDirectory();
@@ -566,11 +564,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.LONG));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("3000000000", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("3000000000", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -579,7 +577,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type long in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestLongReverse()
         {
             Directory dir = NewDirectory();
@@ -603,11 +601,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.LONG, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // reverse numeric order
-            Assert.AreEqual("3000000000", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("3000000000", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -616,7 +614,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type long with a missing value </summary>
-        [Test]
+        [Fact]
         public virtual void TestLongMissing()
         {
             Directory dir = NewDirectory();
@@ -638,11 +636,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.LONG));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as 0
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -650,7 +648,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type long, specifying the missing value should be treated as Long.MAX_VALUE </summary>
-        [Test]
+        [Fact]
         public virtual void TestLongMissingLast()
         {
             Directory dir = NewDirectory();
@@ -674,11 +672,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(sortField);
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as Long.MAX_VALUE
-            Assert.AreEqual("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -686,7 +684,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type float </summary>
-        [Test]
+        [Fact]
         public virtual void TestFloat()
         {
             Directory dir = NewDirectory();
@@ -710,11 +708,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.FLOAT));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("30.1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("30.1", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -723,7 +721,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type float in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestFloatReverse()
         {
             Directory dir = NewDirectory();
@@ -747,11 +745,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.FLOAT, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // reverse numeric order
-            Assert.AreEqual("30.1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("30.1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -760,7 +758,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type float with a missing value </summary>
-        [Test]
+        [Fact]
         public virtual void TestFloatMissing()
         {
             Directory dir = NewDirectory();
@@ -782,11 +780,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.FLOAT));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as 0
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4.2", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4.2", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -794,7 +792,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type float, specifying the missing value should be treated as Float.MAX_VALUE </summary>
-        [Test]
+        [Fact]
         public virtual void TestFloatMissingLast()
         {
             Directory dir = NewDirectory();
@@ -818,11 +816,11 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(sortField);
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(3, td.TotalHits);
+            Assert.Equal(3, td.TotalHits);
             // null is treated as Float.MAX_VALUE
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -830,7 +828,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type double </summary>
-        [Test]
+        [Fact]
         public virtual void TestDouble()
         {
             Directory dir = NewDirectory();
@@ -858,12 +856,12 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.DOUBLE));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(4, td.TotalHits);
+            Assert.Equal(4, td.TotalHits);
             // numeric order
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333332", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333333", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
-            Assert.AreEqual("30.1", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2333333333332", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4.2333333333333", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("30.1", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -872,7 +870,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type double with +/- zero </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoubleSignedZero()
         {
             Directory dir = NewDirectory();
@@ -893,10 +891,10 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.DOUBLE));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(2, td.TotalHits);
+            Assert.Equal(2, td.TotalHits);
             // numeric order
-            Assert.AreEqual("0", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("0", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("0", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("0", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -904,7 +902,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type double in reverse </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoubleReverse()
         {
             Directory dir = NewDirectory();
@@ -932,12 +930,12 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.DOUBLE, true));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(4, td.TotalHits);
+            Assert.Equal(4, td.TotalHits);
             // numeric order
-            Assert.AreEqual("30.1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333333", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333332", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
+            Assert.Equal("30.1", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2333333333333", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4.2333333333332", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
             AssertNoFieldCaches();
 
             ir.Dispose();
@@ -946,7 +944,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type double with a missing value </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoubleMissing()
         {
             Directory dir = NewDirectory();
@@ -972,12 +970,12 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(new SortField("value", SortField.Type_e.DOUBLE));
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(4, td.TotalHits);
+            Assert.Equal(4, td.TotalHits);
             // null treated as a 0
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333332", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333333", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4.2333333333332", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Equal("4.2333333333333", searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();
@@ -985,7 +983,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Tests sorting on type double, specifying the missing value should be treated as Double.MAX_VALUE </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoubleMissingLast()
         {
             Directory dir = NewDirectory();
@@ -1013,12 +1011,12 @@ namespace Lucene.Net.Search
             Sort sort = new Sort(sortField);
 
             TopDocs td = searcher.Search(new MatchAllDocsQuery(), 10, sort);
-            Assert.AreEqual(4, td.TotalHits);
+            Assert.Equal(4, td.TotalHits);
             // null treated as Double.MAX_VALUE
-            Assert.AreEqual("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333332", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
-            Assert.AreEqual("4.2333333333333", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
-            Assert.IsNull(searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
+            Assert.Equal("-1.3", searcher.Doc(td.ScoreDocs[0].Doc).Get("value"));
+            Assert.Equal("4.2333333333332", searcher.Doc(td.ScoreDocs[1].Doc).Get("value"));
+            Assert.Equal("4.2333333333333", searcher.Doc(td.ScoreDocs[2].Doc).Get("value"));
+            Assert.Null(searcher.Doc(td.ScoreDocs[3].Doc).Get("value"));
 
             ir.Dispose();
             dir.Dispose();

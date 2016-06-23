@@ -1,10 +1,9 @@
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -38,10 +37,9 @@ namespace Lucene.Net.Index
     /// <summary>
     /// @lucene.experimental
     /// </summary>
-    [TestFixture]
     public class TestOmitPositions : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -59,12 +57,12 @@ namespace Lucene.Net.Index
             IndexReader reader = w.Reader;
             w.Dispose();
 
-            Assert.IsNull(MultiFields.GetTermPositionsEnum(reader, null, "foo", new BytesRef("test")));
+            Assert.Null(MultiFields.GetTermPositionsEnum(reader, null, "foo", new BytesRef("test")));
 
             DocsEnum de = TestUtil.Docs(Random(), reader, "foo", new BytesRef("test"), null, null, DocsEnum.FLAG_FREQS);
             while (de.NextDoc() != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.AreEqual(2, de.Freq());
+                Assert.Equal(2, de.Freq());
             }
 
             reader.Dispose();
@@ -73,7 +71,7 @@ namespace Lucene.Net.Index
 
         // Tests whether the DocumentWriter correctly enable the
         // omitTermFreqAndPositions bit in the FieldInfo
-        [Test]
+        [Fact]
         public virtual void TestPositions()
         {
             Directory ram = NewDirectory();
@@ -167,23 +165,23 @@ namespace Lucene.Net.Index
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
             // docs + docs = docs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions);
             // docs + docs/freqs = docs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions);
             // docs + docs/freqs/pos = docs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f3").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f3").FieldIndexOptions);
             // docs/freqs + docs = docs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f4").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f4").FieldIndexOptions);
             // docs/freqs + docs/freqs = docs/freqs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f5").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f5").FieldIndexOptions);
             // docs/freqs + docs/freqs/pos = docs/freqs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f6").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f6").FieldIndexOptions);
             // docs/freqs/pos + docs = docs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f7").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f7").FieldIndexOptions);
             // docs/freqs/pos + docs/freqs = docs/freqs
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f8").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS, fi.FieldInfo("f8").FieldIndexOptions);
             // docs/freqs/pos + docs/freqs/pos = docs/freqs/pos
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, fi.FieldInfo("f9").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, fi.FieldInfo("f9").FieldIndexOptions);
 
             reader.Dispose();
             ram.Dispose();
@@ -194,13 +192,13 @@ namespace Lucene.Net.Index
             string[] files = dir.ListAll();
             for (int i = 0; i < files.Length; i++)
             {
-                Assert.IsFalse(files[i].EndsWith(".prx"));
-                Assert.IsFalse(files[i].EndsWith(".pos"));
+                Assert.False(files[i].EndsWith(".prx"));
+                Assert.False(files[i].EndsWith(".pos"));
             }
         }
 
         // Verifies no *.prx exists when all fields omit term positions:
-        [Test]
+        [Fact]
         public virtual void TestNoPrxFile()
         {
             Directory ram = NewDirectory();
@@ -246,7 +244,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// make sure we downgrade positions and payloads correctly </summary>
-        [Test]
+        [Fact]
         public virtual void TestMixing()
         {
             // no positions
@@ -284,8 +282,8 @@ namespace Lucene.Net.Index
 
             DirectoryReader ir = iw.Reader;
             FieldInfos fis = MultiFields.GetMergedFieldInfos(ir);
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS, fis.FieldInfo("foo").FieldIndexOptions);
-            Assert.IsFalse(fis.FieldInfo("foo").HasPayloads());
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS, fis.FieldInfo("foo").FieldIndexOptions);
+            Assert.False(fis.FieldInfo("foo").HasPayloads());
             iw.Dispose();
             ir.Dispose();
             dir.Dispose(); // checkindex

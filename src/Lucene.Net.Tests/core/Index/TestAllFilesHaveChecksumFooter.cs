@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
@@ -41,7 +41,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestAllFilesHaveChecksumFooter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();

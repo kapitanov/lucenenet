@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,7 +22,6 @@ namespace Lucene.Net.Util
     /// <summary>
     /// Check large and special graphs.
     /// </summary>
-    [TestFixture]
     public class TestRamUsageEstimatorOnWildAnimals : LuceneTestCase
     {
         public class ListElement
@@ -30,7 +29,7 @@ namespace Lucene.Net.Util
             internal ListElement Next;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOverflowMaxChainLength()
         {
             int UPPERLIMIT = 100000;
@@ -59,7 +58,7 @@ namespace Lucene.Net.Util
 
             if (lower + 1 < UPPERLIMIT)
             {
-                Assert.Fail("Max object chain length till stack overflow: " + lower);
+                Assert.True(false, "Max object chain length till stack overflow: " + lower);
             }
         }
     }

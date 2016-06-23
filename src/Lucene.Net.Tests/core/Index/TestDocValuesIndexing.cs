@@ -2,12 +2,11 @@ using System;
 using System.Threading;
 using Lucene.Net.Documents;
 using Lucene.Net.Search;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -45,7 +44,6 @@ namespace Lucene.Net.Index
     /// Tests DocValues integration into IndexWriter
     ///
     /// </summary>
-    [TestFixture]
     public class TestDocValuesIndexing : LuceneTestCase
     {
         /*
@@ -53,7 +51,7 @@ namespace Lucene.Net.Index
          * - add multithreaded tests / integrate into stress indexing?
          */
 
-        [Test]
+        [Fact]
         public virtual void TestAddIndexes()
         {
             Directory d1 = NewDirectory();
@@ -86,14 +84,14 @@ namespace Lucene.Net.Index
             DirectoryReader r3 = w.Reader;
             w.Dispose();
             AtomicReader sr = GetOnlySegmentReader(r3);
-            Assert.AreEqual(2, sr.NumDocs);
+            Assert.Equal(2, sr.NumDocs);
             NumericDocValues docValues = sr.GetNumericDocValues("dv");
-            Assert.IsNotNull(docValues);
+            Assert.NotNull(docValues);
             r3.Dispose();
             d3.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultiValuedDocValuesField()
         {
             Directory d = NewDirectory();
@@ -104,15 +102,10 @@ namespace Lucene.Net.Index
             // be able to add same field more than once:
             doc.Add(f);
             doc.Add(f);
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 w.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
 
             doc = new Document();
             doc.Add(f);
@@ -120,12 +113,12 @@ namespace Lucene.Net.Index
             w.ForceMerge(1);
             DirectoryReader r = w.Reader;
             w.Dispose();
-            Assert.AreEqual(17, FieldCache.DEFAULT.GetInts(GetOnlySegmentReader(r), "field", false).Get(0));
+            Assert.Equal(17, FieldCache.DEFAULT.GetInts(GetOnlySegmentReader(r), "field", false).Get(0));
             r.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDifferentTypedDocValuesField()
         {
             Directory d = NewDirectory();
@@ -136,15 +129,10 @@ namespace Lucene.Net.Index
             Field f;
             doc.Add(f = new NumericDocValuesField("field", 17));
             doc.Add(new BinaryDocValuesField("field", new BytesRef("blah")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 w.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
 
             doc = new Document();
             doc.Add(f);
@@ -152,12 +140,12 @@ namespace Lucene.Net.Index
             w.ForceMerge(1);
             DirectoryReader r = w.Reader;
             w.Dispose();
-            Assert.AreEqual(17, FieldCache.DEFAULT.GetInts(GetOnlySegmentReader(r), "field", false).Get(0));
+            Assert.Equal(17, FieldCache.DEFAULT.GetInts(GetOnlySegmentReader(r), "field", false).Get(0));
             r.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDifferentTypedDocValuesField2()
         {
             Directory d = NewDirectory();
@@ -168,28 +156,23 @@ namespace Lucene.Net.Index
             Field f = new NumericDocValuesField("field", 17);
             doc.Add(f);
             doc.Add(new SortedDocValuesField("field", new BytesRef("hello")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 w.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             doc = new Document();
             doc.Add(f);
             w.AddDocument(doc);
             w.ForceMerge(1);
             DirectoryReader r = w.Reader;
-            Assert.AreEqual(17, GetOnlySegmentReader(r).GetNumericDocValues("field").Get(0));
+            Assert.Equal(17, GetOnlySegmentReader(r).GetNumericDocValues("field").Get(0));
             r.Dispose();
             w.Dispose();
             d.Dispose();
         }
 
         // LUCENE-3870
-        [Test]
+        [Fact]
         public virtual void TestLengthPrefixAcrossTwoPages()
         {
             Directory d = NewDirectory();
@@ -209,20 +192,20 @@ namespace Lucene.Net.Index
 
             BytesRef bytes1 = new BytesRef();
             s.Get(0, bytes1);
-            Assert.AreEqual(bytes.Length, bytes1.Length);
+            Assert.Equal(bytes.Length, bytes1.Length);
             bytes[0] = 0;
-            Assert.AreEqual(b, bytes1);
+            Assert.Equal(b, bytes1);
 
             s.Get(1, bytes1);
-            Assert.AreEqual(bytes.Length, bytes1.Length);
+            Assert.Equal(bytes.Length, bytes1.Length);
             bytes[0] = 1;
-            Assert.AreEqual(b, bytes1);
+            Assert.Equal(b, bytes1);
             r.Dispose();
             w.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocValuesUnstored()
         {
             Directory dir = NewDirectory();
@@ -240,15 +223,15 @@ namespace Lucene.Net.Index
             AtomicReader slow = SlowCompositeReaderWrapper.Wrap(r);
             FieldInfos fi = slow.FieldInfos;
             FieldInfo dvInfo = fi.FieldInfo("dv");
-            Assert.IsTrue(dvInfo.HasDocValues());
+            Assert.True(dvInfo.HasDocValues());
             NumericDocValues dv = slow.GetNumericDocValues("dv");
             for (int i = 0; i < 50; i++)
             {
-                Assert.AreEqual(i, dv.Get(i));
+                Assert.Equal(i, dv.Get(i));
                 Document d = slow.Document(i);
                 // cannot use d.Get("dv") due to another bug!
-                Assert.IsNull(d.GetField("dv"));
-                Assert.AreEqual(Convert.ToString(i), d.Get("docId"));
+                Assert.Null(d.GetField("dv"));
+                Assert.Equal(Convert.ToString(i), d.Get("docId"));
             }
             slow.Dispose();
             writer.Dispose();
@@ -256,7 +239,7 @@ namespace Lucene.Net.Index
         }
 
         // Same field in one document as different types:
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesSameDocument()
         {
             Directory dir = NewDirectory();
@@ -277,7 +260,7 @@ namespace Lucene.Net.Index
         }
 
         // Two documents with same field as different types:
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesDifferentDocuments()
         {
             Directory dir = NewDirectory();
@@ -300,7 +283,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddSortedTwice()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -313,21 +296,16 @@ namespace Lucene.Net.Index
             Document doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo!")));
             doc.Add(new SortedDocValuesField("dv", new BytesRef("bar!")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 iwriter.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
 
             iwriter.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddBinaryTwice()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -340,21 +318,16 @@ namespace Lucene.Net.Index
             Document doc = new Document();
             doc.Add(new BinaryDocValuesField("dv", new BytesRef("foo!")));
             doc.Add(new BinaryDocValuesField("dv", new BytesRef("bar!")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 iwriter.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
 
             iwriter.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddNumericTwice()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -367,21 +340,16 @@ namespace Lucene.Net.Index
             Document doc = new Document();
             doc.Add(new NumericDocValuesField("dv", 1));
             doc.Add(new NumericDocValuesField("dv", 2));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 iwriter.AddDocument(doc);
-                Assert.Fail("didn't hit expected exception");
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
 
             iwriter.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTooLargeSortedBytes()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -396,20 +364,15 @@ namespace Lucene.Net.Index
             BytesRef b = new BytesRef(bytes);
             Random().NextBytes(bytes);
             doc.Add(new SortedDocValuesField("dv", b));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 iwriter.AddDocument(doc);
-                Assert.Fail("did not get expected exception");
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
             iwriter.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTooLargeTermSortedSetBytes()
         {
             AssumeTrue("codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -425,21 +388,16 @@ namespace Lucene.Net.Index
             BytesRef b = new BytesRef(bytes);
             Random().NextBytes((byte[])(Array)bytes);
             doc.Add(new SortedSetDocValuesField("dv", b));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 iwriter.AddDocument(doc);
-                Assert.Fail("did not get expected exception");
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
             iwriter.Dispose();
             directory.Dispose();
         }
 
         // Two documents across segments
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesDifferentSegments()
         {
             Directory dir = NewDirectory();
@@ -464,7 +422,7 @@ namespace Lucene.Net.Index
         }
 
         // Add inconsistent document after deleteAll
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesAfterDeleteAll()
         {
             Directory dir = NewDirectory();
@@ -482,7 +440,7 @@ namespace Lucene.Net.Index
         }
 
         // Add inconsistent document after reopening IW w/ create
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesAfterReopenCreate()
         {
             Directory dir = NewDirectory();
@@ -504,7 +462,7 @@ namespace Lucene.Net.Index
 
         // Two documents with same field as different types, added
         // from separate threads:
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesDifferentThreads()
         {
             Directory dir = NewDirectory();
@@ -541,7 +499,7 @@ namespace Lucene.Net.Index
             {
                 t.Join();
             }
-            Assert.IsTrue(hitExc.Get());
+            Assert.True(hitExc.Get());
             w.Dispose();
             dir.Dispose();
         }
@@ -584,7 +542,7 @@ namespace Lucene.Net.Index
         }
 
         // Adding documents via addIndexes
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesViaAddIndexes()
         {
             Directory dir = NewDirectory();
@@ -626,7 +584,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalTypeChange()
         {
             Directory dir = NewDirectory();
@@ -637,20 +595,15 @@ namespace Lucene.Net.Index
             writer.AddDocument(doc);
             doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalTypeChangeAcrossSegments()
         {
             Directory dir = NewDirectory();
@@ -664,20 +617,15 @@ namespace Lucene.Net.Index
             writer = new IndexWriter(dir, (IndexWriterConfig)conf.Clone());
             doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeAfterCloseAndDeleteAll()
         {
             Directory dir = NewDirectory();
@@ -697,7 +645,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeAfterDeleteAll()
         {
             Directory dir = NewDirectory();
@@ -714,7 +662,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeAfterCommitAndDeleteAll()
         {
             Directory dir = NewDirectory();
@@ -732,7 +680,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeAfterOpenCreate()
         {
             Directory dir = NewDirectory();
@@ -751,7 +699,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeViaAddIndexes()
         {
             Directory dir = NewDirectory();
@@ -767,22 +715,17 @@ namespace Lucene.Net.Index
             doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
             writer.AddDocument(doc);
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddIndexes(dir);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             writer.Dispose();
 
             dir.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeViaAddIndexesIR()
         {
             Directory dir = NewDirectory();
@@ -799,15 +742,10 @@ namespace Lucene.Net.Index
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
             writer.AddDocument(doc);
             IndexReader[] readers = new IndexReader[] { DirectoryReader.Open(dir) };
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddIndexes(readers);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             readers[0].Dispose();
             writer.Dispose();
 
@@ -815,7 +753,7 @@ namespace Lucene.Net.Index
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeViaAddIndexes2()
         {
             Directory dir = NewDirectory();
@@ -831,21 +769,16 @@ namespace Lucene.Net.Index
             writer.AddIndexes(dir);
             doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            });
             writer.Dispose();
             dir2.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTypeChangeViaAddIndexesIR2()
         {
             Directory dir = NewDirectory();
@@ -863,21 +796,13 @@ namespace Lucene.Net.Index
             readers[0].Dispose();
             doc = new Document();
             doc.Add(new SortedDocValuesField("dv", new BytesRef("foo")));
-            try
-            {
-                writer.AddDocument(doc);
-                Assert.Fail("did not hit exception");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // expected
-            }
+            Assert.Throws<System.ArgumentException>(() => writer.AddDocument(doc));
             writer.Dispose();
             dir2.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocsWithField()
         {
             Directory dir = NewDirectory();
@@ -896,16 +821,16 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             AtomicReader subR = (AtomicReader)r.Leaves[0].Reader;
-            Assert.AreEqual(2, subR.NumDocs);
+            Assert.Equal(2, subR.NumDocs);
 
             Bits bits = FieldCache.DEFAULT.GetDocsWithField(subR, "dv");
-            Assert.IsTrue(bits.Get(0));
-            Assert.IsTrue(bits.Get(1));
+            Assert.True(bits.Get(0));
+            Assert.True(bits.Get(1));
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSameFieldNameForPostingAndDocValue()
         {
             // LUCENE-5192: FieldInfos.Builder neglected to update
@@ -926,7 +851,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.AddDocument(doc);
-                Assert.Fail("should not have succeeded to add a field with different DV type than what already exists");
+                Assert.True(false, "should not have succeeded to add a field with different DV type than what already exists");
             }
             catch (System.ArgumentException e)
             {

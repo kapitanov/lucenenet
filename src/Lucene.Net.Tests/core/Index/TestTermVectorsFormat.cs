@@ -1,8 +1,7 @@
-using NUnit.Framework;
-
 namespace Lucene.Net.Index
 {
     using System.Collections.Generic;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -53,7 +52,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public override void TestMergeStability()
         {
             AssumeTrue("The MockRandom PF randomizes content on the fly, so we can't check it", false);

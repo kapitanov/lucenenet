@@ -9,7 +9,7 @@ namespace Lucene.Net.Tests.Expressions
 	/// <summary>Tests validation of bindings</summary>
 	public class TestExpressionValidation : Util.LuceneTestCase
 	{
-		[Test]
+		[Fact]
 		public virtual void TestValidExternals()
 		{
 			SimpleBindings bindings = new SimpleBindings();
@@ -26,7 +26,7 @@ namespace Lucene.Net.Tests.Expressions
 			bindings.Validate();
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestInvalidExternal()
 		{
 			SimpleBindings bindings = new SimpleBindings();
@@ -43,7 +43,7 @@ namespace Lucene.Net.Tests.Expressions
 			}
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestInvalidExternal2()
 		{
 			SimpleBindings bindings = new SimpleBindings();

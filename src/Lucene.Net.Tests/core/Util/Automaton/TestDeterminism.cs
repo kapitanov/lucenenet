@@ -1,5 +1,4 @@
-using Lucene.Net.Attributes;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -24,12 +23,12 @@ namespace Lucene.Net.Util.Automaton
     /// Not completely thorough, but tries to test determinism correctness
     /// somewhat randomly.
     /// </summary>
-    [TestFixture]
     public class TestDeterminism : LuceneTestCase
     {
         /// <summary>
         /// test a bunch of random regular expressions </summary>
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestRegexps()
         {
             int num = AtLeast(500);
@@ -41,8 +40,8 @@ namespace Lucene.Net.Util.Automaton
 
         /// <summary>
         /// test against a simple, unoptimized det </summary>
-        [Ignore]
-        [Test]
+        [Ignore("Ignored test")]
+        [Fact]
         public virtual void TestAgainstSimple()
         {
             int num = AtLeast(200);
@@ -54,7 +53,7 @@ namespace Lucene.Net.Util.Automaton
                 b.Deterministic = false; // force det
                 b.Determinize();
                 // TODO: more verifications possible?
-                Assert.IsTrue(BasicOperations.SameLanguage(a, b));
+                Assert.True(BasicOperations.SameLanguage(a, b));
             }
         }
 
@@ -63,19 +62,19 @@ namespace Lucene.Net.Util.Automaton
             Automaton clone = (Automaton)a.Clone();
             // complement(complement(a)) = a
             Automaton equivalent = BasicOperations.Complement(BasicOperations.Complement(a));
-            Assert.IsTrue(BasicOperations.SameLanguage(a, equivalent));
+            Assert.True(BasicOperations.SameLanguage(a, equivalent));
 
             // a union a = a
             equivalent = BasicOperations.Union(a, clone);
-            Assert.IsTrue(BasicOperations.SameLanguage(a, equivalent));
+            Assert.True(BasicOperations.SameLanguage(a, equivalent));
 
             // a intersect a = a
             equivalent = BasicOperations.Intersection(a, clone);
-            Assert.IsTrue(BasicOperations.SameLanguage(a, equivalent));
+            Assert.True(BasicOperations.SameLanguage(a, equivalent));
 
             // a minus a = empty
             Automaton empty = BasicOperations.Minus(a, clone);
-            Assert.IsTrue(BasicOperations.IsEmpty(empty));
+            Assert.True(BasicOperations.IsEmpty(empty));
 
             // as long as don't accept the empty string
             // then optional(a) - empty = a
@@ -86,7 +85,7 @@ namespace Lucene.Net.Util.Automaton
                 //System.out.println("optional " + optional);
                 equivalent = BasicOperations.Minus(optional, BasicAutomata.MakeEmptyString());
                 //System.out.println("equiv " + equivalent);
-                Assert.IsTrue(BasicOperations.SameLanguage(a, equivalent));
+                Assert.True(BasicOperations.SameLanguage(a, equivalent));
             }
         }
     }

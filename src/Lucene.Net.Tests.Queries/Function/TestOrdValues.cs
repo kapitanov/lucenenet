@@ -22,14 +22,14 @@ namespace Lucene.Net.Tests.Queries.Function
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             CreateIndex(false);
         }
 
         /// <summary>
         /// Test OrdFieldSource
         /// </summary>
-        [Test]
+        [Fact]
         public void TestOrdFieldRank()
         {
             DoTestRank(ID_FIELD, true);
@@ -38,7 +38,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test ReverseOrdFieldSource
         /// </summary>
-        [Test]
+        [Fact]
         public void TestReverseOrdFieldRank()
         {
             DoTestRank(ID_FIELD, false);
@@ -91,7 +91,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test exact score for OrdFieldSource
         /// </summary>
-        [Test]
+        [Fact]
         public void TestOrdFieldExactScore()
         {
             DoTestExactScore(ID_FIELD, true);
@@ -100,7 +100,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test exact score for ReverseOrdFieldSource
         /// </summary>
-        [Test]
+        [Fact]
         public void TestReverseOrdFieldExactScore()
         {
             DoTestExactScore(ID_FIELD, false);
@@ -144,7 +144,7 @@ namespace Lucene.Net.Tests.Queries.Function
         }
 
         // LUCENE-1250
-        [Test]
+        [Fact]
         public void TestEqualsNull()
         {
             OrdFieldSource ofs = new OrdFieldSource("f");

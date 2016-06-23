@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -32,16 +32,13 @@ namespace Lucene.Net.Index
     using TermRangeQuery = Lucene.Net.Search.TermRangeQuery;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestReaderClosed : LuceneTestCase
     {
         private IndexReader Reader;
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestReaderClosed() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
 
@@ -61,10 +58,10 @@ namespace Lucene.Net.Index
             writer.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
-            Assert.IsTrue(Reader.RefCount > 0);
+            Assert.True(Reader.RefCount > 0);
             IndexSearcher searcher = NewSearcher(Reader);
             TermRangeQuery query = TermRangeQuery.NewStringRange("field", "a", "z", true, true);
             searcher.Search(query, 5);
@@ -80,10 +77,10 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-3800
-        [Test]
+        [Fact]
         public virtual void TestReaderChaining()
         {
-            Assert.IsTrue(Reader.RefCount > 0);
+            Assert.True(Reader.RefCount > 0);
             IndexReader wrappedReader = SlowCompositeReaderWrapper.Wrap(Reader);
             wrappedReader = new ParallelAtomicReader((AtomicReader)wrappedReader);
 
@@ -97,7 +94,7 @@ namespace Lucene.Net.Index
             }
             catch (AlreadyClosedException ace)
             {
-                Assert.AreEqual("this IndexReader cannot be used anymore as one of its child readers was closed", ace.Message);
+                Assert.Equal("this IndexReader cannot be used anymore as one of its child readers was closed", ace.Message);
             }
             finally
             {
@@ -106,11 +103,10 @@ namespace Lucene.Net.Index
             }
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
     }
 }

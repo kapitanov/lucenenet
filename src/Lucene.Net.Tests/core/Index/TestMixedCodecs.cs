@@ -5,7 +5,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using Codec = Lucene.Net.Codecs.Codec;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -32,10 +32,9 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestMixedCodecs : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             int NUM_DOCS = AtLeast(1000);
@@ -93,7 +92,7 @@ namespace Lucene.Net.Index
                     if (Random().Next(17) == 6)
                     {
                         IndexReader r = w.Reader;
-                        Assert.AreEqual(NUM_DOCS - deleted.Count, r.NumDocs);
+                        Assert.Equal(NUM_DOCS - deleted.Count, r.NumDocs);
                         r.Dispose();
                     }
                 }

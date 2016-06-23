@@ -1,5 +1,6 @@
-using NUnit.Framework;
+
 using System.IO;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -23,7 +24,7 @@ namespace Lucene.Net.Analysis
     [TestFixture]
     public class TestMockCharFilter : BaseTokenStreamTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Analyzer analyzer = new AnalyzerAnonymousInnerClassHelper(this);

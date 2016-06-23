@@ -8,7 +8,7 @@ namespace Lucene.Net.Search
 {
     using Lucene.Net.Index;
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -45,10 +45,9 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// random sorting tests </summary>
-    [TestFixture]
     public class TestSortRandom : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestRandomStringSort()
         {
             Random random = new Random(Random().Next());
@@ -273,7 +272,7 @@ namespace Lucene.Net.Search
                         br2 = new BytesRef();
                     }
 
-                    Assert.AreEqual(br, br2, "hit=" + hitIDX + " has wrong sort value");
+                    Assert.Equal(br, br2, "hit=" + hitIDX + " has wrong sort value");
                 }
             }
 
@@ -347,7 +346,7 @@ namespace Lucene.Net.Search
             {
                 int maxDoc = context.Reader.MaxDoc;
                 FieldCache.Ints idSource = FieldCache.DEFAULT.GetInts(context.AtomicReader, "id", false);
-                Assert.IsNotNull(idSource);
+                Assert.NotNull(idSource);
                 FixedBitSet bits = new FixedBitSet(maxDoc);
                 for (int docID = 0; docID < maxDoc; docID++)
                 {

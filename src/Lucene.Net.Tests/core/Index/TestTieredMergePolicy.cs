@@ -1,10 +1,10 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -37,7 +37,7 @@ namespace Lucene.Net.Index
             return NewTieredMergePolicy();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIndexWriterDirtSimple()
         {
             Directory dir = new RAMDirectory();
@@ -59,11 +59,11 @@ namespace Lucene.Net.Index
                 w.AddDocument(doc);
             }
 
-            Assert.AreEqual(numDocs, w.MaxDoc);
-            Assert.AreEqual(numDocs, w.NumDocs());
+            Assert.Equal(numDocs, w.MaxDoc);
+            Assert.Equal(numDocs, w.NumDocs());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestForceMergeDeletes()
         {
             Directory dir = NewDirectory();
@@ -81,8 +81,8 @@ namespace Lucene.Net.Index
                 doc.Add(NewTextField("content", "aaa " + (i % 4), Field.Store.NO));
                 w.AddDocument(doc);
             }
-            Assert.AreEqual(80, w.MaxDoc);
-            Assert.AreEqual(80, w.NumDocs());
+            Assert.Equal(80, w.MaxDoc);
+            Assert.Equal(80, w.NumDocs());
 
             if (VERBOSE)
             {
@@ -91,8 +91,8 @@ namespace Lucene.Net.Index
             w.DeleteDocuments(new Term("content", "0"));
             w.ForceMergeDeletes();
 
-            Assert.AreEqual(80, w.MaxDoc);
-            Assert.AreEqual(60, w.NumDocs());
+            Assert.Equal(80, w.MaxDoc);
+            Assert.Equal(60, w.NumDocs());
 
             if (VERBOSE)
             {
@@ -100,13 +100,13 @@ namespace Lucene.Net.Index
             }
             ((TieredMergePolicy)w.Config.MergePolicy).ForceMergeDeletesPctAllowed = 10.0;
             w.ForceMergeDeletes();
-            Assert.AreEqual(60, w.NumDocs());
-            Assert.AreEqual(60, w.MaxDoc);
+            Assert.Equal(60, w.NumDocs());
+            Assert.Equal(60, w.MaxDoc);
             w.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPartialMerge()
         {
             int num = AtLeast(10);
@@ -135,7 +135,7 @@ namespace Lucene.Net.Index
                     w.AddDocument(doc);
                     int count = w.SegmentCount;
                     maxCount = Math.Max(count, maxCount);
-                    Assert.IsTrue(count >= maxCount - 3, "count=" + count + " maxCount=" + maxCount);
+                    Assert.True(count >= maxCount - 3, "count=" + count + " maxCount=" + maxCount);
                 }
 
                 w.Flush(true, true);
@@ -147,14 +147,14 @@ namespace Lucene.Net.Index
                     Console.WriteLine("TEST: merge to " + targetCount + " segs (current count=" + segmentCount + ")");
                 }
                 w.ForceMerge(targetCount);
-                Assert.AreEqual(targetCount, w.SegmentCount);
+                Assert.Equal(targetCount, w.SegmentCount);
 
                 w.Dispose();
                 dir.Dispose();
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestForceMergeDeletesMaxSegSize()
         {
             Directory dir = NewDirectory();
@@ -178,8 +178,8 @@ namespace Lucene.Net.Index
 
             w.ForceMerge(1);
             IndexReader r = w.Reader;
-            Assert.AreEqual(numDocs, r.MaxDoc);
-            Assert.AreEqual(numDocs, r.NumDocs);
+            Assert.Equal(numDocs, r.MaxDoc);
+            Assert.Equal(numDocs, r.NumDocs);
             r.Dispose();
 
             if (VERBOSE)
@@ -190,15 +190,15 @@ namespace Lucene.Net.Index
             w.DeleteDocuments(new Term("id", "" + (42 + 17)));
 
             r = w.Reader;
-            Assert.AreEqual(numDocs, r.MaxDoc);
-            Assert.AreEqual(numDocs - 1, r.NumDocs);
+            Assert.Equal(numDocs, r.MaxDoc);
+            Assert.Equal(numDocs - 1, r.NumDocs);
             r.Dispose();
 
             w.ForceMergeDeletes();
 
             r = w.Reader;
-            Assert.AreEqual(numDocs - 1, r.MaxDoc);
-            Assert.AreEqual(numDocs - 1, r.NumDocs);
+            Assert.Equal(numDocs - 1, r.MaxDoc);
+            Assert.Equal(numDocs - 1, r.NumDocs);
             r.Dispose();
 
             w.Dispose();
@@ -208,24 +208,24 @@ namespace Lucene.Net.Index
 
         private const double EPSILON = 1E-14;
 
-        [Test]
+        [Fact]
         public virtual void TestSetters()
         {
             TieredMergePolicy tmp = new TieredMergePolicy();
 
             tmp.MaxMergedSegmentMB = 0.5;
-            Assert.AreEqual(0.5, tmp.MaxMergedSegmentMB, EPSILON);
+            Assert.Equal(0.5, tmp.MaxMergedSegmentMB, EPSILON);
 
             tmp.MaxMergedSegmentMB = double.PositiveInfinity;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
 
             tmp.MaxMergedSegmentMB = long.MaxValue / 1024 / 1024.0;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
 
             try
             {
                 tmp.MaxMergedSegmentMB = -2.0;
-                Assert.Fail("Didn't throw IllegalArgumentException");
+                Assert.True(false, "Didn't throw IllegalArgumentException");
             }
             catch (System.ArgumentException iae)
             {
@@ -233,18 +233,18 @@ namespace Lucene.Net.Index
             }
 
             tmp.FloorSegmentMB = 2.0;
-            Assert.AreEqual(2.0, tmp.FloorSegmentMB, EPSILON);
+            Assert.Equal(2.0, tmp.FloorSegmentMB, EPSILON);
 
             tmp.FloorSegmentMB = double.PositiveInfinity;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
 
             tmp.FloorSegmentMB = long.MaxValue / 1024 / 1024.0;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
 
             try
             {
                 tmp.FloorSegmentMB = -2.0;
-                Assert.Fail("Didn't throw IllegalArgumentException");
+                Assert.True(false, "Didn't throw IllegalArgumentException");
             }
             catch (System.ArgumentException iae)
             {
@@ -252,18 +252,18 @@ namespace Lucene.Net.Index
             }
 
             tmp.MaxCFSSegmentSizeMB = 2.0;
-            Assert.AreEqual(2.0, tmp.MaxCFSSegmentSizeMB, EPSILON);
+            Assert.Equal(2.0, tmp.MaxCFSSegmentSizeMB, EPSILON);
 
             tmp.MaxCFSSegmentSizeMB = double.PositiveInfinity;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
 
             tmp.MaxCFSSegmentSizeMB = long.MaxValue / 1024 / 1024.0;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
 
             try
             {
                 tmp.MaxCFSSegmentSizeMB = -2.0;
-                Assert.Fail("Didn't throw IllegalArgumentException");
+                Assert.True(false, "Didn't throw IllegalArgumentException");
             }
             catch (System.ArgumentException iae)
             {

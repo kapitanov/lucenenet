@@ -14,7 +14,7 @@ namespace Lucene.Net.Tests.Queries.Function
     /// </summary>
     public class TestFunctionQuerySort : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestSearchAfterWhenSortingByFunctionValues()
         {
             Directory dir = NewDirectory();

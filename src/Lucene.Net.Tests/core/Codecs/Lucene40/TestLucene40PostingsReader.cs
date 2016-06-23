@@ -1,6 +1,7 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -8,7 +9,7 @@ using System.Text;
 namespace Lucene.Net.Codecs.Lucene40
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -63,7 +64,7 @@ namespace Lucene.Net.Codecs.Lucene40
         /// tests terms with different probabilities of being in the document.
         ///  depends heavily on term vectors cross-check at checkIndex
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestPostings()
         {
             Directory dir = NewFSDirectory(CreateTempDir("postings"));

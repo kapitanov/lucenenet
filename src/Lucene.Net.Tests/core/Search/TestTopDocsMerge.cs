@@ -7,7 +7,7 @@ using Lucene.Net.Util;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using CompositeReaderContext = Lucene.Net.Index.CompositeReaderContext;
     using Directory = Lucene.Net.Store.Directory;
@@ -41,7 +41,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestTopDocsMerge : LuceneTestCaseWithReducedFloatPrecision
     {
         private class ShardSearcher : IndexSearcher
@@ -70,13 +69,13 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSort_1()
         {
             TestSort(false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSort_2()
         {
             TestSort(true);
@@ -348,7 +347,7 @@ namespace Lucene.Net.Search
                     for (int hitIDX = 0; hitIDX < mergedHits.ScoreDocs.Length; hitIDX++)
                     {
                         ScoreDoc sd = mergedHits.ScoreDocs[hitIDX];
-                        Assert.AreEqual(ReaderUtil.SubIndex(sd.Doc, docStarts), sd.ShardIndex, "doc=" + sd.Doc + " wrong shard");
+                        Assert.Equal(ReaderUtil.SubIndex(sd.Doc, docStarts), sd.ShardIndex, "doc=" + sd.Doc + " wrong shard");
                     }
                 }
 

@@ -1,11 +1,11 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using System.Collections.Generic;
     using Directory = Lucene.Net.Store.Directory;
 
@@ -33,15 +33,12 @@ namespace Lucene.Net.Index
     //   - mix in forceMerge, addIndexes
     //   - randomoly mix in non-congruent docs
 
-    [TestFixture]
     public class TestNRTThreads : ThreadedIndexingAndSearchingTestCase
     {
         private bool UseNonNrtReaders = true;
 
-        [SetUp]
-        public virtual void SetUp()
+        public TestNRTThreads() : base()
         {
-            base.SetUp();
             UseNonNrtReaders = Random().NextBoolean();
         }
 
@@ -80,7 +77,7 @@ namespace Lucene.Net.Index
                         Console.WriteLine("OBD files: " + openDeletedFiles);
                     }
                     anyOpenDelFiles |= openDeletedFiles.Count > 0;
-                    //Assert.AreEqual("open but deleted: " + openDeletedFiles, 0, openDeletedFiles.Size());
+                    //Assert.Equal("open but deleted: " + openDeletedFiles, 0, openDeletedFiles.Size());
                     if (VERBOSE)
                     {
                         Console.WriteLine("TEST: now open");
@@ -111,7 +108,7 @@ namespace Lucene.Net.Index
             }
             anyOpenDelFiles |= openDeletedFiles_.Count > 0;
 
-            Assert.IsFalse(anyOpenDelFiles, "saw non-zero open-but-deleted count");
+            Assert.False(anyOpenDelFiles, "saw non-zero open-but-deleted count");
         }
 
         protected override Directory GetDirectory(Directory @in)
@@ -176,7 +173,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNRTThreads_Mem()
         {
             RunTest("TestNRTThreads");

@@ -14,7 +14,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AreEqual(expected, actual);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestNegationOperation()
 		{
 			AssertEvaluatesTo("-1", -1);
@@ -24,7 +24,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("--0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAddOperation()
 		{
 			AssertEvaluatesTo("1+1", 2);
@@ -38,7 +38,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0+0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestSubtractOperation()
 		{
 			AssertEvaluatesTo("1-1", 0);
@@ -52,7 +52,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0-0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestMultiplyOperation()
 		{
 			AssertEvaluatesTo("1*1", 1);
@@ -65,7 +65,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0*0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestDivisionOperation()
 		{
 			AssertEvaluatesTo("1*1", 1);
@@ -78,7 +78,7 @@ namespace Lucene.Net.Tests.Expressions.JS
             AssertEvaluatesTo("1/0", -9223372036854775808);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestModuloOperation()
 		{
 			AssertEvaluatesTo("1%1", 0);
@@ -88,7 +88,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("27%(9%5)", 3);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestLessThanOperation()
 		{
 			AssertEvaluatesTo("1 < 1", 0);
@@ -101,7 +101,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-1 < 0", 1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestLessThanEqualsOperation()
 		{
 			AssertEvaluatesTo("1 <= 1", 1);
@@ -114,7 +114,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-1 <= 0", 1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestGreaterThanOperation()
 		{
 			AssertEvaluatesTo("1 > 1", 0);
@@ -127,7 +127,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-1 > 0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestGreaterThanEqualsOperation()
 		{
 			AssertEvaluatesTo("1 >= 1", 1);
@@ -140,7 +140,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-1 >= 0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestEqualsOperation()
 		{
 			AssertEvaluatesTo("1 == 1", 1);
@@ -157,7 +157,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-2 == -1", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestNotEqualsOperation()
 		{
 			AssertEvaluatesTo("1 != 1", 0);
@@ -174,7 +174,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-2 != -1", 1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBoolNotOperation()
 		{
 			AssertEvaluatesTo("!1", 0);
@@ -186,7 +186,7 @@ namespace Lucene.Net.Tests.Expressions.JS
             AssertEvaluatesTo("!-2", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBoolAndOperation()
 		{
 			AssertEvaluatesTo("1 && 1", 1);
@@ -199,7 +199,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-0 && -0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBoolOrOperation()
 		{
 			AssertEvaluatesTo("1 || 1", 1);
@@ -212,7 +212,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-0 || -0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestConditionalOperation()
 		{
 			AssertEvaluatesTo("1 ? 2 : 3", 2);
@@ -228,7 +228,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("(0 ? 1 : 0) ? 3 : 4", 4);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitShiftLeft()
 		{
 			AssertEvaluatesTo("1 << 1", 2);
@@ -244,7 +244,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-15 << 62", 1073741824);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitShiftRight()
 		{
 			AssertEvaluatesTo("1 >> 1", 0);
@@ -260,7 +260,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("-2147483646 >> 1", -1073741823);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitShiftRightUnsigned()
 		{
 			AssertEvaluatesTo("1 >>> 1", 0);
@@ -277,7 +277,7 @@ namespace Lucene.Net.Tests.Expressions.JS
             AssertEvaluatesTo("2147483648 >>> 1", 1073741824);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitwiseAnd()
 		{
 			AssertEvaluatesTo("4 & 4", 4);
@@ -290,7 +290,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("1 & 0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitwiseOr()
 		{
 			AssertEvaluatesTo("4 | 4", 4);
@@ -303,7 +303,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("1 | 0", 1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitwiseXor()
 		{
 			AssertEvaluatesTo("4 ^ 4", 0);
@@ -317,7 +317,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0 ^ 0", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBitwiseNot()
 		{
 			AssertEvaluatesTo("~-5", 4);
@@ -326,7 +326,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("~-1", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestDecimalConst()
 		{
 			AssertEvaluatesTo("0", 0);
@@ -337,7 +337,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("500E-2", 5);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestHexConst()
 		{
 			AssertEvaluatesTo("0x0", 0);
@@ -350,7 +350,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0xA << 2", unchecked((int)(0xA)) << 2);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestHexConst2()
 		{
 			AssertEvaluatesTo("0X0", 0);
@@ -359,7 +359,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("0X1234ABCDEF", 78193085935L);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestOctalConst()
 		{
 			AssertEvaluatesTo("00", 0);

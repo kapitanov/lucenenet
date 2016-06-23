@@ -1,7 +1,6 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace Lucene.Net.Util
@@ -23,7 +22,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestCollectionUtil : LuceneTestCase
     {
         private CollectionsHelper.ReverseComparer<int> ReverseOrder = new CollectionsHelper.ReverseComparer<int>();
@@ -39,7 +37,7 @@ namespace Lucene.Net.Util
             return Arrays.AsList(a);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntroSort()
         {
             for (int i = 0, c = AtLeast(500); i < c; i++)
@@ -47,21 +45,21 @@ namespace Lucene.Net.Util
                 List<int> list1 = CreateRandomList(2000), list2 = new List<int>(list1);
                 CollectionUtil.IntroSort(list1);
                 list2.Sort();
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
 
                 list1 = CreateRandomList(2000);
                 list2 = new List<int>(list1);
                 CollectionUtil.IntroSort<int>(list1, ReverseOrder);
                 list2.Sort(ReverseOrder);
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
                 // reverse back, so we can test that completely backwards sorted array (worst case) is working:
                 CollectionUtil.IntroSort(list1);
                 list2.Sort();
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTimSort()
         {
             for (int i = 0, c = AtLeast(500); i < c; i++)
@@ -69,21 +67,21 @@ namespace Lucene.Net.Util
                 List<int> list1 = CreateRandomList(2000), list2 = new List<int>(list1);
                 CollectionUtil.TimSort(list1);
                 list2.Sort();
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
 
                 list1 = CreateRandomList(2000);
                 list2 = new List<int>(list1);
                 CollectionUtil.TimSort(list1, ReverseOrder);
                 list2.Sort(ReverseOrder);
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
                 // reverse back, so we can test that completely backwards sorted array (worst case) is working:
                 CollectionUtil.TimSort(list1);
                 list2.Sort();
-                Assert.AreEqual(list2, list1);
+                Assert.Equal(list2, list1);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyListSort()
         {
             // should produce no exceptions
@@ -101,7 +99,7 @@ namespace Lucene.Net.Util
             CollectionUtil.TimSort(list, ReverseOrder);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneElementListSort()
         {
             // check that one-element non-random access lists pass sorting without ex (as sorting is not needed)

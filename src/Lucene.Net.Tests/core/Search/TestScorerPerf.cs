@@ -1,11 +1,11 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
     using Directory = Lucene.Net.Store.Directory;
@@ -37,7 +37,6 @@ namespace Lucene.Net.Search
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestScorerPerf : LuceneTestCase
     {
         internal bool Validate = true; // set to false when doing performance testing
@@ -213,7 +212,7 @@ namespace Lucene.Net.Search
 
             public override DocIdSet GetDocIdSet(AtomicReaderContext context, Bits acceptDocs)
             {
-                Assert.IsNull(acceptDocs, "acceptDocs should be null, as we have an index without deletions");
+                Assert.Null(acceptDocs); //, "acceptDocs should be null, as we have an index without deletions");
                 return new DocIdBitSet(Rnd);
             }
         }
@@ -238,7 +237,7 @@ namespace Lucene.Net.Search
 
                 if (Validate)
                 {
-                    Assert.AreEqual(result.Cardinality(), hc.Count);
+                    Assert.Equal(result.Cardinality(), hc.Count);
                 }
                 // System.out.println(hc.getCount());
             }
@@ -275,7 +274,7 @@ namespace Lucene.Net.Search
                 ret += hc.Sum;
                 if (Validate)
                 {
-                    Assert.AreEqual(result.Cardinality(), hc.Count);
+                    Assert.Equal(result.Cardinality(), hc.Count);
                 }
                 // System.out.println(hc.getCount());
             }
@@ -396,7 +395,7 @@ namespace Lucene.Net.Search
             return ret;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConjunctions()
         {
             // test many small sets... the bugs will be found on boundary conditions

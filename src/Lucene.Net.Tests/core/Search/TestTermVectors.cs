@@ -1,8 +1,9 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using System;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using DocsAndPositionsEnum = Lucene.Net.Index.DocsAndPositionsEnum;
@@ -42,16 +43,195 @@ namespace Lucene.Net.Search
     using TermsEnum = Lucene.Net.Index.TermsEnum;
     using TextField = TextField;
 
-    public class TestTermVectors : LuceneTestCase
+    public class TestTermVectors : LuceneTestCase, IClassFixture<TestTermVectorsFixture>
     {
-        private static IndexReader Reader;
-        private static Directory Directory;
+        private readonly TestTermVectorsFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestTermVectors(TestTermVectorsFixture fixture)
         {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true)).SetMergePolicy(NewLogMergePolicy()));
+            _fixture = fixture;
+        }
+
+        // In a single doc, for the same field, mix the term
+        // vectors up
+        [Fact]
+        public virtual void TestMixedVectrosVectors()
+        {
+            RandomIndexWriter writer = new RandomIndexWriter(Random(), _fixture.Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true)).SetOpenMode(OpenMode.CREATE));
+            Document doc = new Document();
+
+            FieldType ft2 = new FieldType(TextField.TYPE_STORED);
+            ft2.StoreTermVectors = true;
+
+            FieldType ft3 = new FieldType(TextField.TYPE_STORED);
+            ft3.StoreTermVectors = true;
+            ft3.StoreTermVectorPositions = true;
+
+            FieldType ft4 = new FieldType(TextField.TYPE_STORED);
+            ft4.StoreTermVectors = true;
+            ft4.StoreTermVectorOffsets = true;
+
+            FieldType ft5 = new FieldType(TextField.TYPE_STORED);
+            ft5.StoreTermVectors = true;
+            ft5.StoreTermVectorOffsets = true;
+            ft5.StoreTermVectorPositions = true;
+
+            doc.Add(NewTextField("field", "one", Field.Store.YES));
+            doc.Add(NewField("field", "one", ft2));
+            doc.Add(NewField("field", "one", ft3));
+            doc.Add(NewField("field", "one", ft4));
+            doc.Add(NewField("field", "one", ft5));
+            writer.AddDocument(doc);
+            IndexReader reader = writer.Reader;
+            writer.Dispose();
+
+            IndexSearcher searcher = NewSearcher(reader);
+
+            Query query = new TermQuery(new Term("field", "one"));
+            ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
+            Assert.Equal(1, hits.Length);
+
+            Fields vectors = searcher.IndexReader.GetTermVectors(hits[0].Doc);
+            Assert.NotNull(vectors);
+            Assert.Equal(1, vectors.Size);
+            Terms vector = vectors.Terms("field");
+            Assert.NotNull(vector);
+            Assert.Equal(1, vector.Size());
+            TermsEnum termsEnum = vector.Iterator(null);
+            Assert.NotNull(termsEnum.Next());
+            Assert.Equal("one", termsEnum.Term().Utf8ToString());
+            Assert.Equal(5, termsEnum.TotalTermFreq());
+            DocsAndPositionsEnum dpEnum = termsEnum.DocsAndPositions(null, null);
+            Assert.NotNull(dpEnum);
+            Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+            Assert.Equal(5, dpEnum.Freq());
+            for (int i = 0; i < 5; i++)
+            {
+                Assert.Equal(i, dpEnum.NextPosition());
+            }
+
+            dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
+            Assert.NotNull(dpEnum);
+            Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+            Assert.Equal(5, dpEnum.Freq());
+            for (int i = 0; i < 5; i++)
+            {
+                dpEnum.NextPosition();
+                Assert.Equal(4 * i, dpEnum.StartOffset());
+                Assert.Equal(4 * i + 3, dpEnum.EndOffset());
+            }
+            reader.Dispose();
+        }
+
+        private IndexWriter CreateWriter(Directory dir)
+        {
+            return new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(2));
+        }
+
+        private void CreateDir(Directory dir)
+        {
+            IndexWriter writer = CreateWriter(dir);
+            writer.AddDocument(CreateDoc());
+            writer.Dispose();
+        }
+
+        private Document CreateDoc()
+        {
+            Document doc = new Document();
+            FieldType ft = new FieldType(TextField.TYPE_STORED);
+            ft.StoreTermVectors = true;
+            ft.StoreTermVectorOffsets = true;
+            ft.StoreTermVectorPositions = true;
+            doc.Add(NewField("c", "aaa", ft));
+            return doc;
+        }
+
+        private void VerifyIndex(Directory dir)
+        {
+            IndexReader r = DirectoryReader.Open(dir);
+            int numDocs = r.NumDocs;
+            for (int i = 0; i < numDocs; i++)
+            {
+                Assert.NotNull(r.GetTermVectors(i).Terms("c")); //, "term vectors should not have been null for document " + i);
+            }
+            r.Dispose();
+        }
+
+        [Fact]
+        public virtual void TestFullMergeAddDocs()
+        {
+            Directory target = NewDirectory();
+            IndexWriter writer = CreateWriter(target);
+            // with maxBufferedDocs=2, this results in two segments, so that forceMerge
+            // actually does something.
+            for (int i = 0; i < 4; i++)
+            {
+                writer.AddDocument(CreateDoc());
+            }
+            writer.ForceMerge(1);
+            writer.Dispose();
+
+            VerifyIndex(target);
+            target.Dispose();
+        }
+
+        [Fact]
+        public virtual void TestFullMergeAddIndexesDir()
+        {
+            Directory[] input = new Directory[] { NewDirectory(), NewDirectory() };
+            Directory target = NewDirectory();
+
+            foreach (Directory dir in input)
+            {
+                CreateDir(dir);
+            }
+
+            IndexWriter writer = CreateWriter(target);
+            writer.AddIndexes(input);
+            writer.ForceMerge(1);
+            writer.Dispose();
+
+            VerifyIndex(target);
+
+            IOUtils.Close(target, input[0], input[1]);
+        }
+
+        [Fact]
+        public virtual void TestFullMergeAddIndexesReader()
+        {
+            Directory[] input = new Directory[] { NewDirectory(), NewDirectory() };
+            Directory target = NewDirectory();
+
+            foreach (Directory dir in input)
+            {
+                CreateDir(dir);
+            }
+
+            IndexWriter writer = CreateWriter(target);
+            foreach (Directory dir in input)
+            {
+                IndexReader r = DirectoryReader.Open(dir);
+                writer.AddIndexes(r);
+                r.Dispose();
+            }
+            writer.ForceMerge(1);
+            writer.Dispose();
+
+            VerifyIndex(target);
+            IOUtils.Close(target, input[0], input[1]);
+        }
+    }
+
+    public class TestTermVectorsFixture : IDisposable
+    {
+        internal IndexReader Reader { get; private set; }
+        internal Directory Directory { get; private set; }
+
+        public TestTermVectorsFixture()
+        {
+            var random = LuceneTestCase.Random();
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(random, Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random, MockTokenizer.SIMPLE, true)).SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
             //writer.setNoCFSRatio(1.0);
             //writer.infoStream = System.out;
             for (int i = 0; i < 1000; i++)
@@ -89,182 +269,12 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TestFixtureTearDown]
-        public static void AfterClass()
+        public void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
             Reader = null;
             Directory = null;
-        }
-
-        // In a single doc, for the same field, mix the term
-        // vectors up
-        [Test]
-        public virtual void TestMixedVectrosVectors()
-        {
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true)).SetOpenMode(OpenMode.CREATE));
-            Document doc = new Document();
-
-            FieldType ft2 = new FieldType(TextField.TYPE_STORED);
-            ft2.StoreTermVectors = true;
-
-            FieldType ft3 = new FieldType(TextField.TYPE_STORED);
-            ft3.StoreTermVectors = true;
-            ft3.StoreTermVectorPositions = true;
-
-            FieldType ft4 = new FieldType(TextField.TYPE_STORED);
-            ft4.StoreTermVectors = true;
-            ft4.StoreTermVectorOffsets = true;
-
-            FieldType ft5 = new FieldType(TextField.TYPE_STORED);
-            ft5.StoreTermVectors = true;
-            ft5.StoreTermVectorOffsets = true;
-            ft5.StoreTermVectorPositions = true;
-
-            doc.Add(NewTextField("field", "one", Field.Store.YES));
-            doc.Add(NewField("field", "one", ft2));
-            doc.Add(NewField("field", "one", ft3));
-            doc.Add(NewField("field", "one", ft4));
-            doc.Add(NewField("field", "one", ft5));
-            writer.AddDocument(doc);
-            IndexReader reader = writer.Reader;
-            writer.Dispose();
-
-            IndexSearcher searcher = NewSearcher(reader);
-
-            Query query = new TermQuery(new Term("field", "one"));
-            ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-
-            Fields vectors = searcher.IndexReader.GetTermVectors(hits[0].Doc);
-            Assert.IsNotNull(vectors);
-            Assert.AreEqual(1, vectors.Size);
-            Terms vector = vectors.Terms("field");
-            Assert.IsNotNull(vector);
-            Assert.AreEqual(1, vector.Size());
-            TermsEnum termsEnum = vector.Iterator(null);
-            Assert.IsNotNull(termsEnum.Next());
-            Assert.AreEqual("one", termsEnum.Term().Utf8ToString());
-            Assert.AreEqual(5, termsEnum.TotalTermFreq());
-            DocsAndPositionsEnum dpEnum = termsEnum.DocsAndPositions(null, null);
-            Assert.IsNotNull(dpEnum);
-            Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-            Assert.AreEqual(5, dpEnum.Freq());
-            for (int i = 0; i < 5; i++)
-            {
-                Assert.AreEqual(i, dpEnum.NextPosition());
-            }
-
-            dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
-            Assert.IsNotNull(dpEnum);
-            Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-            Assert.AreEqual(5, dpEnum.Freq());
-            for (int i = 0; i < 5; i++)
-            {
-                dpEnum.NextPosition();
-                Assert.AreEqual(4 * i, dpEnum.StartOffset());
-                Assert.AreEqual(4 * i + 3, dpEnum.EndOffset());
-            }
-            reader.Dispose();
-        }
-
-        private IndexWriter CreateWriter(Directory dir)
-        {
-            return new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(2));
-        }
-
-        private void CreateDir(Directory dir)
-        {
-            IndexWriter writer = CreateWriter(dir);
-            writer.AddDocument(CreateDoc());
-            writer.Dispose();
-        }
-
-        private Document CreateDoc()
-        {
-            Document doc = new Document();
-            FieldType ft = new FieldType(TextField.TYPE_STORED);
-            ft.StoreTermVectors = true;
-            ft.StoreTermVectorOffsets = true;
-            ft.StoreTermVectorPositions = true;
-            doc.Add(NewField("c", "aaa", ft));
-            return doc;
-        }
-
-        private void VerifyIndex(Directory dir)
-        {
-            IndexReader r = DirectoryReader.Open(dir);
-            int numDocs = r.NumDocs;
-            for (int i = 0; i < numDocs; i++)
-            {
-                Assert.IsNotNull(r.GetTermVectors(i).Terms("c"), "term vectors should not have been null for document " + i);
-            }
-            r.Dispose();
-        }
-
-        [Test]
-        public virtual void TestFullMergeAddDocs()
-        {
-            Directory target = NewDirectory();
-            IndexWriter writer = CreateWriter(target);
-            // with maxBufferedDocs=2, this results in two segments, so that forceMerge
-            // actually does something.
-            for (int i = 0; i < 4; i++)
-            {
-                writer.AddDocument(CreateDoc());
-            }
-            writer.ForceMerge(1);
-            writer.Dispose();
-
-            VerifyIndex(target);
-            target.Dispose();
-        }
-
-        [Test]
-        public virtual void TestFullMergeAddIndexesDir()
-        {
-            Directory[] input = new Directory[] { NewDirectory(), NewDirectory() };
-            Directory target = NewDirectory();
-
-            foreach (Directory dir in input)
-            {
-                CreateDir(dir);
-            }
-
-            IndexWriter writer = CreateWriter(target);
-            writer.AddIndexes(input);
-            writer.ForceMerge(1);
-            writer.Dispose();
-
-            VerifyIndex(target);
-
-            IOUtils.Close(target, input[0], input[1]);
-        }
-
-        [Test]
-        public virtual void TestFullMergeAddIndexesReader()
-        {
-            Directory[] input = new Directory[] { NewDirectory(), NewDirectory() };
-            Directory target = NewDirectory();
-
-            foreach (Directory dir in input)
-            {
-                CreateDir(dir);
-            }
-
-            IndexWriter writer = CreateWriter(target);
-            foreach (Directory dir in input)
-            {
-                IndexReader r = DirectoryReader.Open(dir);
-                writer.AddIndexes(r);
-                r.Dispose();
-            }
-            writer.ForceMerge(1);
-            writer.Dispose();
-
-            VerifyIndex(target);
-            IOUtils.Close(target, input[0], input[1]);
         }
     }
 }

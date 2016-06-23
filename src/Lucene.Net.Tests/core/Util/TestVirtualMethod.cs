@@ -1,5 +1,4 @@
-using NUnit.Framework;
-using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -20,7 +19,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestVirtualMethod : LuceneTestCase
     {
         private static readonly VirtualMethod<TestVirtualMethod> PublicTestMethod;
@@ -40,7 +38,7 @@ namespace Lucene.Net.Util
         {
         }
 
-        [Ignore]
+        [Trait("Category", "Ignore")]
         internal class TestClass1 : TestVirtualMethod
         {
             public override void PublicTest(string test)
@@ -52,7 +50,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Trait("Category", "Ignore")]
         internal class TestClass2 : TestClass1
         {
             protected override void ProtectedTest(int test) // make it public here
@@ -60,7 +58,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Trait("Category", "Ignore")]
         internal class TestClass3 : TestClass2
         {
             public override void PublicTest(string test)
@@ -68,45 +66,45 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Ignore]
+        [Trait("Category", "Ignore")]
         internal class TestClass4 : TestVirtualMethod
         {
         }
 
-        [Ignore]
+        [Trait("Category", "Ignore")]
         internal class TestClass5 : TestClass4
         {
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGeneral()
         {
-            Assert.AreEqual(0, PublicTestMethod.GetImplementationDistance(this.GetType()));
-            Assert.AreEqual(1, PublicTestMethod.GetImplementationDistance(typeof(TestClass1)));
-            Assert.AreEqual(1, PublicTestMethod.GetImplementationDistance(typeof(TestClass2)));
-            Assert.AreEqual(3, PublicTestMethod.GetImplementationDistance(typeof(TestClass3)));
-            Assert.IsFalse(PublicTestMethod.IsOverriddenAsOf(typeof(TestClass4)));
-            Assert.IsFalse(PublicTestMethod.IsOverriddenAsOf(typeof(TestClass5)));
+            Assert.Equal(0, PublicTestMethod.GetImplementationDistance(this.GetType()));
+            Assert.Equal(1, PublicTestMethod.GetImplementationDistance(typeof(TestClass1)));
+            Assert.Equal(1, PublicTestMethod.GetImplementationDistance(typeof(TestClass2)));
+            Assert.Equal(3, PublicTestMethod.GetImplementationDistance(typeof(TestClass3)));
+            Assert.False(PublicTestMethod.IsOverriddenAsOf(typeof(TestClass4)));
+            Assert.False(PublicTestMethod.IsOverriddenAsOf(typeof(TestClass5)));
 
-            Assert.AreEqual(0, ProtectedTestMethod.GetImplementationDistance(this.GetType()));
-            Assert.AreEqual(1, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass1)));
-            Assert.AreEqual(2, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass2)));
-            Assert.AreEqual(2, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass3)));
-            Assert.IsFalse(ProtectedTestMethod.IsOverriddenAsOf(typeof(TestClass4)));
-            Assert.IsFalse(ProtectedTestMethod.IsOverriddenAsOf(typeof(TestClass5)));
+            Assert.Equal(0, ProtectedTestMethod.GetImplementationDistance(this.GetType()));
+            Assert.Equal(1, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass1)));
+            Assert.Equal(2, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass2)));
+            Assert.Equal(2, ProtectedTestMethod.GetImplementationDistance(typeof(TestClass3)));
+            Assert.False(ProtectedTestMethod.IsOverriddenAsOf(typeof(TestClass4)));
+            Assert.False(ProtectedTestMethod.IsOverriddenAsOf(typeof(TestClass5)));
 
-            Assert.IsTrue(VirtualMethod<TestVirtualMethod>.compareImplementationDistance(typeof(TestClass3), PublicTestMethod, ProtectedTestMethod) > 0);
-            Assert.AreEqual(0, VirtualMethod<TestVirtualMethod>.compareImplementationDistance(typeof(TestClass5), PublicTestMethod, ProtectedTestMethod));
+            Assert.True(VirtualMethod<TestVirtualMethod>.compareImplementationDistance(typeof(TestClass3), PublicTestMethod, ProtectedTestMethod) > 0);
+            Assert.Equal(0, VirtualMethod<TestVirtualMethod>.compareImplementationDistance(typeof(TestClass5), PublicTestMethod, ProtectedTestMethod));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptions()
         {
             try
             {
                 // cast to Class to remove generics:
                 PublicTestMethod.GetImplementationDistance(typeof(LuceneTestCase));
-                Assert.Fail("LuceneTestCase is not a subclass and can never override publicTest(String)");
+                Assert.True(false, "LuceneTestCase is not a subclass and can never override publicTest(String)");
             }
             catch (System.ArgumentException arg)
             {
@@ -116,7 +114,7 @@ namespace Lucene.Net.Util
             try
             {
                 new VirtualMethod<TestVirtualMethod>(typeof(TestVirtualMethod), "bogus");
-                Assert.Fail("Method bogus() does not exist, so IAE should be thrown");
+                Assert.True(false, "Method bogus() does not exist, so IAE should be thrown");
             }
             catch (System.ArgumentException arg)
             {
@@ -129,14 +127,14 @@ namespace Lucene.Net.Util
             }
             catch (System.ArgumentException arg)
             {
-                Assert.Fail("Method publicTest(String) is declared in TestClass2, so IAE should not be thrown");
+                Assert.True(false, "Method publicTest(String) is declared in TestClass2, so IAE should not be thrown");
             }
 
             try
             {
                 // try to create a second instance of the same baseClass / method combination
                 new VirtualMethod<TestVirtualMethod>(typeof(TestVirtualMethod), "PublicTest", typeof(string));
-                Assert.Fail("Violating singleton status succeeded");
+                Assert.True(false, "Violating singleton status succeeded");
             }
             catch (System.ArgumentException arg)
             {

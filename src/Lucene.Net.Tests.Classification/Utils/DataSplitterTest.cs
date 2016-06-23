@@ -43,7 +43,7 @@ namespace Lucene.Net.Classification
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             _dir = NewDirectory();
             _indexWriter = new RandomIndexWriter(Random(), _dir, new MockAnalyzer(Random()));
 
@@ -76,17 +76,17 @@ namespace Lucene.Net.Classification
             _originalIndex.Dispose();
             _indexWriter.Dispose();
             _dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSplitOnAllFields()
         {
             AssertSplit(_originalIndex, 0.1, 0.1);
         }
 
 
-        [Test]
+        [Fact]
         public void TestSplitOnSomeFields()
         {
             AssertSplit(_originalIndex, 0.2, 0.35, _idFieldName, _textFieldName);

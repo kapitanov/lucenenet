@@ -7,8 +7,8 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -39,7 +39,6 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestConcurrentMergeScheduler : LuceneTestCase
     {
         private class FailOnlyOnFlush : MockDirectoryWrapper.Failure
@@ -100,8 +99,7 @@ namespace Lucene.Net.Index
 
         // Make sure running BG merges still work fine even when
         // we are hitting exceptions during flushing.
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignoring this test")]
         public virtual void TestFlushExceptions()
         {
             MockDirectoryWrapper directory = NewMockDirectory();
@@ -139,7 +137,7 @@ namespace Lucene.Net.Index
                         writer.Flush(true, true);
                         if (failure.HitExc)
                         {
-                            Assert.Fail("failed to hit IOException");
+                            Assert.True(false, "failed to hit IOException");
                         }
                         extraCount++;
                     }
@@ -153,19 +151,19 @@ namespace Lucene.Net.Index
                         break;
                     }
                 }
-                Assert.AreEqual(20 * (i + 1) + extraCount, writer.NumDocs());
+                Assert.Equal(20 * (i + 1) + extraCount, writer.NumDocs());
             }
 
             writer.Dispose();
             IndexReader reader = DirectoryReader.Open(directory);
-            Assert.AreEqual(200 + extraCount, reader.NumDocs);
+            Assert.Equal(200 + extraCount, reader.NumDocs);
             reader.Dispose();
             directory.Dispose();
         }
 
         // Test that deletes committed after a merge started and
         // before it finishes, are correctly merged back:
-        [Test]
+        [Fact]
         public virtual void TestDeleteMerging()
         {
             Directory directory = NewDirectory();
@@ -209,12 +207,13 @@ namespace Lucene.Net.Index
             writer.Dispose();
             IndexReader reader = DirectoryReader.Open(directory);
             // Verify that we did not lose any deletes...
-            Assert.AreEqual(450, reader.NumDocs);
+            Assert.Equal(450, reader.NumDocs);
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Fact]
         public virtual void TestNoExtraFiles()
         {
             Directory directory = NewDirectory();
@@ -246,7 +245,7 @@ namespace Lucene.Net.Index
             directory.Dispose();
         }
 
-        [Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
         public virtual void TestNoWaitClose()
         {
             Directory directory = NewDirectory();
@@ -280,7 +279,7 @@ namespace Lucene.Net.Index
                 writer.Dispose(false);
 
                 IndexReader reader = DirectoryReader.Open(directory);
-                Assert.AreEqual((1 + iter) * 182, reader.NumDocs);
+                Assert.Equal((1 + iter) * 182, reader.NumDocs);
                 reader.Dispose();
 
                 // Reopen
@@ -292,7 +291,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-4544
-        [Test]
+        [Fact]
         public virtual void TestMaxMergeCount()
         {
             Directory dir = NewDirectory();
@@ -360,7 +359,7 @@ namespace Lucene.Net.Index
                     int count = RunningMergeCount.IncrementAndGet();
                     try
                     {
-                        Assert.IsTrue(count <= MaxMergeCount, "count=" + count + " vs maxMergeCount=" + MaxMergeCount);
+                        Assert.True(count <= MaxMergeCount, "count=" + count + " vs maxMergeCount=" + MaxMergeCount);
                         EnoughMergesWaiting.Signal();
 
                         // Stall this merge until we see exactly
@@ -408,7 +407,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
         public virtual void TestTotalBytesSize()
         {
             Directory d = NewDirectory();
@@ -436,7 +435,7 @@ namespace Lucene.Net.Index
                     w.DeleteDocuments(new Term("id", "" + Random().Next(i + 1)));
                 }
             }
-            Assert.IsTrue(((TrackingCMS)w.w.Config.MergeScheduler).TotMergedBytes != 0);
+            Assert.True(((TrackingCMS)w.w.Config.MergeScheduler).TotMergedBytes != 0);
             w.Dispose();
             d.Dispose();
         }

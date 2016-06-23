@@ -1,5 +1,6 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -7,7 +8,6 @@ using System.Threading;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -42,7 +42,7 @@ namespace Lucene.Net.Search
     [TestFixture]
     public class TestLiveFieldValues : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewFSDirectory(CreateTempDir("livefieldupdates"));
@@ -88,7 +88,7 @@ namespace Lucene.Net.Search
                 thread.Join();
             }
             mgr.MaybeRefresh();
-            Assert.AreEqual(0, rt.Size());
+            Assert.Equal(0, rt.Size());
 
             rt.Dispose();
             mgr.Dispose();
@@ -115,7 +115,7 @@ namespace Lucene.Net.Search
             {
                 TermQuery tq = new TermQuery(new Term("id", id));
                 TopDocs hits = s.Search(tq, 1);
-                Assert.IsTrue(hits.TotalHits <= 1);
+                Assert.True(hits.TotalHits <= 1);
                 if (hits.TotalHits == 0)
                 {
                     return null;
@@ -219,7 +219,7 @@ namespace Lucene.Net.Search
 
                         if (ThreadRandom.Next(10) == 7)
                         {
-                            Assert.AreEqual(null, Rt.Get("foo"));
+                            Assert.Equal(null, Rt.Get("foo"));
                         }
 
                         if (allIDs.Count > 0)
@@ -230,7 +230,7 @@ namespace Lucene.Net.Search
                             {
                                 expected = null;
                             }
-                            Assert.AreEqual(expected, Rt.Get(randomID), "id=" + randomID);
+                            Assert.Equal(expected, Rt.Get(randomID), "id=" + randomID);
                         }
                     }
                 }

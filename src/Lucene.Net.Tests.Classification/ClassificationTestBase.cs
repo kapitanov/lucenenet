@@ -25,7 +25,6 @@ using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
 
 namespace Lucene.Net.Classification
 {
@@ -33,7 +32,7 @@ namespace Lucene.Net.Classification
     /**
      * Base class for testing {@link Classifier}s
      */
-    public abstract class ClassificationTestBase<T> : Util.LuceneTestCase
+    public abstract class ClassificationTestBase<T> : LuceneTestCase
     {
         public readonly static String POLITICS_INPUT = "Here are some interesting questions and answers about Mitt Romney.. " +
             "If you don't know the answer to the question about Mitt Romney, then simply click on the answer below the question section.";
@@ -52,10 +51,8 @@ namespace Lucene.Net.Classification
 
         String booleanFieldName;
 
-        [SetUp]
-        public override void SetUp()
+        public ClassificationTestBase() : base()
         {
-            base.SetUp();
             dir = NewDirectory();
             indexWriter = new RandomIndexWriter(Random(), dir);
             textFieldName = "text";
@@ -67,10 +64,9 @@ namespace Lucene.Net.Classification
             ft.StoreTermVectorPositions = true;
         }
 
-        [TearDown]
-        public void tearDown()
+        public override void Dispose()
         {
-            base.TearDown();
+            base.Dispose();
             indexWriter.Dispose();
             dir.Dispose();
         }
@@ -90,8 +86,8 @@ namespace Lucene.Net.Classification
                 classifier.Train(atomicReader, textFieldName, classFieldName, analyzer, query);
                 ClassificationResult<T> classificationResult = classifier.AssignClass(inputDoc);
                 NotNull(classificationResult.AssignedClass);
-                AreEqual(expectedResult, classificationResult.AssignedClass, "got an assigned class of " + classificationResult.AssignedClass);
-                IsTrue(classificationResult.Score > 0, "got a not positive score " + classificationResult.Score);
+                Equal(expectedResult, classificationResult.AssignedClass); //, "got an assigned class of " + classificationResult.AssignedClass);
+                True(classificationResult.Score > 0, "got a not positive score " + classificationResult.Score);
             }
             finally
             {
@@ -114,12 +110,12 @@ namespace Lucene.Net.Classification
                 classifier.Train(atomicReader, textFieldName, classFieldName, analyzer, query);
                 ClassificationResult<T> classificationResult = classifier.AssignClass(inputDoc);
                 NotNull(classificationResult.AssignedClass);
-                AreEqual(expectedResult, classificationResult.AssignedClass, "got an assigned class of " + classificationResult.AssignedClass);
-                IsTrue(classificationResult.Score > 0, "got a not positive score " + classificationResult.Score);
+                Equal(expectedResult, classificationResult.AssignedClass); //, "got an assigned class of " + classificationResult.AssignedClass);
+                True(classificationResult.Score > 0, "got a not positive score " + classificationResult.Score);
                 UpdateSampleIndex(analyzer);
                 ClassificationResult<T> secondClassificationResult = classifier.AssignClass(inputDoc);
-                Equals(classificationResult.AssignedClass, secondClassificationResult.AssignedClass);
-                Equals(classificationResult.Score, secondClassificationResult.Score);
+                Equal(classificationResult.AssignedClass, secondClassificationResult.AssignedClass);
+                Equal(classificationResult.Score, secondClassificationResult.Score);
 
             }
             finally
@@ -218,7 +214,7 @@ namespace Lucene.Net.Classification
                 classifier.Train(atomicReader, textFieldName, classFieldName, analyzer);
                 stopwatch.Stop();
                 long trainTime = stopwatch.ElapsedMilliseconds;
-                IsTrue(trainTime < 120000, "training took more than 2 mins : " + trainTime / 1000 + "s");
+                True(trainTime < 120000, "training took more than 2 mins : " + trainTime / 1000 + "s");
             }
             finally
             {

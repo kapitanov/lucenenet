@@ -1,6 +1,6 @@
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Text;
 
@@ -52,14 +52,14 @@ namespace Lucene.Net.Codecs.Compressing
                 // 5 of them
                 if (off == compressed.Length)
                 {
-                    Assert.AreEqual(decompressed.Length, decompressedOff);
-                    Assert.IsTrue(literalLen >= LZ4.LAST_LITERALS || literalLen == decompressed.Length, "lastLiterals=" + literalLen + ", bytes=" + decompressed.Length);
+                    Assert.Equal(decompressed.Length, decompressedOff);
+                    Assert.True(literalLen >= LZ4.LAST_LITERALS || literalLen == decompressed.Length, "lastLiterals=" + literalLen + ", bytes=" + decompressed.Length);
                     break;
                 }
 
                 int matchDec = (compressed[off++] & 0xFF) | ((compressed[off++] & 0xFF) << 8);
                 // check that match dec is not 0
-                Assert.IsTrue(matchDec > 0 && matchDec <= decompressedOff, matchDec + " " + decompressedOff);
+                Assert.True(matchDec > 0 && matchDec <= decompressedOff, matchDec + " " + decompressedOff);
 
                 int matchLen = token & 0x0F;
                 if (matchLen == 0x0F)
@@ -79,16 +79,16 @@ namespace Lucene.Net.Codecs.Compressing
                 {
                     bool moreCommonBytes = decompressed[decompressedOff + matchLen] == decompressed[decompressedOff - matchDec + matchLen];
                     bool nextSequenceHasLiterals = ((int)((uint)(compressed[off] & 0xFF) >> 4)) != 0;
-                    Assert.IsTrue(!moreCommonBytes || !nextSequenceHasLiterals);
+                    Assert.True(!moreCommonBytes || !nextSequenceHasLiterals);
                 }
 
                 decompressedOff += matchLen;
             }
-            Assert.AreEqual(decompressed.Length, decompressedOff);
+            Assert.Equal(decompressed.Length, decompressedOff);
             return compressed;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestShortLiteralsAndMatchs()
         {
             // literals and matchs lengths <= 15
@@ -96,7 +96,7 @@ namespace Lucene.Net.Codecs.Compressing
             Test(decompressed);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongMatchs()
         {
             // match length >= 20
@@ -108,7 +108,7 @@ namespace Lucene.Net.Codecs.Compressing
             Test(decompressed);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongLiterals()
         {
             // long literals (length >= 16) which are not the last literals
@@ -120,7 +120,7 @@ namespace Lucene.Net.Codecs.Compressing
             Test(decompressed);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMatchRightBeforeLastLiterals()
         {
             Test(new byte[] { 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 5 });

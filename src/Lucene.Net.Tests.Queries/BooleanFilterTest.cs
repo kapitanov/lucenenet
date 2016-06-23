@@ -17,7 +17,7 @@ namespace Lucene.Net.Tests.Queries
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory, new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
 
@@ -35,7 +35,7 @@ namespace Lucene.Net.Tests.Queries
         {
             reader.Dispose();
             directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private void AddDoc(RandomIndexWriter writer, string accessRights, string price, string date, string inStock)
@@ -139,7 +139,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         private void TstFilterCard(string mes, int expected, Filter filt)
         {
             DocIdSet docIdSet = filt.GetDocIdSet(reader.AtomicContext, reader.LiveDocs);
@@ -156,7 +156,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals(mes, expected, actual);
         }
 
-        [Test]
+        [Fact]
         public void TestShould()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -167,7 +167,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Should retrieves only 1 doc", 1, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestShoulds()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -176,7 +176,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Shoulds are Ored together", 5, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestShouldsAndMustNot()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -195,7 +195,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Shoulds Ored but AndNots", 3, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestShouldsAndMust()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -210,7 +210,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Shoulds Ored but MUST", 3, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestShouldsAndMusts()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -221,7 +221,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Shoulds Ored but MUSTs ANDED", 1, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestShouldsAndMustsAndMustNot()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -238,7 +238,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"Shoulds Ored but MUSTs ANDED and MustNot", 0, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestJustMust()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -249,7 +249,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"MUST", 3, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestJustMustNot()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -260,7 +260,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"MUST_NOT", 4, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestMustAndMustNot()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -273,14 +273,14 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"MUST_NOT wins over MUST for same docs", 0, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestEmpty()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
             TstFilterCard(@"empty BooleanFilter returns no results", 0, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestCombinedNullDocIdSets()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -309,7 +309,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"A MUST_NOT filter that returns a null DISI should be invisible", 1, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestJustNullDocIdSets()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -332,7 +332,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@"A single MUST_NOT filter that returns a null DIS should be invisible", 5, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestNonMatchingShouldsAndMusts()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -349,7 +349,7 @@ namespace Lucene.Net.Tests.Queries
             TstFilterCard(@">0 shoulds with no matches should return no docs", 0, booleanFilter);
         }
 
-        [Test]
+        [Fact]
         public void TestToStringOfBooleanFilterContainingTermsFilter()
         {
             BooleanFilter booleanFilter = new BooleanFilter();
@@ -358,7 +358,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals(@"BooleanFilter(+inStock:N +isFragile:Y)", booleanFilter.ToString());
         }
 
-        [Test]
+        [Fact]
         public void TestToStringOfWrappedBooleanFilters()
         {
             BooleanFilter orFilter = new BooleanFilter();

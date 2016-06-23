@@ -1,8 +1,8 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
+
 using System;
 using System.IO;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -23,10 +23,11 @@ namespace Lucene.Net.Analysis
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestLookaheadTokenFilter : BaseTokenStreamTestCase
     {
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestRandomStrings()
         {
             Analyzer a = new AnalyzerAnonymousInnerClassHelper(this);
@@ -69,7 +70,9 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestNeverCallingPeek()
         {
             Analyzer a = new NCPAnalyzerAnonymousInnerClassHelper(this);
@@ -93,7 +96,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMissedFirstToken()
         {
             Analyzer analyzer = new AnalyzerAnonymousInnerClassHelper2(this);

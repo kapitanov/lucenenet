@@ -131,7 +131,7 @@ namespace Lucene.Net.Facet.Taxonomy
 
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNrt()
         {
             Store.Directory dir = NewDirectory();
@@ -253,7 +253,7 @@ namespace Lucene.Net.Facet.Taxonomy
         }
 
         
-        [Test]
+        [Fact]
         public virtual void TestDirectory()
         {
             Store.Directory indexDir = NewDirectory();
@@ -316,7 +316,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(mgr, tw, w, taxoDir, indexDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReplaceTaxonomyNrt()
         {
             Store.Directory dir = NewDirectory();
@@ -336,7 +336,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 mgr.MaybeRefresh();
-                Fail("should have hit exception");
+                True(false, "should have hit exception");
             }
             catch (InvalidOperationException)
             {
@@ -346,7 +346,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(mgr, tw, w, taxoDir, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReplaceTaxonomyDirectory()
         {
             Store.Directory indexDir = NewDirectory();
@@ -365,7 +365,7 @@ namespace Lucene.Net.Facet.Taxonomy
             SearcherAndTaxonomy pair = mgr.Acquire();
             try
             {
-                Assert.AreEqual(1, pair.taxonomyReader.Size);
+                Assert.Equal(1, pair.taxonomyReader.Size);
             }
             finally
             {
@@ -382,7 +382,7 @@ namespace Lucene.Net.Facet.Taxonomy
             pair = mgr.Acquire();
             try
             {
-                Assert.AreEqual(3, pair.taxonomyReader.Size);
+                Assert.Equal(3, pair.taxonomyReader.Size);
             }
             finally
             {

@@ -30,7 +30,7 @@ namespace Lucene.Net.Tests.Join
 
     public class TestBlockJoinSorting : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestNestedSorting()
         {
             Directory dir = NewDirectory();

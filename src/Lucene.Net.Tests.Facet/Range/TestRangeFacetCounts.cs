@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using Lucene.Net.Facet.Range;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet.Range
 {
@@ -68,7 +67,7 @@ namespace Lucene.Net.Facet.Range
     public class TestRangeFacetCounts : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestBasicLong()
         {
             Directory d = NewDirectory();
@@ -97,19 +96,19 @@ namespace Lucene.Net.Facet.Range
 
             FacetResult result = facets.GetTopChildren(10, "field");
 
-            Assert.AreEqual("dim=field path=[] value=22 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (1)\n", result.ToString());
+            Assert.Equal("dim=field path=[] value=22 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (1)\n", result.ToString());
 
             r.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUselessRange()
         {
             try
             {
                 new LongRange("useless", 7, true, 6, true);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -118,7 +117,7 @@ namespace Lucene.Net.Facet.Range
             try
             {
                 new LongRange("useless", 7, true, 7, false);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -127,7 +126,7 @@ namespace Lucene.Net.Facet.Range
             try
             {
                 new DoubleRange("useless", 7.0, true, 6.0, true);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -136,7 +135,7 @@ namespace Lucene.Net.Facet.Range
             try
             {
                 new DoubleRange("useless", 7.0, true, 7.0, false);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -144,7 +143,7 @@ namespace Lucene.Net.Facet.Range
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongMinMax()
         {
 
@@ -170,13 +169,13 @@ namespace Lucene.Net.Facet.Range
             Facets facets = new LongRangeFacetCounts("field", fc, new LongRange("min", long.MinValue, true, long.MinValue, true), new LongRange("max", long.MaxValue, true, long.MaxValue, true), new LongRange("all0", long.MinValue, true, long.MaxValue, true), new LongRange("all1", long.MinValue, false, long.MaxValue, true), new LongRange("all2", long.MinValue, true, long.MaxValue, false), new LongRange("all3", long.MinValue, false, long.MaxValue, false));
 
             FacetResult result = facets.GetTopChildren(10, "field");
-            Assert.AreEqual("dim=field path=[] value=3 childCount=6\n  min (1)\n  max (1)\n  all0 (3)\n  all1 (2)\n  all2 (2)\n  all3 (1)\n", result.ToString());
+            Assert.Equal("dim=field path=[] value=3 childCount=6\n  min (1)\n  max (1)\n  all0 (3)\n  all1 (2)\n  all2 (2)\n  all3 (1)\n", result.ToString());
 
             r.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOverlappedEndStart()
         {
             Directory d = NewDirectory();
@@ -202,7 +201,7 @@ namespace Lucene.Net.Facet.Range
             Facets facets = new LongRangeFacetCounts("field", fc, new LongRange("0-10", 0L, true, 10L, true), new LongRange("10-20", 10L, true, 20L, true), new LongRange("20-30", 20L, true, 30L, true), new LongRange("30-40", 30L, true, 40L, true));
 
             FacetResult result = facets.GetTopChildren(10, "field");
-            Assert.AreEqual("dim=field path=[] value=41 childCount=4\n  0-10 (11)\n  10-20 (11)\n  20-30 (11)\n  30-40 (11)\n", result.ToString());
+            Assert.Equal("dim=field path=[] value=41 childCount=4\n  0-10 (11)\n  10-20 (11)\n  20-30 (11)\n  30-40 (11)\n", result.ToString());
 
             r.Dispose();
             d.Dispose();
@@ -212,7 +211,7 @@ namespace Lucene.Net.Facet.Range
         /// Tests single request that mixes Range and non-Range
         ///  faceting, with DrillSideways and taxonomy. 
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMixedRangeAndNonRangeTaxonomy()
         {
             Directory d = NewDirectory();
@@ -258,27 +257,27 @@ namespace Lucene.Net.Facet.Range
             DrillDownQuery ddq = new DrillDownQuery(config);
             DrillSidewaysResult dsr = ds.Search(null, ddq, 10);
 
-            Assert.AreEqual(100, dsr.Hits.TotalHits);
-            Assert.AreEqual("dim=dim path=[] value=100 childCount=2\n  b (75)\n  a (25)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
-            Assert.AreEqual("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal(100, dsr.Hits.TotalHits);
+            Assert.Equal("dim=dim path=[] value=100 childCount=2\n  b (75)\n  a (25)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
+            Assert.Equal("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
 
             // Second search, drill down on dim=b:
             ddq = new DrillDownQuery(config);
             ddq.Add("dim", "b");
             dsr = ds.Search(null, ddq, 10);
 
-            Assert.AreEqual(75, dsr.Hits.TotalHits);
-            Assert.AreEqual("dim=dim path=[] value=100 childCount=2\n  b (75)\n  a (25)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
-            Assert.AreEqual("dim=field path=[] value=16 childCount=5\n  less than 10 (7)\n  less than or equal to 10 (8)\n  over 90 (7)\n  90 or above (8)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal(75, dsr.Hits.TotalHits);
+            Assert.Equal("dim=dim path=[] value=100 childCount=2\n  b (75)\n  a (25)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
+            Assert.Equal("dim=field path=[] value=16 childCount=5\n  less than 10 (7)\n  less than or equal to 10 (8)\n  over 90 (7)\n  90 or above (8)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
 
             // Third search, drill down on "less than or equal to 10":
             ddq = new DrillDownQuery(config);
             ddq.Add("field", NumericRangeQuery.NewLongRange("field", 0L, 10L, true, true));
             dsr = ds.Search(null, ddq, 10);
 
-            Assert.AreEqual(11, dsr.Hits.TotalHits);
-            Assert.AreEqual("dim=dim path=[] value=11 childCount=2\n  b (8)\n  a (3)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
-            Assert.AreEqual("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal(11, dsr.Hits.TotalHits);
+            Assert.Equal("dim=dim path=[] value=11 childCount=2\n  b (8)\n  a (3)\n", dsr.Facets.GetTopChildren(10, "dim").ToString());
+            Assert.Equal("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
             IOUtils.Close(tw, tr, td, w, r, d);
         }
 
@@ -327,7 +326,7 @@ namespace Lucene.Net.Facet.Range
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasicDouble()
         {
             Directory d = NewDirectory();
@@ -349,12 +348,12 @@ namespace Lucene.Net.Facet.Range
             s.Search(new MatchAllDocsQuery(), fc);
             Facets facets = new DoubleRangeFacetCounts("field", fc, new DoubleRange("less than 10", 0.0, true, 10.0, false), new DoubleRange("less than or equal to 10", 0.0, true, 10.0, true), new DoubleRange("over 90", 90.0, false, 100.0, false), new DoubleRange("90 or above", 90.0, true, 100.0, false), new DoubleRange("over 1000", 1000.0, false, double.PositiveInfinity, false));
 
-            Assert.AreEqual("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
 
             IOUtils.Close(w, r, d);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasicFloat()
         {
             Directory d = NewDirectory();
@@ -377,12 +376,12 @@ namespace Lucene.Net.Facet.Range
 
             Facets facets = new DoubleRangeFacetCounts("field", new FloatFieldSource("field"), fc, new DoubleRange("less than 10", 0.0f, true, 10.0f, false), new DoubleRange("less than or equal to 10", 0.0f, true, 10.0f, true), new DoubleRange("over 90", 90.0f, false, 100.0f, false), new DoubleRange("90 or above", 90.0f, true, 100.0f, false), new DoubleRange("over 1000", 1000.0f, false, double.PositiveInfinity, false));
 
-            Assert.AreEqual("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal("dim=field path=[] value=21 childCount=5\n  less than 10 (10)\n  less than or equal to 10 (11)\n  over 90 (9)\n  90 or above (10)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
 
             IOUtils.Close(w, r, d);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomLongs()
         {
             Directory dir = NewDirectory();
@@ -538,7 +537,7 @@ namespace Lucene.Net.Facet.Range
                 ValueSource vs = new LongFieldSource("field");
                 Facets facets = new LongRangeFacetCounts("field", vs, sfc, fastMatchFilter, ranges);
                 FacetResult result = facets.GetTopChildren(10, "field");
-                Assert.AreEqual(numRange, result.LabelValues.Length);
+                Assert.Equal(numRange, result.LabelValues.Length);
                 for (int rangeID = 0; rangeID < numRange; rangeID++)
                 {
                     if (VERBOSE)
@@ -546,8 +545,8 @@ namespace Lucene.Net.Facet.Range
                         Console.WriteLine("  range " + rangeID + " expectedCount=" + expectedCounts[rangeID]);
                     }
                     LabelAndValue subNode = result.LabelValues[rangeID];
-                    Assert.AreEqual("r" + rangeID, subNode.label);
-                    Assert.AreEqual(expectedCounts[rangeID], (int)subNode.value);
+                    Assert.Equal("r" + rangeID, subNode.label);
+                    Assert.Equal(expectedCounts[rangeID], (int)subNode.value);
 
                     LongRange range = ranges[rangeID];
 
@@ -568,14 +567,14 @@ namespace Lucene.Net.Facet.Range
                     {
                         ddq.Add("field", range.GetFilter(fastMatchFilter, vs));
                     }
-                    Assert.AreEqual(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
+                    Assert.Equal(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
                 }
             }
 
             IOUtils.Close(w, r, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomFloats()
         {
             Directory dir = NewDirectory();
@@ -743,7 +742,7 @@ namespace Lucene.Net.Facet.Range
                 ValueSource vs = new FloatFieldSource("field");
                 Facets facets = new DoubleRangeFacetCounts("field", vs, sfc, fastMatchFilter, ranges);
                 FacetResult result = facets.GetTopChildren(10, "field");
-                Assert.AreEqual(numRange, result.LabelValues.Length);
+                Assert.Equal(numRange, result.LabelValues.Length);
                 for (int rangeID = 0; rangeID < numRange; rangeID++)
                 {
                     if (VERBOSE)
@@ -751,8 +750,8 @@ namespace Lucene.Net.Facet.Range
                         Console.WriteLine("TEST: verify range " + rangeID + " expectedCount=" + expectedCounts[rangeID]);
                     }
                     LabelAndValue subNode = result.LabelValues[rangeID];
-                    Assert.AreEqual("r" + rangeID, subNode.label);
-                    Assert.AreEqual(expectedCounts[rangeID], (int)subNode.value);
+                    Assert.Equal("r" + rangeID, subNode.label);
+                    Assert.Equal(expectedCounts[rangeID], (int)subNode.value);
 
                     DoubleRange range = ranges[rangeID];
 
@@ -773,14 +772,14 @@ namespace Lucene.Net.Facet.Range
                     {
                         ddq.Add("field", range.GetFilter(fastMatchFilter, vs));
                     }
-                    Assert.AreEqual(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
+                    Assert.Equal(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
                 }
             }
 
             IOUtils.Close(w, r, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomDoubles()
         {
             Directory dir = NewDirectory();
@@ -929,7 +928,7 @@ namespace Lucene.Net.Facet.Range
                 ValueSource vs = new DoubleFieldSource("field");
                 Facets facets = new DoubleRangeFacetCounts("field", vs, sfc, fastMatchFilter, ranges);
                 FacetResult result = facets.GetTopChildren(10, "field");
-                Assert.AreEqual(numRange, result.LabelValues.Length);
+                Assert.Equal(numRange, result.LabelValues.Length);
                 for (int rangeID = 0; rangeID < numRange; rangeID++)
                 {
                     if (VERBOSE)
@@ -937,8 +936,8 @@ namespace Lucene.Net.Facet.Range
                         Console.WriteLine("  range " + rangeID + " expectedCount=" + expectedCounts[rangeID]);
                     }
                     LabelAndValue subNode = result.LabelValues[rangeID];
-                    Assert.AreEqual("r" + rangeID, subNode.label);
-                    Assert.AreEqual(expectedCounts[rangeID], (int)subNode.value);
+                    Assert.Equal("r" + rangeID, subNode.label);
+                    Assert.Equal(expectedCounts[rangeID], (int)subNode.value);
 
                     DoubleRange range = ranges[rangeID];
 
@@ -960,7 +959,7 @@ namespace Lucene.Net.Facet.Range
                         ddq.Add("field", range.GetFilter(fastMatchFilter, vs));
                     }
 
-                    Assert.AreEqual(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
+                    Assert.Equal(expectedCounts[rangeID], s.Search(ddq, 10).TotalHits);
                 }
             }
 
@@ -968,7 +967,7 @@ namespace Lucene.Net.Facet.Range
         }
 
         // LUCENE-5178
-        [Test]
+        [Fact]
         public virtual void TestMissingValues()
         {
             AssumeTrue("codec does not support docsWithField", DefaultCodecSupportsDocsWithField());
@@ -997,12 +996,12 @@ namespace Lucene.Net.Facet.Range
             s.Search(new MatchAllDocsQuery(), fc);
             Facets facets = new LongRangeFacetCounts("field", fc, new LongRange("less than 10", 0L, true, 10L, false), new LongRange("less than or equal to 10", 0L, true, 10L, true), new LongRange("over 90", 90L, false, 100L, false), new LongRange("90 or above", 90L, true, 100L, false), new LongRange("over 1000", 1000L, false, long.MaxValue, false));
 
-            Assert.AreEqual("dim=field path=[] value=16 childCount=5\n  less than 10 (8)\n  less than or equal to 10 (8)\n  over 90 (8)\n  90 or above (8)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal("dim=field path=[] value=16 childCount=5\n  less than 10 (8)\n  less than or equal to 10 (8)\n  over 90 (8)\n  90 or above (8)\n  over 1000 (0)\n", facets.GetTopChildren(10, "field").ToString());
 
             IOUtils.Close(w, r, d);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustomDoublesValueSource()
         {
             Directory dir = NewDirectory();
@@ -1047,22 +1046,22 @@ namespace Lucene.Net.Facet.Range
 
             Facets facets = new DoubleRangeFacetCounts("field", vs, fc, fastMatchFilter, ranges);
 
-            Assert.AreEqual("dim=field path=[] value=3 childCount=6\n  < 1 (0)\n  < 2 (1)\n  < 5 (3)\n  < 10 (3)\n  < 20 (3)\n  < 50 (3)\n", facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal("dim=field path=[] value=3 childCount=6\n  < 1 (0)\n  < 2 (1)\n  < 5 (3)\n  < 10 (3)\n  < 20 (3)\n  < 50 (3)\n", facets.GetTopChildren(10, "field").ToString());
             Assert.True(fastMatchFilter == null || filterWasUsed.Get());
 
             DrillDownQuery ddq = new DrillDownQuery(config);
             ddq.Add("field", ranges[1].GetFilter(fastMatchFilter, vs));
 
             // Test simple drill-down:
-            Assert.AreEqual(1, s.Search(ddq, 10).TotalHits);
+            Assert.Equal(1, s.Search(ddq, 10).TotalHits);
 
             // Test drill-sideways after drill-down
             DrillSideways ds = new DrillSidewaysAnonymousInnerClassHelper2(this, s, config, (TaxonomyReader)null, vs, ranges, fastMatchFilter);
 
 
             DrillSidewaysResult dsr = ds.Search(ddq, 10);
-            Assert.AreEqual(1, dsr.Hits.TotalHits);
-            Assert.AreEqual("dim=field path=[] value=3 childCount=6\n  < 1 (0)\n  < 2 (1)\n  < 5 (3)\n  < 10 (3)\n  < 20 (3)\n  < 50 (3)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
+            Assert.Equal(1, dsr.Hits.TotalHits);
+            Assert.Equal("dim=field path=[] value=3 childCount=6\n  < 1 (0)\n  < 2 (1)\n  < 5 (3)\n  < 10 (3)\n  < 20 (3)\n  < 50 (3)\n", dsr.Facets.GetTopChildren(10, "field").ToString());
 
             IOUtils.Close(r, writer, dir);
         }

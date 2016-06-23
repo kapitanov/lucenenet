@@ -1,5 +1,3 @@
-using NUnit.Framework;
-
 namespace Lucene.Net.Search
 {
     /*
@@ -22,9 +20,12 @@ namespace Lucene.Net.Search
     /// <summary>
     /// subclass of TestSimpleExplanations that verifies non matches.
     /// </summary>
-    [TestFixture]
     public class TestSimpleExplanationsOfNonMatches : TestSimpleExplanations
     {
+        public TestSimpleExplanationsOfNonMatches(TestExplanationsFixture fixture) : base(fixture)
+        {
+        }
+
         /// <summary>
         /// Overrides superclass to ignore matches and focus on non-matches
         /// </summary>

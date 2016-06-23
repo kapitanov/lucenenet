@@ -1,10 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
     using Directory = Lucene.Net.Store.Directory;
@@ -40,7 +39,6 @@ namespace Lucene.Net.Search
     using StringField = StringField;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestCachingWrapperFilter : LuceneTestCase
     {
         internal Directory Dir;
@@ -48,10 +46,8 @@ namespace Lucene.Net.Search
         internal IndexSearcher @is;
         internal RandomIndexWriter Iw;
 
-        [SetUp]
-        public override void SetUp()
+        public TestCachingWrapperFilter() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             Iw = new RandomIndexWriter(Random(), Dir);
             Document doc = new Document();
@@ -72,11 +68,10 @@ namespace Lucene.Net.Search
             @is = NewSearcher(Ir);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             IOUtils.Close(Iw, Ir, Dir);
-            base.TearDown();
+            base.Dispose();
         }
 
         private void AssertFilterEquals(Filter f1, Filter f2)
@@ -84,18 +79,18 @@ namespace Lucene.Net.Search
             Query query = new MatchAllDocsQuery();
             TopDocs hits1 = @is.Search(query, f1, Ir.MaxDoc);
             TopDocs hits2 = @is.Search(query, f2, Ir.MaxDoc);
-            Assert.AreEqual(hits1.TotalHits, hits2.TotalHits);
+            Assert.Equal(hits1.TotalHits, hits2.TotalHits);
             CheckHits.CheckEqual(query, hits1.ScoreDocs, hits2.ScoreDocs);
             // now do it again to confirm caching works
             TopDocs hits3 = @is.Search(query, f1, Ir.MaxDoc);
             TopDocs hits4 = @is.Search(query, f2, Ir.MaxDoc);
-            Assert.AreEqual(hits3.TotalHits, hits4.TotalHits);
+            Assert.Equal(hits3.TotalHits, hits4.TotalHits);
             CheckHits.CheckEqual(query, hits3.ScoreDocs, hits4.ScoreDocs);
         }
 
         /// <summary>
         /// test null iterator </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmpty()
         {
             Query query = new BooleanQuery();
@@ -106,7 +101,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test iterator returns NO_MORE_DOCS </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmpty2()
         {
             BooleanQuery query = new BooleanQuery();
@@ -119,7 +114,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test null docidset </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmpty3()
         {
             Filter expected = new PrefixFilter(new Term("bogusField", "bogusVal"));
@@ -129,7 +124,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test iterator returns single document </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingle()
         {
             for (int i = 0; i < 10; i++)
@@ -144,7 +139,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test sparse filters (match single documents) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSparse()
         {
             for (int i = 0; i < 10; i++)
@@ -160,7 +155,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test dense filters (match entire index) </summary>
-        [Test]
+        [Fact]
         public virtual void TestDense()
         {
             Query query = new MatchAllDocsQuery();
@@ -169,7 +164,7 @@ namespace Lucene.Net.Search
             AssertFilterEquals(expected, actual);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCachingWorks()
         {
             Directory dir = NewDirectory();
@@ -183,7 +178,7 @@ namespace Lucene.Net.Search
 
             // first time, nested filter is called
             DocIdSet strongRef = cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs);
-            Assert.IsTrue(filter.WasCalled(), "first time");
+            Assert.True(filter.WasCalled(), "first time");
 
             // make sure no exception if cache is holding the wrong docIdSet
             cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs);
@@ -191,13 +186,13 @@ namespace Lucene.Net.Search
             // second time, nested filter should not be called
             filter.Clear();
             cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs);
-            Assert.IsFalse(filter.WasCalled(), "second time");
+            Assert.False(filter.WasCalled(), "second time");
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullDocIdSet()
         {
             Directory dir = NewDirectory();
@@ -211,8 +206,8 @@ namespace Lucene.Net.Search
             CachingWrapperFilter cacher = new CachingWrapperFilter(filter);
 
             // the caching filter should return the empty set constant
-            //Assert.IsNull(cacher.GetDocIdSet(context, "second time", (context.AtomicReader).LiveDocs));
-            Assert.IsNull(cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs));
+            //Assert.Null(cacher.GetDocIdSet(context, "second time", (context.AtomicReader).LiveDocs));
+            Assert.Null(cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs));
 
             reader.Dispose();
             dir.Dispose();
@@ -236,7 +231,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullDocIdSetIterator()
         {
             Directory dir = NewDirectory();
@@ -250,7 +245,7 @@ namespace Lucene.Net.Search
             CachingWrapperFilter cacher = new CachingWrapperFilter(filter);
 
             // the caching filter should return the empty set constant
-            Assert.IsNull(cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs));
+            Assert.Null(cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs));
 
             reader.Dispose();
             dir.Dispose();
@@ -291,36 +286,36 @@ namespace Lucene.Net.Search
 
         private static void AssertDocIdSetCacheable(IndexReader reader, Filter filter, bool shouldCacheable)
         {
-            Assert.IsTrue(reader.Context is AtomicReaderContext);
+            Assert.True(reader.Context is AtomicReaderContext);
             AtomicReaderContext context = (AtomicReaderContext)reader.Context;
             CachingWrapperFilter cacher = new CachingWrapperFilter(filter);
             DocIdSet originalSet = filter.GetDocIdSet(context, (context.AtomicReader).LiveDocs);
             DocIdSet cachedSet = cacher.GetDocIdSet(context, (context.AtomicReader).LiveDocs);
             if (originalSet == null)
             {
-                Assert.IsNull(cachedSet);
+                Assert.Null(cachedSet);
             }
             if (cachedSet == null)
             {
-                Assert.IsTrue(originalSet == null || originalSet.GetIterator() == null);
+                Assert.True(originalSet == null || originalSet.GetIterator() == null);
             }
             else
             {
-                Assert.IsTrue(cachedSet.Cacheable);
-                Assert.AreEqual(shouldCacheable, originalSet.Cacheable);
+                Assert.True(cachedSet.Cacheable);
+                Assert.Equal(shouldCacheable, originalSet.Cacheable);
                 //System.out.println("Original: "+originalSet.getClass().getName()+" -- cached: "+cachedSet.getClass().getName());
                 if (originalSet.Cacheable)
                 {
-                    Assert.AreEqual(originalSet.GetType(), cachedSet.GetType(), "Cached DocIdSet must be of same class like uncached, if cacheable");
+                    Assert.Equal(originalSet.GetType(), cachedSet.GetType()); //, "Cached DocIdSet must be of same class like uncached, if cacheable");
                 }
                 else
                 {
-                    Assert.IsTrue(cachedSet is FixedBitSet || cachedSet == null, "Cached DocIdSet must be an FixedBitSet if the original one was not cacheable");
+                    Assert.True(cachedSet is FixedBitSet || cachedSet == null, "Cached DocIdSet must be an FixedBitSet if the original one was not cacheable");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIsCacheAble()
         {
             Directory dir = NewDirectory();
@@ -358,7 +353,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEnforceDeletions()
         {
             Directory dir = NewDirectory();
@@ -382,20 +377,20 @@ namespace Lucene.Net.Search
             searcher = NewSearcher(reader, false);
 
             TopDocs docs = searcher.Search(new MatchAllDocsQuery(), 1);
-            Assert.AreEqual(1, docs.TotalHits, "Should find a hit...");
+            Assert.Equal(1, docs.TotalHits); //, "Should find a hit...");
 
             Filter startFilter = new QueryWrapperFilter(new TermQuery(new Term("id", "1")));
 
             CachingWrapperFilter filter = new CachingWrapperFilter(startFilter);
 
             docs = searcher.Search(new MatchAllDocsQuery(), filter, 1);
-            Assert.IsTrue(filter.SizeInBytes() > 0);
+            Assert.True(filter.SizeInBytes() > 0);
 
-            Assert.AreEqual(1, docs.TotalHits, "[query + filter] Should find a hit...");
+            Assert.Equal(1, docs.TotalHits); //, "[query + filter] Should find a hit...");
 
             Query constantScore = new ConstantScoreQuery(filter);
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(1, docs.TotalHits, "[just filter] Should find a hit...");
+            Assert.Equal(1, docs.TotalHits); //, "[just filter] Should find a hit...");
 
             // make sure we get a cache hit when we reopen reader
             // that had no change to deletions
@@ -405,13 +400,13 @@ namespace Lucene.Net.Search
 
             IndexReader oldReader = reader;
             reader = RefreshReader(reader);
-            Assert.IsTrue(reader == oldReader);
+            Assert.True(reader == oldReader);
             int missCount = filter.MissCount;
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(1, docs.TotalHits, "[just filter] Should find a hit...");
+            Assert.Equal(1, docs.TotalHits); //, "[just filter] Should find a hit...");
 
             // cache hit:
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(missCount, filter.MissCount);
 
             // now delete the doc, refresh the reader, and see that it's not there
             writer.DeleteDocuments(new Term("id", "1"));
@@ -426,12 +421,12 @@ namespace Lucene.Net.Search
 
             missCount = filter.MissCount;
             docs = searcher.Search(new MatchAllDocsQuery(), filter, 1);
-            Assert.AreEqual(0, docs.TotalHits, "[query + filter] Should *not* find a hit...");
+            Assert.Equal(0, docs.TotalHits); //, "[query + filter] Should *not* find a hit...");
 
             // cache hit
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(missCount, filter.MissCount);
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(0, docs.TotalHits, "[just filter] Should *not* find a hit...");
+            Assert.Equal(0, docs.TotalHits); //, "[just filter] Should *not* find a hit...");
 
             // apply deletes dynamically:
             filter = new CachingWrapperFilter(startFilter);
@@ -440,13 +435,13 @@ namespace Lucene.Net.Search
             searcher = NewSearcher(reader, false);
 
             docs = searcher.Search(new MatchAllDocsQuery(), filter, 1);
-            Assert.AreEqual(1, docs.TotalHits, "[query + filter] Should find a hit...");
+            Assert.Equal(1, docs.TotalHits); //, "[query + filter] Should find a hit...");
             missCount = filter.MissCount;
-            Assert.IsTrue(missCount > 0);
+            Assert.True(missCount > 0);
             constantScore = new ConstantScoreQuery(filter);
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(1, docs.TotalHits, "[just filter] Should find a hit...");
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(1, docs.TotalHits); //, "[just filter] Should find a hit...");
+            Assert.Equal(missCount, filter.MissCount);
 
             writer.AddDocument(doc);
 
@@ -459,14 +454,14 @@ namespace Lucene.Net.Search
             searcher = NewSearcher(reader, false);
 
             docs = searcher.Search(new MatchAllDocsQuery(), filter, 1);
-            Assert.AreEqual(2, docs.TotalHits, "[query + filter] Should find 2 hits...");
-            Assert.IsTrue(filter.MissCount > missCount);
+            Assert.Equal(2, docs.TotalHits); //, "[query + filter] Should find 2 hits...");
+            Assert.True(filter.MissCount > missCount);
             missCount = filter.MissCount;
 
             constantScore = new ConstantScoreQuery(filter);
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(2, docs.TotalHits, "[just filter] Should find a hit...");
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(2, docs.TotalHits); //, "[just filter] Should find a hit...");
+            Assert.Equal(missCount, filter.MissCount);
 
             // now delete the doc, refresh the reader, and see that it's not there
             writer.DeleteDocuments(new Term("id", "1"));
@@ -475,20 +470,20 @@ namespace Lucene.Net.Search
             searcher = NewSearcher(reader, false);
 
             docs = searcher.Search(new MatchAllDocsQuery(), filter, 1);
-            Assert.AreEqual(0, docs.TotalHits, "[query + filter] Should *not* find a hit...");
+            Assert.Equal(0, docs.TotalHits); //, "[query + filter] Should *not* find a hit...");
             // CWF reused the same entry (it dynamically applied the deletes):
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(missCount, filter.MissCount);
 
             docs = searcher.Search(constantScore, 1);
-            Assert.AreEqual(0, docs.TotalHits, "[just filter] Should *not* find a hit...");
+            Assert.Equal(0, docs.TotalHits); //, "[just filter] Should *not* find a hit...");
             // CWF reused the same entry (it dynamically applied the deletes):
-            Assert.AreEqual(missCount, filter.MissCount);
+            Assert.Equal(missCount, filter.MissCount);
 
             // NOTE: silliness to make sure JRE does not eliminate
             // our holding onto oldReader to prevent
             // CachingWrapperFilter's WeakHashMap from dropping the
             // entry:
-            Assert.IsTrue(oldReader != null);
+            Assert.True(oldReader != null);
 
             reader.Dispose();
             writer.Dispose();

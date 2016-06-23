@@ -5,7 +5,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
     using Directory = Lucene.Net.Store.Directory;
@@ -33,10 +33,9 @@ namespace Lucene.Net.Search
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestDocIdSet : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestFilteredDocIdSet()
         {
             const int maxdoc = 10;
@@ -69,7 +68,7 @@ namespace Lucene.Net.Search
             {
                 Console.WriteLine("answer: " + Arrays.ToString(answer));
                 Console.WriteLine("gotten: " + Arrays.ToString(docs));
-                Assert.Fail();
+                Assert.True(false);
             }
         }
 
@@ -141,7 +140,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullDocIdSet()
         {
             // Tests that if a Filter produces a null DocIdSet, which is given to
@@ -156,12 +155,12 @@ namespace Lucene.Net.Search
 
             // First verify the document is searchable.
             IndexSearcher searcher = NewSearcher(reader);
-            Assert.AreEqual(1, searcher.Search(new MatchAllDocsQuery(), 10).TotalHits);
+            Assert.Equal(1, searcher.Search(new MatchAllDocsQuery(), 10).TotalHits);
 
             // Now search w/ a Filter which returns a null DocIdSet
             Filter f = new FilterAnonymousInnerClassHelper(this);
 
-            Assert.AreEqual(0, searcher.Search(new MatchAllDocsQuery(), f, 10).TotalHits);
+            Assert.Equal(0, searcher.Search(new MatchAllDocsQuery(), f, 10).TotalHits);
             reader.Dispose();
             dir.Dispose();
         }
@@ -181,7 +180,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullIteratorFilteredDocIdSet()
         {
             Directory dir = NewDirectory();
@@ -194,12 +193,12 @@ namespace Lucene.Net.Search
 
             // First verify the document is searchable.
             IndexSearcher searcher = NewSearcher(reader);
-            Assert.AreEqual(1, searcher.Search(new MatchAllDocsQuery(), 10).TotalHits);
+            Assert.Equal(1, searcher.Search(new MatchAllDocsQuery(), 10).TotalHits);
 
             // Now search w/ a Filter which returns a null DocIdSet
             Filter f = new FilterAnonymousInnerClassHelper2(this);
 
-            Assert.AreEqual(0, searcher.Search(new MatchAllDocsQuery(), f, 10).TotalHits);
+            Assert.Equal(0, searcher.Search(new MatchAllDocsQuery(), f, 10).TotalHits);
             reader.Dispose();
             dir.Dispose();
         }

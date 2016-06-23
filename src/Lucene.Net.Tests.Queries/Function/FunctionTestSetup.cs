@@ -59,7 +59,7 @@ namespace Lucene.Net.Tests.Queries.Function
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            base.Dispose();
             dir.Dispose();
             dir = null;
             anlzr = null;

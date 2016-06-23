@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Randomized;
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet.SortedSet
 {
@@ -47,7 +46,7 @@ namespace Lucene.Net.Facet.SortedSet
 
         // NOTE: TestDrillSideways.testRandom also sometimes
         // randomly uses SortedSetDV
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
 
@@ -85,21 +84,21 @@ namespace Lucene.Net.Facet.SortedSet
 
             SortedSetDocValuesFacetCounts facets = new SortedSetDocValuesFacetCounts(state, c);
 
-            Assert.AreEqual("dim=a path=[] value=4 childCount=3\n  foo (2)\n  bar (1)\n  zoo (1)\n", facets.GetTopChildren(10, "a").ToString());
-            Assert.AreEqual("dim=b path=[] value=1 childCount=1\n  baz (1)\n", facets.GetTopChildren(10, "b").ToString());
+            Assert.Equal("dim=a path=[] value=4 childCount=3\n  foo (2)\n  bar (1)\n  zoo (1)\n", facets.GetTopChildren(10, "a").ToString());
+            Assert.Equal("dim=b path=[] value=1 childCount=1\n  baz (1)\n", facets.GetTopChildren(10, "b").ToString());
 
             // DrillDown:
             DrillDownQuery q = new DrillDownQuery(config);
             q.Add("a", "foo");
             q.Add("b", "baz");
             TopDocs hits = searcher.Search(q, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
 
             IOUtils.Close(writer, searcher.IndexReader, dir);
         }
 
         // LUCENE-5090
-        [Test]
+        [Fact]
         public virtual void TestStaleState()
         {
             AssumeTrue("Test requires SortedSetDV support", DefaultCodecSupportsSortedSet());
@@ -133,7 +132,7 @@ namespace Lucene.Net.Facet.SortedSet
             try
             {
                 new SortedSetDocValuesFacetCounts(state, c);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (IllegalStateException)
             {
@@ -147,7 +146,7 @@ namespace Lucene.Net.Facet.SortedSet
         }
 
         // LUCENE-5333
-        [Test]
+        [Fact]
         public virtual void TestSparseFacets()
         {
             AssumeTrue("Test requires SortedSetDV support", DefaultCodecSupportsSortedSet());
@@ -196,16 +195,16 @@ namespace Lucene.Net.Facet.SortedSet
             // Ask for top 10 labels for any dims that have counts:
             IList<FacetResult> results = facets.GetAllDims(10);
 
-            Assert.AreEqual(3, results.Count);
-            Assert.AreEqual("dim=a path=[] value=3 childCount=3\n  foo1 (1)\n  foo2 (1)\n  foo3 (1)\n", results[0].ToString());
-            Assert.AreEqual("dim=b path=[] value=2 childCount=2\n  bar1 (1)\n  bar2 (1)\n", results[1].ToString());
-            Assert.AreEqual("dim=c path=[] value=1 childCount=1\n  baz1 (1)\n", results[2].ToString());
+            Assert.Equal(3, results.Count);
+            Assert.Equal("dim=a path=[] value=3 childCount=3\n  foo1 (1)\n  foo2 (1)\n  foo3 (1)\n", results[0].ToString());
+            Assert.Equal("dim=b path=[] value=2 childCount=2\n  bar1 (1)\n  bar2 (1)\n", results[1].ToString());
+            Assert.Equal("dim=c path=[] value=1 childCount=1\n  baz1 (1)\n", results[2].ToString());
 
             searcher.IndexReader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeSegmentsMissing()
         {
             AssumeTrue("Test requires SortedSetDV support", DefaultCodecSupportsSortedSet());
@@ -241,13 +240,13 @@ namespace Lucene.Net.Facet.SortedSet
             SortedSetDocValuesFacetCounts facets = new SortedSetDocValuesFacetCounts(state, c);
 
             // Ask for top 10 labels for any dims that have counts:
-            Assert.AreEqual("dim=a path=[] value=2 childCount=2\n  foo1 (1)\n  foo2 (1)\n", facets.GetTopChildren(10, "a").ToString());
+            Assert.Equal("dim=a path=[] value=2 childCount=2\n  foo1 (1)\n  foo2 (1)\n", facets.GetTopChildren(10, "a").ToString());
 
             searcher.IndexReader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSlowCompositeReaderWrapper()
         {
             AssumeTrue("Test requires SortedSetDV support", DefaultCodecSupportsSortedSet());
@@ -278,13 +277,13 @@ namespace Lucene.Net.Facet.SortedSet
             Facets facets = new SortedSetDocValuesFacetCounts(state, c);
 
             // Ask for top 10 labels for any dims that have counts:
-            Assert.AreEqual("dim=a path=[] value=2 childCount=2\n  foo1 (1)\n  foo2 (1)\n", facets.GetTopChildren(10, "a").ToString());
+            Assert.Equal("dim=a path=[] value=2 childCount=2\n  foo1 (1)\n  foo2 (1)\n", facets.GetTopChildren(10, "a").ToString());
 
             IOUtils.Close(writer, searcher.IndexReader, dir);
         }
 
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             AssumeTrue("Test requires SortedSetDV support", DefaultCodecSupportsSortedSet());
@@ -384,7 +383,7 @@ namespace Lucene.Net.Facet.SortedSet
                 // Messy: fixup ties
                 //sortTies(actual);
 
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
 
             IOUtils.Close(w, searcher.IndexReader, indexDir, taxoDir);

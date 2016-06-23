@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
 
@@ -36,7 +36,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestDocCount : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             Directory dir = NewDirectory();
@@ -93,7 +93,7 @@ namespace Lucene.Net.Index
                         visited.Set(de.DocID());
                     }
                 }
-                Assert.AreEqual(visited.Cardinality(), docCount);
+                Assert.Equal(visited.Cardinality(), docCount);
             }
         }
     }

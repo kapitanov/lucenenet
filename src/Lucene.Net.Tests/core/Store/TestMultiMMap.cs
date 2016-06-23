@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.IO;
 
@@ -40,18 +40,16 @@ namespace Lucene.Net.Store
     /// values, it's necessary to access a file >
     /// Integer.MAX_VALUE in size using multiple byte buffers.
     /// </summary>
-    [TestFixture]
     public class TestMultiMMap : LuceneTestCase
     {
-        [SetUp]
-        public override void SetUp()
+        public TestMultiMMap() : base()
         {
-            base.SetUp();
+            
             // LUCENENET TODO: what?!?!?!?!?!
             AssumeTrue("test requires a jre that supports unmapping", MMapDirectory.UNMAP_SUPPORTED);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloneSafety()
         {
             MMapDirectory mmapDir = new MMapDirectory(CreateTempDir("testCloneSafety"));
@@ -65,7 +63,7 @@ namespace Lucene.Net.Store
             try
             {
                 one.ReadVInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -74,7 +72,7 @@ namespace Lucene.Net.Store
             try
             {
                 two.ReadVInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -83,7 +81,7 @@ namespace Lucene.Net.Store
             try
             {
                 three.ReadVInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -96,7 +94,7 @@ namespace Lucene.Net.Store
             mmapDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloneClose()
         {
             MMapDirectory mmapDir = new MMapDirectory(CreateTempDir("testCloneClose"));
@@ -107,23 +105,23 @@ namespace Lucene.Net.Store
             IndexInput two = (IndexInput)one.Clone();
             IndexInput three = (IndexInput)two.Clone(); // clone of clone
             two.Dispose();
-            Assert.AreEqual(5, one.ReadVInt());
+            Assert.Equal(5, one.ReadVInt());
             try
             {
                 two.ReadVInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
                 // pass
             }
-            Assert.AreEqual(5, three.ReadVInt());
+            Assert.Equal(5, three.ReadVInt());
             one.Dispose();
             three.Dispose();
             mmapDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloneSliceSafety()
         {
             MMapDirectory mmapDir = new MMapDirectory(CreateTempDir("testCloneSliceSafety"));
@@ -140,7 +138,7 @@ namespace Lucene.Net.Store
             try
             {
                 one.ReadInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -149,7 +147,7 @@ namespace Lucene.Net.Store
             try
             {
                 two.ReadInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -158,7 +156,7 @@ namespace Lucene.Net.Store
             try
             {
                 three.ReadInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -167,7 +165,7 @@ namespace Lucene.Net.Store
             try
             {
                 four.ReadInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
@@ -182,7 +180,7 @@ namespace Lucene.Net.Store
             mmapDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloneSliceClose()
         {
             MMapDirectory mmapDir = new MMapDirectory(CreateTempDir("testCloneSliceClose"));
@@ -197,23 +195,23 @@ namespace Lucene.Net.Store
             try
             {
                 one.ReadInt();
-                Assert.Fail("Must throw AlreadyClosedException");
+                Assert.True(false, "Must throw AlreadyClosedException");
             }
             catch (AlreadyClosedException ignore)
             {
                 // pass
             }
-            Assert.AreEqual(2, two.ReadInt());
+            Assert.Equal(2, two.ReadInt());
             // reopen a new slice "one":
             one = slicer.OpenSlice("first int", 0, 4);
-            Assert.AreEqual(1, one.ReadInt());
+            Assert.Equal(1, one.ReadInt());
             one.Dispose();
             two.Dispose();
             slicer.Dispose();
             mmapDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeekZero()
         {
             for (int i = 0; i < 31; i++)
@@ -228,7 +226,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeekSliceZero()
         {
             for (int i = 0; i < 31; i++)
@@ -245,7 +243,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeekEnd()
         {
             for (int i = 0; i < 17; i++)
@@ -259,14 +257,14 @@ namespace Lucene.Net.Store
                 IndexInput ii = mmapDir.OpenInput("bytes", NewIOContext(Random()));
                 var actual = new byte[1 << i];
                 ii.ReadBytes(actual, 0, actual.Length);
-                Assert.AreEqual(new BytesRef(bytes), new BytesRef(actual));
+                Assert.Equal(new BytesRef(bytes), new BytesRef(actual));
                 ii.Seek(1 << i);
                 ii.Dispose();
                 mmapDir.Dispose();
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeekSliceEnd()
         {
             for (int i = 0; i < 17; i++)
@@ -281,7 +279,7 @@ namespace Lucene.Net.Store
                 IndexInput ii = slicer.OpenSlice("full slice", 0, bytes.Length);
                 var actual = new byte[1 << i];
                 ii.ReadBytes(actual, 0, actual.Length);
-                Assert.AreEqual(new BytesRef(bytes), new BytesRef(actual));
+                Assert.Equal(new BytesRef(bytes), new BytesRef(actual));
                 ii.Seek(1 << i);
                 ii.Dispose();
                 slicer.Dispose();
@@ -289,7 +287,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeeking()
         {
             for (int i = 0; i < 10; i++)
@@ -303,7 +301,7 @@ namespace Lucene.Net.Store
                 IndexInput ii = mmapDir.OpenInput("bytes", NewIOContext(Random()));
                 var actual = new byte[1 << (i + 1)]; // first read all bytes
                 ii.ReadBytes(actual, 0, actual.Length);
-                Assert.AreEqual(new BytesRef(bytes), new BytesRef(actual));
+                Assert.Equal(new BytesRef(bytes), new BytesRef(actual));
                 for (int sliceStart = 0; sliceStart < bytes.Length; sliceStart++)
                 {
                     for (int sliceLength = 0; sliceLength < bytes.Length - sliceStart; sliceLength++)
@@ -311,7 +309,7 @@ namespace Lucene.Net.Store
                         var slice = new byte[sliceLength];
                         ii.Seek(sliceStart);
                         ii.ReadBytes(slice, 0, slice.Length);
-                        Assert.AreEqual(new BytesRef(bytes, sliceStart, sliceLength), new BytesRef(slice));
+                        Assert.Equal(new BytesRef(bytes, sliceStart, sliceLength), new BytesRef(slice));
                     }
                 }
                 ii.Dispose();
@@ -321,7 +319,7 @@ namespace Lucene.Net.Store
 
         // note instead of seeking to offset and reading length, this opens slices at the
         // the various offset+length and just does readBytes.
-        [Test]
+        [Fact]
         public virtual void TestSlicedSeeking()
         {
             for (int i = 0; i < 10; i++)
@@ -336,7 +334,7 @@ namespace Lucene.Net.Store
                 var actual = new byte[1 << (i + 1)]; // first read all bytes
                 ii.ReadBytes(actual, 0, actual.Length);
                 ii.Dispose();
-                Assert.AreEqual(new BytesRef(bytes), new BytesRef(actual));
+                Assert.Equal(new BytesRef(bytes), new BytesRef(actual));
                 IndexInputSlicer slicer = mmapDir.CreateSlicer("bytes", NewIOContext(Random()));
                 for (int sliceStart = 0; sliceStart < bytes.Length; sliceStart++)
                 {
@@ -346,7 +344,7 @@ namespace Lucene.Net.Store
                         IndexInput input = slicer.OpenSlice("bytesSlice", sliceStart, slice.Length);
                         input.ReadBytes(slice, 0, slice.Length);
                         input.Dispose();
-                        Assert.AreEqual(new BytesRef(bytes, sliceStart, sliceLength), new BytesRef(slice));
+                        Assert.Equal(new BytesRef(bytes, sliceStart, sliceLength), new BytesRef(slice));
                     }
                 }
                 slicer.Dispose();
@@ -354,7 +352,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomChunkSizes()
         {
             int num = AtLeast(10);
@@ -395,7 +393,7 @@ namespace Lucene.Net.Store
             for (int i = 0; i < numAsserts; i++)
             {
                 int docID = random.Next(numDocs);
-                Assert.AreEqual("" + docID, reader.Document(docID).Get("docid"));
+                Assert.Equal("" + docID, reader.Document(docID).Get("docid"));
             }
             reader.Dispose();
             dir.Dispose();

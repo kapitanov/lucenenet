@@ -21,8 +21,8 @@ namespace Lucene.Net.Search
      */
 
     using Lucene.Net.Analysis;
-    using NUnit.Framework;
-    using System.Collections.Generic;
+    using Xunit;
+
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
@@ -35,27 +35,23 @@ namespace Lucene.Net.Search
     using OpenMode = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using Terms = Lucene.Net.Index.Terms;
 
-    [TestFixture]
     public class TestTermRangeQuery : LuceneTestCase
     {
         private int DocCount = 0;
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestTermRangeQuery() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExclusive()
         {
             Query query = TermRangeQuery.NewStringRange("content", "A", "C", false, false);
@@ -63,25 +59,25 @@ namespace Lucene.Net.Search
             IndexReader reader = DirectoryReader.Open(Dir);
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "A,B,C,D, only B in range");
+            Assert.Equal(1, hits.Length); //, "A,B,C,D, only B in range");
             reader.Dispose();
 
             InitializeIndex(new string[] { "A", "B", "D" });
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "A,B,D, only B in range");
+            Assert.Equal(1, hits.Length); //, "A,B,D, only B in range");
             reader.Dispose();
 
             AddDoc("C");
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "C added, still only B in range");
+            Assert.Equal(1, hits.Length); //, "C added, still only B in range");
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInclusive()
         {
             Query query = TermRangeQuery.NewStringRange("content", "A", "C", true, true);
@@ -90,25 +86,25 @@ namespace Lucene.Net.Search
             IndexReader reader = DirectoryReader.Open(Dir);
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length, "A,B,C,D - A,B,C in range");
+            Assert.Equal(3, hits.Length); //, "A,B,C,D - A,B,C in range");
             reader.Dispose();
 
             InitializeIndex(new string[] { "A", "B", "D" });
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length, "A,B,D - A and B in range");
+            Assert.Equal(2, hits.Length); //, "A,B,D - A and B in range");
             reader.Dispose();
 
             AddDoc("C");
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length, "C added - A, B, C in range");
+            Assert.Equal(3, hits.Length); //, "C added - A, B, C in range");
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllDocs()
         {
             InitializeIndex(new string[] { "A", "B", "C", "D" });
@@ -116,18 +112,18 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             TermRangeQuery query = new TermRangeQuery("content", null, null, true, true);
             Terms terms = MultiFields.GetTerms(searcher.IndexReader, "content");
-            Assert.IsFalse(query.GetTermsEnum(terms) is TermRangeTermsEnum);
-            Assert.AreEqual(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
+            Assert.False(query.GetTermsEnum(terms) is TermRangeTermsEnum);
+            Assert.Equal(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
             query = new TermRangeQuery("content", null, null, false, false);
-            Assert.IsFalse(query.GetTermsEnum(terms) is TermRangeTermsEnum);
-            Assert.AreEqual(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
+            Assert.False(query.GetTermsEnum(terms) is TermRangeTermsEnum);
+            Assert.Equal(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
             query = TermRangeQuery.NewStringRange("content", "", null, true, false);
-            Assert.IsFalse(query.GetTermsEnum(terms) is TermRangeTermsEnum);
-            Assert.AreEqual(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
+            Assert.False(query.GetTermsEnum(terms) is TermRangeTermsEnum);
+            Assert.Equal(4, searcher.Search(query, null, 1000).ScoreDocs.Length);
             // and now anothe one
             query = TermRangeQuery.NewStringRange("content", "B", null, true, false);
-            Assert.IsTrue(query.GetTermsEnum(terms) is TermRangeTermsEnum);
-            Assert.AreEqual(3, searcher.Search(query, null, 1000).ScoreDocs.Length);
+            Assert.True(query.GetTermsEnum(terms) is TermRangeTermsEnum);
+            Assert.Equal(3, searcher.Search(query, null, 1000).ScoreDocs.Length);
             reader.Dispose();
         }
 
@@ -135,7 +131,7 @@ namespace Lucene.Net.Search
         /// this test should not be here, but it tests the fuzzy query rewrite mode (TOP_TERMS_SCORING_BOOLEAN_REWRITE)
         /// with constant score and checks, that only the lower end of terms is put into the range
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestTopTermsRewrite()
         {
             InitializeIndex(new string[] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K" });
@@ -163,19 +159,19 @@ namespace Lucene.Net.Search
             query.SetRewriteMethod(new MultiTermQuery.TopTermsScoringBooleanQueryRewrite(50));
             BooleanQuery bq = (BooleanQuery)searcher.Rewrite(query);
             var allowedTerms = AsSet(terms);
-            Assert.AreEqual(allowedTerms.Count, bq.Clauses.Length);
+            Assert.Equal(allowedTerms.Count, bq.Clauses.Length);
             foreach (BooleanClause c in bq.Clauses)
             {
-                Assert.IsTrue(c.Query is TermQuery);
+                Assert.True(c.Query is TermQuery);
                 TermQuery tq = (TermQuery)c.Query;
                 string term = tq.Term.Text();
-                Assert.IsTrue(allowedTerms.Contains(term), "invalid term: " + term);
+                Assert.True(allowedTerms.Contains(term), "invalid term: " + term);
                 allowedTerms.Remove(term); // remove to fail on double terms
             }
-            Assert.AreEqual(0, allowedTerms.Count);
+            Assert.Equal(0, allowedTerms.Count);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEqualsHashcode()
         {
             Query query = TermRangeQuery.NewStringRange("content", "A", "C", true, true);
@@ -184,39 +180,39 @@ namespace Lucene.Net.Search
             Query other = TermRangeQuery.NewStringRange("content", "A", "C", true, true);
             other.Boost = 1.0f;
 
-            Assert.AreEqual(query, query, "query equals itself is true");
-            Assert.AreEqual(query, other, "equivalent queries are equal");
-            Assert.AreEqual(query.GetHashCode(), other.GetHashCode(), "hashcode must return same value when equals is true");
+            Assert.Equal(query, query); //, "query equals itself is true");
+            Assert.Equal(query, other); //, "equivalent queries are equal");
+            Assert.Equal(query.GetHashCode(), other.GetHashCode()); //, "hashcode must return same value when equals is true");
 
             other.Boost = 2.0f;
-            Assert.IsFalse(query.Equals(other), "Different boost queries are not equal");
+            Assert.False(query.Equals(other), "Different boost queries are not equal");
 
             other = TermRangeQuery.NewStringRange("notcontent", "A", "C", true, true);
-            Assert.IsFalse(query.Equals(other), "Different fields are not equal");
+            Assert.False(query.Equals(other), "Different fields are not equal");
 
             other = TermRangeQuery.NewStringRange("content", "X", "C", true, true);
-            Assert.IsFalse(query.Equals(other), "Different lower terms are not equal");
+            Assert.False(query.Equals(other), "Different lower terms are not equal");
 
             other = TermRangeQuery.NewStringRange("content", "A", "Z", true, true);
-            Assert.IsFalse(query.Equals(other), "Different upper terms are not equal");
+            Assert.False(query.Equals(other), "Different upper terms are not equal");
 
             query = TermRangeQuery.NewStringRange("content", null, "C", true, true);
             other = TermRangeQuery.NewStringRange("content", null, "C", true, true);
-            Assert.AreEqual(query, other, "equivalent queries with null lowerterms are equal()");
-            Assert.AreEqual(query.GetHashCode(), other.GetHashCode(), "hashcode must return same value when equals is true");
+            Assert.Equal(query, other); //, "equivalent queries with null lowerterms are equal()");
+            Assert.Equal(query.GetHashCode(), other.GetHashCode()); //, "hashcode must return same value when equals is true");
 
             query = TermRangeQuery.NewStringRange("content", "C", null, true, true);
             other = TermRangeQuery.NewStringRange("content", "C", null, true, true);
-            Assert.AreEqual(query, other, "equivalent queries with null upperterms are equal()");
-            Assert.AreEqual(query.GetHashCode(), other.GetHashCode(), "hashcode returns same value");
+            Assert.Equal(query, other); //, "equivalent queries with null upperterms are equal()");
+            Assert.Equal(query.GetHashCode(), other.GetHashCode()); //, "hashcode returns same value");
 
             query = TermRangeQuery.NewStringRange("content", null, "C", true, true);
             other = TermRangeQuery.NewStringRange("content", "C", null, true, true);
-            Assert.IsFalse(query.Equals(other), "queries with different upper and lower terms are not equal");
+            Assert.False(query.Equals(other), "queries with different upper and lower terms are not equal");
 
             query = TermRangeQuery.NewStringRange("content", "A", "C", false, false);
             other = TermRangeQuery.NewStringRange("content", "A", "C", true, true);
-            Assert.IsFalse(query.Equals(other), "queries with different inclusive are not equal");
+            Assert.False(query.Equals(other), "queries with different inclusive are not equal");
         }
 
         private class SingleCharAnalyzer : Analyzer
@@ -300,7 +296,7 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-38
-        [Test]
+        [Fact]
         public virtual void TestExclusiveLowerNull()
         {
             Analyzer analyzer = new SingleCharAnalyzer();
@@ -311,9 +307,9 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             int numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(3, numHits, "A,B,<empty string>,C,D => A, B & <empty string> are in range");
+            Assert.Equal(3, numHits); //, "A,B,<empty string>,C,D => A, B & <empty string> are in range");
             // until Lucene-38 is fixed, use this assert:
-            //Assert.AreEqual(2, hits.Length(), "A,B,<empty string>,C,D => A, B & <empty string> are in range");
+            //Assert.Equal(2, hits.Length(), "A,B,<empty string>,C,D => A, B & <empty string> are in range");
 
             reader.Dispose();
             InitializeIndex(new string[] { "A", "B", "", "D" }, analyzer);
@@ -321,23 +317,23 @@ namespace Lucene.Net.Search
             searcher = NewSearcher(reader);
             numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(3, numHits, "A,B,<empty string>,D => A, B & <empty string> are in range");
+            Assert.Equal(3, numHits); //, "A,B,<empty string>,D => A, B & <empty string> are in range");
             // until Lucene-38 is fixed, use this assert:
-            //Assert.AreEqual(2, hits.Length(), "A,B,<empty string>,D => A, B & <empty string> are in range");
+            //Assert.Equal(2, hits.Length(), "A,B,<empty string>,D => A, B & <empty string> are in range");
             reader.Dispose();
             AddDoc("C");
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(3, numHits, "C added, still A, B & <empty string> are in range");
+            Assert.Equal(3, numHits); //, "C added, still A, B & <empty string> are in range");
             // until Lucene-38 is fixed, use this assert
-            //Assert.AreEqual(2, hits.Length(), "C added, still A, B & <empty string> are in range");
+            //Assert.Equal(2, hits.Length(), "C added, still A, B & <empty string> are in range");
             reader.Dispose();
         }
 
         // LUCENE-38
-        [Test]
+        [Fact]
         public virtual void TestInclusiveLowerNull()
         {
             //http://issues.apache.org/jira/browse/LUCENE-38
@@ -348,27 +344,27 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             int numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(4, numHits, "A,B,<empty string>,C,D => A,B,<empty string>,C in range");
+            Assert.Equal(4, numHits); //, "A,B,<empty string>,C,D => A,B,<empty string>,C in range");
             // until Lucene-38 is fixed, use this assert
-            //Assert.AreEqual(3, hits.Length(), "A,B,<empty string>,C,D => A,B,<empty string>,C in range");
+            //Assert.Equal(3, hits.Length(), "A,B,<empty string>,C,D => A,B,<empty string>,C in range");
             reader.Dispose();
             InitializeIndex(new string[] { "A", "B", "", "D" }, analyzer);
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(3, numHits, "A,B,<empty string>,D - A, B and <empty string> in range");
+            Assert.Equal(3, numHits); //, "A,B,<empty string>,D - A, B and <empty string> in range");
             // until Lucene-38 is fixed, use this assert
-            //Assert.AreEqual(2, hits.Length(), "A,B,<empty string>,D => A, B and <empty string> in range");
+            //Assert.Equal(2, hits.Length(), "A,B,<empty string>,D => A, B and <empty string> in range");
             reader.Dispose();
             AddDoc("C");
             reader = DirectoryReader.Open(Dir);
             searcher = NewSearcher(reader);
             numHits = searcher.Search(query, null, 1000).TotalHits;
             // When Lucene-38 is fixed, use the assert on the next line:
-            Assert.AreEqual(4, numHits, "C added => A,B,<empty string>,C in range");
+            Assert.Equal(4, numHits); //, "C added => A,B,<empty string>,C in range");
             // until Lucene-38 is fixed, use this assert
-            //Assert.AreEqual(3, hits.Length(), "C added => A,B,<empty string>,C in range");
+            //Assert.Equal(3, hits.Length(), "C added => A,B,<empty string>,C in range");
             reader.Dispose();
         }
     }

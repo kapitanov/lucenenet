@@ -3,7 +3,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
@@ -103,7 +102,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConcurrency()
         {
             AtomicInteger numDocs = new AtomicInteger(AtLeast(10000));
@@ -146,7 +145,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                         Console.WriteLine("FAIL: path=" + label + " not recognized");
                     }
                 }
-                Fail("mismatch number of categories");
+                True(false, "mismatch number of categories");
             }
             int[] parents = tr.ParallelTaxonomyArrays.Parents();
             foreach (string cat in values.Keys)
@@ -160,7 +159,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 {
                     path = cp.Subpath(i + 1);
                     int ord = tr.GetOrdinal(path);
-                    Assert.AreEqual(parentOrd, parents[ord], "invalid parent for cp=" + path);
+                    Assert.Equal(parentOrd, parents[ord], "invalid parent for cp=" + path);
                     parentOrd = ord; // next level should have this parent
                 }
             }

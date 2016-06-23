@@ -1,6 +1,8 @@
+using Xunit;
+
 namespace Lucene.Net.Codecs.Lucene40
 {
-    using NUnit.Framework;
+    
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -34,7 +36,7 @@ namespace Lucene.Net.Codecs.Lucene40
         /// <summary>
         /// Test the default constructor on BitVectors of various sizes.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestConstructSize()
         {
             DoTestConstructOfSize(8);
@@ -46,13 +48,13 @@ namespace Lucene.Net.Codecs.Lucene40
         private void DoTestConstructOfSize(int n)
         {
             BitVector bv = new BitVector(n);
-            Assert.AreEqual(n, bv.Size());
+            Assert.Equal(n, bv.Size());
         }
 
         /// <summary>
         /// Test the get() and set() methods on BitVectors of various sizes.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestGetSet()
         {
             DoTestGetSetVectorOfSize(8);
@@ -67,16 +69,16 @@ namespace Lucene.Net.Codecs.Lucene40
             for (int i = 0; i < bv.Size(); i++)
             {
                 // ensure a set bit can be git'
-                Assert.IsFalse(bv.Get(i));
+                Assert.False(bv.Get(i));
                 bv.Set(i);
-                Assert.IsTrue(bv.Get(i));
+                Assert.True(bv.Get(i));
             }
         }
 
         /// <summary>
         /// Test the clear() method on BitVectors of various sizes.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestClear()
         {
             DoTestClearVectorOfSize(8);
@@ -91,18 +93,18 @@ namespace Lucene.Net.Codecs.Lucene40
             for (int i = 0; i < bv.Size(); i++)
             {
                 // ensure a set bit is cleared
-                Assert.IsFalse(bv.Get(i));
+                Assert.False(bv.Get(i));
                 bv.Set(i);
-                Assert.IsTrue(bv.Get(i));
+                Assert.True(bv.Get(i));
                 bv.Clear(i);
-                Assert.IsFalse(bv.Get(i));
+                Assert.False(bv.Get(i));
             }
         }
 
         /// <summary>
         /// Test the count() method on BitVectors of various sizes.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCount()
         {
             DoTestCountVectorOfSize(8);
@@ -117,32 +119,32 @@ namespace Lucene.Net.Codecs.Lucene40
             // test count when incrementally setting bits
             for (int i = 0; i < bv.Size(); i++)
             {
-                Assert.IsFalse(bv.Get(i));
-                Assert.AreEqual(i, bv.Count());
+                Assert.False(bv.Get(i));
+                Assert.Equal(i, bv.Count());
                 bv.Set(i);
-                Assert.IsTrue(bv.Get(i));
-                Assert.AreEqual(i + 1, bv.Count());
+                Assert.True(bv.Get(i));
+                Assert.Equal(i + 1, bv.Count());
             }
 
             bv = new BitVector(n);
             // test count when setting then clearing bits
             for (int i = 0; i < bv.Size(); i++)
             {
-                Assert.IsFalse(bv.Get(i));
-                Assert.AreEqual(0, bv.Count());
+                Assert.False(bv.Get(i));
+                Assert.Equal(0, bv.Count());
                 bv.Set(i);
-                Assert.IsTrue(bv.Get(i));
-                Assert.AreEqual(1, bv.Count());
+                Assert.True(bv.Get(i));
+                Assert.Equal(1, bv.Count());
                 bv.Clear(i);
-                Assert.IsFalse(bv.Get(i));
-                Assert.AreEqual(0, bv.Count());
+                Assert.False(bv.Get(i));
+                Assert.Equal(0, bv.Count());
             }
         }
 
         /// <summary>
         /// Test writing and construction to/from Directory.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestWriteRead()
         {
             DoTestWriteRead(8);
@@ -159,22 +161,22 @@ namespace Lucene.Net.Codecs.Lucene40
             // test count when incrementally setting bits
             for (int i = 0; i < bv.Size(); i++)
             {
-                Assert.IsFalse(bv.Get(i));
-                Assert.AreEqual(i, bv.Count());
+                Assert.False(bv.Get(i));
+                Assert.Equal(i, bv.Count());
                 bv.Set(i);
-                Assert.IsTrue(bv.Get(i));
-                Assert.AreEqual(i + 1, bv.Count());
+                Assert.True(bv.Get(i));
+                Assert.Equal(i + 1, bv.Count());
                 bv.Write(d, "TESTBV", NewIOContext(Random()));
                 BitVector compare = new BitVector(d, "TESTBV", NewIOContext(Random()));
                 // compare bit vectors with bits set incrementally
-                Assert.IsTrue(DoCompare(bv, compare));
+                Assert.True(DoCompare(bv, compare));
             }
         }
 
         /// <summary>
         /// Test r/w when size/count cause switching between bit-set and d-gaps file formats.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDgaps()
         {
             DoTestDgaps(1, 0, 1);
@@ -207,7 +209,7 @@ namespace Lucene.Net.Codecs.Lucene40
             }
             bv.Write(d, "TESTBV", NewIOContext(Random()));
             BitVector compare = new BitVector(d, "TESTBV", NewIOContext(Random()));
-            Assert.IsTrue(DoCompare(bv, compare));
+            Assert.True(DoCompare(bv, compare));
         }
 
         private void DoTestDgaps(int size, int count1, int count2)
@@ -219,32 +221,32 @@ namespace Lucene.Net.Codecs.Lucene40
             for (int i = 0; i < count1; i++)
             {
                 bv.Clear(i);
-                Assert.AreEqual(i + 1, size - bv.Count());
+                Assert.Equal(i + 1, size - bv.Count());
             }
             bv.Write(d, "TESTBV", NewIOContext(Random()));
             // gradually increase number of set bits
             for (int i = count1; i < count2; i++)
             {
                 BitVector bv2 = new BitVector(d, "TESTBV", NewIOContext(Random()));
-                Assert.IsTrue(DoCompare(bv, bv2));
+                Assert.True(DoCompare(bv, bv2));
                 bv = bv2;
                 bv.Clear(i);
-                Assert.AreEqual(i + 1, size - bv.Count());
+                Assert.Equal(i + 1, size - bv.Count());
                 bv.Write(d, "TESTBV", NewIOContext(Random()));
             }
             // now start decreasing number of set bits
             for (int i = count2 - 1; i >= count1; i--)
             {
                 BitVector bv2 = new BitVector(d, "TESTBV", NewIOContext(Random()));
-                Assert.IsTrue(DoCompare(bv, bv2));
+                Assert.True(DoCompare(bv, bv2));
                 bv = bv2;
                 bv.Set(i);
-                Assert.AreEqual(i, size - bv.Count());
+                Assert.Equal(i, size - bv.Count());
                 bv.Write(d, "TESTBV", NewIOContext(Random()));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSparseWrite()
         {
             Directory d = NewDirectory();
@@ -258,11 +260,11 @@ namespace Lucene.Net.Codecs.Lucene40
             }
             bv.Write(d, "test", NewIOContext(Random()));
             long size = d.FileLength("test");
-            Assert.IsTrue(size < 100, "size=" + size);
+            Assert.True(size < 100, "size=" + size);
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestClearedBitNearEnd()
         {
             Directory d = NewDirectory();
@@ -271,11 +273,11 @@ namespace Lucene.Net.Codecs.Lucene40
             bv.InvertAll();
             bv.Clear(numBits - TestUtil.NextInt(Random(), 1, 7));
             bv.Write(d, "test", NewIOContext(Random()));
-            Assert.AreEqual(numBits - 1, bv.Count());
+            Assert.Equal(numBits - 1, bv.Count());
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMostlySet()
         {
             Directory d = NewDirectory();
@@ -293,7 +295,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     {
                         bv.Clear(bit);
                         count++;
-                        Assert.AreEqual(numBits - count, bv.Count());
+                        Assert.Equal(numBits - count, bv.Count());
                     }
                 }
             }
@@ -318,7 +320,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     break;
                 }
             }
-            Assert.AreEqual(bv.Count(), compare.Count());
+            Assert.Equal(bv.Count(), compare.Count());
             return equal;
         }
     }

@@ -1,10 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Perfield
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
 
@@ -109,10 +110,10 @@ namespace Lucene.Net.Codecs.Perfield
           writer.Commit();
           AddDocs2(writer, 10);
           writer.Commit();
-          Assert.AreEqual(30, writer.MaxDoc());
+          Assert.Equal(30, writer.MaxDoc());
           TestUtil.CheckIndex(dir);
           writer.ForceMerge(1);
-          Assert.AreEqual(30, writer.MaxDoc());
+          Assert.Equal(30, writer.MaxDoc());
           writer.Dispose();
           dir.Dispose();
         }*/
@@ -163,7 +164,7 @@ namespace Lucene.Net.Codecs.Perfield
           AddDocs2(writer, 10);
           writer.Commit();
           codec = iwconf.Codec;
-          Assert.AreEqual(30, writer.MaxDoc());
+          Assert.Equal(30, writer.MaxDoc());
           AssertQuery(new Term("content", "bbb"), dir, 10);
           AssertQuery(new Term("content", "ccc"), dir, 10); ////
           AssertQuery(new Term("content", "aaa"), dir, 10);
@@ -177,14 +178,14 @@ namespace Lucene.Net.Codecs.Perfield
           AssertQuery(new Term("content", "ccc"), dir, 10);
           AssertQuery(new Term("content", "bbb"), dir, 20);
           AssertQuery(new Term("content", "aaa"), dir, 10);
-          Assert.AreEqual(40, writer.MaxDoc());
+          Assert.Equal(40, writer.MaxDoc());
 
           if (VERBOSE)
           {
             Console.WriteLine("TEST: now optimize");
           }
           writer.ForceMerge(1);
-          Assert.AreEqual(40, writer.MaxDoc());
+          Assert.Equal(40, writer.MaxDoc());
           writer.Dispose();
           AssertQuery(new Term("content", "ccc"), dir, 10);
           AssertQuery(new Term("content", "bbb"), dir, 20);
@@ -202,7 +203,7 @@ namespace Lucene.Net.Codecs.Perfield
             IndexReader reader = DirectoryReader.Open(dir, 1);
             IndexSearcher searcher = NewSearcher(reader);
             TopDocs search = searcher.Search(new TermQuery(t), num + 10);
-            Assert.AreEqual(num, search.TotalHits);
+            Assert.Equal(num, search.TotalHits);
             reader.Dispose();
         }
 
@@ -251,7 +252,7 @@ namespace Lucene.Net.Codecs.Perfield
          * Test per field codec support - adding fields with random codecs
          */
 
-        [Test]
+        [Fact]
         public virtual void TestStressPerFieldCodec()
         {
             Directory dir = NewDirectory(Random());
@@ -281,7 +282,7 @@ namespace Lucene.Net.Codecs.Perfield
                     writer.ForceMerge(1);
                 }
                 writer.Commit();
-                Assert.AreEqual((i + 1) * docsPerRound, writer.MaxDoc);
+                Assert.Equal((i + 1) * docsPerRound, writer.MaxDoc);
                 writer.Dispose();
             }
             dir.Dispose();
@@ -351,7 +352,7 @@ namespace Lucene.Net.Codecs.Perfield
             }
         }*/
 
-        [Test]
+        [Fact]
         private void TestMixedPostings(Codec codec)
         {
             Directory dir = NewDirectory();

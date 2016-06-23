@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search.Similarities
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
 
     /*
@@ -62,7 +62,6 @@ namespace Lucene.Net.Search.Similarities
     /// the best performing setups in the original papers are verified.
     /// </p>
     /// </summary>
-    [TestFixture]
     public class TestSimilarityBase : LuceneTestCase
     {
         private static string FIELD_BODY = "body";
@@ -100,11 +99,8 @@ namespace Lucene.Net.Search.Similarities
         /// The list of similarities to test. </summary>
         private IList<SimilarityBase> Sims;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSimilarityBase() : base()
         {
-            base.SetUp();
-
             Dir = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir);
 
@@ -216,16 +212,16 @@ namespace Lucene.Net.Search.Similarities
                 BasicStats realStats = (BasicStats)sim.ComputeWeight(stats.TotalBoost, ToCollectionStats(stats), ToTermStats(stats));
                 float score = sim.Score(realStats, freq, docLen);
                 float explScore = sim.Explain(realStats, 1, new Explanation(freq, "freq"), docLen).Value;
-                Assert.IsFalse(float.IsInfinity(score), "Score infinite: " + sim.ToString());
-                Assert.IsFalse(float.IsNaN(score), "Score NaN: " + sim.ToString());
-                Assert.IsTrue(score >= 0, "Score negative: " + sim.ToString());
-                Assert.AreEqual(score, explScore, FLOAT_EPSILON, "score() and explain() return different values: " + sim.ToString());
+                Assert.False(float.IsInfinity(score), "Score infinite: " + sim.ToString());
+                Assert.False(float.IsNaN(score), "Score NaN: " + sim.ToString());
+                Assert.True(score >= 0, "Score negative: " + sim.ToString());
+                Assert.Equal(score, explScore, FLOAT_EPSILON, "score() and explain() return different values: " + sim.ToString());
             }
         }
 
         /// <summary>
         /// Runs the unit test with the default statistics. </summary>
-        [Test]
+        [Fact]
         public virtual void TestDefault()
         {
             UnitTestCore(CreateStats(), FREQ, DOC_LEN);
@@ -235,7 +231,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code numberOfDocuments = numberOfFieldTokens}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSparseDocuments()
         {
             BasicStats stats = CreateStats();
@@ -249,7 +245,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code numberOfDocuments > numberOfFieldTokens}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestVerySparseDocuments()
         {
             BasicStats stats = CreateStats();
@@ -263,7 +259,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code NumberOfDocuments = 1}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOneDocument()
         {
             BasicStats stats = CreateStats();
@@ -279,7 +275,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code docFreq = numberOfDocuments}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestAllDocumentsRelevant()
         {
             BasicStats stats = CreateStats();
@@ -293,7 +289,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code docFreq > numberOfDocuments / 2}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMostDocumentsRelevant()
         {
             BasicStats stats = CreateStats();
@@ -307,7 +303,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code docFreq = 1}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOnlyOneRelevantDocument()
         {
             BasicStats stats = CreateStats();
@@ -320,7 +316,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code totalTermFreq = numberOfFieldTokens}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestAllTermsRelevant()
         {
             BasicStats stats = CreateStats();
@@ -334,7 +330,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code totalTermFreq > numberOfDocuments}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMoreTermsThanDocuments()
         {
             BasicStats stats = CreateStats();
@@ -346,7 +342,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when
         /// {@code totalTermFreq = numberOfDocuments}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestNumberOfTermsAsDocuments()
         {
             BasicStats stats = CreateStats();
@@ -357,7 +353,7 @@ namespace Lucene.Net.Search.Similarities
         /// <summary>
         /// Tests correct behavior when {@code totalTermFreq = 1}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOneTerm()
         {
             BasicStats stats = CreateStats();
@@ -369,7 +365,7 @@ namespace Lucene.Net.Search.Similarities
         /// <summary>
         /// Tests correct behavior when {@code totalTermFreq = freq}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOneRelevantDocument()
         {
             BasicStats stats = CreateStats();
@@ -381,7 +377,7 @@ namespace Lucene.Net.Search.Similarities
         /// <summary>
         /// Tests correct behavior when {@code numberOfFieldTokens = freq}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestAllTermsRelevantOnlyOneDocument()
         {
             BasicStats stats = CreateStats();
@@ -397,7 +393,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when there is only one document with a single term
         /// in the collection.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOnlyOneTermOneDocument()
         {
             BasicStats stats = CreateStats();
@@ -413,7 +409,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests correct behavior when there is only one term in the field, but
         /// more than one documents.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOnlyOneTerm()
         {
             BasicStats stats = CreateStats();
@@ -427,7 +423,7 @@ namespace Lucene.Net.Search.Similarities
         /// <summary>
         /// Tests correct behavior when {@code avgFieldLength = docLen}.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDocumentLengthAverage()
         {
             BasicStats stats = CreateStats();
@@ -438,7 +434,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the Dirichlet LM model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestLMDirichlet()
         {
             float p = (FREQ + 2000.0f * (TOTAL_TERM_FREQ + 1) / (NUMBER_OF_FIELD_TOKENS + 1.0f)) / (DOC_LEN + 2000.0f);
@@ -449,7 +445,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the Jelinek-Mercer LM model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestLMJelinekMercer()
         {
             float p = (1 - 0.1f) * FREQ / DOC_LEN + 0.1f * (TOTAL_TERM_FREQ + 1) / (NUMBER_OF_FIELD_TOKENS + 1.0f);
@@ -461,7 +457,7 @@ namespace Lucene.Net.Search.Similarities
         /// Correctness test for the LL IB model with DF-based lambda and
         /// no normalization.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestLLForIB()
         {
             SimilarityBase sim = new IBSimilarity(new DistributionLL(), new LambdaDF(), new Normalization.NoNormalization());
@@ -472,7 +468,7 @@ namespace Lucene.Net.Search.Similarities
         /// Correctness test for the SPL IB model with TTF-based lambda and
         /// no normalization.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSPLForIB()
         {
             SimilarityBase sim = new IBSimilarity(new DistributionSPL(), new LambdaTTF(), new Normalization.NoNormalization());
@@ -481,7 +477,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the PL2 DFR model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestPL2()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelP(), new AfterEffectL(), new NormalizationH2());
@@ -495,7 +491,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the IneB2 DFR model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestIneB2()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelIne(), new AfterEffectB(), new NormalizationH2());
@@ -504,7 +500,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the GL1 DFR model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestGL1()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelG(), new AfterEffectL(), new NormalizationH1());
@@ -513,7 +509,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the BEB1 DFR model. </summary>
-        [Test]
+        [Fact]
         public virtual void TestBEB1()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelBE(), new AfterEffectB(), new NormalizationH1());
@@ -533,7 +529,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the D DFR model (basic model only). </summary>
-        [Test]
+        [Fact]
         public virtual void TestD()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelD(), new AfterEffect.NoAfterEffect(), new Normalization.NoNormalization());
@@ -547,7 +543,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the In2 DFR model with no aftereffect. </summary>
-        [Test]
+        [Fact]
         public virtual void TestIn2()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelIn(), new AfterEffect.NoAfterEffect(), new NormalizationH2());
@@ -558,7 +554,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// Correctness test for the IFB DFR model with no normalization. </summary>
-        [Test]
+        [Fact]
         public virtual void TestIFB()
         {
             SimilarityBase sim = new DFRSimilarity(new BasicModelIF(), new AfterEffectB(), new Normalization.NoNormalization());
@@ -579,7 +575,9 @@ namespace Lucene.Net.Search.Similarities
             BasicStats stats = CreateStats();
             BasicStats realStats = (BasicStats)sim.ComputeWeight(stats.TotalBoost, ToCollectionStats(stats), ToTermStats(stats));
             float score = sim.Score(realStats, FREQ, DOC_LEN);
-            Assert.AreEqual(gold, score, FLOAT_EPSILON, sim.ToString() + " score not correct.");
+            float min = gold - FLOAT_EPSILON;
+            float max = gold + FLOAT_EPSILON;
+            Assert.InRange(score, min, max); //, sim.ToString() + " score not correct.");
         }
 
         // ---------------------------- Integration tests ----------------------------
@@ -592,7 +590,7 @@ namespace Lucene.Net.Search.Similarities
         /// Tests whether all similarities return three documents for the query word
         /// "heart".
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestHeartList()
         {
             Query q = new TermQuery(new Term(FIELD_BODY, "heart"));
@@ -601,13 +599,13 @@ namespace Lucene.Net.Search.Similarities
             {
                 Searcher.Similarity = sim;
                 TopDocs topDocs = Searcher.Search(q, 1000);
-                Assert.AreEqual(3, topDocs.TotalHits, "Failed: " + sim.ToString());
+                Assert.Equal(3, topDocs.TotalHits); //, "Failed: " + sim.ToString());
             }
         }
 
         /// <summary>
         /// Test whether all similarities return document 3 before documents 7 and 8. </summary>
-        [Test]
+        [Fact]
         public virtual void TestHeartRanking()
         {
             AssumeFalse("PreFlex codec does not support the stats necessary for this test!", "Lucene3x".Equals(Codec.Default.Name));
@@ -618,20 +616,19 @@ namespace Lucene.Net.Search.Similarities
             {
                 Searcher.Similarity = sim;
                 TopDocs topDocs = Searcher.Search(q, 1000);
-                Assert.AreEqual("2", Reader.Document(topDocs.ScoreDocs[0].Doc).Get(FIELD_ID), "Failed: " + sim.ToString());
+                Assert.Equal("2", Reader.Document(topDocs.ScoreDocs[0].Doc).Get(FIELD_ID)); //, "Failed: " + sim.ToString());
             }
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         // LUCENE-5221
-        [Test]
+        [Fact]
         public virtual void TestDiscountOverlapsBoost()
         {
             DefaultSimilarity expected = new DefaultSimilarity();
@@ -642,10 +639,10 @@ namespace Lucene.Net.Search.Similarities
             state.Length = 5;
             state.NumOverlap = 2;
             state.Boost = 3;
-            Assert.AreEqual(expected.ComputeNorm(state), actual.ComputeNorm(state));
+            Assert.Equal(expected.ComputeNorm(state), actual.ComputeNorm(state));
             expected.DiscountOverlaps = true;
             actual.DiscountOverlaps = true;
-            Assert.AreEqual(expected.ComputeNorm(state), actual.ComputeNorm(state));
+            Assert.Equal(expected.ComputeNorm(state), actual.ComputeNorm(state));
         }
     }
 }

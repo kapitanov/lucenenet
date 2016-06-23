@@ -1,7 +1,7 @@
+using Xunit;
+
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -21,10 +21,9 @@ namespace Lucene.Net.Index
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestTerm : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             Term @base = new Term("same", "same");
@@ -32,11 +31,11 @@ namespace Lucene.Net.Index
             Term differentField = new Term("different", "same");
             Term differentText = new Term("same", "different");
             const string differentType = "AString";
-            Assert.AreEqual(@base, @base);
-            Assert.AreEqual(@base, same);
-            Assert.IsFalse(@base.Equals(differentField));
-            Assert.IsFalse(@base.Equals(differentText));
-            Assert.IsFalse(@base.Equals(differentType));
+            Assert.Equal(@base, @base);
+            Assert.Equal(@base, same);
+            Assert.False(@base.Equals(differentField));
+            Assert.False(@base.Equals(differentText));
+            Assert.False(@base.Equals(differentType));
         }
     }
 }

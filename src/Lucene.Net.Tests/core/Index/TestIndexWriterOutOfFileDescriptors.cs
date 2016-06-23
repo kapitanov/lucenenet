@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using IOContext = Lucene.Net.Store.IOContext;
@@ -36,7 +36,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestIndexWriterOutOfFileDescriptors : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             MockDirectoryWrapper dir = NewMockFSDirectory(CreateTempDir("TestIndexWriterOutOfFileDescriptors"));
@@ -115,7 +115,7 @@ namespace Lucene.Net.Index
                     // Verify numDocs only increases, to catch IndexWriter
                     // accidentally deleting the index:
                     dir.RandomIOExceptionRateOnOpen = 0.0;
-                    Assert.IsTrue(DirectoryReader.IndexExists(dir));
+                    Assert.True(DirectoryReader.IndexExists(dir));
                     if (r2 == null)
                     {
                         r2 = DirectoryReader.Open(dir);
@@ -129,7 +129,7 @@ namespace Lucene.Net.Index
                             r2 = r3;
                         }
                     }
-                    Assert.IsTrue(r2.NumDocs >= lastNumDocs, "before=" + lastNumDocs + " after=" + r2.NumDocs);
+                    Assert.True(r2.NumDocs >= lastNumDocs, "before=" + lastNumDocs + " after=" + r2.NumDocs);
                     lastNumDocs = r2.NumDocs;
                     //System.out.println("numDocs=" + lastNumDocs);
                     dir.RandomIOExceptionRateOnOpen = rate;

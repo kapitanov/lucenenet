@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
-    using System.Threading;
-using Lucene.Net.Attributes;
+using System.IO;
+using System.Threading;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Support;
-    using NUnit.Framework;
-    using System.IO;
     using AssertingDocValuesFormat = Lucene.Net.Codecs.asserting.AssertingDocValuesFormat;
     using BinaryDocValuesField = BinaryDocValuesField;
     using Bits = Lucene.Net.Util.Bits;
@@ -52,7 +51,6 @@ namespace Lucene.Net.Index
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestBinaryDocValuesUpdates : LuceneTestCase
     {
         internal static long GetValue(BinaryDocValues bdv, int idx, BytesRef scratch)
@@ -92,7 +90,7 @@ namespace Lucene.Net.Index
             return doc;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdatesAreFlushed()
         {
             Directory dir = NewDirectory();
@@ -101,21 +99,21 @@ namespace Lucene.Net.Index
             writer.AddDocument(Doc(1)); // val=2
             writer.AddDocument(Doc(3)); // val=2
             writer.Commit();
-            Assert.AreEqual(1, writer.FlushDeletesCount);
+            Assert.Equal(1, writer.FlushDeletesCount);
             writer.UpdateBinaryDocValue(new Term("id", "doc-0"), "val", ToBytes(5));
-            Assert.AreEqual(2, writer.FlushDeletesCount);
+            Assert.Equal(2, writer.FlushDeletesCount);
             writer.UpdateBinaryDocValue(new Term("id", "doc-1"), "val", ToBytes(6));
-            Assert.AreEqual(3, writer.FlushDeletesCount);
+            Assert.Equal(3, writer.FlushDeletesCount);
             writer.UpdateBinaryDocValue(new Term("id", "doc-2"), "val", ToBytes(7));
-            Assert.AreEqual(4, writer.FlushDeletesCount);
+            Assert.Equal(4, writer.FlushDeletesCount);
             writer.Config.SetRAMBufferSizeMB(1000d);
             writer.UpdateBinaryDocValue(new Term("id", "doc-2"), "val", ToBytes(7));
-            Assert.AreEqual(4, writer.FlushDeletesCount);
+            Assert.Equal(4, writer.FlushDeletesCount);
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             Directory dir = NewDirectory();
@@ -144,18 +142,18 @@ namespace Lucene.Net.Index
                 writer.Dispose();
             }
 
-            Assert.AreEqual(1, reader.Leaves.Count);
+            Assert.Equal(1, reader.Leaves.Count);
             AtomicReader r = (AtomicReader)reader.Leaves[0].Reader;
             BinaryDocValues bdv = r.GetBinaryDocValues("val");
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(2, GetValue(bdv, 0, scratch));
-            Assert.AreEqual(2, GetValue(bdv, 1, scratch));
+            Assert.Equal(2, GetValue(bdv, 0, scratch));
+            Assert.Equal(2, GetValue(bdv, 1, scratch));
             reader.Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateFewSegments()
         {
             Directory dir = NewDirectory();
@@ -200,12 +198,12 @@ namespace Lucene.Net.Index
             {
                 AtomicReader r = context.AtomicReader;
                 BinaryDocValues bdv = r.GetBinaryDocValues("val");
-                Assert.IsNotNull(bdv);
+                Assert.NotNull(bdv);
                 for (int i = 0; i < r.MaxDoc; i++)
                 {
                     long expected = expectedValues[i + context.DocBase];
                     long actual = GetValue(bdv, i, scratch);
-                    Assert.AreEqual(expected, actual);
+                    Assert.Equal(expected, actual);
                 }
             }
 
@@ -213,7 +211,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReopen()
         {
             Directory dir = NewDirectory();
@@ -243,19 +241,19 @@ namespace Lucene.Net.Index
 
             // reopen reader and assert only it sees the update
             DirectoryReader reader2 = DirectoryReader.OpenIfChanged(reader1);
-            Assert.IsNotNull(reader2);
-            Assert.IsTrue(reader1 != reader2);
+            Assert.NotNull(reader2);
+            Assert.True(reader1 != reader2);
 
             BytesRef scratch = new BytesRef();
             BinaryDocValues bdv1 = ((AtomicReader)reader1.Leaves[0].Reader).GetBinaryDocValues("val");
             BinaryDocValues bdv2 = ((AtomicReader)reader2.Leaves[0].Reader).GetBinaryDocValues("val");
-            Assert.AreEqual(1, GetValue(bdv1, 0, scratch));
-            Assert.AreEqual(10, GetValue(bdv2, 0, scratch));
+            Assert.Equal(1, GetValue(bdv1, 0, scratch));
+            Assert.Equal(10, GetValue(bdv2, 0, scratch));
 
             IOUtils.Close(writer, reader1, reader2, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdatesAndDeletes()
         {
             // create an index with a segment with only deletes, a segment with both
@@ -300,7 +298,7 @@ namespace Lucene.Net.Index
             bool[] expectedLiveDocs = new bool[] { true, false, false, true, true, true };
             for (int i = 0; i < expectedLiveDocs.Length; i++)
             {
-                Assert.AreEqual(expectedLiveDocs[i], liveDocs.Get(i));
+                Assert.Equal(expectedLiveDocs[i], liveDocs.Get(i));
             }
 
             long[] expectedValues = new long[] { 1, 2, 3, 17, 5, 17 };
@@ -308,14 +306,14 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < expectedValues.Length; i++)
             {
-                Assert.AreEqual(expectedValues[i], GetValue(bdv, i, scratch));
+                Assert.Equal(expectedValues[i], GetValue(bdv, i, scratch));
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdatesWithDeletes()
         {
             // update and delete different documents in the same commit session
@@ -348,14 +346,14 @@ namespace Lucene.Net.Index
             }
 
             AtomicReader r = (AtomicReader)reader.Leaves[0].Reader;
-            Assert.IsFalse(r.LiveDocs.Get(0));
-            Assert.AreEqual(17, GetValue(r.GetBinaryDocValues("val"), 1, new BytesRef()));
+            Assert.False(r.LiveDocs.Get(0));
+            Assert.Equal(17, GetValue(r.GetBinaryDocValues("val"), 1, new BytesRef()));
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateAndDeleteSameDocument()
         {
             // update and delete same document in same commit session
@@ -388,14 +386,14 @@ namespace Lucene.Net.Index
             }
 
             AtomicReader r = (AtomicReader)reader.Leaves[0].Reader;
-            Assert.IsFalse(r.LiveDocs.Get(0));
-            Assert.AreEqual(1, GetValue(r.GetBinaryDocValues("val"), 0, new BytesRef())); // deletes are currently applied first
+            Assert.False(r.LiveDocs.Get(0));
+            Assert.Equal(1, GetValue(r.GetBinaryDocValues("val"), 0, new BytesRef())); // deletes are currently applied first
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultipleDocValuesTypes()
         {
             Directory dir = NewDirectory();
@@ -429,28 +427,28 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(i, ndv.Get(i));
-                Assert.AreEqual(17, GetValue(bdv, i, scratch));
+                Assert.Equal(i, ndv.Get(i));
+                Assert.Equal(17, GetValue(bdv, i, scratch));
                 sdv.Get(i, scratch);
-                Assert.AreEqual(new BytesRef(Convert.ToString(i)), scratch);
+                Assert.Equal(new BytesRef(Convert.ToString(i)), scratch);
                 ssdv.Document = i;
                 long ord = ssdv.NextOrd();
                 ssdv.LookupOrd(ord, scratch);
-                Assert.AreEqual(i, Convert.ToInt32(scratch.Utf8ToString()));
+                Assert.Equal(i, Convert.ToInt32(scratch.Utf8ToString()));
                 if (i != 0)
                 {
                     ord = ssdv.NextOrd();
                     ssdv.LookupOrd(ord, scratch);
-                    Assert.AreEqual(i * 2, Convert.ToInt32(scratch.Utf8ToString()));
+                    Assert.Equal(i * 2, Convert.ToInt32(scratch.Utf8ToString()));
                 }
-                Assert.AreEqual(SortedSetDocValues.NO_MORE_ORDS, ssdv.NextOrd());
+                Assert.Equal(SortedSetDocValues.NO_MORE_ORDS, ssdv.NextOrd());
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultipleBinaryDocValues()
         {
             Directory dir = NewDirectory();
@@ -480,15 +478,15 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(17, GetValue(bdv1, i, scratch));
-                Assert.AreEqual(i, GetValue(bdv2, i, scratch));
+                Assert.Equal(17, GetValue(bdv1, i, scratch));
+                Assert.Equal(i, GetValue(bdv2, i, scratch));
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocumentWithNoValue()
         {
             Directory dir = NewDirectory();
@@ -517,14 +515,14 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(17, GetValue(bdv, i, scratch));
+                Assert.Equal(17, GetValue(bdv, i, scratch));
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUnsetValue()
         {
             AssumeTrue("codec does not support docsWithField", DefaultCodecSupportsDocsWithField());
@@ -554,23 +552,23 @@ namespace Lucene.Net.Index
                 if (i == 0)
                 {
                     bdv.Get(i, scratch);
-                    Assert.AreEqual(0, scratch.Length);
+                    Assert.Equal(0, scratch.Length);
                 }
                 else
                 {
-                    Assert.AreEqual(5, GetValue(bdv, i, scratch));
+                    Assert.Equal(5, GetValue(bdv, i, scratch));
                 }
             }
 
             Bits docsWithField = r.GetDocsWithField("bdv");
-            Assert.IsFalse(docsWithField.Get(0));
-            Assert.IsTrue(docsWithField.Get(1));
+            Assert.False(docsWithField.Get(0));
+            Assert.True(docsWithField.Get(1));
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUnsetAllValues()
         {
             AssumeTrue("codec does not support docsWithField", DefaultCodecSupportsDocsWithField());
@@ -598,18 +596,18 @@ namespace Lucene.Net.Index
             for (int i = 0; i < r.MaxDoc; i++)
             {
                 bdv.Get(i, scratch);
-                Assert.AreEqual(0, scratch.Length);
+                Assert.Equal(0, scratch.Length);
             }
 
             Bits docsWithField = r.GetDocsWithField("bdv");
-            Assert.IsFalse(docsWithField.Get(0));
-            Assert.IsFalse(docsWithField.Get(1));
+            Assert.False(docsWithField.Get(0));
+            Assert.False(docsWithField.Get(1));
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateNonBinaryDocValuesField()
         {
             // we don't support adding new fields or updating existing non-binary-dv
@@ -628,7 +626,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.UpdateBinaryDocValue(new Term("key", "doc"), "bdv", ToBytes(17L));
-                Assert.Fail("should not have allowed creating new fields through update");
+                Assert.True(false, "should not have allowed creating new fields through update");
             }
             catch (System.ArgumentException e)
             {
@@ -638,7 +636,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.UpdateBinaryDocValue(new Term("key", "doc"), "foo", ToBytes(17L));
-                Assert.Fail("should not have allowed updating an existing field to binary-dv");
+                Assert.True(false, "should not have allowed updating an existing field to binary-dv");
             }
             catch (System.ArgumentException e)
             {
@@ -649,7 +647,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDifferentDVFormatPerField()
         {
             Directory dir = NewDirectory();
@@ -676,9 +674,9 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(17, GetValue(bdv, i, scratch));
+                Assert.Equal(17, GetValue(bdv, i, scratch));
                 sdv.Get(i, scratch);
-                Assert.AreEqual(new BytesRef("value"), scratch);
+                Assert.Equal(new BytesRef("value"), scratch);
             }
 
             reader.Dispose();
@@ -700,7 +698,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateSameDocMultipleTimes()
         {
             Directory dir = NewDirectory();
@@ -724,13 +722,13 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(3, GetValue(bdv, i, scratch));
+                Assert.Equal(3, GetValue(bdv, i, scratch));
             }
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSegmentMerges()
         {
             Directory dir = NewDirectory();
@@ -796,15 +794,15 @@ namespace Lucene.Net.Index
                     reader = DirectoryReader.Open(writer, true);
                 }
 
-                Assert.AreEqual(1, reader.Leaves.Count);
+                Assert.Equal(1, reader.Leaves.Count);
                 AtomicReader r = (AtomicReader)reader.Leaves[0].Reader;
-                Assert.IsNull(r.LiveDocs, "index should have no deletes after forceMerge");
+                Assert.Null(r.LiveDocs); //, "index should have no deletes after forceMerge");
                 BinaryDocValues bdv = r.GetBinaryDocValues("bdv");
-                Assert.IsNotNull(bdv);
+                Assert.NotNull(bdv);
                 BytesRef scratch = new BytesRef();
                 for (int i = 0; i < r.MaxDoc; i++)
                 {
-                    Assert.AreEqual(value, GetValue(bdv, i, scratch));
+                    Assert.Equal(value, GetValue(bdv, i, scratch));
                 }
                 reader.Dispose();
             }
@@ -813,7 +811,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateDocumentByMultipleTerms()
         {
             // make sure the order of updates is respected, even when multiple terms affect same document
@@ -839,13 +837,13 @@ namespace Lucene.Net.Index
             BytesRef scratch = new BytesRef();
             for (int i = 0; i < r.MaxDoc; i++)
             {
-                Assert.AreEqual(3, GetValue(bdv, i, scratch));
+                Assert.Equal(3, GetValue(bdv, i, scratch));
             }
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestManyReopensAndFields()
         {
             Directory dir = NewDirectory();
@@ -936,11 +934,11 @@ namespace Lucene.Net.Index
 
                 //      System.out.println("[" + Thread.currentThread().getName() + "]: reopen reader: " + reader);
                 DirectoryReader newReader = DirectoryReader.OpenIfChanged(reader);
-                Assert.IsNotNull(newReader);
+                Assert.NotNull(newReader);
                 reader.Dispose();
                 reader = newReader;
                 //      System.out.println("[" + Thread.currentThread().getName() + "]: reopened reader: " + reader);
-                Assert.IsTrue(reader.NumDocs > 0); // we delete at most one document per round
+                Assert.True(reader.NumDocs > 0); // we delete at most one document per round
                 BytesRef scratch = new BytesRef();
                 foreach (AtomicReaderContext context in reader.Leaves)
                 {
@@ -952,7 +950,7 @@ namespace Lucene.Net.Index
                         string f = "f" + field;
                         BinaryDocValues bdv = r.GetBinaryDocValues(f);
                         Bits docsWithField = r.GetDocsWithField(f);
-                        Assert.IsNotNull(bdv);
+                        Assert.NotNull(bdv);
                         int maxDoc = r.MaxDoc;
                         for (int doc = 0; doc < maxDoc; doc++)
                         {
@@ -961,12 +959,12 @@ namespace Lucene.Net.Index
                                 //              System.out.println("doc=" + (doc + context.DocBase) + " f='" + f + "' vslue=" + getValue(bdv, doc, scratch));
                                 if (fieldHasValue[field])
                                 {
-                                    Assert.IsTrue(docsWithField.Get(doc));
-                                    Assert.AreEqual(fieldValues[field], GetValue(bdv, doc, scratch), "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
+                                    Assert.True(docsWithField.Get(doc));
+                                    Assert.Equal(fieldValues[field], GetValue(bdv, doc, scratch));// , "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
                                 }
                                 else
                                 {
-                                    Assert.IsFalse(docsWithField.Get(doc));
+                                    Assert.False(docsWithField.Get(doc));
                                 }
                             }
                         }
@@ -978,7 +976,7 @@ namespace Lucene.Net.Index
             IOUtils.Close(writer, reader, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateSegmentWithNoDocValues()
         {
             Directory dir = NewDirectory();
@@ -1024,18 +1022,18 @@ namespace Lucene.Net.Index
                 AtomicReader r = context.AtomicReader;
                 BinaryDocValues bdv = r.GetBinaryDocValues("bdv");
                 Bits docsWithField = r.GetDocsWithField("bdv");
-                Assert.IsNotNull(docsWithField);
-                Assert.IsTrue(docsWithField.Get(0));
-                Assert.AreEqual(5L, GetValue(bdv, 0, scratch));
-                Assert.IsFalse(docsWithField.Get(1));
+                Assert.NotNull(docsWithField);
+                Assert.True(docsWithField.Get(0));
+                Assert.Equal(5L, GetValue(bdv, 0, scratch));
+                Assert.False(docsWithField.Get(1));
                 bdv.Get(1, scratch);
-                Assert.AreEqual(0, scratch.Length);
+                Assert.Equal(0, scratch.Length);
             }
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateSegmentWithPostingButNoDocValues()
         {
             Directory dir = NewDirectory();
@@ -1073,7 +1071,7 @@ namespace Lucene.Net.Index
                 BinaryDocValues bdv = r.GetBinaryDocValues("bdv");
                 for (int i = 0; i < r.MaxDoc; i++)
                 {
-                    Assert.AreEqual(5L, GetValue(bdv, i, scratch));
+                    Assert.Equal(5L, GetValue(bdv, i, scratch));
                 }
             }
             reader.Dispose();
@@ -1081,7 +1079,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateBinaryDVFieldWithSameNameAsPostingField()
         {
             // this used to fail because FieldInfos.Builder neglected to update
@@ -1100,13 +1098,13 @@ namespace Lucene.Net.Index
 
             DirectoryReader r = DirectoryReader.Open(dir);
             BinaryDocValues bdv = ((AtomicReader)r.Leaves[0].Reader).GetBinaryDocValues("f");
-            Assert.AreEqual(17, GetValue(bdv, 0, new BytesRef()));
+            Assert.Equal(17, GetValue(bdv, 0, new BytesRef()));
             r.Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateOldSegments()
         {
             Codec[] oldCodecs = new Codec[] { new Lucene40RWCodec(), new Lucene41RWCodec(), new Lucene42RWCodec(), new Lucene45RWCodec() };
@@ -1131,7 +1129,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.Dispose();
-                Assert.Fail("should not have succeeded to update a segment written with an old Codec");
+                Assert.True(false, "should not have succeeded to update a segment written with an old Codec");
             }
             catch (System.NotSupportedException e)
             {
@@ -1145,7 +1143,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStressMultiThreading()
         {
             Directory dir = NewDirectory();
@@ -1222,10 +1220,10 @@ namespace Lucene.Net.Index
                     {
                         if (liveDocs == null || liveDocs.Get(j))
                         {
-                            Assert.AreEqual(docsWithBdv.Get(j), docsWithControl.Get(j));
+                            Assert.Equal(docsWithBdv.Get(j), docsWithControl.Get(j));
                             if (docsWithBdv.Get(j))
                             {
-                                Assert.AreEqual(GetValue(control, j, scratch), GetValue(bdv, j, scratch) * 2);
+                                Assert.Equal(GetValue(control, j, scratch), GetValue(bdv, j, scratch) * 2);
                             }
                         }
                     }
@@ -1360,7 +1358,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateDifferentDocsInDifferentGens()
         {
             // update same document multiple times across generations
@@ -1396,7 +1394,7 @@ namespace Lucene.Net.Index
                     BinaryDocValues cfbdv = r.GetBinaryDocValues("cf");
                     for (int j = 0; j < r.MaxDoc; j++)
                     {
-                        Assert.AreEqual(GetValue(cfbdv, j, scratch), GetValue(fbdv, j, scratch) * 2);
+                        Assert.Equal(GetValue(cfbdv, j, scratch), GetValue(fbdv, j, scratch) * 2);
                     }
                 }
                 reader.Dispose();
@@ -1405,7 +1403,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestChangeCodec()
         {
             Directory dir = NewDirectory();
@@ -1436,10 +1434,10 @@ namespace Lucene.Net.Index
             BinaryDocValues f1 = r.GetBinaryDocValues("f1");
             BinaryDocValues f2 = r.GetBinaryDocValues("f2");
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(12L, GetValue(f1, 0, scratch));
-            Assert.AreEqual(13L, GetValue(f2, 0, scratch));
-            Assert.AreEqual(17L, GetValue(f1, 1, scratch));
-            Assert.AreEqual(2L, GetValue(f2, 1, scratch));
+            Assert.Equal(12L, GetValue(f1, 0, scratch));
+            Assert.Equal(13L, GetValue(f2, 0, scratch));
+            Assert.Equal(17L, GetValue(f1, 1, scratch));
+            Assert.Equal(2L, GetValue(f2, 1, scratch));
             reader.Dispose();
             dir.Dispose();
         }
@@ -1474,7 +1472,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddIndexes()
         {
             Directory dir1 = NewDirectory();
@@ -1535,7 +1533,7 @@ namespace Lucene.Net.Index
                 BinaryDocValues control = r.GetBinaryDocValues("control");
                 for (int i = 0; i < r.MaxDoc; i++)
                 {
-                    Assert.AreEqual(GetValue(bdv, i, scratch) * 2, GetValue(control, i, scratch));
+                    Assert.Equal(GetValue(bdv, i, scratch) * 2, GetValue(control, i, scratch));
                 }
             }
             reader_.Dispose();
@@ -1543,7 +1541,7 @@ namespace Lucene.Net.Index
             IOUtils.Close(dir1, dir2);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteUnusedUpdatesFiles()
         {
             Directory dir = NewDirectory();
@@ -1562,23 +1560,24 @@ namespace Lucene.Net.Index
 
             DirectoryReader r = DirectoryReader.Open(dir);
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(2L, GetValue(((AtomicReader)r.Leaves[0].Reader).GetBinaryDocValues("f"), 0, scratch));
+            Assert.Equal(2L, GetValue(((AtomicReader)r.Leaves[0].Reader).GetBinaryDocValues("f"), 0, scratch));
             r.Dispose();
 
             // create second gen of update files, first gen should be deleted
             writer.UpdateBinaryDocValue(new Term("id", "d0"), "f", ToBytes(5L));
             writer.Commit();
-            Assert.AreEqual(numFiles, dir.ListAll().Length);
+            Assert.Equal(numFiles, dir.ListAll().Length);
 
             r = DirectoryReader.Open(dir);
-            Assert.AreEqual(5L, GetValue(((AtomicReader)r.Leaves[0].Reader).GetBinaryDocValues("f"), 0, scratch));
+            Assert.Equal(5L, GetValue(((AtomicReader)r.Leaves[0].Reader).GetBinaryDocValues("f"), 0, scratch));
             r.Dispose();
 
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestTonsOfUpdates()
         {
             // LUCENE-5248: make sure that when there are many updates, we don't use too much RAM
@@ -1648,7 +1647,7 @@ namespace Lucene.Net.Index
                     BinaryDocValues cf = r.GetBinaryDocValues("cf" + i);
                     for (int j = 0; j < r.MaxDoc; j++)
                     {
-                        Assert.AreEqual(GetValue(cf, j, scratch), GetValue(f, j, scratch) * 2, "reader=" + r + ", field=f" + i + ", doc=" + j);
+                        Assert.Equal(GetValue(cf, j, scratch), GetValue(f, j, scratch) * 2);// , "reader=" + r + ", field=f" + i + ", doc=" + j);
                     }
                 }
             }
@@ -1657,7 +1656,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdatesOrder()
         {
             Directory dir = NewDirectory();
@@ -1679,14 +1678,14 @@ namespace Lucene.Net.Index
 
             DirectoryReader reader = DirectoryReader.Open(dir);
             BytesRef scratch = new BytesRef();
-            Assert.AreEqual(4, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, scratch));
-            Assert.AreEqual(3, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f2"), 0, scratch));
+            Assert.Equal(4, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, scratch));
+            Assert.Equal(3, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f2"), 0, scratch));
             reader.Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateAllDeletedSegment()
         {
             Directory dir = NewDirectory();
@@ -1705,14 +1704,14 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             DirectoryReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, reader.Leaves.Count);
-            Assert.AreEqual(2L, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, new BytesRef()));
+            Assert.Equal(1, reader.Leaves.Count);
+            Assert.Equal(2L, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, new BytesRef()));
             reader.Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateTwoNonexistingTerms()
         {
             Directory dir = NewDirectory();
@@ -1729,8 +1728,8 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             DirectoryReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, reader.Leaves.Count);
-            Assert.AreEqual(1L, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, new BytesRef()));
+            Assert.Equal(1, reader.Leaves.Count);
+            Assert.Equal(1L, GetValue(((AtomicReader)reader.Leaves[0].Reader).GetBinaryDocValues("f1"), 0, new BytesRef()));
             reader.Dispose();
 
             dir.Dispose();

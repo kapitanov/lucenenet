@@ -1,11 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Search;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Search;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using IndexSearcher = Lucene.Net.Search.IndexSearcher;
@@ -73,7 +73,7 @@ namespace Lucene.Net.Index
             return directory;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTryDeleteDocument()
         {
             Directory directory = CreateIndex();
@@ -87,7 +87,7 @@ namespace Lucene.Net.Index
             IndexSearcher searcher = mgr.Acquire();
 
             TopDocs topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
-            Assert.AreEqual(1, topDocs.TotalHits);
+            Assert.Equal(1, topDocs.TotalHits);
 
             long result;
             if (Random().NextBoolean())
@@ -102,16 +102,16 @@ namespace Lucene.Net.Index
             }
 
             // The tryDeleteDocument should have succeeded:
-            Assert.IsTrue(result != -1);
+            Assert.True(result != -1);
 
-            Assert.IsTrue(writer.HasDeletions());
+            Assert.True(writer.HasDeletions());
 
             if (Random().NextBoolean())
             {
                 writer.Commit();
             }
 
-            Assert.IsTrue(writer.HasDeletions());
+            Assert.True(writer.HasDeletions());
 
             mgr.MaybeRefresh();
 
@@ -119,10 +119,10 @@ namespace Lucene.Net.Index
 
             topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
 
-            Assert.AreEqual(0, topDocs.TotalHits);
+            Assert.Equal(0, topDocs.TotalHits);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTryDeleteDocumentCloseAndReopen()
         {
             Directory directory = CreateIndex();
@@ -134,16 +134,16 @@ namespace Lucene.Net.Index
             IndexSearcher searcher = mgr.Acquire();
 
             TopDocs topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
-            Assert.AreEqual(1, topDocs.TotalHits);
+            Assert.Equal(1, topDocs.TotalHits);
 
             TrackingIndexWriter mgrWriter = new TrackingIndexWriter(writer);
             long result = mgrWriter.TryDeleteDocument(DirectoryReader.Open(writer, true), 0);
 
-            Assert.AreEqual(1, result);
+            Assert.Equal(1, result);
 
             writer.Commit();
 
-            Assert.IsTrue(writer.HasDeletions());
+            Assert.True(writer.HasDeletions());
 
             mgr.MaybeRefresh();
 
@@ -151,7 +151,7 @@ namespace Lucene.Net.Index
 
             topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
 
-            Assert.AreEqual(0, topDocs.TotalHits);
+            Assert.Equal(0, topDocs.TotalHits);
 
             writer.Dispose();
 
@@ -159,10 +159,10 @@ namespace Lucene.Net.Index
 
             topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
 
-            Assert.AreEqual(0, topDocs.TotalHits);
+            Assert.Equal(0, topDocs.TotalHits);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteDocuments()
         {
             Directory directory = CreateIndex();
@@ -174,16 +174,16 @@ namespace Lucene.Net.Index
             IndexSearcher searcher = mgr.Acquire();
 
             TopDocs topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
-            Assert.AreEqual(1, topDocs.TotalHits);
+            Assert.Equal(1, topDocs.TotalHits);
 
             TrackingIndexWriter mgrWriter = new TrackingIndexWriter(writer);
             long result = mgrWriter.DeleteDocuments(new TermQuery(new Term("foo", "0")));
 
-            Assert.AreEqual(1, result);
+            Assert.Equal(1, result);
 
             // writer.Commit();
 
-            Assert.IsTrue(writer.HasDeletions());
+            Assert.True(writer.HasDeletions());
 
             mgr.MaybeRefresh();
 
@@ -191,7 +191,7 @@ namespace Lucene.Net.Index
 
             topDocs = searcher.Search(new TermQuery(new Term("foo", "0")), 100);
 
-            Assert.AreEqual(0, topDocs.TotalHits);
+            Assert.Equal(0, topDocs.TotalHits);
         }
     }
 }

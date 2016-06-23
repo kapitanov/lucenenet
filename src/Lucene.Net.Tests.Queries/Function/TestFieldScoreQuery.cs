@@ -21,14 +21,14 @@ namespace Lucene.Net.Tests.Queries.Function
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             CreateIndex(true);
         }
 
         /// <summary>
         /// Test that FieldScoreQuery of Type.BYTE returns docs in expected order.
         /// </summary>
-        [Test]
+        [Fact]
         public void TestRankByte()
         {
             // INT field values are small enough to be parsed as byte
@@ -38,7 +38,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test that FieldScoreQuery of Type.SHORT returns docs in expected order.
         /// </summary>
-        [Test]
+        [Fact]
         public void TestRankShort()
         {
             // INT field values are small enough to be parsed as short
@@ -48,7 +48,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test that FieldScoreQuery of Type.INT returns docs in expected order.
         /// </summary>
-        [Test]
+        [Fact]
         public void TestRankInt()
         {
             DoTestRank(INT_VALUESOURCE);
@@ -57,7 +57,7 @@ namespace Lucene.Net.Tests.Queries.Function
         /// <summary>
         /// Test that FieldScoreQuery of Type.FLOAT returns docs in expected order.
         /// </summary>
-        [Test]
+        [Fact]
         public void TestRankFloat()
         {
             // INT field can be parsed as float

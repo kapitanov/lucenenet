@@ -1,11 +1,10 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Randomized.Generators;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -40,7 +39,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestMultiDocValues : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNumerics()
         {
             Directory dir = NewDirectory();
@@ -72,14 +71,15 @@ namespace Lucene.Net.Index
             NumericDocValues single = merged.GetNumericDocValues("numbers");
             for (int i = 0; i < numDocs; i++)
             {
-                Assert.AreEqual(single.Get(i), multi.Get(i));
+                Assert.Equal(single.Get(i), multi.Get(i));
             }
             ir.Dispose();
             ir2.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [
+            Fact]
         public virtual void TestBinary()
         {
             Directory dir = NewDirectory();
@@ -116,14 +116,14 @@ namespace Lucene.Net.Index
             {
                 single.Get(i, expected);
                 multi.Get(i, actual);
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
             ir.Dispose();
             ir2.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSorted()
         {
             Directory dir = NewDirectory();
@@ -158,17 +158,17 @@ namespace Lucene.Net.Index
 
             SortedDocValues multi = MultiDocValues.GetSortedValues(ir, "bytes");
             SortedDocValues single = merged.GetSortedDocValues("bytes");
-            Assert.AreEqual(single.ValueCount, multi.ValueCount);
+            Assert.Equal(single.ValueCount, multi.ValueCount);
             BytesRef actual = new BytesRef();
             BytesRef expected = new BytesRef();
             for (int i = 0; i < numDocs; i++)
             {
                 // check ord
-                Assert.AreEqual(single.GetOrd(i), multi.GetOrd(i));
+                Assert.Equal(single.GetOrd(i), multi.GetOrd(i));
                 // check value
                 single.Get(i, expected);
                 multi.Get(i, actual);
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
             ir.Dispose();
             ir2.Dispose();
@@ -176,7 +176,7 @@ namespace Lucene.Net.Index
         }
 
         // tries to make more dups than testSorted
-        [Test]
+        [Fact]
         public virtual void TestSortedWithLotsOfDups()
         {
             Directory dir = NewDirectory();
@@ -207,24 +207,24 @@ namespace Lucene.Net.Index
 
             SortedDocValues multi = MultiDocValues.GetSortedValues(ir, "bytes");
             SortedDocValues single = merged.GetSortedDocValues("bytes");
-            Assert.AreEqual(single.ValueCount, multi.ValueCount);
+            Assert.Equal(single.ValueCount, multi.ValueCount);
             BytesRef actual = new BytesRef();
             BytesRef expected = new BytesRef();
             for (int i = 0; i < numDocs; i++)
             {
                 // check ord
-                Assert.AreEqual(single.GetOrd(i), multi.GetOrd(i));
+                Assert.Equal(single.GetOrd(i), multi.GetOrd(i));
                 // check ord value
                 single.Get(i, expected);
                 multi.Get(i, actual);
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
             ir.Dispose();
             ir2.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortedSet()
         {
             AssumeTrue("codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -259,11 +259,11 @@ namespace Lucene.Net.Index
             SortedSetDocValues single = merged.GetSortedSetDocValues("bytes");
             if (multi == null)
             {
-                Assert.IsNull(single);
+                Assert.Null(single);
             }
             else
             {
-                Assert.AreEqual(single.ValueCount, multi.ValueCount);
+                Assert.Equal(single.ValueCount, multi.ValueCount);
                 BytesRef actual = new BytesRef();
                 BytesRef expected = new BytesRef();
                 // check values
@@ -271,7 +271,7 @@ namespace Lucene.Net.Index
                 {
                     single.LookupOrd(i, expected);
                     multi.LookupOrd(i, actual);
-                    Assert.AreEqual(expected, actual);
+                    Assert.Equal(expected, actual);
                 }
                 // check ord list
                 for (int i = 0; i < numDocs; i++)
@@ -288,10 +288,10 @@ namespace Lucene.Net.Index
                     int upto = 0;
                     while ((ord = multi.NextOrd()) != SortedSetDocValues.NO_MORE_ORDS)
                     {
-                        Assert.AreEqual(expectedList[upto], ord);
+                        Assert.Equal(expectedList[upto], ord);
                         upto++;
                     }
-                    Assert.AreEqual(expectedList.Count, upto);
+                    Assert.Equal(expectedList.Count, upto);
                 }
             }
 
@@ -301,7 +301,7 @@ namespace Lucene.Net.Index
         }
 
         // tries to make more dups than testSortedSet
-        [Test]
+        [Fact]
         public virtual void TestSortedSetWithDups()
         {
             AssumeTrue("codec does not support SORTED_SET", DefaultCodecSupportsSortedSet());
@@ -336,11 +336,11 @@ namespace Lucene.Net.Index
             SortedSetDocValues single = merged.GetSortedSetDocValues("bytes");
             if (multi == null)
             {
-                Assert.IsNull(single);
+                Assert.Null(single);
             }
             else
             {
-                Assert.AreEqual(single.ValueCount, multi.ValueCount);
+                Assert.Equal(single.ValueCount, multi.ValueCount);
                 BytesRef actual = new BytesRef();
                 BytesRef expected = new BytesRef();
                 // check values
@@ -348,7 +348,7 @@ namespace Lucene.Net.Index
                 {
                     single.LookupOrd(i, expected);
                     multi.LookupOrd(i, actual);
-                    Assert.AreEqual(expected, actual);
+                    Assert.Equal(expected, actual);
                 }
                 // check ord list
                 for (int i = 0; i < numDocs; i++)
@@ -365,10 +365,10 @@ namespace Lucene.Net.Index
                     int upto = 0;
                     while ((ord = multi.NextOrd()) != SortedSetDocValues.NO_MORE_ORDS)
                     {
-                        Assert.AreEqual((long)expectedList[upto], ord);
+                        Assert.Equal((long)expectedList[upto], ord);
                         upto++;
                     }
-                    Assert.AreEqual(expectedList.Count, upto);
+                    Assert.Equal(expectedList.Count, upto);
                 }
             }
 
@@ -377,7 +377,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocsWithField()
         {
             AssumeTrue("codec does not support docsWithField", DefaultCodecSupportsDocsWithField());
@@ -412,23 +412,23 @@ namespace Lucene.Net.Index
             Bits single = merged.GetDocsWithField("numbers");
             if (multi == null)
             {
-                Assert.IsNull(single);
+                Assert.Null(single);
             }
             else
             {
-                Assert.AreEqual(single.Length(), multi.Length());
+                Assert.Equal(single.Length(), multi.Length());
                 for (int i = 0; i < numDocs; i++)
                 {
-                    Assert.AreEqual(single.Get(i), multi.Get(i));
+                    Assert.Equal(single.Get(i), multi.Get(i));
                 }
             }
 
             multi = MultiDocValues.GetDocsWithField(ir, "numbersAlways");
             single = merged.GetDocsWithField("numbersAlways");
-            Assert.AreEqual(single.Length(), multi.Length());
+            Assert.Equal(single.Length(), multi.Length());
             for (int i = 0; i < numDocs; i++)
             {
-                Assert.AreEqual(single.Get(i), multi.Get(i));
+                Assert.Equal(single.Get(i), multi.Get(i));
             }
             ir.Dispose();
             ir2.Dispose();

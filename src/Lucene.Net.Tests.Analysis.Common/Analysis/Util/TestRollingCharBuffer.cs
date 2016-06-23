@@ -3,7 +3,7 @@ using System.IO;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
@@ -25,10 +25,9 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestRollingCharBuffer : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             var ITERS = AtLeast(1000);

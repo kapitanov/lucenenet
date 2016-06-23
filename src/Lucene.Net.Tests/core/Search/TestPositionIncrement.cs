@@ -24,7 +24,7 @@ namespace Lucene.Net.Search
      */
 
     using Lucene.Net.Analysis;
-    using NUnit.Framework;
+    
     using System.IO;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -47,15 +47,12 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Term position unit test.
-    ///
-    ///
     /// </summary>
-    [TestFixture]
     public class TestPositionIncrement : LuceneTestCase
     {
         internal const bool VERBOSE = false;
 
-        [Test]
+        [Fact]
         public virtual void TestSetPosition()
         {
             Analyzer analyzer = new AnalyzerAnonymousInnerClassHelper(this);
@@ -72,12 +69,12 @@ namespace Lucene.Net.Search
             DocsAndPositionsEnum pos = MultiFields.GetTermPositionsEnum(searcher.IndexReader, MultiFields.GetLiveDocs(searcher.IndexReader), "field", new BytesRef("1"));
             pos.NextDoc();
             // first token should be at position 0
-            Assert.AreEqual(0, pos.NextPosition());
+            Assert.Equal(0, pos.NextPosition());
 
             pos = MultiFields.GetTermPositionsEnum(searcher.IndexReader, MultiFields.GetLiveDocs(searcher.IndexReader), "field", new BytesRef("2"));
             pos.NextDoc();
             // second token should be at position 2
-            Assert.AreEqual(2, pos.NextPosition());
+            Assert.Equal(2, pos.NextPosition());
 
             PhraseQuery q;
             ScoreDoc[] hits;
@@ -86,40 +83,40 @@ namespace Lucene.Net.Search
             q.Add(new Term("field", "1"));
             q.Add(new Term("field", "2"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // same as previous, just specify positions explicitely.
             q = new PhraseQuery();
             q.Add(new Term("field", "1"), 0);
             q.Add(new Term("field", "2"), 1);
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // specifying correct positions should find the phrase.
             q = new PhraseQuery();
             q.Add(new Term("field", "1"), 0);
             q.Add(new Term("field", "2"), 2);
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "2"));
             q.Add(new Term("field", "3"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "3"));
             q.Add(new Term("field", "4"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // phrase query would find it when correct positions are specified.
             q = new PhraseQuery();
             q.Add(new Term("field", "3"), 0);
             q.Add(new Term("field", "4"), 0);
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             // phrase query should fail for non existing searched term
             // even if there exist another searched terms in the same searched position.
@@ -127,38 +124,38 @@ namespace Lucene.Net.Search
             q.Add(new Term("field", "3"), 0);
             q.Add(new Term("field", "9"), 0);
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // multi-phrase query should succed for non existing searched term
             // because there exist another searched terms in the same searched position.
             MultiPhraseQuery mq = new MultiPhraseQuery();
             mq.Add(new Term[] { new Term("field", "3"), new Term("field", "9") }, 0);
             hits = searcher.Search(mq, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "2"));
             q.Add(new Term("field", "4"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "3"));
             q.Add(new Term("field", "5"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "4"));
             q.Add(new Term("field", "5"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             q = new PhraseQuery();
             q.Add(new Term("field", "2"));
             q.Add(new Term("field", "5"));
             hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             reader.Dispose();
             store.Dispose();
@@ -226,7 +223,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPayloadsPos0()
         {
             Directory dir = NewDirectory();
@@ -241,16 +238,16 @@ namespace Lucene.Net.Search
             DocsAndPositionsEnum tp = r.TermPositionsEnum(new Term("content", "a"));
 
             int count = 0;
-            Assert.IsTrue(tp.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+            Assert.True(tp.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
             // "a" occurs 4 times
-            Assert.AreEqual(4, tp.Freq());
-            Assert.AreEqual(0, tp.NextPosition());
-            Assert.AreEqual(1, tp.NextPosition());
-            Assert.AreEqual(3, tp.NextPosition());
-            Assert.AreEqual(6, tp.NextPosition());
+            Assert.Equal(4, tp.Freq());
+            Assert.Equal(0, tp.NextPosition());
+            Assert.Equal(1, tp.NextPosition());
+            Assert.Equal(3, tp.NextPosition());
+            Assert.Equal(6, tp.NextPosition());
 
             // only one doc has "a"
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, tp.NextDoc());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, tp.NextDoc());
 
             IndexSearcher @is = NewSearcher(readerFromWriter);
 
@@ -283,8 +280,8 @@ namespace Lucene.Net.Search
                     }
                 }
             }
-            Assert.IsTrue(sawZero);
-            Assert.AreEqual(5, count);
+            Assert.True(sawZero);
+            Assert.Equal(5, count);
 
             // System.out.println("\ngetSpans test");
             Search.Spans.Spans spans = MultiSpansWrapper.Wrap(@is.TopReaderContext, snq);
@@ -297,8 +294,8 @@ namespace Lucene.Net.Search
                 // System.out.println(spans.Doc() + " - " + spans.Start() + " - " +
                 // spans.End());
             }
-            Assert.AreEqual(4, count);
-            Assert.IsTrue(sawZero);
+            Assert.Equal(4, count);
+            Assert.True(sawZero);
 
             // System.out.println("\nPayloadSpanUtil test");
 
@@ -312,8 +309,8 @@ namespace Lucene.Net.Search
                 //System.out.println(s);
                 sawZero |= s.Equals("pos: 0");
             }
-            Assert.AreEqual(5, count);
-            Assert.IsTrue(sawZero);
+            Assert.Equal(5, count);
+            Assert.True(sawZero);
             writer.Dispose();
             @is.IndexReader.Dispose();
             dir.Dispose();

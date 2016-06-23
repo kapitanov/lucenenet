@@ -1,11 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Search;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Search;
-    using NUnit.Framework;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -33,13 +33,12 @@ namespace Lucene.Net.Index
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestParallelAtomicReader : LuceneTestCase
     {
         private IndexSearcher Parallel_Renamed, Single_Renamed;
         private Directory Dir, Dir1, Dir2;
 
-        [Test]
+        [Fact]
         public virtual void TestQueries()
         {
             Single_Renamed = Single(Random());
@@ -71,24 +70,24 @@ namespace Lucene.Net.Index
             Dir2 = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFieldNames()
         {
             Directory dir1 = GetDir1(Random());
             Directory dir2 = GetDir2(Random());
             ParallelAtomicReader pr = new ParallelAtomicReader(SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir1)), SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir2)));
             FieldInfos fieldInfos = pr.FieldInfos;
-            Assert.AreEqual(4, fieldInfos.Size());
-            Assert.IsNotNull(fieldInfos.FieldInfo("f1"));
-            Assert.IsNotNull(fieldInfos.FieldInfo("f2"));
-            Assert.IsNotNull(fieldInfos.FieldInfo("f3"));
-            Assert.IsNotNull(fieldInfos.FieldInfo("f4"));
+            Assert.Equal(4, fieldInfos.Size());
+            Assert.NotNull(fieldInfos.FieldInfo("f1"));
+            Assert.NotNull(fieldInfos.FieldInfo("f2"));
+            Assert.NotNull(fieldInfos.FieldInfo("f3"));
+            Assert.NotNull(fieldInfos.FieldInfo("f4"));
             pr.Dispose();
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRefCounts1()
         {
             Directory dir1 = GetDir1(Random());
@@ -98,16 +97,16 @@ namespace Lucene.Net.Index
             ParallelAtomicReader pr = new ParallelAtomicReader(ir1 = SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir1)), ir2 = SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir2)));
 
             // check RefCounts
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             pr.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRefCounts2()
         {
             Directory dir1 = GetDir1(Random());
@@ -117,20 +116,20 @@ namespace Lucene.Net.Index
             // don't close subreaders, so ParallelReader will increment refcounts
             ParallelAtomicReader pr = new ParallelAtomicReader(false, ir1, ir2);
             // check RefCounts
-            Assert.AreEqual(2, ir1.RefCount);
-            Assert.AreEqual(2, ir2.RefCount);
+            Assert.Equal(2, ir1.RefCount);
+            Assert.Equal(2, ir2.RefCount);
             pr.Dispose();
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             ir1.Dispose();
             ir2.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloseInnerReader()
         {
             Directory dir1 = GetDir1(Random());
@@ -144,7 +143,7 @@ namespace Lucene.Net.Index
             try
             {
                 pr.Document(0);
-                Assert.Fail("ParallelAtomicReader should be already closed because inner reader was closed!");
+                Assert.True(false, "ParallelAtomicReader should be already closed because inner reader was closed!");
             }
             catch (AlreadyClosedException e)
             {
@@ -156,7 +155,7 @@ namespace Lucene.Net.Index
             dir1.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIncompatibleIndexes()
         {
             // two documents:
@@ -177,7 +176,7 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelAtomicReader(ir1, ir2);
-                Assert.Fail("didn't get exptected exception: indexes don't have same number of documents");
+                Assert.True(false, "didn't get exptected exception: indexes don't have same number of documents");
             }
             catch (System.ArgumentException e)
             {
@@ -187,22 +186,22 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelAtomicReader(Random().NextBoolean(), new AtomicReader[] { ir1, ir2 }, new AtomicReader[] { ir1, ir2 });
-                Assert.Fail("didn't get expected exception: indexes don't have same number of documents");
+                Assert.True(false, "didn't get expected exception: indexes don't have same number of documents");
             }
             catch (System.ArgumentException e)
             {
                 // expected exception
             }
             // check RefCounts
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             ir1.Dispose();
             ir2.Dispose();
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIgnoreStoredFields()
         {
             Directory dir1 = GetDir1(Random());
@@ -212,48 +211,48 @@ namespace Lucene.Net.Index
 
             // with overlapping
             ParallelAtomicReader pr = new ParallelAtomicReader(false, new AtomicReader[] { ir1, ir2 }, new AtomicReader[] { ir1 });
-            Assert.AreEqual("v1", pr.Document(0).Get("f1"));
-            Assert.AreEqual("v1", pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Equal("v1", pr.Document(0).Get("f1"));
+            Assert.Equal("v1", pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
-            Assert.IsNotNull(pr.Terms("f1"));
-            Assert.IsNotNull(pr.Terms("f2"));
-            Assert.IsNotNull(pr.Terms("f3"));
-            Assert.IsNotNull(pr.Terms("f4"));
+            Assert.NotNull(pr.Terms("f1"));
+            Assert.NotNull(pr.Terms("f2"));
+            Assert.NotNull(pr.Terms("f3"));
+            Assert.NotNull(pr.Terms("f4"));
             pr.Dispose();
 
             // no stored fields at all
             pr = new ParallelAtomicReader(false, new AtomicReader[] { ir2 }, new AtomicReader[0]);
-            Assert.IsNull(pr.Document(0).Get("f1"));
-            Assert.IsNull(pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Null(pr.Document(0).Get("f1"));
+            Assert.Null(pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
-            Assert.IsNull(pr.Terms("f1"));
-            Assert.IsNull(pr.Terms("f2"));
-            Assert.IsNotNull(pr.Terms("f3"));
-            Assert.IsNotNull(pr.Terms("f4"));
+            Assert.Null(pr.Terms("f1"));
+            Assert.Null(pr.Terms("f2"));
+            Assert.NotNull(pr.Terms("f3"));
+            Assert.NotNull(pr.Terms("f4"));
             pr.Dispose();
 
             // without overlapping
             pr = new ParallelAtomicReader(true, new AtomicReader[] { ir2 }, new AtomicReader[] { ir1 });
-            Assert.AreEqual("v1", pr.Document(0).Get("f1"));
-            Assert.AreEqual("v1", pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Equal("v1", pr.Document(0).Get("f1"));
+            Assert.Equal("v1", pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
-            Assert.IsNull(pr.Terms("f1"));
-            Assert.IsNull(pr.Terms("f2"));
-            Assert.IsNotNull(pr.Terms("f3"));
-            Assert.IsNotNull(pr.Terms("f4"));
+            Assert.Null(pr.Terms("f1"));
+            Assert.Null(pr.Terms("f2"));
+            Assert.NotNull(pr.Terms("f3"));
+            Assert.NotNull(pr.Terms("f4"));
             pr.Dispose();
 
             // no main readers
             try
             {
                 new ParallelAtomicReader(true, new AtomicReader[0], new AtomicReader[] { ir1 });
-                Assert.Fail("didn't get expected exception: need a non-empty main-reader array");
+                Assert.True(false, "didn't get expected exception: need a non-empty main-reader array");
             }
             catch (System.ArgumentException iae)
             {
@@ -268,16 +267,16 @@ namespace Lucene.Net.Index
         {
             ScoreDoc[] parallelHits = Parallel_Renamed.Search(query, null, 1000).ScoreDocs;
             ScoreDoc[] singleHits = Single_Renamed.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(parallelHits.Length, singleHits.Length);
+            Assert.Equal(parallelHits.Length, singleHits.Length);
             for (int i = 0; i < parallelHits.Length; i++)
             {
-                Assert.AreEqual(parallelHits[i].Score, singleHits[i].Score, 0.001f);
+                Assert.Equal(parallelHits[i].Score, singleHits[i].Score, 0.001f);
                 Document docParallel = Parallel_Renamed.Doc(parallelHits[i].Doc);
                 Document docSingle = Single_Renamed.Doc(singleHits[i].Doc);
-                Assert.AreEqual(docParallel.Get("f1"), docSingle.Get("f1"));
-                Assert.AreEqual(docParallel.Get("f2"), docSingle.Get("f2"));
-                Assert.AreEqual(docParallel.Get("f3"), docSingle.Get("f3"));
-                Assert.AreEqual(docParallel.Get("f4"), docSingle.Get("f4"));
+                Assert.Equal(docParallel.Get("f1"), docSingle.Get("f1"));
+                Assert.Equal(docParallel.Get("f2"), docSingle.Get("f2"));
+                Assert.Equal(docParallel.Get("f3"), docSingle.Get("f3"));
+                Assert.Equal(docParallel.Get("f4"), docSingle.Get("f4"));
             }
         }
 

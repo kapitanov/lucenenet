@@ -4,7 +4,7 @@ using Field = Lucene.Net.Documents.Field;
 namespace Lucene.Net.Codecs.Compressing
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using BaseStoredFieldsFormatTestCase = Lucene.Net.Index.BaseStoredFieldsFormatTestCase;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -44,8 +44,8 @@ namespace Lucene.Net.Codecs.Compressing
             }
         }
 
-        [Test]
-        [ExpectedException("System.ArgumentException")]
+        //[ExpectedException("System.ArgumentException")]
+        [Fact]
         public virtual void TestDeletePartiallyWrittenFilesIfAbort()
         {
             Directory dir = NewDirectory();
@@ -83,8 +83,9 @@ namespace Lucene.Net.Codecs.Compressing
                         counter++;
                     }
                 }
+
                 // Only one .fdt and one .fdx files must have been found
-                Assert.AreEqual(2, counter);
+                Assert.Equal(2, counter);
                 iw.Dispose();
                 dir.Dispose();
             }

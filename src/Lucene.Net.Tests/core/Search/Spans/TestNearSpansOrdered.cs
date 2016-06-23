@@ -1,9 +1,9 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search.Spans
 {
     using Lucene.Net.Index;
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -47,13 +47,13 @@ namespace Lucene.Net.Search.Spans
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
             for (int i = 0; i < DocFields.Length; i++)
@@ -79,7 +79,7 @@ namespace Lucene.Net.Search.Spans
             return MakeQuery("w1", "w2", "w3", 1, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSpanNearQuery()
         {
             SpanNearQuery q = MakeQuery();
@@ -96,16 +96,16 @@ namespace Lucene.Net.Search.Spans
             return "s(" + doc + "," + start + "," + end + ")";
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansNext()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(0, 0, 3), s(span));
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(1, 0, 4), s(span));
-            Assert.AreEqual(false, span.Next());
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(0, 0, 3), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(1, 0, 4), s(span));
+            Assert.Equal(false, span.Next());
         }
 
         /// <summary>
@@ -113,71 +113,71 @@ namespace Lucene.Net.Search.Spans
         /// same as next -- it's only applicable in this case since we know doc
         /// does not contain more than one span
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestNearSpansSkipToLikeNext()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.SkipTo(0));
-            Assert.AreEqual(s(0, 0, 3), s(span));
-            Assert.AreEqual(true, span.SkipTo(1));
-            Assert.AreEqual(s(1, 0, 4), s(span));
-            Assert.AreEqual(false, span.SkipTo(2));
+            Assert.Equal(true, span.SkipTo(0));
+            Assert.Equal(s(0, 0, 3), s(span));
+            Assert.Equal(true, span.SkipTo(1));
+            Assert.Equal(s(1, 0, 4), s(span));
+            Assert.Equal(false, span.SkipTo(2));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansNextThenSkipTo()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(0, 0, 3), s(span));
-            Assert.AreEqual(true, span.SkipTo(1));
-            Assert.AreEqual(s(1, 0, 4), s(span));
-            Assert.AreEqual(false, span.Next());
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(0, 0, 3), s(span));
+            Assert.Equal(true, span.SkipTo(1));
+            Assert.Equal(s(1, 0, 4), s(span));
+            Assert.Equal(false, span.Next());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansNextThenSkipPast()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(0, 0, 3), s(span));
-            Assert.AreEqual(false, span.SkipTo(2));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(0, 0, 3), s(span));
+            Assert.Equal(false, span.SkipTo(2));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansSkipPast()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(false, span.SkipTo(2));
+            Assert.Equal(false, span.SkipTo(2));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansSkipTo0()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.SkipTo(0));
-            Assert.AreEqual(s(0, 0, 3), s(span));
+            Assert.Equal(true, span.SkipTo(0));
+            Assert.Equal(s(0, 0, 3), s(span));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNearSpansSkipTo1()
         {
             SpanNearQuery q = MakeQuery();
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
-            Assert.AreEqual(true, span.SkipTo(1));
-            Assert.AreEqual(s(1, 0, 4), s(span));
+            Assert.Equal(true, span.SkipTo(1));
+            Assert.Equal(s(1, 0, 4), s(span));
         }
 
         /// <summary>
         /// not a direct test of NearSpans, but a demonstration of how/when
         /// this causes problems
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearScorerSkipTo1()
         {
             SpanNearQuery q = MakeQuery();
@@ -185,19 +185,19 @@ namespace Lucene.Net.Search.Spans
             IndexReaderContext topReaderContext = Searcher.TopReaderContext;
             AtomicReaderContext leave = topReaderContext.Leaves[0];
             Scorer s = w.Scorer(leave, ((AtomicReader)leave.Reader).LiveDocs);
-            Assert.AreEqual(1, s.Advance(1));
+            Assert.Equal(1, s.Advance(1));
         }
 
         /// <summary>
         /// not a direct test of NearSpans, but a demonstration of how/when
         /// this causes problems
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearScorerExplain()
         {
             SpanNearQuery q = MakeQuery();
             Explanation e = Searcher.Explain(q, 1);
-            Assert.IsTrue(0.0f < e.Value, "Scorer explanation value for doc#1 isn't positive: " + e.ToString());
+            Assert.True(0.0f < e.Value, "Scorer explanation value for doc#1 isn't positive: " + e.ToString());
         }
     }
 }

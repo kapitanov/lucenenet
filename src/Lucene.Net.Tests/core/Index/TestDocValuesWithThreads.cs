@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Threading;
 using Lucene.Net.Documents;
 using Lucene.Net.Search;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
     using BinaryDocValuesField = BinaryDocValuesField;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -38,10 +38,9 @@ namespace Lucene.Net.Index
     using SortedDocValuesField = SortedDocValuesField;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
-    public class TestDocValuesWithThreads : LuceneTestCase
+    public class TestDocValuesWithThreads : LuceneTestCase // make sure base constructor and dispose is called.
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();
@@ -70,7 +69,7 @@ namespace Lucene.Net.Index
             IndexReader r = w.Reader;
             w.Dispose();
 
-            Assert.AreEqual(1, r.Leaves.Count);
+            Assert.Equal(1, r.Leaves.Count);
             AtomicReader ar = (AtomicReader)r.Leaves[0].Reader;
 
             int numThreads = TestUtil.NextInt(Random(), 2, 5);
@@ -138,34 +137,34 @@ namespace Lucene.Net.Index
                         switch (ThreadRandom.Next(6))
                         {
                             case 0:
-                                Assert.AreEqual((long)(sbyte)Numbers[docID], FieldCache.DEFAULT.GetBytes(Ar, "number", false).Get(docID));
+                                Assert.Equal((long)(sbyte)Numbers[docID], FieldCache.DEFAULT.GetBytes(Ar, "number", false).Get(docID));
                                 break;
 
                             case 1:
-                                Assert.AreEqual((long)(short)Numbers[docID], FieldCache.DEFAULT.GetShorts(Ar, "number", false).Get(docID));
+                                Assert.Equal((long)(short)Numbers[docID], FieldCache.DEFAULT.GetShorts(Ar, "number", false).Get(docID));
                                 break;
 
                             case 2:
-                                Assert.AreEqual((long)(int)Numbers[docID], FieldCache.DEFAULT.GetInts(Ar, "number", false).Get(docID));
+                                Assert.Equal((long)(int)Numbers[docID], FieldCache.DEFAULT.GetInts(Ar, "number", false).Get(docID));
                                 break;
 
                             case 3:
-                                Assert.AreEqual((long)Numbers[docID], FieldCache.DEFAULT.GetLongs(Ar, "number", false).Get(docID));
+                                Assert.Equal((long)Numbers[docID], FieldCache.DEFAULT.GetLongs(Ar, "number", false).Get(docID));
                                 break;
 
                             case 4:
-                                Assert.AreEqual(Number.IntBitsToFloat((int)Numbers[docID]), FieldCache.DEFAULT.GetFloats(Ar, "number", false).Get(docID), 0.0f);
+                                Assert.Equal(Number.IntBitsToFloat((int)Numbers[docID]), FieldCache.DEFAULT.GetFloats(Ar, "number", false).Get(docID)); //, 0.0f);
                                 break;
 
                             case 5:
-                                Assert.AreEqual(BitConverter.Int64BitsToDouble((long)Numbers[docID]), FieldCache.DEFAULT.GetDoubles(Ar, "number", false).Get(docID), 0.0);
+                                Assert.Equal(BitConverter.Int64BitsToDouble((long)Numbers[docID]), FieldCache.DEFAULT.GetDoubles(Ar, "number", false).Get(docID)); //, 0.0);
                                 break;
                         }
                         bdv.Get(docID, scratch);
-                        Assert.AreEqual(Binary[docID], scratch);
+                        Assert.Equal(Binary[docID], scratch);
                         // Cannot share a single scratch against two "sources":
                         sdv.Get(docID, scratch2);
-                        Assert.AreEqual(Sorted[docID], scratch2);
+                        Assert.Equal(Sorted[docID], scratch2);
                     }
                 }
                 catch (Exception e)
@@ -175,7 +174,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void Test2()
         {
             Random random = Random();
@@ -282,7 +281,7 @@ namespace Lucene.Net.Index
                 {
                     stringDVDirect = Sr.GetSortedDocValues("stringdv");
                     docIDToID = Sr.GetNumericDocValues("id");
-                    Assert.IsNotNull(stringDVDirect);
+                    Assert.NotNull(stringDVDirect);
                 }
                 catch (IOException ioe)
                 {
@@ -298,7 +297,7 @@ namespace Lucene.Net.Index
                     {
                         int docID = random.Next(Sr.MaxDoc);
                         source.Get(docID, scratch);
-                        Assert.AreEqual(DocValues[(int)docIDToID.Get(docID)], scratch);
+                        Assert.Equal(DocValues[(int)docIDToID.Get(docID)], scratch);
                     }
                 }
             }

@@ -1,5 +1,6 @@
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -22,7 +23,6 @@ namespace Lucene.Net.Index
 
     using Lucene.Net.Analysis;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -44,7 +44,6 @@ namespace Lucene.Net.Index
     /// testcases.
     ///
     /// </summary>
-    [TestFixture]
     public class TestMultiLevelSkipList : LuceneTestCase
     {
         internal class CountingRAMDirectory : MockDirectoryWrapper
@@ -68,14 +67,12 @@ namespace Lucene.Net.Index
             }
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestMultiLevelSkipList() : base()
         {
-            base.SetUp();
             Counter = 0;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleSkip()
         {
             Directory dir = new CountingRAMDirectory(this, new RAMDirectory());
@@ -112,15 +109,15 @@ namespace Lucene.Net.Index
             tp.Advance(target);
             if (maxCounter < Counter)
             {
-                Assert.Fail("Too many bytes read: " + Counter + " vs " + maxCounter);
+                Assert.True(false, "Too many bytes read: " + Counter + " vs " + maxCounter);
             }
 
-            Assert.AreEqual(target, tp.DocID(), "Wrong document " + tp.DocID() + " after skipTo target " + target);
-            Assert.AreEqual(1, tp.Freq(), "Frequency is not 1: " + tp.Freq());
+            Assert.Equal(target, tp.DocID()); //, "Wrong document " + tp.DocID() + " after skipTo target " + target);
+            Assert.Equal(1, tp.Freq()); //, "Frequency is not 1: " + tp.Freq());
             tp.NextPosition();
             BytesRef b = tp.Payload;
-            Assert.AreEqual(1, b.Length);
-            Assert.AreEqual((sbyte)target, (sbyte)b.Bytes[b.Offset], "Wrong payload for the target " + target + ": " + (sbyte)b.Bytes[b.Offset]);
+            Assert.Equal(1, b.Length);
+            Assert.Equal((sbyte)target, (sbyte)b.Bytes[b.Offset]); //, "Wrong payload for the target " + target + ": " + (sbyte)b.Bytes[b.Offset]);
         }
 
         private class PayloadAnalyzer : Analyzer

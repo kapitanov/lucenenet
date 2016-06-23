@@ -131,7 +131,7 @@ namespace Lucene.Net.Facet
             taxo = new DirectoryTaxonomyReader(taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAndOrs()
         {
             IndexSearcher searcher = NewSearcher(reader);
@@ -142,10 +142,10 @@ namespace Lucene.Net.Facet
             q.Add("a", "2");
             q.Add("b", "1");
             TopDocs docs = searcher.Search(q, 100);
-            Assert.AreEqual(5, docs.TotalHits);
+            Assert.Equal(5, docs.TotalHits);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQuery()
         {
             IndexSearcher searcher = NewSearcher(reader);
@@ -155,14 +155,14 @@ namespace Lucene.Net.Facet
             q.Add("a");
             QueryUtils.Check(q);
             TopDocs docs = searcher.Search(q, 100);
-            Assert.AreEqual(25, docs.TotalHits);
+            Assert.Equal(25, docs.TotalHits);
 
             // Making sure the query yields 5 documents with the facet "b" and the
             // previous (facet "a") query as a base query
             DrillDownQuery q2 = new DrillDownQuery(config, q);
             q2.Add("b");
             docs = searcher.Search(q2, 100);
-            Assert.AreEqual(5, docs.TotalHits);
+            Assert.Equal(5, docs.TotalHits);
 
             // Making sure that a query of both facet "a" and facet "b" yields 5 results
             DrillDownQuery q3 = new DrillDownQuery(config);
@@ -170,17 +170,17 @@ namespace Lucene.Net.Facet
             q3.Add("b");
             docs = searcher.Search(q3, 100);
 
-            Assert.AreEqual(5, docs.TotalHits);
+            Assert.Equal(5, docs.TotalHits);
             // Check that content:foo (which yields 50% results) and facet/b (which yields 20%)
             // would gather together 10 results (10%..) 
             Query fooQuery = new TermQuery(new Term("content", "foo"));
             DrillDownQuery q4 = new DrillDownQuery(config, fooQuery);
             q4.Add("b");
             docs = searcher.Search(q4, 100);
-            Assert.AreEqual(10, docs.TotalHits);
+            Assert.Equal(10, docs.TotalHits);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueryImplicitDefaultParams()
         {
             IndexSearcher searcher = NewSearcher(reader);
@@ -194,7 +194,7 @@ namespace Lucene.Net.Facet
             DrillDownQuery q2 = new DrillDownQuery(config, q);
             q2.Add("b");
             TopDocs docs = searcher.Search(q2, 100);
-            Assert.AreEqual(5, docs.TotalHits);
+            Assert.Equal(5, docs.TotalHits);
 
             // Check that content:foo (which yields 50% results) and facet/b (which yields 20%)
             // would gather together 10 results (10%..) 
@@ -202,10 +202,10 @@ namespace Lucene.Net.Facet
             DrillDownQuery q4 = new DrillDownQuery(config, fooQuery);
             q4.Add("b");
             docs = searcher.Search(q4, 100);
-            Assert.AreEqual(10, docs.TotalHits);
+            Assert.Equal(10, docs.TotalHits);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestScoring()
         {
             // verify that drill-down queries do not modify scores
@@ -226,11 +226,11 @@ namespace Lucene.Net.Facet
             docs = searcher.Search(q2, reader.MaxDoc); // fetch all available docs to this query
             foreach (ScoreDoc sd in docs.ScoreDocs)
             {
-                Assert.AreEqual(scores[sd.Doc], sd.Score, 0f, "score of doc=" + sd.Doc + " modified");
+                Assert.Equal(scores[sd.Doc], sd.Score, 0f, "score of doc=" + sd.Doc + " modified");
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestScoringNoBaseQuery()
         {
             // verify that drill-down queries (with no base query) returns 0.0 score
@@ -241,23 +241,23 @@ namespace Lucene.Net.Facet
             TopDocs docs = searcher.Search(q, reader.MaxDoc); // fetch all available docs to this query
             foreach (ScoreDoc sd in docs.ScoreDocs)
             {
-                Assert.AreEqual(0f, sd.Score, 0f);
+                Assert.Equal(0f, sd.Score, 0f);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermNonDefault()
         {
             string aField = config.GetDimConfig("a").IndexFieldName;
             Term termA = DrillDownQuery.Term(aField, "a");
-            Assert.AreEqual(new Term(aField, "a"), termA);
+            Assert.Equal(new Term(aField, "a"), termA);
 
             string bField = config.GetDimConfig("b").IndexFieldName;
             Term termB = DrillDownQuery.Term(bField, "b");
-            Assert.AreEqual(new Term(bField, "b"), termB);
+            Assert.Equal(new Term(bField, "b"), termB);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestClone()
         {
             var q = new DrillDownQuery(config, new MatchAllDocsQuery());
@@ -269,13 +269,13 @@ namespace Lucene.Net.Facet
             Assert.False(q.ToString().Equals(clone.ToString()), "query wasn't cloned: source=" + q + " clone=" + clone);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoDrillDown()
         {
             Query @base = new MatchAllDocsQuery();
             DrillDownQuery q = new DrillDownQuery(config, @base);
             Query rewrite = q.Rewrite(reader).Rewrite(reader);
-            Assert.AreSame(@base, rewrite);
+            Assert.Same(@base, rewrite);
         }
     }
 

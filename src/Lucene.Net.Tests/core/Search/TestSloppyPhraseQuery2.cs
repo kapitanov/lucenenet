@@ -1,9 +1,8 @@
 using System;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -27,12 +26,11 @@ namespace Lucene.Net.Search
     /// <summary>
     /// random sloppy phrase query tests
     /// </summary>
-    [TestFixture]
     public class TestSloppyPhraseQuery2 : SearchEquivalenceTestBase
     {
         /// <summary>
         /// "A B"~N ⊆ "A B"~N+1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestIncreasingSloppiness()
         {
             Term t1 = RandomTerm();
@@ -53,7 +51,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as the above with posincr </summary>
-        [Test]
+        [Fact]
         public virtual void TestIncreasingSloppinessWithHoles()
         {
             Term t1 = RandomTerm();
@@ -74,7 +72,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A B C"~N ⊆ "A B C"~N+1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestIncreasingSloppiness3()
         {
             Term t1 = RandomTerm();
@@ -98,7 +96,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as the above with posincr </summary>
-        [Test]
+        [Fact]
         public virtual void TestIncreasingSloppiness3WithHoles()
         {
             Term t1 = RandomTerm();
@@ -124,7 +122,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A A"~N ⊆ "A A"~N+1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestRepetitiveIncreasingSloppiness()
         {
             Term t = RandomTerm();
@@ -144,7 +142,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as the above with posincr </summary>
-        [Test]
+        [Fact]
         public virtual void TestRepetitiveIncreasingSloppinessWithHoles()
         {
             Term t = RandomTerm();
@@ -164,7 +162,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A A A"~N ⊆ "A A A"~N+1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestRepetitiveIncreasingSloppiness3()
         {
             Term t = RandomTerm();
@@ -186,7 +184,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as the above with posincr </summary>
-        [Test]
+        [Fact]
         public virtual void TestRepetitiveIncreasingSloppiness3WithHoles()
         {
             Term t = RandomTerm();
@@ -210,7 +208,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// MultiPhraseQuery~N ⊆ MultiPhraseQuery~N+1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestRandomIncreasingSloppiness()
         {
             int seed = Random().Next();

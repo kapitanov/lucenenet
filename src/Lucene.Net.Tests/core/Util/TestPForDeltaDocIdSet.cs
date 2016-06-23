@@ -1,5 +1,5 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System.Collections;
 
 namespace Lucene.Net.Util
@@ -36,7 +36,7 @@ namespace Lucene.Net.Util
         public override void AssertEquals(int numBits, BitArray ds1, PForDeltaDocIdSet ds2)
         {
             base.AssertEquals(numBits, ds1, ds2);
-            Assert.AreEqual(ds1.Cardinality(), ds2.Cardinality());
+            Assert.Equal(ds1.Cardinality(), ds2.Cardinality());
         }
     }
 }

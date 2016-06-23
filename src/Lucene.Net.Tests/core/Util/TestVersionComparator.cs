@@ -1,6 +1,6 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -24,36 +24,35 @@ namespace Lucene.Net.Util
     /// <summary>
     /// Tests for StringHelper.getVersionComparator
     /// </summary>
-    [TestFixture]
     public class TestVersionComparator : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestVersions()
         {
             IComparer<string> comp = StringHelper.VersionComparator;
-            Assert.IsTrue(comp.Compare("1", "2") < 0);
-            Assert.IsTrue(comp.Compare("1", "1") == 0);
-            Assert.IsTrue(comp.Compare("2", "1") > 0);
+            Assert.True(comp.Compare("1", "2") < 0);
+            Assert.True(comp.Compare("1", "1") == 0);
+            Assert.True(comp.Compare("2", "1") > 0);
 
-            Assert.IsTrue(comp.Compare("1.1", "1") > 0);
-            Assert.IsTrue(comp.Compare("1", "1.1") < 0);
-            Assert.IsTrue(comp.Compare("1.1", "1.1") == 0);
+            Assert.True(comp.Compare("1.1", "1") > 0);
+            Assert.True(comp.Compare("1", "1.1") < 0);
+            Assert.True(comp.Compare("1.1", "1.1") == 0);
 
-            Assert.IsTrue(comp.Compare("1.0", "1") == 0);
-            Assert.IsTrue(comp.Compare("1", "1.0") == 0);
-            Assert.IsTrue(comp.Compare("1.0.1", "1.0") > 0);
-            Assert.IsTrue(comp.Compare("1.0", "1.0.1") < 0);
+            Assert.True(comp.Compare("1.0", "1") == 0);
+            Assert.True(comp.Compare("1", "1.0") == 0);
+            Assert.True(comp.Compare("1.0.1", "1.0") > 0);
+            Assert.True(comp.Compare("1.0", "1.0.1") < 0);
 
-            Assert.IsTrue(comp.Compare("1.02.003", "1.2.3.0") == 0);
-            Assert.IsTrue(comp.Compare("1.2.3.0", "1.02.003") == 0);
+            Assert.True(comp.Compare("1.02.003", "1.2.3.0") == 0);
+            Assert.True(comp.Compare("1.2.3.0", "1.02.003") == 0);
 
-            Assert.IsTrue(comp.Compare("1.10", "1.9") > 0);
-            Assert.IsTrue(comp.Compare("1.9", "1.10") < 0);
+            Assert.True(comp.Compare("1.10", "1.9") > 0);
+            Assert.True(comp.Compare("1.9", "1.10") < 0);
 
-            Assert.IsTrue(comp.Compare("0", "1.0") < 0);
-            Assert.IsTrue(comp.Compare("00", "1.0") < 0);
-            Assert.IsTrue(comp.Compare("-1.0", "1.0") < 0);
-            Assert.IsTrue(comp.Compare("3.0", Convert.ToString(int.MinValue)) > 0);
+            Assert.True(comp.Compare("0", "1.0") < 0);
+            Assert.True(comp.Compare("00", "1.0") < 0);
+            Assert.True(comp.Compare("-1.0", "1.0") < 0);
+            Assert.True(comp.Compare("3.0", Convert.ToString(int.MinValue)) > 0);
         }
     }
 }

@@ -1,12 +1,12 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Util;
+using Xunit;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace Lucene.Net.Index
 {
-    //using AlreadySetException = Lucene.Net.Util.SetOnce.AlreadySetException;
-    using NUnit.Framework;
+	//using AlreadySetException = Lucene.Net.Util.SetOnce.AlreadySetException;
     using Codec = Lucene.Net.Codecs.Codec;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -37,7 +37,6 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using Store = Field.Store;
 
-    [TestFixture]
     public class TestIndexWriterConfig : LuceneTestCase
     {
         private sealed class MySimilarity : DefaultSimilarity
@@ -54,34 +53,35 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDefaults()
         {
             IndexWriterConfig conf = new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
-            Assert.AreEqual(typeof(MockAnalyzer), conf.Analyzer.GetType());
-            Assert.IsNull(conf.IndexCommit);
-            Assert.AreEqual(typeof(KeepOnlyLastCommitDeletionPolicy), conf.DelPolicy.GetType());
-            Assert.AreEqual(typeof(ConcurrentMergeScheduler), conf.MergeScheduler.GetType());
-            Assert.AreEqual(OpenMode_e.CREATE_OR_APPEND, conf.OpenMode);
+            Assert.Equal(typeof(MockAnalyzer), conf.Analyzer.GetType());
+            Assert.Null(conf.IndexCommit);
+            Assert.Equal(typeof(KeepOnlyLastCommitDeletionPolicy), conf.DelPolicy.GetType());
+            Assert.Equal(typeof(ConcurrentMergeScheduler), conf.MergeScheduler.GetType());
+            Assert.Equal(OpenMode_e.CREATE_OR_APPEND, conf.OpenMode);
+
             // we don't need to assert this, it should be unspecified
-            Assert.IsTrue(IndexSearcher.DefaultSimilarity == conf.Similarity);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_TERM_INDEX_INTERVAL, conf.TermIndexInterval);
-            Assert.AreEqual(IndexWriterConfig.DefaultWriteLockTimeout, conf.WriteLockTimeout);
-            Assert.AreEqual(IndexWriterConfig.WRITE_LOCK_TIMEOUT, IndexWriterConfig.DefaultWriteLockTimeout);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS, conf.MaxBufferedDeleteTerms);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, conf.RAMBufferSizeMB, 0.0);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS, conf.MaxBufferedDocs);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_READER_POOLING, conf.ReaderPooling);
-            Assert.IsTrue(DocumentsWriterPerThread.DefaultIndexingChain == conf.IndexingChain);
-            Assert.IsNull(conf.MergedSegmentWarmer);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_READER_TERMS_INDEX_DIVISOR, conf.ReaderTermsIndexDivisor);
-            Assert.AreEqual(typeof(TieredMergePolicy), conf.MergePolicy.GetType());
-            Assert.AreEqual(typeof(ThreadAffinityDocumentsWriterThreadPool), conf.IndexerThreadPool.GetType());
-            Assert.AreEqual(typeof(FlushByRamOrCountsPolicy), conf.FlushPolicy.GetType());
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_RAM_PER_THREAD_HARD_LIMIT_MB, conf.RAMPerThreadHardLimitMB);
-            Assert.AreEqual(Codec.Default, conf.Codec);
-            Assert.AreEqual(InfoStream.Default, conf.InfoStream);
-            Assert.AreEqual(IndexWriterConfig.DEFAULT_USE_COMPOUND_FILE_SYSTEM, conf.UseCompoundFile);
+            Assert.True(IndexSearcher.DefaultSimilarity == conf.Similarity);
+            Assert.Equal(IndexWriterConfig.DEFAULT_TERM_INDEX_INTERVAL, conf.TermIndexInterval);
+            Assert.Equal(IndexWriterConfig.DefaultWriteLockTimeout, conf.WriteLockTimeout);
+            Assert.Equal(IndexWriterConfig.WRITE_LOCK_TIMEOUT, IndexWriterConfig.DefaultWriteLockTimeout);
+            Assert.Equal(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS, conf.MaxBufferedDeleteTerms);
+            Assert.Equal(IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, conf.RAMBufferSizeMB, 0.0);
+            Assert.Equal(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS, conf.MaxBufferedDocs);
+            Assert.Equal(IndexWriterConfig.DEFAULT_READER_POOLING, conf.ReaderPooling);
+            Assert.True(DocumentsWriterPerThread.DefaultIndexingChain == conf.IndexingChain);
+            Assert.Null(conf.MergedSegmentWarmer);
+            Assert.Equal(IndexWriterConfig.DEFAULT_READER_TERMS_INDEX_DIVISOR, conf.ReaderTermsIndexDivisor);
+            Assert.Equal(typeof(TieredMergePolicy), conf.MergePolicy.GetType());
+            Assert.Equal(typeof(ThreadAffinityDocumentsWriterThreadPool), conf.IndexerThreadPool.GetType());
+            Assert.Equal(typeof(FlushByRamOrCountsPolicy), conf.FlushPolicy.GetType());
+            Assert.Equal(IndexWriterConfig.DEFAULT_RAM_PER_THREAD_HARD_LIMIT_MB, conf.RAMPerThreadHardLimitMB);
+            Assert.Equal(Codec.Default, conf.Codec);
+            Assert.Equal(InfoStream.Default, conf.InfoStream);
+            Assert.Equal(IndexWriterConfig.DEFAULT_USE_COMPOUND_FILE_SYSTEM, conf.UseCompoundFile);
             // Sanity check - validate that all getters are covered.
             HashSet<string> getters = new HashSet<string>();
             getters.Add("getAnalyzer");
@@ -114,12 +114,12 @@ namespace Lucene.Net.Index
             {
                 if (m.DeclaringType == typeof(IndexWriterConfig) && m.Name.StartsWith("get") && !m.Name.StartsWith("get_"))
                 {
-                    Assert.IsTrue(getters.Contains(m.Name), "method " + m.Name + " is not tested for defaults");
+                    Assert.True(getters.Contains(m.Name), "method " + m.Name + " is not tested for defaults");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSettersChaining()
         {
             // Ensures that every setter returns IndexWriterConfig to allow chaining.
@@ -141,17 +141,17 @@ namespace Lucene.Net.Index
                     }
                     else
                     {
-                        Assert.AreEqual(typeof(IndexWriterConfig), m.ReturnType, "method " + m.Name + " does not return IndexWriterConfig");
+                        Assert.Equal(typeof(IndexWriterConfig), m.ReturnType); //, "method " + m.Name + " does not return IndexWriterConfig");
                     }
                 }
             }
             foreach (string setter in liveSetters)
             {
-                Assert.IsTrue(allSetters.Contains(setter), "setter method not overridden by IndexWriterConfig: " + setter);
+                Assert.True(allSetters.Contains(setter), "setter method not overridden by IndexWriterConfig: " + setter);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReuse()
         {
             Directory dir = NewDirectory();
@@ -162,8 +162,8 @@ namespace Lucene.Net.Index
             // this should fail
             try
             {
-                Assert.IsNotNull(new RandomIndexWriter(Random(), dir, conf));
-                Assert.Fail("should have hit AlreadySetException");
+                Assert.NotNull(new RandomIndexWriter(Random(), dir, conf));
+                Assert.True(false, "should have hit AlreadySetException");
             }
             catch (SetOnce<IndexWriter>.AlreadySetException e)
             {
@@ -173,8 +173,8 @@ namespace Lucene.Net.Index
             // also cloning it won't help, after it has been used already
             try
             {
-                Assert.IsNotNull(new RandomIndexWriter(Random(), dir, (IndexWriterConfig)conf.Clone()));
-                Assert.Fail("should have hit AlreadySetException");
+                Assert.NotNull(new RandomIndexWriter(Random(), dir, (IndexWriterConfig)conf.Clone()));
+                Assert.True(false, "should have hit AlreadySetException");
             }
             catch (SetOnce<IndexWriter>.AlreadySetException e)
             {
@@ -189,7 +189,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOverrideGetters()
         {
             // Test that IndexWriterConfig overrides all getters, so that javadocs
@@ -208,29 +208,29 @@ namespace Lucene.Net.Index
             {
                 if (m.Name.StartsWith("get") && !m.Name.StartsWith("get_") && !m.IsStatic)
                 {
-                    Assert.AreEqual(typeof(IndexWriterConfig), m.DeclaringType, "method " + m.Name + " not overrided by IndexWriterConfig");
-                    Assert.IsTrue(liveGetters.Contains(m.Name), "method " + m.Name + " not declared on LiveIndexWriterConfig");
+                    Assert.Equal(typeof(IndexWriterConfig), m.DeclaringType); //, "method " + m.Name + " not overrided by IndexWriterConfig");
+                    Assert.True(liveGetters.Contains(m.Name), "method " + m.Name + " not declared on LiveIndexWriterConfig");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConstants()
         {
             // Tests that the values of the constants does not change
-            Assert.AreEqual(1000, IndexWriterConfig.WRITE_LOCK_TIMEOUT);
-            Assert.AreEqual(32, IndexWriterConfig.DEFAULT_TERM_INDEX_INTERVAL);
-            Assert.AreEqual(-1, IndexWriterConfig.DISABLE_AUTO_FLUSH);
-            Assert.AreEqual(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS);
-            Assert.AreEqual(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS);
-            Assert.AreEqual(16.0, IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, 0.0);
-            Assert.AreEqual(false, IndexWriterConfig.DEFAULT_READER_POOLING);
-            Assert.AreEqual(true, IndexWriterConfig.DEFAULT_USE_COMPOUND_FILE_SYSTEM);
-            Assert.AreEqual(DirectoryReader.DEFAULT_TERMS_INDEX_DIVISOR, IndexWriterConfig.DEFAULT_READER_TERMS_INDEX_DIVISOR);
+            Assert.Equal(1000, IndexWriterConfig.WRITE_LOCK_TIMEOUT);
+            Assert.Equal(32, IndexWriterConfig.DEFAULT_TERM_INDEX_INTERVAL);
+            Assert.Equal(-1, IndexWriterConfig.DISABLE_AUTO_FLUSH);
+            Assert.Equal(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS);
+            Assert.Equal(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS);
+            Assert.Equal(16.0, IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, 0.0);
+            Assert.Equal(false, IndexWriterConfig.DEFAULT_READER_POOLING);
+            Assert.Equal(true, IndexWriterConfig.DEFAULT_USE_COMPOUND_FILE_SYSTEM);
+            Assert.Equal(DirectoryReader.DEFAULT_TERMS_INDEX_DIVISOR, IndexWriterConfig.DEFAULT_READER_TERMS_INDEX_DIVISOR);
         }
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestToString()
         {
             string str = (new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))).ToString();
@@ -252,11 +252,11 @@ namespace Lucene.Net.Index
                 {
                     continue;
                 }
-                Assert.IsTrue(str.IndexOf(f.Name) != -1, f.Name + " not found in toString");
+                Assert.True(str.IndexOf(f.Name) != -1, f.Name + " not found in toString");
             }
         }*/
 
-        [Test]
+        [Fact]
         public virtual void TestClone()
         {
             IndexWriterConfig conf = new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
@@ -265,94 +265,74 @@ namespace Lucene.Net.Index
             // Make sure parameters that can't be reused are cloned
             IndexDeletionPolicy delPolicy = conf.DelPolicy;
             IndexDeletionPolicy delPolicyClone = clone.DelPolicy;
-            Assert.IsTrue(delPolicy.GetType() == delPolicyClone.GetType() && (delPolicy != delPolicyClone || delPolicy.Clone() == delPolicyClone.Clone()));
+            Assert.True(delPolicy.GetType() == delPolicyClone.GetType() && (delPolicy != delPolicyClone || delPolicy.Clone() == delPolicyClone.Clone()));
 
             FlushPolicy flushPolicy = conf.FlushPolicy;
             FlushPolicy flushPolicyClone = clone.FlushPolicy;
-            Assert.IsTrue(flushPolicy.GetType() == flushPolicyClone.GetType() && (flushPolicy != flushPolicyClone || flushPolicy.Clone() == flushPolicyClone.Clone()));
+            Assert.True(flushPolicy.GetType() == flushPolicyClone.GetType() && (flushPolicy != flushPolicyClone || flushPolicy.Clone() == flushPolicyClone.Clone()));
 
             DocumentsWriterPerThreadPool pool = conf.IndexerThreadPool;
             DocumentsWriterPerThreadPool poolClone = clone.IndexerThreadPool;
-            Assert.IsTrue(pool.GetType() == poolClone.GetType() && (pool != poolClone || pool.Clone() == poolClone.Clone()));
+            Assert.True(pool.GetType() == poolClone.GetType() && (pool != poolClone || pool.Clone() == poolClone.Clone()));
 
             MergePolicy mergePolicy = conf.MergePolicy;
             MergePolicy mergePolicyClone = clone.MergePolicy;
-            Assert.IsTrue(mergePolicy.GetType() == mergePolicyClone.GetType() && (mergePolicy != mergePolicyClone || mergePolicy.Clone() == mergePolicyClone.Clone()));
+            Assert.True(mergePolicy.GetType() == mergePolicyClone.GetType() && (mergePolicy != mergePolicyClone || mergePolicy.Clone() == mergePolicyClone.Clone()));
 
             IMergeScheduler mergeSched = conf.MergeScheduler;
             IMergeScheduler mergeSchedClone = clone.MergeScheduler;
-            Assert.IsTrue(mergeSched.GetType() == mergeSchedClone.GetType() && (mergeSched != mergeSchedClone || mergeSched.Clone() == mergeSchedClone.Clone()));
+            Assert.True(mergeSched.GetType() == mergeSchedClone.GetType() && (mergeSched != mergeSchedClone || mergeSched.Clone() == mergeSchedClone.Clone()));
 
             conf.SetMergeScheduler(new SerialMergeScheduler());
-            Assert.AreEqual(typeof(ConcurrentMergeScheduler), clone.MergeScheduler.GetType());
+            Assert.Equal(typeof(ConcurrentMergeScheduler), clone.MergeScheduler.GetType());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInvalidValues()
         {
             IndexWriterConfig conf = new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
 
             // Test IndexDeletionPolicy
-            Assert.AreEqual(typeof(KeepOnlyLastCommitDeletionPolicy), conf.DelPolicy.GetType());
+            Assert.Equal(typeof(KeepOnlyLastCommitDeletionPolicy), conf.DelPolicy.GetType());
             conf.SetIndexDeletionPolicy(new SnapshotDeletionPolicy(null));
-            Assert.AreEqual(typeof(SnapshotDeletionPolicy), conf.DelPolicy.GetType());
-            try
+            Assert.Equal(typeof(SnapshotDeletionPolicy), conf.DelPolicy.GetType());
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 conf.SetIndexDeletionPolicy(null);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // ok
-            }
+            });
 
             // Test MergeScheduler
-            Assert.AreEqual(typeof(ConcurrentMergeScheduler), conf.MergeScheduler.GetType());
+            Assert.Equal(typeof(ConcurrentMergeScheduler), conf.MergeScheduler.GetType());
             conf.SetMergeScheduler(new SerialMergeScheduler());
-            Assert.AreEqual(typeof(SerialMergeScheduler), conf.MergeScheduler.GetType());
-            try
+            Assert.Equal(typeof(SerialMergeScheduler), conf.MergeScheduler.GetType());
+			Assert.Throws<System.ArgumentException>(() =>
             {
                 conf.SetMergeScheduler(null);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // ok
-            }
+            });
 
             // Test Similarity:
             // we shouldnt assert what the default is, just that its not null.
-            Assert.IsTrue(IndexSearcher.DefaultSimilarity == conf.Similarity);
+            Assert.True(IndexSearcher.DefaultSimilarity == conf.Similarity);
             conf.SetSimilarity(new MySimilarity());
-            Assert.AreEqual(typeof(MySimilarity), conf.Similarity.GetType());
-            try
+            Assert.Equal(typeof(MySimilarity), conf.Similarity.GetType());
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 conf.SetSimilarity(null);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // ok
-            }
+            });
 
             // Test IndexingChain
-            Assert.IsTrue(DocumentsWriterPerThread.DefaultIndexingChain == conf.IndexingChain);
+            Assert.True(DocumentsWriterPerThread.DefaultIndexingChain == conf.IndexingChain);
             conf.SetIndexingChain(new MyIndexingChain());
-            Assert.AreEqual(typeof(MyIndexingChain), conf.IndexingChain.GetType());
-            try
+            Assert.Equal(typeof(MyIndexingChain), conf.IndexingChain.GetType());
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 conf.SetIndexingChain(null);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // ok
-            }
+            });
 
             try
             {
                 conf.SetMaxBufferedDeleteTerms(0);
-                Assert.Fail("should not have succeeded to set maxBufferedDeleteTerms to 0");
+                Assert.True(false, "should not have succeeded to set maxBufferedDeleteTerms to 0");
             }
             catch (System.ArgumentException e)
             {
@@ -362,7 +342,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetMaxBufferedDocs(1);
-                Assert.Fail("should not have succeeded to set maxBufferedDocs to 1");
+                Assert.True(false, "should not have succeeded to set maxBufferedDocs to 1");
             }
             catch (System.ArgumentException e)
             {
@@ -375,7 +355,7 @@ namespace Lucene.Net.Index
                 conf.SetMaxBufferedDocs(4);
                 conf.SetRAMBufferSizeMB(IndexWriterConfig.DISABLE_AUTO_FLUSH);
                 conf.SetMaxBufferedDocs(IndexWriterConfig.DISABLE_AUTO_FLUSH);
-                Assert.Fail("should not have succeeded to disable maxBufferedDocs when ramBufferSizeMB is disabled as well");
+                Assert.True(false, "should not have succeeded to disable maxBufferedDocs when ramBufferSizeMB is disabled as well");
             }
             catch (System.ArgumentException e)
             {
@@ -387,7 +367,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetRAMBufferSizeMB(IndexWriterConfig.DISABLE_AUTO_FLUSH);
-                Assert.Fail("should not have succeeded to disable ramBufferSizeMB when maxBufferedDocs is disabled as well");
+                Assert.True(false, "should not have succeeded to disable ramBufferSizeMB when maxBufferedDocs is disabled as well");
             }
             catch (System.ArgumentException e)
             {
@@ -398,7 +378,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetReaderTermsIndexDivisor(0);
-                Assert.Fail("should not have succeeded to set termsIndexDivisor to 0");
+                Assert.True(false, "should not have succeeded to set termsIndexDivisor to 0");
             }
             catch (System.ArgumentException e)
             {
@@ -410,7 +390,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetReaderTermsIndexDivisor(-2);
-                Assert.Fail("should not have succeeded to set termsIndexDivisor to < -1");
+                Assert.True(false, "should not have succeeded to set termsIndexDivisor to < -1");
             }
             catch (System.ArgumentException e)
             {
@@ -420,7 +400,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetRAMPerThreadHardLimitMB(2048);
-                Assert.Fail("should not have succeeded to set RAMPerThreadHardLimitMB to >= 2048");
+                Assert.True(false, "should not have succeeded to set RAMPerThreadHardLimitMB to >= 2048");
             }
             catch (System.ArgumentException e)
             {
@@ -430,7 +410,7 @@ namespace Lucene.Net.Index
             try
             {
                 conf.SetRAMPerThreadHardLimitMB(0);
-                Assert.Fail("should not have succeeded to set RAMPerThreadHardLimitMB to 0");
+                Assert.True(false, "should not have succeeded to set RAMPerThreadHardLimitMB to 0");
             }
             catch (System.ArgumentException e)
             {
@@ -438,21 +418,16 @@ namespace Lucene.Net.Index
             }
 
             // Test MergePolicy
-            Assert.AreEqual(typeof(TieredMergePolicy), conf.MergePolicy.GetType());
+            Assert.Equal(typeof(TieredMergePolicy), conf.MergePolicy.GetType());
             conf.SetMergePolicy(new LogDocMergePolicy());
-            Assert.AreEqual(typeof(LogDocMergePolicy), conf.MergePolicy.GetType());
-            try
+            Assert.Equal(typeof(LogDocMergePolicy), conf.MergePolicy.GetType());
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 conf.SetMergePolicy(null);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // ok
-            }
+            });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLiveChangeToCFS()
         {
             Directory dir = NewDirectory();
@@ -469,7 +444,7 @@ namespace Lucene.Net.Index
             doc.Add(NewStringField("field", "foo", Store.NO));
             w.AddDocument(doc);
             w.Commit();
-            Assert.IsTrue(w.NewestSegment().Info.UseCompoundFile, "Expected CFS after commit");
+            Assert.True(w.NewestSegment().Info.UseCompoundFile, "Expected CFS after commit");
 
             doc.Add(NewStringField("field", "foo", Store.NO));
             w.AddDocument(doc);
@@ -478,7 +453,7 @@ namespace Lucene.Net.Index
             w.Commit();
 
             // no compound files after merge
-            Assert.IsFalse(w.NewestSegment().Info.UseCompoundFile, "Expected Non-CFS after merge");
+            Assert.False(w.NewestSegment().Info.UseCompoundFile, "Expected Non-CFS after merge");
 
             MergePolicy lmp = w.Config.MergePolicy;
             lmp.NoCFSRatio = 1.0;
@@ -487,7 +462,7 @@ namespace Lucene.Net.Index
             w.AddDocument(doc);
             w.ForceMerge(1);
             w.Commit();
-            Assert.IsTrue(w.NewestSegment().Info.UseCompoundFile, "Expected CFS after merge");
+            Assert.True(w.NewestSegment().Info.UseCompoundFile, "Expected CFS after merge");
             w.Dispose();
             dir.Dispose();
         }

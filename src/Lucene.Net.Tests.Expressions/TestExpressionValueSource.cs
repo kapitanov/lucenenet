@@ -20,7 +20,7 @@ namespace Lucene.Net.Tests.Expressions
 		[SetUp]
 		public override void SetUp()
 		{
-			base.SetUp();
+			
 			dir = NewDirectory();
 			IndexWriterConfig iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer
 				(Random()));
@@ -58,10 +58,10 @@ namespace Lucene.Net.Tests.Expressions
 		{
 			reader.Dispose();
 			dir.Dispose();
-			base.TearDown();
+			base.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestTypes()
 		{
 			Expression expr = JavascriptCompiler.Compile("2*popularity");
@@ -97,7 +97,7 @@ namespace Lucene.Net.Tests.Expressions
 			AreEqual(System.Convert.ToDouble(4), values.ObjectVal(2));
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestRangeScorer()
 		{
 			Expression expr = JavascriptCompiler.Compile("2*popularity");
@@ -122,7 +122,7 @@ namespace Lucene.Net.Tests.Expressions
 			AreEqual(DocIdSetIterator.NO_MORE_DOCS, scorer.NextDoc());
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestEquals()
 		{
 			Expression expr = JavascriptCompiler.Compile("sqrt(a) + ln(b)");

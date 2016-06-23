@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -54,13 +54,13 @@ namespace Lucene.Net.Index
             }
             IndexCommit firstCommit = commits[0];
             long last = SegmentInfos.GenerationFromSegmentsFileName(firstCommit.SegmentsFileName);
-            Assert.AreEqual(last, firstCommit.Generation);
+            Assert.Equal(last, firstCommit.Generation);
             for (int i = 1; i < commits.Count; i++)
             {
                 IndexCommit commit = commits[i];
                 long now = SegmentInfos.GenerationFromSegmentsFileName(commit.SegmentsFileName);
-                Assert.IsTrue(now > last, "SegmentInfos commits are out-of-order");
-                Assert.AreEqual(now, commit.Generation);
+                Assert.True(now > last, "SegmentInfos commits are out-of-order");
+                Assert.Equal(now, commit.Generation);
                 last = now;
             }
         }
@@ -89,7 +89,7 @@ namespace Lucene.Net.Index
             {
                 IndexCommit lastCommit = commits[commits.Count - 1];
                 DirectoryReader r = DirectoryReader.Open(Dir);
-                Assert.AreEqual(r.Leaves.Count, lastCommit.SegmentCount, "lastCommit.segmentCount()=" + lastCommit.SegmentCount + " vs IndexReader.segmentCount=" + r.Leaves.Count);
+                Assert.Equal(r.Leaves.Count, lastCommit.SegmentCount); //, "lastCommit.segmentCount()=" + lastCommit.SegmentCount + " vs IndexReader.segmentCount=" + r.Leaves.Count);
                 r.Dispose();
                 OuterInstance.VerifyCommitOrder(commits);
                 NumOnCommit++;
@@ -120,7 +120,7 @@ namespace Lucene.Net.Index
                 foreach (IndexCommit commit in commits)
                 {
                     commit.Delete();
-                    Assert.IsTrue(commit.Deleted);
+                    Assert.True(commit.Deleted);
                 }
             }
 
@@ -259,7 +259,7 @@ namespace Lucene.Net.Index
          * Test "by time expiration" deletion policy:
          */
 
-        [Test]
+        [Fact]
         public virtual void TestExpirationTimeDeletionPolicy()
         {
             const double SECONDS = 2.0;
@@ -329,7 +329,7 @@ namespace Lucene.Net.Index
                     oneSecondResolution &= (modTime % 1000) == 0;
                     long leeway = (long)((SECONDS + (oneSecondResolution ? 1.0 : 0.0)) * 1000);
 
-                    Assert.IsTrue(lastDeleteTime - modTime <= leeway, "commit point was older than " + SECONDS + " seconds (" + (lastDeleteTime - modTime) + " msec) but did not get deleted ");
+                    Assert.True(lastDeleteTime - modTime <= leeway, "commit point was older than " + SECONDS + " seconds (" + (lastDeleteTime - modTime) + " msec) but did not get deleted ");
                 }
                 catch (IOException e)
                 {
@@ -348,7 +348,7 @@ namespace Lucene.Net.Index
          * Test a silly deletion policy that keeps all commits around.
          */
 
-        [Test]
+        [Fact]
         public virtual void TestKeepAllDeletionPolicy()
         {
             for (int pass = 0; pass < 2; pass++)
@@ -394,16 +394,16 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                 }
 
-                Assert.AreEqual(needsMerging ? 2 : 1, policy.NumOnInit);
+                Assert.Equal(needsMerging ? 2 : 1, policy.NumOnInit);
 
                 // If we are not auto committing then there should
                 // be exactly 2 commits (one per close above):
-                Assert.AreEqual(1 + (needsMerging ? 1 : 0), policy.NumOnCommit);
+                Assert.Equal(1 + (needsMerging ? 1 : 0), policy.NumOnCommit);
 
                 // Test listCommits
                 ICollection<IndexCommit> commits = DirectoryReader.ListCommits(dir);
                 // 2 from closing writer
-                Assert.AreEqual(1 + (needsMerging ? 1 : 0), commits.Count);
+                Assert.Equal(1 + (needsMerging ? 1 : 0), commits.Count);
 
                 // Make sure we can open a reader on each commit:
                 foreach (IndexCommit commit in commits)
@@ -433,7 +433,7 @@ namespace Lucene.Net.Index
                         writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetOpenMode(OpenMode_e.APPEND).SetIndexDeletionPolicy(policy));
                         writer.Dispose();
                         int postCount = dir.ListAll().Length;
-                        Assert.IsTrue(postCount < preCount);
+                        Assert.True(postCount < preCount);
                     }
                 }
 
@@ -445,7 +445,7 @@ namespace Lucene.Net.Index
          * then, opens a new IndexWriter on a previous commit
          * point. */
 
-        [Test]
+        [Fact]
         public virtual void TestOpenPriorSnapshot()
         {
             Directory dir = NewDirectory();
@@ -463,7 +463,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             ICollection<IndexCommit> commits = DirectoryReader.ListCommits(dir);
-            Assert.AreEqual(5, commits.Count);
+            Assert.Equal(5, commits.Count);
             IndexCommit lastCommit = null;
             foreach (IndexCommit commit in commits)
             {
@@ -472,43 +472,43 @@ namespace Lucene.Net.Index
                     lastCommit = commit;
                 }
             }
-            Assert.IsTrue(lastCommit != null);
+            Assert.True(lastCommit != null);
 
             // Now add 1 doc and merge
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetIndexDeletionPolicy(policy));
             AddDoc(writer);
-            Assert.AreEqual(11, writer.NumDocs());
+            Assert.Equal(11, writer.NumDocs());
             writer.ForceMerge(1);
             writer.Dispose();
 
-            Assert.AreEqual(6, DirectoryReader.ListCommits(dir).Count);
+            Assert.Equal(6, DirectoryReader.ListCommits(dir).Count);
 
             // Now open writer on the commit just before merge:
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetIndexDeletionPolicy(policy).SetIndexCommit(lastCommit));
-            Assert.AreEqual(10, writer.NumDocs());
+            Assert.Equal(10, writer.NumDocs());
 
             // Should undo our rollback:
             writer.Rollback();
 
             DirectoryReader r = DirectoryReader.Open(dir);
             // Still merged, still 11 docs
-            Assert.AreEqual(1, r.Leaves.Count);
-            Assert.AreEqual(11, r.NumDocs);
+            Assert.Equal(1, r.Leaves.Count);
+            Assert.Equal(11, r.NumDocs);
             r.Dispose();
 
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetIndexDeletionPolicy(policy).SetIndexCommit(lastCommit));
-            Assert.AreEqual(10, writer.NumDocs());
+            Assert.Equal(10, writer.NumDocs());
             // Commits the rollback:
             writer.Dispose();
 
             // Now 8 because we made another commit
-            Assert.AreEqual(7, DirectoryReader.ListCommits(dir).Count);
+            Assert.Equal(7, DirectoryReader.ListCommits(dir).Count);
 
             r = DirectoryReader.Open(dir);
             // Not fully merged because we rolled it back, and now only
             // 10 docs
-            Assert.IsTrue(r.Leaves.Count > 1);
-            Assert.AreEqual(10, r.NumDocs);
+            Assert.True(r.Leaves.Count > 1);
+            Assert.Equal(10, r.NumDocs);
             r.Dispose();
 
             // Re-merge
@@ -517,28 +517,28 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             r = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, r.Leaves.Count);
-            Assert.AreEqual(10, r.NumDocs);
+            Assert.Equal(1, r.Leaves.Count);
+            Assert.Equal(10, r.NumDocs);
             r.Dispose();
 
             // Now open writer on the commit just before merging,
             // but this time keeping only the last commit:
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetIndexCommit(lastCommit));
-            Assert.AreEqual(10, writer.NumDocs());
+            Assert.Equal(10, writer.NumDocs());
 
             // Reader still sees fully merged index, because writer
             // opened on the prior commit has not yet committed:
             r = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, r.Leaves.Count);
-            Assert.AreEqual(10, r.NumDocs);
+            Assert.Equal(1, r.Leaves.Count);
+            Assert.Equal(10, r.NumDocs);
             r.Dispose();
 
             writer.Dispose();
 
             // Now reader sees not-fully-merged index:
             r = DirectoryReader.Open(dir);
-            Assert.IsTrue(r.Leaves.Count > 1);
-            Assert.AreEqual(10, r.NumDocs);
+            Assert.True(r.Leaves.Count > 1);
+            Assert.Equal(10, r.NumDocs);
             r.Dispose();
 
             dir.Dispose();
@@ -549,7 +549,7 @@ namespace Lucene.Net.Index
          * you know there are no readers.
          */
 
-        [Test]
+        [Fact]
         public virtual void TestKeepNoneOnInitDeletionPolicy()
         {
             for (int pass = 0; pass < 2; pass++)
@@ -577,10 +577,10 @@ namespace Lucene.Net.Index
                 writer.ForceMerge(1);
                 writer.Dispose();
 
-                Assert.AreEqual(2, policy.NumOnInit);
+                Assert.Equal(2, policy.NumOnInit);
                 // If we are not auto committing then there should
                 // be exactly 2 commits (one per close above):
-                Assert.AreEqual(2, policy.NumOnCommit);
+                Assert.Equal(2, policy.NumOnCommit);
 
                 // Simplistic check: just verify the index is in fact
                 // readable:
@@ -595,7 +595,7 @@ namespace Lucene.Net.Index
          * Test a deletion policy that keeps last N commits.
          */
 
-        [Test]
+        [Fact]
         public virtual void TestKeepLastNDeletionPolicy()
         {
             const int N = 5;
@@ -622,9 +622,9 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                 }
 
-                Assert.IsTrue(policy.NumDelete > 0);
-                Assert.AreEqual(N + 1, policy.NumOnInit);
-                Assert.AreEqual(N + 1, policy.NumOnCommit);
+                Assert.True(policy.NumDelete > 0);
+                Assert.Equal(N + 1, policy.NumOnInit);
+                Assert.Equal(N + 1, policy.NumOnCommit);
 
                 // Simplistic check: just verify only the past N segments_N's still
                 // exist, and, I can open a reader on each:
@@ -638,7 +638,7 @@ namespace Lucene.Net.Index
                         reader.Dispose();
                         if (i == N)
                         {
-                            Assert.Fail("should have failed on commits prior to last " + N);
+                            Assert.True(false, "should have failed on commits prior to last " + N);
                         }
                     }
                     catch (IOException e)
@@ -664,7 +664,8 @@ namespace Lucene.Net.Index
          * around, through creates.
          */
 
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         public virtual void TestKeepLastNDeletionPolicyWithCreates()
         {
             const int N = 10;
@@ -705,7 +706,7 @@ namespace Lucene.Net.Index
                     IndexReader reader = DirectoryReader.Open(dir);
                     IndexSearcher searcher = NewSearcher(reader);
                     ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-                    Assert.AreEqual(16, hits.Length);
+                    Assert.Equal(16, hits.Length);
                     reader.Dispose();
 
                     writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetOpenMode(OpenMode_e.CREATE).SetIndexDeletionPolicy(policy));
@@ -715,13 +716,13 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                 }
 
-                Assert.AreEqual(3 * (N + 1) + 1, policy.NumOnInit);
-                Assert.AreEqual(3 * (N + 1) + 1, policy.NumOnCommit);
+                Assert.Equal(3 * (N + 1) + 1, policy.NumOnInit);
+                Assert.Equal(3 * (N + 1) + 1, policy.NumOnCommit);
 
                 IndexReader rwReader = DirectoryReader.Open(dir);
                 IndexSearcher searcher_ = NewSearcher(rwReader);
                 ScoreDoc[] hits_ = searcher_.Search(query, null, 1000).ScoreDocs;
-                Assert.AreEqual(0, hits_.Length);
+                Assert.Equal(0, hits_.Length);
 
                 // Simplistic check: just verify only the past N segments_N's still
                 // exist, and, I can open a reader on each:
@@ -742,7 +743,7 @@ namespace Lucene.Net.Index
                         // count should be.
                         searcher_ = NewSearcher(reader);
                         hits_ = searcher_.Search(query, null, 1000).ScoreDocs;
-                        Assert.AreEqual(expectedCount, hits_.Length);
+                        Assert.Equal(expectedCount, hits_.Length);
                         if (expectedCount == 0)
                         {
                             expectedCount = 16;
@@ -758,7 +759,7 @@ namespace Lucene.Net.Index
                         reader.Dispose();
                         if (i == N)
                         {
-                            Assert.Fail("should have failed on commits before last " + N);
+                            Assert.True(false, "should have failed on commits before last " + N);
                         }
                     }
                     catch (IOException e)

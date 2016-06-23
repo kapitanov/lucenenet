@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -38,7 +37,6 @@ namespace Lucene.Net.Search
 
     // TODO: refactor to a base class, that collects freqs from the scorer tree
     // and test all queries with it
-    [TestFixture]
     public class TestBooleanQueryVisitSubscorers : LuceneTestCase
     {
         internal Analyzer Analyzer;
@@ -49,10 +47,8 @@ namespace Lucene.Net.Search
         internal const string F1 = "title";
         internal const string F2 = "body";
 
-        [SetUp]
-        public override void SetUp()
+        public TestBooleanQueryVisitSubscorers() : base()
         {
-            base.SetUp();
             Analyzer = new MockAnalyzer(Random());
             Dir = NewDirectory();
             IndexWriterConfig config = NewIndexWriterConfig(TEST_VERSION_CURRENT, Analyzer);
@@ -66,15 +62,14 @@ namespace Lucene.Net.Search
             Searcher = NewSearcher(Reader);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDisjunctions()
         {
             BooleanQuery bq = new BooleanQuery();
@@ -82,13 +77,13 @@ namespace Lucene.Net.Search
             bq.Add(new TermQuery(new Term(F2, "lucene")), BooleanClause.Occur.SHOULD);
             bq.Add(new TermQuery(new Term(F2, "search")), BooleanClause.Occur.SHOULD);
             IDictionary<int, int> tfs = GetDocCounts(Searcher, bq);
-            Assert.AreEqual(3, tfs.Count); // 3 documents
-            Assert.AreEqual(3, (int)tfs[0]); // f1:lucene + f2:lucene + f2:search
-            Assert.AreEqual(2, (int)tfs[1]); // f2:search + f2:lucene
-            Assert.AreEqual(2, (int)tfs[2]); // f2:search + f2:lucene
+            Assert.Equal(3, tfs.Count); // 3 documents
+            Assert.Equal(3, (int)tfs[0]); // f1:lucene + f2:lucene + f2:search
+            Assert.Equal(2, (int)tfs[1]); // f2:search + f2:lucene
+            Assert.Equal(2, (int)tfs[2]); // f2:search + f2:lucene
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNestedDisjunctions()
         {
             BooleanQuery bq = new BooleanQuery();
@@ -98,23 +93,23 @@ namespace Lucene.Net.Search
             bq2.Add(new TermQuery(new Term(F2, "search")), BooleanClause.Occur.SHOULD);
             bq.Add(bq2, BooleanClause.Occur.SHOULD);
             IDictionary<int, int> tfs = GetDocCounts(Searcher, bq);
-            Assert.AreEqual(3, tfs.Count); // 3 documents
-            Assert.AreEqual(3, (int)tfs[0]); // f1:lucene + f2:lucene + f2:search
-            Assert.AreEqual(2, (int)tfs[1]); // f2:search + f2:lucene
-            Assert.AreEqual(2, (int)tfs[2]); // f2:search + f2:lucene
+            Assert.Equal(3, tfs.Count); // 3 documents
+            Assert.Equal(3, (int)tfs[0]); // f1:lucene + f2:lucene + f2:search
+            Assert.Equal(2, (int)tfs[1]); // f2:search + f2:lucene
+            Assert.Equal(2, (int)tfs[2]); // f2:search + f2:lucene
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConjunctions()
         {
             BooleanQuery bq = new BooleanQuery();
             bq.Add(new TermQuery(new Term(F2, "lucene")), BooleanClause.Occur.MUST);
             bq.Add(new TermQuery(new Term(F2, "is")), BooleanClause.Occur.MUST);
             IDictionary<int, int> tfs = GetDocCounts(Searcher, bq);
-            Assert.AreEqual(3, tfs.Count); // 3 documents
-            Assert.AreEqual(2, (int)tfs[0]); // f2:lucene + f2:is
-            Assert.AreEqual(3, (int)tfs[1]); // f2:is + f2:is + f2:lucene
-            Assert.AreEqual(3, (int)tfs[2]); // f2:is + f2:is + f2:lucene
+            Assert.Equal(3, tfs.Count); // 3 documents
+            Assert.Equal(2, (int)tfs[0]); // f2:lucene + f2:is
+            Assert.Equal(3, (int)tfs[1]); // f2:is + f2:is + f2:lucene
+            Assert.Equal(3, (int)tfs[2]); // f2:is + f2:is + f2:lucene
         }
 
         internal static Document Doc(string v1, string v2)

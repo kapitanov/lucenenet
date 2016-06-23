@@ -1,9 +1,9 @@
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Document = Documents.Document;
     using Field = Field;
@@ -39,7 +39,7 @@ namespace Lucene.Net.Index
     {
         // Make sure we don't clone IndexInputs too frequently
         // during merging:
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             // NOTE: if we see a fail on this test with "NestedPulsing" its because its
@@ -67,7 +67,7 @@ namespace Lucene.Net.Index
 
             int cloneCount = dir.InputCloneCount;
             //System.out.println("merge clone count=" + cloneCount);
-            Assert.IsTrue(cloneCount < 500, "too many calls to IndexInput.clone during merging: " + dir.InputCloneCount);
+            Assert.True(cloneCount < 500, "too many calls to IndexInput.clone during merging: " + dir.InputCloneCount);
 
             IndexSearcher s = NewSearcher(r);
 
@@ -75,10 +75,10 @@ namespace Lucene.Net.Index
             // cutover to filter rewrite and reuse a single DocsEnum
             // across all terms;
             TopDocs hits = s.Search(new TermRangeQuery("field", new BytesRef(), new BytesRef("\uFFFF"), true, true), 10);
-            Assert.IsTrue(hits.TotalHits > 0);
+            Assert.True(hits.TotalHits > 0);
             int queryCloneCount = dir.InputCloneCount - cloneCount;
             //System.out.println("query clone count=" + queryCloneCount);
-            Assert.IsTrue(queryCloneCount < 50, "too many calls to IndexInput.clone during TermRangeQuery: " + queryCloneCount);
+            Assert.True(queryCloneCount < 50, "too many calls to IndexInput.clone during TermRangeQuery: " + queryCloneCount);
             r.Dispose();
             dir.Dispose();
         }

@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Automaton = Lucene.Net.Util.Automaton.Automaton;
     using Directory = Lucene.Net.Store.Directory;
 
@@ -36,7 +36,6 @@ namespace Lucene.Net.Search
     /// specifically enumerating strings/indexes containing supplementary characters,
     /// and the differences between UTF-8/UTF-32 and UTF-16 binary sort order.
     /// </summary>
-    [TestFixture]
     public class TestAutomatonQueryUnicode : LuceneTestCase
     {
         private IndexReader Reader;
@@ -45,10 +44,8 @@ namespace Lucene.Net.Search
 
         private readonly string FN = "field";
 
-        [SetUp]
-        public override void SetUp()
+        public TestAutomatonQueryUnicode() : base()
         {
-            base.SetUp();
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
             Document doc = new Document();
@@ -88,12 +85,11 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private Term NewTerm(string value)
@@ -111,16 +107,16 @@ namespace Lucene.Net.Search
             AutomatonQuery query = new AutomatonQuery(NewTerm("bogus"), automaton);
 
             query.SetRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
         }
 
         /// <summary>
@@ -129,7 +125,7 @@ namespace Lucene.Net.Search
         /// this expression matches something either starting with the arabic
         /// presentation forms block, or a supplementary character.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSortOrder()
         {
             Automaton a = (new RegExp("((\uD866\uDF05)|\uFB94).*")).ToAutomaton();

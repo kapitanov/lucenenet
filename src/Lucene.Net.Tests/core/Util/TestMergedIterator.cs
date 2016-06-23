@@ -1,7 +1,6 @@
-using NUnit.Framework;
 using System;
-using System.Collections;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,20 +21,19 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestMergedIterator : LuceneTestCase
     {
         private const int REPEATS = 2;
         private const int VALS_TO_MERGE = 15000;
 
-        [Test]
+        [Fact]
         public virtual void TestMergeEmpty()
         {
             IEnumerator<int> merged = new MergedIterator<int>();
-            Assert.IsFalse(merged.MoveNext());
+            Assert.False(merged.MoveNext());
 
             merged = new MergedIterator<int>((new List<int>()).GetEnumerator());
-            Assert.IsFalse(merged.MoveNext());
+            Assert.False(merged.MoveNext());
 
             IEnumerator<int>[] itrs = new IEnumerator<int>[Random().Next(100)];
             for (int i = 0; i < itrs.Length; i++)
@@ -43,76 +41,76 @@ namespace Lucene.Net.Util
                 itrs[i] = (new List<int>()).GetEnumerator();
             }
             merged = new MergedIterator<int>(itrs);
-            Assert.IsFalse(merged.MoveNext());
+            Assert.False(merged.MoveNext());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoDupsRemoveDups()
         {
             TestCase(1, 1, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOffItrDupsRemoveDups()
         {
             TestCase(3, 1, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOnItrDupsRemoveDups()
         {
             TestCase(1, 3, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOnItrRandomDupsRemoveDups()
         {
             TestCase(1, -3, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBothDupsRemoveDups()
         {
             TestCase(3, 3, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBothDupsWithRandomDupsRemoveDups()
         {
             TestCase(3, -3, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoDupsKeepDups()
         {
             TestCase(1, 1, false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOffItrDupsKeepDups()
         {
             TestCase(3, 1, false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOnItrDupsKeepDups()
         {
             TestCase(1, 3, false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOnItrRandomDupsKeepDups()
         {
             TestCase(1, -3, false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBothDupsKeepDups()
         {
             TestCase(3, 3, false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBothDupsWithRandomDupsKeepDups()
         {
             TestCase(3, -3, false);
@@ -166,10 +164,10 @@ namespace Lucene.Net.Util
             IEnumerator<int?> expectedItr = expected.GetEnumerator();
             while (expectedItr.MoveNext())
             {
-                Assert.IsTrue(mergedItr.MoveNext());
-                Assert.AreEqual(expectedItr.Current, mergedItr.Current);
+                Assert.True(mergedItr.MoveNext());
+                Assert.Equal(expectedItr.Current, mergedItr.Current);
             }
-            Assert.IsFalse(mergedItr.MoveNext());
+            Assert.False(mergedItr.MoveNext());
         }
     }
 }

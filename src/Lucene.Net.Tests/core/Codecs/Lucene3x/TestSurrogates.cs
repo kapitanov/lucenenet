@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene3x
 {
     using Lucene.Net.Analysis;
-    
+
     using Lucene.Net.Index;
 
     /*
@@ -27,9 +28,7 @@ namespace Lucene.Net.Codecs.Lucene3x
 
     using Lucene.Net.Store;
     using Lucene.Net.Util;
-    using NUnit.Framework;
 
-    [TestFixture]
     public class TestSurrogates : LuceneTestCase
     {
         /// <summary>
@@ -132,7 +131,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 foreach (string field in fields)
                 {
                     Terms terms = fields.Terms(field);
-                    Assert.IsNotNull(terms);
+                    Assert.NotNull(terms);
                     TermsEnum termsEnum = terms.Iterator(null);
                     BytesRef text;
                     BytesRef lastText = null;
@@ -151,11 +150,11 @@ namespace Lucene.Net.Codecs.Lucene3x
                         }
                         else
                         {
-                            Assert.IsTrue(lastText.CompareTo(text) < 0);
+                            Assert.True(lastText.CompareTo(text) < 0);
                             lastText.CopyBytes(text);
                         }
-                        Assert.AreEqual(exp.Field, field);
-                        Assert.AreEqual(exp.Bytes, text);
+                        Assert.Equal(exp.Field, field);
+                        Assert.Equal(exp.Bytes, text);
                         termCount++;
                     }
                     if (VERBOSE)
@@ -163,7 +162,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                         Console.WriteLine("  no more terms for field=" + field);
                     }
                 }
-                Assert.AreEqual(uniqueTermCount, termCount);
+                Assert.Equal(uniqueTermCount, termCount);
             }
         }
 
@@ -206,7 +205,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 }
 
                 // seek should find the term
-                Assert.AreEqual(TermsEnum.SeekStatus.FOUND, te.SeekCeil(term.Bytes));
+                Assert.Equal(TermsEnum.SeekStatus.FOUND, te.SeekCeil(term.Bytes));
 
                 // now .next() this many times:
                 int ct = TestUtil.NextInt(r, 5, 100);
@@ -223,7 +222,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                     term = fieldTerms[1 + spot + i];
                     if (!term.Field.Equals(field))
                     {
-                        Assert.IsNull(te.Next());
+                        Assert.Null(te.Next());
                         break;
                     }
                     else
@@ -236,7 +235,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                             Console.WriteLine("       exp=" + UnicodeUtil.ToHexString(term.Text().ToString()));
                         }
 
-                        Assert.AreEqual(term.Bytes, t);
+                        Assert.Equal(term.Bytes, t);
                     }
                 }
             }
@@ -285,11 +284,11 @@ namespace Lucene.Net.Codecs.Lucene3x
 
                         if (spot == fieldTerms.Count || !fieldTerms[spot].Field.Equals(field))
                         {
-                            Assert.AreEqual(TermsEnum.SeekStatus.END, te.SeekCeil(tx.Bytes));
+                            Assert.Equal(TermsEnum.SeekStatus.END, te.SeekCeil(tx.Bytes));
                         }
                         else
                         {
-                            Assert.AreEqual(TermsEnum.SeekStatus.NOT_FOUND, te.SeekCeil(tx.Bytes));
+                            Assert.Equal(TermsEnum.SeekStatus.NOT_FOUND, te.SeekCeil(tx.Bytes));
 
                             if (VERBOSE)
                             {
@@ -297,7 +296,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                                 Console.WriteLine("  exp term=" + UnicodeUtil.ToHexString(fieldTerms[spot].Text()));
                             }
 
-                            Assert.AreEqual(fieldTerms[spot].Bytes, te.Term());
+                            Assert.Equal(fieldTerms[spot].Bytes, te.Term());
 
                             // now .next() this many times:
                             int ct = TestUtil.NextInt(r, 5, 100);
@@ -314,7 +313,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                                 Term term = fieldTerms[1 + spot + i];
                                 if (!term.Field.Equals(field))
                                 {
-                                    Assert.IsNull(te.Next());
+                                    Assert.Null(te.Next());
                                     break;
                                 }
                                 else
@@ -327,7 +326,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                                         Console.WriteLine("       exp=" + UnicodeUtil.ToHexString(term.Text().ToString()));
                                     }
 
-                                    Assert.AreEqual(term.Bytes, t);
+                                    Assert.Equal(term.Bytes, t);
                                 }
                             }
                         }
@@ -336,7 +335,8 @@ namespace Lucene.Net.Codecs.Lucene3x
             }
         }
 
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         public virtual void TestSurrogatesOrder()
         {
             Directory dir = NewDirectory();
@@ -399,7 +399,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             //SegmentInfo si = makePreFlexSegment(r, "_0", dir, fieldInfos, codec, fieldTerms);
 
             //FieldsProducer fields = codec.fieldsProducer(new SegmentReadState(dir, si, fieldInfos, 1024, 1));
-            //Assert.IsNotNull(fields);
+            //Assert.NotNull(fields);
 
             DoTestStraightEnum(fieldTerms, reader, uniqueTermCount);
             DoTestSeekExists(Random(), fieldTerms, reader);

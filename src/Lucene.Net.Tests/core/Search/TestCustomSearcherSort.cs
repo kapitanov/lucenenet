@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /// <summary>
     /// Copyright 2005 The Apache Software Foundation
     ///
@@ -35,7 +34,6 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Unit test for sorting code. </summary>
-    [TestFixture]
     public class TestCustomSearcherSort : LuceneTestCase
     {
         private Directory Index = null;
@@ -48,10 +46,8 @@ namespace Lucene.Net.Search
         /// <summary>
         /// Create index and query for test cases.
         /// </summary>
-        [SetUp]
-        public override void SetUp()
+        public TestCustomSearcherSort() : base()
         {
-            base.SetUp();
             INDEX_SIZE = AtLeast(2000);
             Index = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Index);
@@ -78,18 +74,17 @@ namespace Lucene.Net.Search
             Query = new TermQuery(new Term("content", "test"));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Index.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
         /// Run the test using two CustomSearcher instances.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestFieldSortCustomSearcher()
         {
             // log("Run testFieldSortCustomSearcher");
@@ -103,7 +98,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// Run the test using one CustomSearcher wrapped by a MultiSearcher.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestFieldSortSingleSearcher()
         {
             // log("Run testFieldSortSingleSearcher");
@@ -143,7 +138,7 @@ namespace Lucene.Net.Search
                 {
                     Log("ID " + idHitDate + " not found. Possibliy a duplicate.");
                 }
-                Assert.IsTrue(resultMap.ContainsKey(idHitDate)); // same ID must be in the
+                Assert.True(resultMap.ContainsKey(idHitDate)); // same ID must be in the
                 // Map from the rank-sorted
                 // search
                 // every hit must appear once in both result sets --> remove it from the
@@ -159,7 +154,7 @@ namespace Lucene.Net.Search
             {
                 Log("Couldn't match " + resultMap.Count + " hits.");
             }
-            Assert.AreEqual(resultMap.Count, 0);
+            Assert.Equal(resultMap.Count, 0);
         }
 
         /// <summary>

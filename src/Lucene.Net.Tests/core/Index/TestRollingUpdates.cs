@@ -1,5 +1,6 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -9,7 +10,6 @@ namespace Lucene.Net.Index
     using Lucene.Net.Store;
     using Lucene.Net.Support;
     using Lucene.Net.Util;
-    using NUnit.Framework;
     using Codec = Lucene.Net.Codecs.Codec;
     using IndexSearcher = Lucene.Net.Search.IndexSearcher;
 
@@ -34,13 +34,12 @@ namespace Lucene.Net.Index
     using TermQuery = Lucene.Net.Search.TermQuery;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestRollingUpdates : LuceneTestCase
     {
         // Just updates the same set of N docs over and over, to
         // stress out deletions
 
-        [Test]
+        [Fact]
         public virtual void TestRollingUpdates_Mem()
         {
             Random random = new Random(Random().Next());
@@ -94,7 +93,7 @@ namespace Lucene.Net.Index
                 if (s != null && updateCount < SIZE)
                 {
                     TopDocs hits = s.Search(new TermQuery(idTerm), 1);
-                    Assert.AreEqual(1, hits.TotalHits);
+                    Assert.Equal(1, hits.TotalHits);
                     doUpdate = !w.TryDeleteDocument(r, hits.ScoreDocs[0].Doc);
                     if (VERBOSE)
                     {
@@ -151,7 +150,7 @@ namespace Lucene.Net.Index
                     {
                         s = null;
                     }
-                    Assert.IsTrue(!applyDeletions || r.NumDocs == SIZE, "applyDeletions=" + applyDeletions + " r.NumDocs=" + r.NumDocs + " vs SIZE=" + SIZE);
+                    Assert.True(!applyDeletions || r.NumDocs == SIZE, "applyDeletions=" + applyDeletions + " r.NumDocs=" + r.NumDocs + " vs SIZE=" + SIZE);
                     updateCount = 0;
                 }
             }
@@ -162,7 +161,7 @@ namespace Lucene.Net.Index
             }
 
             w.Commit();
-            Assert.AreEqual(SIZE, w.NumDocs());
+            Assert.Equal(SIZE, w.NumDocs());
 
             w.Dispose();
 
@@ -186,11 +185,11 @@ namespace Lucene.Net.Index
                     totalBytes2 += dir.FileLength(fileName);
                 }
             }
-            Assert.AreEqual(totalBytes2, totalBytes);
+            Assert.Equal(totalBytes2, totalBytes);
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateSameDoc()
         {
             Directory dir = NewDirectory();
@@ -217,7 +216,7 @@ namespace Lucene.Net.Index
             }
 
             IndexReader open = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, open.NumDocs);
+            Assert.Equal(1, open.NumDocs);
             open.Dispose();
             docs.Dispose();
             dir.Dispose();
@@ -259,7 +258,7 @@ namespace Lucene.Net.Index
                                 open.Dispose();
                                 open = reader;
                             }
-                            Assert.AreEqual(1, open.NumDocs, "iter: " + i + " numDocs: " + open.NumDocs + " del: " + open.NumDeletedDocs + " max: " + open.MaxDoc);
+                            Assert.Equal(1, open.NumDocs, "iter: " + i + " numDocs: " + open.NumDocs + " del: " + open.NumDeletedDocs + " max: " + open.MaxDoc);
                         }
                     }
                     if (open != null)

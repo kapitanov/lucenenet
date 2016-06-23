@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -32,7 +32,6 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestParallelTermEnum : LuceneTestCase
     {
         private AtomicReader Ir1;
@@ -40,10 +39,8 @@ namespace Lucene.Net.Index
         private Directory Rd1;
         private Directory Rd2;
 
-        [SetUp]
-        public override void SetUp()
+        public TestParallelTermEnum() : base()
         {
-            base.SetUp();
             Document doc;
             Rd1 = NewDirectory();
             IndexWriter iw1 = new IndexWriter(Rd1, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
@@ -68,35 +65,34 @@ namespace Lucene.Net.Index
             this.Ir2 = SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(Rd2));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Ir1.Dispose();
             Ir2.Dispose();
             Rd1.Dispose();
             Rd2.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private void CheckTerms(Terms terms, Bits liveDocs, params string[] termsList)
         {
-            Assert.IsNotNull(terms);
+            Assert.NotNull(terms);
             TermsEnum te = terms.Iterator(null);
 
             foreach (string t in termsList)
             {
                 BytesRef b = te.Next();
-                Assert.IsNotNull(b);
-                Assert.AreEqual(t, b.Utf8ToString());
+                Assert.NotNull(b);
+                Assert.Equal(t, b.Utf8ToString());
                 DocsEnum td = TestUtil.Docs(Random(), te, liveDocs, null, DocsEnum.FLAG_NONE);
-                Assert.IsTrue(td.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                Assert.AreEqual(0, td.DocID());
-                Assert.AreEqual(td.NextDoc(), DocIdSetIterator.NO_MORE_DOCS);
+                Assert.True(td.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                Assert.Equal(0, td.DocID());
+                Assert.Equal(td.NextDoc(), DocIdSetIterator.NO_MORE_DOCS);
             }
-            Assert.IsNull(te.Next());
+            Assert.Null(te.Next());
         }
 
-        [Test]
+        [Fact]
         public virtual void Test1()
         {
             ParallelAtomicReader pr = new ParallelAtomicReader(Ir1, Ir2);
@@ -108,20 +104,20 @@ namespace Lucene.Net.Index
 
             fe.MoveNext();
             string f = fe.Current;
-            Assert.AreEqual("field1", f);
+            Assert.Equal("field1", f);
             CheckTerms(fields.Terms(f), liveDocs, "brown", "fox", "jumps", "quick", "the");
 
             fe.MoveNext();
             f = fe.Current;
-            Assert.AreEqual("field2", f);
+            Assert.Equal("field2", f);
             CheckTerms(fields.Terms(f), liveDocs, "brown", "fox", "jumps", "quick", "the");
 
             fe.MoveNext();
             f = fe.Current;
-            Assert.AreEqual("field3", f);
+            Assert.Equal("field3", f);
             CheckTerms(fields.Terms(f), liveDocs, "dog", "fox", "jumps", "lazy", "over", "the");
 
-            Assert.IsFalse(fe.MoveNext());
+            Assert.False(fe.MoveNext());
         }
     }
 }

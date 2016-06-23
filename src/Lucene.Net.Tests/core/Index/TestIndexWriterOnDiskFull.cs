@@ -1,10 +1,10 @@
 using System;
 using System.Diagnostics;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -43,7 +43,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Tests for IndexWriter when the disk runs out of space
     /// </summary>
-    [TestFixture]
     public class TestIndexWriterOnDiskFull : LuceneTestCase
     {
         /*
@@ -52,7 +51,7 @@ namespace Lucene.Net.Index
          * TODO: how to do this on windows with FSDirectory?
          */
 
-        [Test]
+        [Fact]
         public virtual void TestAddDocumentOnDiskFull()
         {
             for (int pass = 0; pass < 2; pass++)
@@ -178,7 +177,7 @@ namespace Lucene.Net.Index
         fact added.
          */
 
-        [Test]
+        [Fact]
         public virtual void TestAddIndexOnDiskFull()
         {
             // MemoryCodec, since it uses FST, is not necessarily
@@ -228,11 +227,11 @@ namespace Lucene.Net.Index
             // Make sure starting index seems to be working properly:
             Term searchTerm = new Term("content", "aaa");
             IndexReader reader = DirectoryReader.Open(startDir);
-            Assert.AreEqual(57, reader.DocFreq(searchTerm), "first docFreq");
+            Assert.Equal(57, reader.DocFreq(searchTerm)); //, "first docFreq");
 
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(new TermQuery(searchTerm), null, 1000).ScoreDocs;
-            Assert.AreEqual(57, hits.Length, "first number of hits");
+            Assert.Equal(57, hits.Length); //, "first number of hits");
             reader.Dispose();
 
             // Iterate with larger and larger amounts of free
@@ -429,7 +428,7 @@ namespace Lucene.Net.Index
                             if (1 == x)
                             {
                                 Console.WriteLine(e.StackTrace);
-                                Assert.Fail(methodName + " hit IOException after disk space was freed up");
+                                Assert.True(false, methodName + " hit IOException after disk space was freed up");
                             }
                         }
 
@@ -454,14 +453,14 @@ namespace Lucene.Net.Index
                         catch (IOException e)
                         {
                             Console.WriteLine(e.StackTrace);
-                            Assert.Fail(testName + ": exception when creating IndexReader: " + e);
+                            Assert.True(false, testName + ": exception when creating IndexReader: " + e);
                         }
                         int result = reader.DocFreq(searchTerm);
                         if (success)
                         {
                             if (result != START_COUNT)
                             {
-                                Assert.Fail(testName + ": method did not throw exception but docFreq('aaa') is " + result + " instead of expected " + START_COUNT);
+                                Assert.True(false, testName + ": method did not throw exception but docFreq('aaa') is " + result + " instead of expected " + START_COUNT);
                             }
                         }
                         else
@@ -471,7 +470,7 @@ namespace Lucene.Net.Index
                             if (result != START_COUNT && result != END_COUNT)
                             {
                                 Console.WriteLine(err.StackTrace);
-                                Assert.Fail(testName + ": method did throw exception but docFreq('aaa') is " + result + " instead of expected " + START_COUNT + " or " + END_COUNT);
+                                Assert.True(false, testName + ": method did throw exception but docFreq('aaa') is " + result + " instead of expected " + START_COUNT + " or " + END_COUNT);
                             }
                         }
 
@@ -483,14 +482,14 @@ namespace Lucene.Net.Index
                         catch (IOException e)
                         {
                             Console.WriteLine(e.StackTrace);
-                            Assert.Fail(testName + ": exception when searching: " + e);
+                            Assert.True(false, testName + ": exception when searching: " + e);
                         }
                         int result2 = hits.Length;
                         if (success)
                         {
                             if (result2 != result)
                             {
-                                Assert.Fail(testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + result);
+                                Assert.True(false, testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + result);
                             }
                         }
                         else
@@ -500,7 +499,7 @@ namespace Lucene.Net.Index
                             if (result2 != result)
                             {
                                 Console.WriteLine(err.StackTrace);
-                                Assert.Fail(testName + ": method did throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + result);
+                                Assert.True(false, testName + ": method did throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + result);
                             }
                         }
 
@@ -526,7 +525,7 @@ namespace Lucene.Net.Index
                         // Javadocs state that temp free Directory space
                         // required is at most 2X total input size of
                         // indices so let's make sure:
-                        Assert.IsTrue((dir.MaxUsedSizeInBytes - startDiskUsage) < 2 * (startDiskUsage + inputDiskUsage), "max free Directory space required exceeded 1X the total input index sizes during " + methodName + ": max temp usage = " + (dir.MaxUsedSizeInBytes - startDiskUsage) + " bytes vs limit=" + (2 * (startDiskUsage + inputDiskUsage)) + "; starting disk usage = " + startDiskUsage + " bytes; " + "input index disk usage = " + inputDiskUsage + " bytes");
+                        Assert.True((dir.MaxUsedSizeInBytes - startDiskUsage) < 2 * (startDiskUsage + inputDiskUsage), "max free Directory space required exceeded 1X the total input index sizes during " + methodName + ": max temp usage = " + (dir.MaxUsedSizeInBytes - startDiskUsage) + " bytes vs limit=" + (2 * (startDiskUsage + inputDiskUsage)) + "; starting disk usage = " + startDiskUsage + " bytes; " + "input index disk usage = " + inputDiskUsage + " bytes");
                     }
 
                     // Make sure we don't hit disk full during close below:
@@ -586,7 +585,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-2593
-        [Test]
+        [Fact]
         public virtual void TestCorruptionAfterDiskFullDuringMerge()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -612,12 +611,12 @@ namespace Lucene.Net.Index
             try
             {
                 w.Commit();
-                Assert.Fail("fake disk full IOExceptions not hit");
+                Assert.True(false, "fake disk full IOExceptions not hit");
             }
             catch (IOException ioe)
             {
                 // expected
-                Assert.IsTrue(ftdm.DidFail1 || ftdm.DidFail2);
+                Assert.True(ftdm.DidFail1 || ftdm.DidFail2);
             }
             TestUtil.CheckIndex(dir);
             ftdm.ClearDoFail();
@@ -630,8 +629,9 @@ namespace Lucene.Net.Index
         // LUCENE-1130: make sure immeidate disk full on creating
         // an IndexWriter (hit during DW.ThreadState.Init()) is
         // OK:
-        [Test]
-        public virtual void TestImmediateDiskFull([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestImmediateDiskFull(IConcurrentMergeScheduler scheduler)
         {
             MockDirectoryWrapper dir = NewMockDirectory();
             var config = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))
@@ -645,7 +645,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit disk full");
+                Assert.True(false, "did not hit disk full");
             }
             catch (IOException)
             {
@@ -654,7 +654,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit disk full");
+                Assert.True(false, "did not hit disk full");
             }
             catch (IOException)
             {
@@ -662,7 +662,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.Dispose(false);
-                Assert.Fail("did not hit disk full");
+                Assert.True(false, "did not hit disk full");
             }
             catch (IOException)
             {

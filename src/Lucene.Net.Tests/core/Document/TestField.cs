@@ -1,10 +1,11 @@
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Document
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
     using System;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -31,10 +32,9 @@ namespace Lucene.Net.Document
     using Token = Lucene.Net.Analysis.Token;
 
     // sanity check some basics of fields
-    [TestFixture]
     public class TestField : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDoubleField()
         {
             Field[] fields = new Field[] { new DoubleField("foo", 5d, Field.Store.NO), new DoubleField("foo", 5d, Field.Store.YES) };
@@ -54,11 +54,11 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual(6d, (double)field.NumericValue, 0.0d);
+                Assert.Equal(6d, (double)field.NumericValue); //, 0.0d);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDoubleDocValuesField()
         {
             DoubleDocValuesField field = new DoubleDocValuesField("foo", 5d);
@@ -76,10 +76,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(6d, BitConverter.Int64BitsToDouble((long)field.NumericValue), 0.0d);
+            Assert.Equal(6d, BitConverter.Int64BitsToDouble((long)field.NumericValue)); //, 0.0d);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFloatDocValuesField()
         {
             FloatDocValuesField field = new FloatDocValuesField("foo", 5f);
@@ -97,10 +97,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(6f, Number.IntBitsToFloat(Convert.ToInt32(field.NumericValue)), 0.0f);
+            Assert.Equal(6f, Number.IntBitsToFloat(Convert.ToInt32(field.NumericValue))); //, 0.0f);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFloatField()
         {
             Field[] fields = new Field[] { new FloatField("foo", 5f, Field.Store.NO), new FloatField("foo", 5f, Field.Store.YES) };
@@ -120,11 +120,11 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual(6f, (float)field.NumericValue, 0.0f);
+                Assert.Equal(6f, (float)field.NumericValue); //, 0.0f);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntField()
         {
             Field[] fields = new Field[] { new IntField("foo", 5, Field.Store.NO), new IntField("foo", 5, Field.Store.YES) };
@@ -144,11 +144,11 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual(6, (int)field.NumericValue);
+                Assert.Equal(6, (int)field.NumericValue);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNumericDocValuesField()
         {
             NumericDocValuesField field = new NumericDocValuesField("foo", 5L);
@@ -166,10 +166,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(6L, (long)field.NumericValue);
+            Assert.Equal(6L, (long)field.NumericValue);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongField()
         {
             Field[] fields = new Field[] { new LongField("foo", 5L, Field.Store.NO), new LongField("foo", 5L, Field.Store.YES) };
@@ -189,11 +189,11 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual(6L, (long)field.NumericValue);
+                Assert.Equal(6L, (long)field.NumericValue);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortedBytesDocValuesField()
         {
             SortedDocValuesField field = new SortedDocValuesField("foo", new BytesRef("bar"));
@@ -211,10 +211,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(new BytesRef("baz"), field.BinaryValue());
+            Assert.Equal(new BytesRef("baz"), field.BinaryValue());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBinaryDocValuesField()
         {
             BinaryDocValuesField field = new BinaryDocValuesField("foo", new BytesRef("bar"));
@@ -232,10 +232,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(new BytesRef("baz"), field.BinaryValue());
+            Assert.Equal(new BytesRef("baz"), field.BinaryValue());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStringField()
         {
             Field[] fields = new Field[] { new StringField("foo", "bar", Field.Store.NO), new StringField("foo", "bar", Field.Store.YES) };
@@ -255,11 +255,11 @@ namespace Lucene.Net.Document
                 field.StringValue = "baz";
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual("baz", field.StringValue);
+                Assert.Equal("baz", field.StringValue);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTextFieldString()
         {
             Field[] fields = new Field[] { new TextField("foo", "bar", Field.Store.NO), new TextField("foo", "bar", Field.Store.YES) };
@@ -279,12 +279,12 @@ namespace Lucene.Net.Document
                 field.StringValue = "baz";
                 field.TokenStream = new CannedTokenStream(new Token("foo", 0, 3));
 
-                Assert.AreEqual("baz", field.StringValue);
-                Assert.AreEqual(5f, field.GetBoost(), 0f);
+                Assert.Equal("baz", field.StringValue);
+                Assert.Equal(5f, field.GetBoost()); //, 0f);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTextFieldReader()
         {
             Field field = new TextField("foo", new StringReader("bar"));
@@ -302,8 +302,8 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             field.TokenStream = new CannedTokenStream(new Token("foo", 0, 3));
 
-            Assert.IsNotNull(field.ReaderValue);
-            Assert.AreEqual(5f, field.GetBoost(), 0f);
+            Assert.NotNull(field.ReaderValue);
+            Assert.Equal(5f, field.GetBoost()); //, 0f);
         }
 
         /* TODO: this is pretty expert and crazy
@@ -312,7 +312,7 @@ namespace Lucene.Net.Document
         }
         */
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldBytes()
         {
             Field[] fields = new Field[] { new StoredField("foo", "bar".GetBytes(Encoding.UTF8)), new StoredField("foo", "bar".GetBytes(Encoding.UTF8), 0, 3), new StoredField("foo", new BytesRef("bar")) };
@@ -332,11 +332,11 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.AreEqual(new BytesRef("baz"), field.BinaryValue());
+                Assert.Equal(new BytesRef("baz"), field.BinaryValue());
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldString()
         {
             Field field = new StoredField("foo", "bar");
@@ -353,10 +353,10 @@ namespace Lucene.Net.Document
             field.StringValue = "baz";
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual("baz", field.StringValue);
+            Assert.Equal("baz", field.StringValue);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldInt()
         {
             Field field = new StoredField("foo", 1);
@@ -373,10 +373,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(5, (int)field.NumericValue);
+            Assert.Equal(5, (int)field.NumericValue);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldDouble()
         {
             Field field = new StoredField("foo", 1D);
@@ -393,10 +393,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(5D, (double)field.NumericValue, 0.0D);
+            Assert.Equal(5D, (double)field.NumericValue); //, 0.0D);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldFloat()
         {
             Field field = new StoredField("foo", 1F);
@@ -413,10 +413,10 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(5f, (float)field.NumericValue, 0.0f);
+            Assert.Equal(5f, (float)field.NumericValue); //, 0.0f);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStoredFieldLong()
         {
             Field field = new StoredField("foo", 1L);
@@ -433,163 +433,103 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.AreEqual(5L, (long)field.NumericValue);
+            Assert.Equal(5L, (long)field.NumericValue);
         }
 
         private void TrySetByteValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.ByteValue = (sbyte)10;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetBytesValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.BytesValue = new BytesRef(new byte[] { 5, 5 });
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetBytesRefValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.BytesValue = new BytesRef("bogus");
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetDoubleValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.DoubleValue = double.MaxValue;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetIntValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.IntValue = int.MaxValue;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetLongValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.LongValue = long.MaxValue;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetFloatValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.FloatValue = float.MaxValue;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetReaderValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.ReaderValue = new StringReader("BOO!");
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetShortValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.ShortValue = short.MaxValue;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetStringValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.StringValue = "BOO!";
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetTokenStreamValue(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.TokenStream = new CannedTokenStream(new Token("foo", 0, 3));
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
         private void TrySetBoost(Field f)
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 f.Boost = 5.0f;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
     }
 }

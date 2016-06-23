@@ -1,13 +1,11 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Text;
-
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -85,7 +83,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInfoStreamGetsFieldName()
         {
             Directory dir = NewDirectory();
@@ -101,20 +99,20 @@ namespace Lucene.Net.Index
             try
             {
                 writer.AddDocument(doc);
-                Assert.Fail("Failed to fail.");
+                Assert.True(false, "Failed to fail.");
             }
             catch (BadNews badNews)
             {
                 infoPrintStream.Flush();
-                string infoStream = Encoding.UTF8.GetString(infoBytes.GetBuffer());
-                Assert.IsTrue(infoStream.Contains("distinctiveFieldName"));
+                string infoStream = Encoding.UTF8.GetString(infoBytes.ToArray());
+                Assert.True(infoStream.Contains("distinctiveFieldName"));
             }
 
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoExtraNoise()
         {
             Directory dir = NewDirectory();
@@ -133,12 +131,11 @@ namespace Lucene.Net.Index
             }
             catch (BadNews badNews)
             {
-                Assert.Fail("Unwanted exception");
+                Assert.True(false, "Unwanted exception");
             }
             infoPrintStream.Flush();
-            string infoStream = Encoding.UTF8.GetString(infoBytes.GetBuffer());
-            Assert.IsFalse(infoStream.Contains("boringFieldName"));
-
+            string infoStream = Encoding.UTF8.GetString(infoBytes.ToArray());
+            Assert.False(infoStream.Contains("boringFieldName"));
             writer.Dispose();
             dir.Dispose();
         }

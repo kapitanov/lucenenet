@@ -1,9 +1,9 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using DateTools = DateTools;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -35,7 +35,6 @@ namespace Lucene.Net.Search
     /// Test date sorting, i.e. auto-sorting of fields with type "long".
     /// See http://issues.apache.org/jira/browse/LUCENE-1045
     /// </summary>
-    [TestFixture]
     public class TestDateSort : LuceneTestCase
     {
         private const string TEXT_FIELD = "text";
@@ -44,10 +43,8 @@ namespace Lucene.Net.Search
         private Directory Directory;
         private IndexReader Reader;
 
-        [SetUp]
-        public override void SetUp()
+        public TestDateSort() : base()
         {
-            base.SetUp();
             // Create an index writer.
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
@@ -69,15 +66,14 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReverseDateSort()
         {
             IndexSearcher searcher = NewSearcher(Reader);
@@ -103,7 +99,7 @@ namespace Lucene.Net.Search
             expectedOrder[3] = "Document 2";
             expectedOrder[4] = "Document 1";
 
-            Assert.AreEqual(Arrays.AsList(expectedOrder), Arrays.AsList(actualOrder));
+            Assert.Equal(Arrays.AsList(expectedOrder), Arrays.AsList(actualOrder));
         }
 
         private Document CreateDocument(string text, long time)

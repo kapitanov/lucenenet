@@ -5,7 +5,7 @@ namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
 
     /*
@@ -41,8 +41,6 @@ namespace Lucene.Net.Search
     //   - BQ, negated clauses, negated prefix clauses
     //   - test pulling docs in 2nd round trip...
     //   - filter too
-
-    [TestFixture]
     public class TestShardSearching : ShardSearchingTestBase
     {
         private class PreviousSearchState
@@ -67,7 +65,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             int numNodes = TestUtil.NextInt(Random(), 1, 10);
@@ -388,7 +386,7 @@ namespace Lucene.Net.Search
             int numNodes = shardSearcher.NodeVersions.Length;
             int[] @base = new int[numNodes];
             IList<IndexReaderContext> subs = mockSearcher.TopReaderContext.Children;
-            Assert.AreEqual(numNodes, subs.Count);
+            Assert.Equal(numNodes, subs.Count);
 
             for (int nodeID = 0; nodeID < numNodes; nodeID++)
             {
@@ -458,7 +456,7 @@ namespace Lucene.Net.Search
             }
             else
             {
-                Assert.AreEqual(hits.TotalHits, numHitsPaged);
+                Assert.Equal(hits.TotalHits, numHitsPaged);
                 bottomHit = null;
                 bottomHitShards = null;
                 moreHits = false;

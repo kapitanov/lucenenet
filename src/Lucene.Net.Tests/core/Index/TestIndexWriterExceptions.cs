@@ -3,12 +3,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
 
     /*
@@ -61,7 +61,6 @@ namespace Lucene.Net.Index
     using TokenFilter = Lucene.Net.Analysis.TokenFilter;
     using TokenStream = Lucene.Net.Analysis.TokenStream;
 
-    [TestFixture]
     public class TestIndexWriterExceptions : LuceneTestCase
     {
         private class DocCopyIterator : IEnumerable<Document>
@@ -309,8 +308,9 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
-        public virtual void TestRandomExceptions([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestRandomExceptions(IConcurrentMergeScheduler scheduler)
         {
             if (VERBOSE)
             {
@@ -341,7 +341,7 @@ namespace Lucene.Net.Index
             if (thread.Failure != null)
             {
                 Console.WriteLine(thread.Failure.StackTrace);
-                Assert.Fail("thread " + thread.Name + ": hit unexpected failure");
+                Assert.True(false, "thread " + thread.Name + ": hit unexpected failure");
             }
 
             if (VERBOSE)
@@ -365,14 +365,15 @@ namespace Lucene.Net.Index
             IndexReader r2 = DirectoryReader.Open(dir);
             int count = r2.DocFreq(new Term("content4", "aaa"));
             int count2 = r2.DocFreq(new Term("content4", "ddd"));
-            Assert.AreEqual(count, count2);
+            Assert.Equal(count, count2);
             r2.Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
-        public virtual void TestRandomExceptionsThreads([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestRandomExceptionsThreads(IConcurrentMergeScheduler scheduler)
         {
             Directory dir = NewDirectory();
             MockAnalyzer analyzer = new MockAnalyzer(Random());
@@ -406,7 +407,7 @@ namespace Lucene.Net.Index
             {
                 if (threads[i].Failure != null)
                 {
-                    Assert.Fail("thread " + threads[i].Name + ": hit unexpected failure");
+                    Assert.True(false, "thread " + threads[i].Name + ": hit unexpected failure");
                 }
             }
 
@@ -427,7 +428,7 @@ namespace Lucene.Net.Index
             IndexReader r2 = DirectoryReader.Open(dir);
             int count = r2.DocFreq(new Term("content4", "aaa"));
             int count2 = r2.DocFreq(new Term("content4", "ddd"));
-            Assert.AreEqual(count, count2);
+            Assert.Equal(count, count2);
             r2.Dispose();
 
             dir.Dispose();
@@ -479,7 +480,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptionDocumentsWriterInit()
         {
             Directory dir = NewDirectory();
@@ -492,7 +493,7 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(doc);
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (Exception re)
             {
@@ -503,7 +504,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1208
-        [Test]
+        [Fact]
         public virtual void TestExceptionJustBeforeFlush()
         {
             Directory dir = NewDirectory();
@@ -519,7 +520,7 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(crashDoc, analyzer);
-                Assert.Fail("did not hit expected exception");
+                Assert.True(false, "did not hit expected exception");
             }
             catch (IOException ioe)
             {
@@ -564,8 +565,9 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1210
-        [Test]
-        public virtual void TestExceptionOnMergeInit([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestExceptionOnMergeInit(IConcurrentMergeScheduler scheduler)
         {
             Directory dir = NewDirectory();
             IndexWriterConfig conf = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(2).SetMergePolicy(NewLogMergePolicy());
@@ -591,13 +593,13 @@ namespace Lucene.Net.Index
             }
 
             ((IConcurrentMergeScheduler)w.Config.MergeScheduler).Sync();
-            Assert.IsTrue(testPoint.Failed);
+            Assert.True(testPoint.Failed);
             w.Dispose();
             dir.Dispose();
         }
 
         // LUCENE-1072
-        [Test]
+        [Fact]
         public virtual void TestExceptionFromTokenStream()
         {
             Directory dir = NewDirectory();
@@ -612,7 +614,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.AddDocument(doc);
-                Assert.Fail("did not hit expected exception");
+                Assert.True(false, "did not hit expected exception");
             }
             catch (Exception e)
             {
@@ -631,7 +633,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
             IndexReader reader = DirectoryReader.Open(dir);
             Term t = new Term("content", "aa");
-            Assert.AreEqual(3, reader.DocFreq(t));
+            Assert.Equal(3, reader.DocFreq(t));
 
             // Make sure the doc that hit the exception was marked
             // as deleted:
@@ -642,9 +644,9 @@ namespace Lucene.Net.Index
             {
                 count++;
             }
-            Assert.AreEqual(2, count);
+            Assert.Equal(2, count);
 
-            Assert.AreEqual(reader.DocFreq(new Term("content", "gg")), 0);
+            Assert.Equal(reader.DocFreq(new Term("content", "gg")), 0);
             reader.Dispose();
             dir.Dispose();
         }
@@ -745,7 +747,7 @@ namespace Lucene.Net.Index
 
         // LUCENE-1072: make sure an errant exception on flushing
         // one segment only takes out those docs in that one flush
-        [Test]
+        [Fact]
         public virtual void TestDocumentsWriterAbort()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -767,19 +769,19 @@ namespace Lucene.Net.Index
                 catch (IOException ioe)
                 {
                     // only one flush should fail:
-                    Assert.IsFalse(hitError);
+                    Assert.False(hitError);
                     hitError = true;
                 }
             }
-            Assert.IsTrue(hitError);
+            Assert.True(hitError);
             writer.Dispose();
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(198, reader.DocFreq(new Term("content", "aa")));
+            Assert.Equal(198, reader.DocFreq(new Term("content", "aa")));
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocumentsWriterExceptions()
         {
             Analyzer analyzer = new TDWEAnalyzerAnonymousInnerClassHelper(this, Analyzer.PER_FIELD_REUSE_STRATEGY);
@@ -807,7 +809,7 @@ namespace Lucene.Net.Index
                 try
                 {
                     writer.AddDocument(doc);
-                    Assert.Fail("did not hit expected exception");
+                    Assert.True(false, "did not hit expected exception");
                 }
                 catch (IOException ioe)
                 {
@@ -835,11 +837,11 @@ namespace Lucene.Net.Index
                 if (i == 0)
                 {
                     int expected = 5;
-                    Assert.AreEqual(expected, reader.DocFreq(new Term("contents", "here")));
-                    Assert.AreEqual(expected, reader.MaxDoc);
+                    Assert.Equal(expected, reader.DocFreq(new Term("contents", "here")));
+                    Assert.Equal(expected, reader.MaxDoc);
                     int numDel = 0;
                     Bits liveDocs = MultiFields.GetLiveDocs(reader);
-                    Assert.IsNotNull(liveDocs);
+                    Assert.NotNull(liveDocs);
                     for (int j = 0; j < reader.MaxDoc; j++)
                     {
                         if (!liveDocs.Get(j))
@@ -852,7 +854,7 @@ namespace Lucene.Net.Index
                             reader.GetTermVectors(j);
                         }
                     }
-                    Assert.AreEqual(1, numDel);
+                    Assert.Equal(1, numDel);
                 }
                 reader.Dispose();
 
@@ -868,17 +870,17 @@ namespace Lucene.Net.Index
 
                 reader = DirectoryReader.Open(dir);
                 int expected_ = 19 + (1 - i) * 2;
-                Assert.AreEqual(expected_, reader.DocFreq(new Term("contents", "here")));
-                Assert.AreEqual(expected_, reader.MaxDoc);
+                Assert.Equal(expected_, reader.DocFreq(new Term("contents", "here")));
+                Assert.Equal(expected_, reader.MaxDoc);
                 int numDel_ = 0;
-                Assert.IsNull(MultiFields.GetLiveDocs(reader));
+                Assert.Null(MultiFields.GetLiveDocs(reader));
                 for (int j = 0; j < reader.MaxDoc; j++)
                 {
                     reader.Document(j);
                     reader.GetTermVectors(j);
                 }
                 reader.Dispose();
-                Assert.AreEqual(0, numDel_);
+                Assert.Equal(0, numDel_);
 
                 dir.Dispose();
             }
@@ -902,7 +904,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocumentsWriterExceptionThreads()
         {
             Analyzer analyzer = new AnalyzerAnonymousInnerClassHelper2(this, Analyzer.PER_FIELD_REUSE_STRATEGY);
@@ -936,11 +938,11 @@ namespace Lucene.Net.Index
 
                 IndexReader reader = DirectoryReader.Open(dir);
                 int expected = (3 + (1 - i) * 2) * NUM_THREAD * NUM_ITER;
-                Assert.AreEqual(expected, reader.DocFreq(new Term("contents", "here")), "i=" + i);
-                Assert.AreEqual(expected, reader.MaxDoc);
+                Assert.Equal(expected, reader.DocFreq(new Term("contents", "here"))); //, "i=" + i);
+                Assert.Equal(expected, reader.MaxDoc);
                 int numDel = 0;
                 Bits liveDocs = MultiFields.GetLiveDocs(reader);
-                Assert.IsNotNull(liveDocs);
+                Assert.NotNull(liveDocs);
                 for (int j = 0; j < reader.MaxDoc; j++)
                 {
                     if (!liveDocs.Get(j))
@@ -955,7 +957,7 @@ namespace Lucene.Net.Index
                 }
                 reader.Dispose();
 
-                Assert.AreEqual(NUM_THREAD * NUM_ITER, numDel);
+                Assert.Equal(NUM_THREAD * NUM_ITER, numDel);
 
                 IndexWriter indWriter = new IndexWriter(dir, (IndexWriterConfig)NewIndexWriterConfig(TEST_VERSION_CURRENT, analyzer).SetMaxBufferedDocs(10));
                 Document doc = new Document();
@@ -969,9 +971,9 @@ namespace Lucene.Net.Index
 
                 reader = DirectoryReader.Open(dir);
                 expected += 17 - NUM_THREAD * NUM_ITER;
-                Assert.AreEqual(expected, reader.DocFreq(new Term("contents", "here")));
-                Assert.AreEqual(expected, reader.MaxDoc);
-                Assert.IsNull(MultiFields.GetLiveDocs(reader));
+                Assert.Equal(expected, reader.DocFreq(new Term("contents", "here")));
+                Assert.Equal(expected, reader.MaxDoc);
+                Assert.Null(MultiFields.GetLiveDocs(reader));
                 for (int j = 0; j < reader.MaxDoc; j++)
                 {
                     reader.Document(j);
@@ -1034,7 +1036,7 @@ namespace Lucene.Net.Index
                         try
                         {
                             Writer.AddDocument(doc);
-                            Assert.Fail("did not hit expected exception");
+                            Assert.True(false, "did not hit expected exception");
                         }
                         catch (IOException ioe)
                         {
@@ -1056,7 +1058,7 @@ namespace Lucene.Net.Index
                         Console.WriteLine(Thread.CurrentThread.Name + ": ERROR: hit unexpected exception");
                         Console.WriteLine(t.StackTrace);
                     }
-                    Assert.Fail();
+                    Assert.True(false);
                 }
             }
         }
@@ -1099,8 +1101,9 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1044: test exception during sync
-        [Test]
-        public virtual void TestExceptionDuringSync([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestExceptionDuringSync(IConcurrentMergeScheduler scheduler)
         {
             MockDirectoryWrapper dir = NewMockDirectory();
             FailOnlyInSync failure = new FailOnlyInSync();
@@ -1130,12 +1133,12 @@ namespace Lucene.Net.Index
                 }
             }
             ((IConcurrentMergeScheduler)writer.Config.MergeScheduler).Sync();
-            Assert.IsTrue(failure.DidFail);
+            Assert.True(failure.DidFail);
             failure.ClearDoFail();
             writer.Dispose();
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(23, reader.NumDocs);
+            Assert.Equal(23, reader.NumDocs);
             reader.Dispose();
             dir.Dispose();
         }
@@ -1202,7 +1205,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptionsDuringCommit()
         {
             FailOnlyInCommit[] failures = new FailOnlyInCommit[] { new FailOnlyInCommit(false, FailOnlyInCommit.PREPARE_STAGE), new FailOnlyInCommit(true, FailOnlyInCommit.PREPARE_STAGE), new FailOnlyInCommit(false, FailOnlyInCommit.FINISH_STAGE) };
@@ -1219,26 +1222,27 @@ namespace Lucene.Net.Index
                 try
                 {
                     w.Dispose();
-                    Assert.Fail();
+                    Assert.True(false);
                 }
-                catch (IOException ioe)
+                catch (IOException)
                 {
-                    Assert.Fail("expected only RuntimeException");
+                    Assert.True(false, "expected only RuntimeException");
                 }
-                catch (Exception re)
+                catch (Exception)
                 {
                     // Expected
                 }
-                Assert.IsTrue(failure.FailOnCommit && failure.FailOnDeleteFile);
+                Assert.True(failure.FailOnCommit && failure.FailOnDeleteFile);
                 w.Rollback();
                 string[] files = dir.ListAll();
-                Assert.IsTrue(files.Length == 0 || Arrays.Equals(files, new string[] { IndexWriter.WRITE_LOCK_NAME }));
+                Assert.True(files.Length == 0 || Arrays.Equals(files, new string[] { IndexWriter.WRITE_LOCK_NAME }));
                 dir.Dispose();
             }
         }
 
-        [Test]
-        public virtual void TestForceMergeExceptions([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestForceMergeExceptions(IConcurrentMergeScheduler scheduler)
         {
             Directory startDir = NewDirectory();
             IndexWriterConfig conf = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(2).SetMergePolicy(NewLogMergePolicy());
@@ -1270,7 +1274,7 @@ namespace Lucene.Net.Index
                 {
                     if (ioe.InnerException == null)
                     {
-                        Assert.Fail("forceMerge threw IOException without root cause");
+                        Assert.True(false, "forceMerge threw IOException without root cause");
                     }
                 }
                 dir.RandomIOExceptionRate = 0;
@@ -1281,7 +1285,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1429
-        [Test]
+        [Fact]
         public virtual void TestOutOfMemoryErrorCausesCloseToFail()
         {
             AtomicBoolean thrown = new AtomicBoolean(false);
@@ -1291,7 +1295,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.Dispose();
-                Assert.Fail("OutOfMemoryError expected");
+                Assert.True(false, "OutOfMemoryError expected");
             }
             catch (System.OutOfMemoryException expected)
             {
@@ -1347,7 +1351,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1347
-        [Test]
+        [Fact]
         public virtual void TestRollbackExceptionHang()
         {
             Directory dir = NewDirectory();
@@ -1359,7 +1363,7 @@ namespace Lucene.Net.Index
             try
             {
                 w.Rollback();
-                Assert.Fail("did not hit intentional RuntimeException");
+                Assert.True(false, "did not hit intentional RuntimeException");
             }
             catch (Exception re)
             {
@@ -1372,7 +1376,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1044: Simulate checksum error in segments_N
-        [Test]
+        [Fact]
         public virtual void TestSegmentsChecksumError()
         {
             Directory dir = NewDirectory();
@@ -1391,7 +1395,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             long gen = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.IsTrue(gen > 0, "segment generation should be > 0 but got " + gen);
+            Assert.True(gen > 0, "segment generation should be > 0 but got " + gen);
 
             string segmentsFileName = SegmentInfos.GetLastCommitSegmentsFileName(dir);
             IndexInput @in = dir.OpenInput(segmentsFileName, NewIOContext(Random()));
@@ -1410,7 +1414,7 @@ namespace Lucene.Net.Index
             catch (IOException e)
             {
                 Console.WriteLine(e.StackTrace);
-                Assert.Fail("segmentInfos failed to retry fallback to correct segments_N file");
+                Assert.True(false, "segmentInfos failed to retry fallback to correct segments_N file");
             }
             reader.Dispose();
 
@@ -1422,7 +1426,7 @@ namespace Lucene.Net.Index
         // Simulate a corrupt index by removing last byte of
         // latest segments file and make sure we get an
         // IOException trying to open the index:
-        [Test]
+        [Fact]
         public virtual void TestSimulatedCorruptIndex1()
         {
             BaseDirectoryWrapper dir = NewDirectory();
@@ -1442,7 +1446,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             long gen = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.IsTrue(gen > 0, "segment generation should be > 0 but got " + gen);
+            Assert.True(gen > 0, "segment generation should be > 0 but got " + gen);
 
             string fileNameIn = SegmentInfos.GetLastCommitSegmentsFileName(dir);
             string fileNameOut = IndexFileNames.FileNameFromGeneration(IndexFileNames.SEGMENTS, "", 1 + gen);
@@ -1461,7 +1465,7 @@ namespace Lucene.Net.Index
             try
             {
                 reader = DirectoryReader.Open(dir);
-                Assert.Fail("reader did not hit IOException on opening a corrupt index");
+                Assert.True(false, "reader did not hit IOException on opening a corrupt index");
             }
             catch (Exception e)
             {
@@ -1476,7 +1480,7 @@ namespace Lucene.Net.Index
         // Simulate a corrupt index by removing one of the cfs
         // files and make sure we get an IOException trying to
         // open the index:
-        [Test]
+        [Fact]
         public virtual void TestSimulatedCorruptIndex2()
         {
             BaseDirectoryWrapper dir = NewDirectory();
@@ -1499,7 +1503,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             long gen = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.IsTrue(gen > 0, "segment generation should be > 0 but got " + gen);
+            Assert.True(gen > 0, "segment generation should be > 0 but got " + gen);
 
             string[] files = dir.ListAll();
             bool corrupted = false;
@@ -1512,13 +1516,13 @@ namespace Lucene.Net.Index
                     break;
                 }
             }
-            Assert.IsTrue(corrupted, "failed to find cfs file to remove");
+            Assert.True(corrupted, "failed to find cfs file to remove");
 
             IndexReader reader = null;
             try
             {
                 reader = DirectoryReader.Open(dir);
-                Assert.Fail("reader did not hit IOException on opening a corrupt index");
+                Assert.True(false, "reader did not hit IOException on opening a corrupt index");
             }
             catch (Exception e)
             {
@@ -1534,7 +1538,7 @@ namespace Lucene.Net.Index
         // file: make sure we can still open the index (ie,
         // gracefully fallback to the previous segments file),
         // and that we can add to the index:
-        [Test]
+        [Fact]
         public virtual void TestSimulatedCrashedWriter()
         {
             Directory dir = NewDirectory();
@@ -1557,7 +1561,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             long gen = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.IsTrue(gen > 0, "segment generation should be > 0 but got " + gen);
+            Assert.True(gen > 0, "segment generation should be > 0 but got " + gen);
 
             // Make the next segments file, with last byte
             // missing, to simulate a writer that crashed while
@@ -1581,7 +1585,7 @@ namespace Lucene.Net.Index
             }
             catch (Exception e)
             {
-                Assert.Fail("reader failed to open on a crashed index");
+                Assert.True(false, "reader failed to open on a crashed index");
             }
             reader.Dispose();
 
@@ -1592,7 +1596,7 @@ namespace Lucene.Net.Index
             catch (Exception e)
             {
                 Console.WriteLine(e.StackTrace);
-                Assert.Fail("writer failed to open on a crashed index");
+                Assert.True(false, "writer failed to open on a crashed index");
             }
 
             // add 100 documents
@@ -1606,7 +1610,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermVectorExceptions()
         {
             FailOnTermVectors[] failures = new FailOnTermVectors[] { new FailOnTermVectors(FailOnTermVectors.AFTER_INIT_STAGE), new FailOnTermVectors(FailOnTermVectors.INIT_STAGE) };
@@ -1628,11 +1632,11 @@ namespace Lucene.Net.Index
                         try
                         {
                             w.AddDocument(doc);
-                            Assert.IsFalse(field.FieldType().StoreTermVectors);
+                            Assert.False(field.FieldType().StoreTermVectors);
                         }
                         catch (Exception e)
                         {
-                            Assert.IsTrue(e.Message.StartsWith(FailOnTermVectors.EXC_MSG));
+                            Assert.True(e.Message.StartsWith(FailOnTermVectors.EXC_MSG));
                         }
                         if (Random().Next(20) == 0)
                         {
@@ -1653,11 +1657,11 @@ namespace Lucene.Net.Index
                         try
                         {
                             w.AddDocument(doc);
-                            Assert.IsFalse(field.FieldType().StoreTermVectors);
+                            Assert.False(field.FieldType().StoreTermVectors);
                         }
                         catch (Exception e)
                         {
-                            Assert.IsTrue(e.Message.StartsWith(FailOnTermVectors.EXC_MSG));
+                            Assert.True(e.Message.StartsWith(FailOnTermVectors.EXC_MSG));
                         }
                         if (Random().Next(20) == 0)
                         {
@@ -1670,12 +1674,12 @@ namespace Lucene.Net.Index
                     w.AddDocument(document);
                     w.Dispose();
                     IndexReader reader = DirectoryReader.Open(dir);
-                    Assert.IsTrue(reader.NumDocs > 0);
+                    Assert.True(reader.NumDocs > 0);
                     SegmentInfos sis = new SegmentInfos();
                     sis.Read(dir);
                     foreach (AtomicReaderContext context in reader.Leaves)
                     {
-                        Assert.IsFalse((context.AtomicReader).FieldInfos.HasVectors());
+                        Assert.False((context.AtomicReader).FieldInfos.HasVectors());
                     }
                     reader.Dispose();
                     dir.Dispose();
@@ -1716,7 +1720,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddDocsNonAbortingException()
         {
             Directory dir = NewDirectory();
@@ -1749,12 +1753,12 @@ namespace Lucene.Net.Index
             {
                 w.AddDocuments(docs);
                 // BUG: CrashingFilter didn't
-                Assert.Fail("did not hit expected exception");
+                Assert.True(false, "did not hit expected exception");
             }
             catch (IOException ioe)
             {
                 // expected
-                Assert.AreEqual(CRASH_FAIL_MESSAGE, ioe.Message);
+                Assert.Equal(CRASH_FAIL_MESSAGE, ioe.Message);
             }
 
             int numDocs2 = Random().Next(25);
@@ -1772,17 +1776,17 @@ namespace Lucene.Net.Index
             PhraseQuery pq = new PhraseQuery();
             pq.Add(new Term("content", "silly"));
             pq.Add(new Term("content", "content"));
-            Assert.AreEqual(0, s.Search(pq, 1).TotalHits);
+            Assert.Equal(0, s.Search(pq, 1).TotalHits);
 
             pq = new PhraseQuery();
             pq.Add(new Term("content", "good"));
             pq.Add(new Term("content", "content"));
-            Assert.AreEqual(numDocs1 + numDocs2, s.Search(pq, 1).TotalHits);
+            Assert.Equal(numDocs1 + numDocs2, s.Search(pq, 1).TotalHits);
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateDocsNonAbortingException()
         {
             Directory dir = NewDirectory();
@@ -1839,12 +1843,12 @@ namespace Lucene.Net.Index
             {
                 w.UpdateDocuments(new Term("subid", "subs"), docs);
                 // BUG: CrashingFilter didn't
-                Assert.Fail("did not hit expected exception");
+                Assert.True(false, "did not hit expected exception");
             }
             catch (IOException ioe)
             {
                 // expected
-                Assert.AreEqual(CRASH_FAIL_MESSAGE, ioe.Message);
+                Assert.Equal(CRASH_FAIL_MESSAGE, ioe.Message);
             }
 
             int numDocs4 = Random().Next(25);
@@ -1862,12 +1866,12 @@ namespace Lucene.Net.Index
             PhraseQuery pq = new PhraseQuery();
             pq.Add(new Term("content", "silly"));
             pq.Add(new Term("content", "content"));
-            Assert.AreEqual(numDocs2, s.Search(pq, 1).TotalHits);
+            Assert.Equal(numDocs2, s.Search(pq, 1).TotalHits);
 
             pq = new PhraseQuery();
             pq.Add(new Term("content", "good"));
             pq.Add(new Term("content", "content"));
-            Assert.AreEqual(numDocs1 + numDocs3 + numDocs4, s.Search(pq, 1).TotalHits);
+            Assert.Equal(numDocs1 + numDocs3 + numDocs4, s.Search(pq, 1).TotalHits);
             r.Dispose();
             dir.Dispose();
         }
@@ -1894,7 +1898,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptionOnCtor()
         {
             UOEDirectory uoe = new UOEDirectory();
@@ -1906,7 +1910,7 @@ namespace Lucene.Net.Index
             try
             {
                 new IndexWriter(d, NewIndexWriterConfig(TEST_VERSION_CURRENT, null));
-                Assert.Fail("should have gotten a UOE");
+                Assert.True(false, "should have gotten a UOE");
             }
             catch (System.NotSupportedException expected)
             {
@@ -1916,7 +1920,7 @@ namespace Lucene.Net.Index
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalPositions()
         {
             Directory dir = NewDirectory();
@@ -1929,20 +1933,13 @@ namespace Lucene.Net.Index
             TokenStream overflowingTokenStream = new CannedTokenStream(new Token[] { t1, t2 });
             Field field = new TextField("foo", overflowingTokenStream);
             doc.Add(field);
-            try
-            {
-                iw.AddDocument(doc);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<ArgumentException>(() => iw.AddDocument(doc));
+
             iw.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLegalbutVeryLargePositions()
         {
             Directory dir = NewDirectory();
@@ -1962,7 +1959,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBoostOmitNorms()
         {
             Directory dir = NewDirectory();
@@ -1981,15 +1978,15 @@ namespace Lucene.Net.Index
                 IList<IndexableField> list = new List<IndexableField>();
                 list.Add(new IndexableFieldAnonymousInnerClassHelper(this));
                 iw.AddDocument(list);
-                Assert.Fail("didn't get any exception, boost silently discarded");
+                Assert.True(false, "didn't get any exception, boost silently discarded");
             }
             catch (System.NotSupportedException expected)
             {
                 // expected
             }
             DirectoryReader ir = DirectoryReader.Open(iw, false);
-            Assert.AreEqual(1, ir.NumDocs);
-            Assert.AreEqual("sometext", ir.Document(0).Get("field1"));
+            Assert.Equal(1, ir.NumDocs);
+            Assert.Equal("sometext", ir.Document(0).Get("field1"));
             ir.Dispose();
             iw.Dispose();
             dir.Dispose();
@@ -2056,7 +2053,7 @@ namespace Lucene.Net.Index
 
         // See LUCENE-4870 TooManyOpenFiles errors are thrown as
         // FNFExceptions which can trigger data loss.
-        [Test]
+        [Fact]
         public virtual void TestTooManyFileException()
         {
             // Create failure that throws Too many open files exception randomly
@@ -2075,7 +2072,7 @@ namespace Lucene.Net.Index
             iw.AddDocument(doc); // add a document
             iw.Commit();
             DirectoryReader ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, ir.NumDocs);
+            Assert.Equal(1, ir.NumDocs);
             ir.Dispose();
             iw.Dispose();
 
@@ -2100,14 +2097,14 @@ namespace Lucene.Net.Index
                 failure.ClearDoFail();
                 iw.Dispose();
                 ir = DirectoryReader.Open(dir);
-                Assert.AreEqual(1, ir.NumDocs, "lost document after iteration: " + i);
+                Assert.Equal(1, ir.NumDocs); //, "lost document after iteration: " + i);
                 ir.Dispose();
             }
 
             // Check if document is still there
             failure.ClearDoFail();
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, ir.NumDocs);
+            Assert.Equal(1, ir.NumDocs);
             ir.Dispose();
 
             dir.Dispose();
@@ -2144,7 +2141,7 @@ namespace Lucene.Net.Index
         // full), and then the exception stops (e.g., disk frees
         // up), so we successfully close IW or open an NRT
         // reader, we don't lose any deletes or updates:
-        [Test]
+        [Fact]
         public virtual void TestNoLostDeletesOrUpdates()
         {
             int deleteCount = 0;
@@ -2259,7 +2256,7 @@ namespace Lucene.Net.Index
 
                     // Sometimes we will make it here (we only randomly
                     // throw the exc):
-                    Assert.AreEqual(docCount - deleteCount, r.NumDocs);
+                    Assert.Equal(docCount - deleteCount, r.NumDocs);
                     r.Dispose();
 
                     // Sometimes close, so the disk full happens on close:
@@ -2328,7 +2325,7 @@ namespace Lucene.Net.Index
                     }
                     ir = w.Reader;
                 }
-                Assert.AreEqual(docCount - deleteCount, ir.NumDocs);
+                Assert.Equal(docCount - deleteCount, ir.NumDocs);
                 if (DefaultCodecSupportsDocValues())
                 {
                     BytesRef scratch = new BytesRef();
@@ -2344,8 +2341,8 @@ namespace Lucene.Net.Index
                         {
                             if (liveDocs == null || liveDocs.Get(i))
                             {
-                                Assert.AreEqual(cf.Get(i), f.Get(i) * 2, "doc=" + (docBase + i).ToString());
-                                Assert.AreEqual(TestBinaryDocValuesUpdates.GetValue(bcf, i, scratch), TestBinaryDocValuesUpdates.GetValue(bf, i, scratch) * 2, "doc=" + (docBase + i).ToString());
+                                Assert.Equal(cf.Get(i), f.Get(i) * 2); //, "doc=" + (docBase + i).ToString());
+                                Assert.Equal(TestBinaryDocValuesUpdates.GetValue(bcf, i, scratch), TestBinaryDocValuesUpdates.GetValue(bf, i, scratch) * 2); //, "doc=" + (docBase + i).ToString());
                             }
                         }
                     }
@@ -2374,7 +2371,7 @@ namespace Lucene.Net.Index
 
             // Final verify:
             IndexReader indRdr = DirectoryReader.Open(dir);
-            Assert.AreEqual(docCount - deleteCount, indRdr.NumDocs);
+            Assert.Equal(docCount - deleteCount, indRdr.NumDocs);
             indRdr.Dispose();
 
             dir.Dispose();
@@ -2450,7 +2447,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptionDuringRollback()
         {
             // currently: fail in two different places
@@ -2484,21 +2481,21 @@ namespace Lucene.Net.Index
             try
             {
                 iw.Rollback();
-                Assert.Fail();
+                Assert.True(false);
             }
             catch (Exception expected)
             {
-                Assert.AreEqual("BOOM!", expected.Message);
+                Assert.Equal("BOOM!", expected.Message);
             }
 
             r.Dispose();
 
             // even though we hit exception: we are closed, no locks or files held, index in good state
-            Assert.IsTrue(iw.Closed);
-            Assert.IsFalse(IndexWriter.IsLocked(dir));
+            Assert.True(iw.Closed);
+            Assert.False(IndexWriter.IsLocked(dir));
 
             r = DirectoryReader.Open(dir);
-            Assert.AreEqual(10, r.MaxDoc);
+            Assert.Equal(10, r.MaxDoc);
             r.Dispose();
 
             // no leaks
@@ -2535,7 +2532,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomExceptionDuringRollback()
         {
             // fail in random places on i/o
@@ -2576,11 +2573,11 @@ namespace Lucene.Net.Index
                 r.Dispose();
 
                 // even though we hit exception: we are closed, no locks or files held, index in good state
-                Assert.IsTrue(iw.Closed);
-                Assert.IsFalse(IndexWriter.IsLocked(dir));
+                Assert.True(iw.Closed);
+                Assert.False(IndexWriter.IsLocked(dir));
 
                 r = DirectoryReader.Open(dir);
-                Assert.AreEqual(10, r.MaxDoc);
+                Assert.Equal(10, r.MaxDoc);
                 r.Dispose();
 
                 // no leaks

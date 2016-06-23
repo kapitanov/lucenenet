@@ -1,7 +1,7 @@
 using System;
-using Lucene.Net.Support;
-using NUnit.Framework;
 using System.Text.RegularExpressions;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,7 +22,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestConstants : LuceneTestCase
     {
         private string VersionDetails
@@ -33,14 +32,14 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLuceneMainVersionConstant()
         {
-            Assert.IsTrue(Regex.IsMatch(Constants.LUCENE_MAIN_VERSION, "\\d+\\.\\d+(|\\.0\\.\\d+)", RegexOptions.IgnoreCase), "LUCENE_MAIN_VERSION does not follow pattern: 'x.y' (stable release) or 'x.y.0.z' (alpha/beta version)" + VersionDetails);
-            Assert.IsTrue(Constants.LUCENE_VERSION.StartsWith(Constants.MainVersionWithoutAlphaBeta()), "LUCENE_VERSION does not start with LUCENE_MAIN_VERSION (without alpha/beta marker)" + VersionDetails);
+            Assert.True(Regex.IsMatch(Constants.LUCENE_MAIN_VERSION, "\\d+\\.\\d+(|\\.0\\.\\d+)", RegexOptions.IgnoreCase), "LUCENE_MAIN_VERSION does not follow pattern: 'x.y' (stable release) or 'x.y.0.z' (alpha/beta version)" + VersionDetails);
+            Assert.True(Constants.LUCENE_VERSION.StartsWith(Constants.MainVersionWithoutAlphaBeta()), "LUCENE_VERSION does not start with LUCENE_MAIN_VERSION (without alpha/beta marker)" + VersionDetails);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBuildSetup()
         {
             // common-build.xml sets lucene.version, if not, we skip this test!
@@ -54,7 +53,7 @@ namespace Lucene.Net.Util
             // remove anything after a "-" from the version string:
             version = Regex.Replace(version, "-.*$", "");
             string versionConstant = Regex.Replace(Constants.LUCENE_VERSION, "-.*$", "");
-            Assert.IsTrue(versionConstant.StartsWith(version) || version.StartsWith(versionConstant), "LUCENE_VERSION should share the same prefix with lucene.version test property ('" + version + "')." + VersionDetails);
+            Assert.True(versionConstant.StartsWith(version) || version.StartsWith(versionConstant), "LUCENE_VERSION should share the same prefix with lucene.version test property ('" + version + "')." + VersionDetails);
         }
     }
 }

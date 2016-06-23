@@ -1,9 +1,9 @@
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -39,7 +39,6 @@ namespace Lucene.Net.Search
     /// Generates random regexps according to simple patterns,
     /// and validates the correct number of hits are returned.
     /// </summary>
-    [TestFixture]
     public class TestRegexpRandom : LuceneTestCase
     {
         private IndexSearcher Searcher;
@@ -49,7 +48,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
 
@@ -98,7 +97,7 @@ namespace Lucene.Net.Search
         {
             Query wq = new RegexpQuery(new Term("field", FillPattern(pattern)));
             TopDocs docs = Searcher.Search(wq, 25);
-            Assert.AreEqual(numHits, docs.TotalHits, "Incorrect hits for pattern: " + pattern);
+            Assert.Equal(numHits, docs.TotalHits, "Incorrect hits for pattern: " + pattern);
         }
 
         [TearDown]
@@ -106,10 +105,10 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRegexps()
         {
             int num = AtLeast(1);

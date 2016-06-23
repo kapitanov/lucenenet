@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
 
@@ -33,10 +33,9 @@ namespace Lucene.Net.Search
     /// Tests <seealso cref="PrefixFilter"/> class.
     ///
     /// </summary>
-    [TestFixture]
     public class TestPrefixFilter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestPrefixFilter_Mem()
         {
             Directory directory = NewDirectory();
@@ -56,55 +55,55 @@ namespace Lucene.Net.Search
             Query query = new ConstantScoreQuery(filter);
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(4, hits.Length);
+            Assert.Equal(4, hits.Length);
 
             // test middle of values
             filter = new PrefixFilter(new Term("category", "/Computers/Mac"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
 
             // test start of values
             filter = new PrefixFilter(new Term("category", "/Computers/Linux"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             // test end of values
             filter = new PrefixFilter(new Term("category", "/Computers/Windows"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             // test non-existant
             filter = new PrefixFilter(new Term("category", "/Computers/ObsoleteOS"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // test non-existant, before values
             filter = new PrefixFilter(new Term("category", "/Computers/AAA"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // test non-existant, after values
             filter = new PrefixFilter(new Term("category", "/Computers/ZZZ"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // test zero length prefix
             filter = new PrefixFilter(new Term("category", ""));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(4, hits.Length);
+            Assert.Equal(4, hits.Length);
 
             // test non existent field
             filter = new PrefixFilter(new Term("nonexistantfield", "/Computers"));
             query = new ConstantScoreQuery(filter);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             writer.Dispose();
             reader.Dispose();

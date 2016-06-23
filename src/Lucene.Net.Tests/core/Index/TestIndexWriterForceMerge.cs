@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -31,10 +31,9 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestIndexWriterForceMerge : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestPartialMerge()
         {
             Directory dir = NewDirectory();
@@ -70,18 +69,19 @@ namespace Lucene.Net.Index
 
                 if (segCount < 3)
                 {
-                    Assert.AreEqual(segCount, optSegCount);
+                    Assert.Equal(segCount, optSegCount);
                 }
                 else
                 {
-                    Assert.AreEqual(3, optSegCount);
+                    Assert.Equal(3, optSegCount);
                 }
             }
             dir.Dispose();
         }
 
-        [Test]
-        public virtual void TestMaxNumSegments2([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestMaxNumSegments2(IConcurrentMergeScheduler scheduler)
         {
             Directory dir = NewDirectory();
 
@@ -122,11 +122,11 @@ namespace Lucene.Net.Index
 
                 if (segCount < 7)
                 {
-                    Assert.AreEqual(segCount, optSegCount);
+                    Assert.Equal(segCount, optSegCount);
                 }
                 else
                 {
-                    Assert.AreEqual(7, optSegCount, "seg: " + segCount);
+                    Assert.Equal(7, optSegCount); //, "seg: " + segCount);
                 }
             }
             writer.Dispose();
@@ -138,7 +138,7 @@ namespace Lucene.Net.Index
         /// starting index size as its temporary free space
         /// required.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestForceMergeTempSpaceUsage()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -184,14 +184,14 @@ namespace Lucene.Net.Index
             writer.ForceMerge(1);
             writer.Dispose();
             long maxDiskUsage = dir.MaxUsedSizeInBytes;
-            Assert.IsTrue(maxDiskUsage <= 4 * startDiskUsage, "forceMerge used too much temporary space: starting usage was " + startDiskUsage + " bytes; max temp usage was " + maxDiskUsage + " but should have been " + (4 * startDiskUsage) + " (= 4X starting usage)");
+            Assert.True(maxDiskUsage <= 4 * startDiskUsage, "forceMerge used too much temporary space: starting usage was " + startDiskUsage + " bytes; max temp usage was " + maxDiskUsage + " but should have been " + (4 * startDiskUsage) + " (= 4X starting usage)");
             dir.Dispose();
         }
 
         // Test calling forceMerge(1, false) whereby forceMerge is kicked
         // off but we don't wait for it to finish (but
         // writer.Dispose()) does wait
-        [Test]
+        [Fact]
         public virtual void TestBackgroundForceMerge()
         {
             Directory dir = NewDirectory();
@@ -210,7 +210,7 @@ namespace Lucene.Net.Index
                 {
                     writer.Dispose();
                     DirectoryReader reader = DirectoryReader.Open(dir);
-                    Assert.AreEqual(1, reader.Leaves.Count);
+                    Assert.Equal(1, reader.Leaves.Count);
                     reader.Dispose();
                 }
                 else
@@ -222,12 +222,12 @@ namespace Lucene.Net.Index
                     writer.Dispose();
 
                     DirectoryReader reader = DirectoryReader.Open(dir);
-                    Assert.IsTrue(reader.Leaves.Count > 1);
+                    Assert.True(reader.Leaves.Count > 1);
                     reader.Dispose();
 
                     SegmentInfos infos = new SegmentInfos();
                     infos.Read(dir);
-                    Assert.AreEqual(2, infos.Size());
+                    Assert.Equal(2, infos.Size());
                 }
             }
 

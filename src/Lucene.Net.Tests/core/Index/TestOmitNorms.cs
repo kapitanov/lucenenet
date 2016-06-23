@@ -1,10 +1,9 @@
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -32,12 +31,11 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestOmitNorms : LuceneTestCase
     {
         // Tests whether the DocumentWriter correctly enable the
         // omitNorms bit in the FieldInfo
-        [Test]
+        [Fact]
         public virtual void TestOmitNorms_Mem()
         {
             Directory ram = NewDirectory();
@@ -75,8 +73,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.IsTrue(fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should be set.");
-            Assert.IsTrue(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
+            Assert.True(fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should be set.");
+            Assert.True(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -84,7 +82,7 @@ namespace Lucene.Net.Index
 
         // Tests whether merging of docs that have different
         // omitNorms for the same field works
-        [Test]
+        [Fact]
         public virtual void TestMixedMerge()
         {
             Directory ram = NewDirectory();
@@ -128,8 +126,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.IsTrue(fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should be set.");
-            Assert.IsTrue(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
+            Assert.True(fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should be set.");
+            Assert.True(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -138,7 +136,7 @@ namespace Lucene.Net.Index
         // Make sure first adding docs that do not omitNorms for
         // field X, then adding docs that do omitNorms for that same
         // field,
-        [Test]
+        [Fact]
         public virtual void TestMixedRAM()
         {
             Directory ram = NewDirectory();
@@ -175,8 +173,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.IsTrue(!fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should not be set.");
-            Assert.IsTrue(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
+            Assert.True(!fi.FieldInfo("f1").OmitsNorms(), "OmitNorms field bit should not be set.");
+            Assert.True(fi.FieldInfo("f2").OmitsNorms(), "OmitNorms field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -188,12 +186,12 @@ namespace Lucene.Net.Index
             for (int i = 0; i < files.Length; i++)
             {
                 // TODO: this relies upon filenames
-                Assert.IsFalse(files[i].EndsWith(".nrm") || files[i].EndsWith(".len"));
+                Assert.False(files[i].EndsWith(".nrm") || files[i].EndsWith(".len"));
             }
         }
 
         // Verifies no *.nrm exists when all fields omit norms:
-        [Test]
+        [Fact]
         public virtual void TestNoNrmFile()
         {
             Directory ram = NewDirectory();
@@ -233,7 +231,7 @@ namespace Lucene.Net.Index
         /// Internally checks that MultiNorms.norms() is consistent (returns the same bytes)
         /// as the fully merged equivalent.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOmitNormsCombos()
         {
             // indexed with norms
@@ -255,21 +253,21 @@ namespace Lucene.Net.Index
             // not indexed nor stored (doesnt exist at all, we index a different field instead)
             Field emptyNorms = new Field("bar", "a", customType);
 
-            Assert.IsNotNull(GetNorms("foo", norms, norms));
-            Assert.IsNull(GetNorms("foo", norms, noNorms));
-            Assert.IsNotNull(GetNorms("foo", norms, noIndex));
-            Assert.IsNotNull(GetNorms("foo", norms, noNormsNoIndex));
-            Assert.IsNotNull(GetNorms("foo", norms, emptyNorms));
-            Assert.IsNull(GetNorms("foo", noNorms, noNorms));
-            Assert.IsNull(GetNorms("foo", noNorms, noIndex));
-            Assert.IsNull(GetNorms("foo", noNorms, noNormsNoIndex));
-            Assert.IsNull(GetNorms("foo", noNorms, emptyNorms));
-            Assert.IsNull(GetNorms("foo", noIndex, noIndex));
-            Assert.IsNull(GetNorms("foo", noIndex, noNormsNoIndex));
-            Assert.IsNull(GetNorms("foo", noIndex, emptyNorms));
-            Assert.IsNull(GetNorms("foo", noNormsNoIndex, noNormsNoIndex));
-            Assert.IsNull(GetNorms("foo", noNormsNoIndex, emptyNorms));
-            Assert.IsNull(GetNorms("foo", emptyNorms, emptyNorms));
+            Assert.NotNull(GetNorms("foo", norms, norms));
+            Assert.Null(GetNorms("foo", norms, noNorms));
+            Assert.NotNull(GetNorms("foo", norms, noIndex));
+            Assert.NotNull(GetNorms("foo", norms, noNormsNoIndex));
+            Assert.NotNull(GetNorms("foo", norms, emptyNorms));
+            Assert.Null(GetNorms("foo", noNorms, noNorms));
+            Assert.Null(GetNorms("foo", noNorms, noIndex));
+            Assert.Null(GetNorms("foo", noNorms, noNormsNoIndex));
+            Assert.Null(GetNorms("foo", noNorms, emptyNorms));
+            Assert.Null(GetNorms("foo", noIndex, noIndex));
+            Assert.Null(GetNorms("foo", noIndex, noNormsNoIndex));
+            Assert.Null(GetNorms("foo", noIndex, emptyNorms));
+            Assert.Null(GetNorms("foo", noNormsNoIndex, noNormsNoIndex));
+            Assert.Null(GetNorms("foo", noNormsNoIndex, emptyNorms));
+            Assert.Null(GetNorms("foo", emptyNorms, emptyNorms));
         }
 
         /// <summary>
@@ -312,13 +310,13 @@ namespace Lucene.Net.Index
 
             if (norms1 == null)
             {
-                Assert.IsNull(norms2);
+                Assert.Null(norms2);
             }
             else
             {
                 for (int docID = 0; docID < ir1.MaxDoc; docID++)
                 {
-                    Assert.AreEqual(norms1.Get(docID), norms2.Get(docID));
+                    Assert.Equal(norms1.Get(docID), norms2.Get(docID));
                 }
             }
             ir1.Dispose();

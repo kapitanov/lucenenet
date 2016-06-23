@@ -97,7 +97,7 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
                 int ord1 = map.GetOrdinal(label);
                 int ord2 = compact.GetOrdinal(label);
 
-                Assert.AreEqual(ord1, ord2);
+                Assert.Equal(ord1, ord2);
 
                 if (ord1 == LabelToOrdinal.INVALID_ORDINAL)
                 {
@@ -121,7 +121,7 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
                 }
                 int ord1 = map.GetOrdinal(label);
                 int ord2 = compact.GetOrdinal(label);
-                Assert.AreEqual(ord1, ord2);
+                Assert.Equal(ord1, ord2);
             }
         }
 

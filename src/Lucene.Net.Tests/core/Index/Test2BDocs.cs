@@ -1,7 +1,9 @@
+using Xunit;
+
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using System;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -24,52 +26,31 @@ namespace Lucene.Net.Index
     using Document = Documents.Document;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [Ignore]
-    [TestFixture]
-    public class Test2BDocs : LuceneTestCase
+    [Trait("Category", "Ignored")]
+    public class Test2BDocs : LuceneTestCase, IClassFixture<Test2BDocsFixture>
     {
-        internal static Directory Dir;
+        private readonly Test2BDocsFixture _testFixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public Test2BDocs(Test2BDocsFixture fixture)
+            : base()
         {
-            Dir = NewFSDirectory(CreateTempDir("2Bdocs"));
-            IndexWriter iw = new IndexWriter(Dir, new IndexWriterConfig(TEST_VERSION_CURRENT, null));
-            Document doc = new Document();
-            for (int i = 0; i < 262144; i++)
-            {
-                iw.AddDocument(doc);
-            }
-            iw.ForceMerge(1);
-            iw.Dispose();
+            _testFixture = fixture;
         }
 
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Dir.Dispose();
-            Dir = null;
-        }
-
-        [Test]
+        [Fact]
         public virtual void TestOverflow()
         {
-            DirectoryReader ir = DirectoryReader.Open(Dir);
+            DirectoryReader ir = DirectoryReader.Open(_testFixture.Dir);
             IndexReader[] subReaders = new IndexReader[8192];
             Arrays.Fill(subReaders, ir);
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 new MultiReader(subReaders);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
             ir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExactlyAtLimit()
         {
             Directory dir2 = NewFSDirectory(CreateTempDir("2BDocs2"));
@@ -80,17 +61,42 @@ namespace Lucene.Net.Index
                 iw.AddDocument(doc);
             }
             iw.Dispose();
-            DirectoryReader ir = DirectoryReader.Open(Dir);
+            DirectoryReader ir = DirectoryReader.Open(_testFixture.Dir);
             DirectoryReader ir2 = DirectoryReader.Open(dir2);
             IndexReader[] subReaders = new IndexReader[8192];
             Arrays.Fill(subReaders, ir);
             subReaders[subReaders.Length - 1] = ir2;
             MultiReader mr = new MultiReader(subReaders);
-            Assert.AreEqual(int.MaxValue, mr.MaxDoc);
-            Assert.AreEqual(int.MaxValue, mr.NumDocs);
+            Assert.Equal(int.MaxValue, mr.MaxDoc);
+            Assert.Equal(int.MaxValue, mr.NumDocs);
             ir.Dispose();
             ir2.Dispose();
             dir2.Dispose();
+        }
+    }
+
+    public class Test2BDocsFixture : IDisposable
+    {
+        internal Directory Dir { get; private set; }
+
+        public Test2BDocsFixture()
+        {
+            var tempDirectory = LuceneTestCase.CreateTempDir("2Bdocs");
+            Dir = LuceneTestCase.NewFSDirectory(tempDirectory);
+            IndexWriter iw = new IndexWriter(Dir, new IndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, null));
+            Document doc = new Document();
+            for (int i = 0; i < 262144; i++)
+            {
+                iw.AddDocument(doc);
+            }
+            iw.ForceMerge(1);
+            iw.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Dir.Dispose();
+            Dir = null;
         }
     }
 }

@@ -1,13 +1,11 @@
 using Lucene.Net.Analysis.Tokenattributes;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
-using NUnit.Framework;
 using System;
 
 namespace Lucene.Net.Index
 {
     using System.IO;
-
+    using Xunit;
     /*
         /// Copyright 2006 The Apache Software Foundation
         ///
@@ -81,7 +79,6 @@ namespace Lucene.Net.Index
         }
     }
 
-    [TestFixture]
     public class TestTermdocPerf : LuceneTestCase
     {
         internal virtual void AddDocs(Random random, Directory dir, int ndocs, string field, string val, int maxTF, float percentDocs)
@@ -163,7 +160,8 @@ namespace Lucene.Net.Index
             return ret;
         }
 
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestTermDocPerf()
         {
             // performance test for 10% of documents containing a term

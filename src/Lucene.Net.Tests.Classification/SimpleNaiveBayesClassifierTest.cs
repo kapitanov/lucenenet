@@ -19,7 +19,6 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
-using NUnit.Framework;
 
 namespace Lucene.Net.Classification
 {
@@ -31,20 +30,20 @@ namespace Lucene.Net.Classification
     [SuppressCodecs]
     public class SimpleNaiveBayesClassifierTest : ClassificationTestBase<BytesRef>
     {
-        [Test]
+        [Fact]
         public void TestBasicUsage()
         {
             CheckCorrectClassification(new SimpleNaiveBayesClassifier(), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName);
             CheckCorrectClassification(new SimpleNaiveBayesClassifier(), POLITICS_INPUT, POLITICS_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName);
         }
 
-        [Test]
+        [Fact]
         public void TestBasicUsageWithQuery()
         {
             CheckCorrectClassification(new SimpleNaiveBayesClassifier(), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName, new TermQuery(new Term(textFieldName, "it")));
         }
 
-        [Test]
+        [Fact]
         [Ignore("Need to figure out what to do with NGramAnalyzer, issues with things in Analysis.Common project")]
         public void TestNGramUsage()
         {
@@ -60,7 +59,7 @@ namespace Lucene.Net.Classification
         //    }
         //}
 
-        [Test]
+        [Fact]
         public void TestPerformance()
         {
             CheckPerformance(new SimpleNaiveBayesClassifier(), new MockAnalyzer(Random()), categoryFieldName);

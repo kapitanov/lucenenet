@@ -2,7 +2,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
 
@@ -31,13 +31,10 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Similarity unit test.
-    ///
-    ///
     /// </summary>
-    [TestFixture]
     public class TestNot : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNot_Mem()
         {
             Directory store = NewDirectory();
@@ -56,7 +53,7 @@ namespace Lucene.Net.Search
             query.Add(new TermQuery(new Term("field", "b")), BooleanClause.Occur.MUST_NOT);
 
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
             writer.Dispose();
             reader.Dispose();
             store.Dispose();

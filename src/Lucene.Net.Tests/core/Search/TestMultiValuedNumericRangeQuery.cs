@@ -3,7 +3,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -32,7 +32,6 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestMultiValuedNumericRangeQuery : LuceneTestCase
     {
         /// <summary>
@@ -41,7 +40,7 @@ namespace Lucene.Net.Search
         /// NumericRangeQuery (see SOLR-1322 for discussion) and the multiple precision terms per numeric value
         /// do not interfere with multiple numeric values.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMultiValuedNRQ()
         {
             Directory directory = NewDirectory();
@@ -79,7 +78,7 @@ namespace Lucene.Net.Search
                 NumericRangeQuery<int> tq = NumericRangeQuery.NewIntRange("trie", lower, upper, true, true);
                 TopDocs trTopDocs = searcher.Search(cq, 1);
                 TopDocs nrTopDocs = searcher.Search(tq, 1);
-                Assert.AreEqual(trTopDocs.TotalHits, nrTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                Assert.Equal(trTopDocs.TotalHits, nrTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
             }
             reader.Dispose();
             directory.Dispose();

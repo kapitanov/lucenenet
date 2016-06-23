@@ -1,6 +1,8 @@
-using Lucene.Net.Analysis.Tokenattributes;
 using System;
+using Lucene.Net.Analysis;
+using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -20,9 +22,6 @@ namespace Lucene.Net.Index
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
-    using Lucene.Net.Analysis;
-    using NUnit.Framework;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Codec = Lucene.Net.Codecs.Codec;
@@ -36,18 +35,19 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestTermVectorsReader : LuceneTestCase
     {
         private bool InstanceFieldsInitialized = false;
 
-        public TestTermVectorsReader()
+        public TestTermVectorsReader() : base()
         {
             if (!InstanceFieldsInitialized)
             {
                 InitializeInstanceFields();
                 InstanceFieldsInitialized = true;
             }
+
+            SetUp();
         }
 
         private void InitializeInstanceFields()
@@ -90,10 +90,8 @@ namespace Lucene.Net.Index
 
         internal TestToken[] Tokens;
 
-        [SetUp]
-        public override void SetUp()
+        private void SetUp()
         {
-            base.SetUp();
             /*
             for (int i = 0; i < testFields.Length; i++) {
               fieldInfos.Add(testFields[i], true, true, testFieldsStorePos[i], testFieldsStoreOff[i]);
@@ -162,11 +160,10 @@ namespace Lucene.Net.Index
             FieldInfos = SegmentReader.ReadFieldInfos(Seg);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private class MyTokenizer : Tokenizer
@@ -234,7 +231,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             //Check to see the files were created properly in setup
@@ -242,171 +239,171 @@ namespace Lucene.Net.Index
             foreach (AtomicReaderContext ctx in reader.Leaves)
             {
                 SegmentReader sr = (SegmentReader)ctx.Reader;
-                Assert.IsTrue(sr.FieldInfos.HasVectors());
+                Assert.True(sr.FieldInfos.HasVectors());
             }
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReader()
         {
             TermVectorsReader reader = Codec.Default.TermVectorsFormat().VectorsReader(Dir, Seg.Info, FieldInfos, NewIOContext(Random()));
             for (int j = 0; j < 5; j++)
             {
                 Terms vector = reader.Get(j).Terms(TestFields[0]);
-                Assert.IsNotNull(vector);
-                Assert.AreEqual(TestTerms.Length, vector.Size());
+                Assert.NotNull(vector);
+                Assert.Equal(TestTerms.Length, vector.Size());
                 TermsEnum termsEnum = vector.Iterator(null);
                 for (int i = 0; i < TestTerms.Length; i++)
                 {
                     BytesRef text = termsEnum.Next();
-                    Assert.IsNotNull(text);
+                    Assert.NotNull(text);
                     string term = text.Utf8ToString();
                     //System.out.println("Term: " + term);
-                    Assert.AreEqual(TestTerms[i], term);
+                    Assert.Equal(TestTerms[i], term);
                 }
-                Assert.IsNull(termsEnum.Next());
+                Assert.Null(termsEnum.Next());
             }
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocsEnum()
         {
             TermVectorsReader reader = Codec.Default.TermVectorsFormat().VectorsReader(Dir, Seg.Info, FieldInfos, NewIOContext(Random()));
             for (int j = 0; j < 5; j++)
             {
                 Terms vector = reader.Get(j).Terms(TestFields[0]);
-                Assert.IsNotNull(vector);
-                Assert.AreEqual(TestTerms.Length, vector.Size());
+                Assert.NotNull(vector);
+                Assert.Equal(TestTerms.Length, vector.Size());
                 TermsEnum termsEnum = vector.Iterator(null);
                 DocsEnum docsEnum = null;
                 for (int i = 0; i < TestTerms.Length; i++)
                 {
                     BytesRef text = termsEnum.Next();
-                    Assert.IsNotNull(text);
+                    Assert.NotNull(text);
                     string term = text.Utf8ToString();
                     //System.out.println("Term: " + term);
-                    Assert.AreEqual(TestTerms[i], term);
+                    Assert.Equal(TestTerms[i], term);
 
                     docsEnum = TestUtil.Docs(Random(), termsEnum, null, docsEnum, DocsEnum.FLAG_NONE);
-                    Assert.IsNotNull(docsEnum);
+                    Assert.NotNull(docsEnum);
                     int doc = docsEnum.DocID();
-                    Assert.AreEqual(-1, doc);
-                    Assert.IsTrue(docsEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                    Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
+                    Assert.Equal(-1, doc);
+                    Assert.True(docsEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                    Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
                 }
-                Assert.IsNull(termsEnum.Next());
+                Assert.Null(termsEnum.Next());
             }
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPositionReader()
         {
             TermVectorsReader reader = Codec.Default.TermVectorsFormat().VectorsReader(Dir, Seg.Info, FieldInfos, NewIOContext(Random()));
             BytesRef[] terms;
             Terms vector = reader.Get(0).Terms(TestFields[0]);
-            Assert.IsNotNull(vector);
-            Assert.AreEqual(TestTerms.Length, vector.Size());
+            Assert.NotNull(vector);
+            Assert.Equal(TestTerms.Length, vector.Size());
             TermsEnum termsEnum = vector.Iterator(null);
             DocsAndPositionsEnum dpEnum = null;
             for (int i = 0; i < TestTerms.Length; i++)
             {
                 BytesRef text = termsEnum.Next();
-                Assert.IsNotNull(text);
+                Assert.NotNull(text);
                 string term = text.Utf8ToString();
                 //System.out.println("Term: " + term);
-                Assert.AreEqual(TestTerms[i], term);
+                Assert.Equal(TestTerms[i], term);
 
                 dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
-                Assert.IsNotNull(dpEnum);
+                Assert.NotNull(dpEnum);
                 int doc = dpEnum.DocID();
-                Assert.AreEqual(-1, doc);
-                Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                Assert.AreEqual(dpEnum.Freq(), Positions[i].Length);
+                Assert.Equal(-1, doc);
+                Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                Assert.Equal(dpEnum.Freq(), Positions[i].Length);
                 for (int j = 0; j < Positions[i].Length; j++)
                 {
-                    Assert.AreEqual(Positions[i][j], dpEnum.NextPosition());
+                    Assert.Equal(Positions[i][j], dpEnum.NextPosition());
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
 
                 dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
                 doc = dpEnum.DocID();
-                Assert.AreEqual(-1, doc);
-                Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                Assert.IsNotNull(dpEnum);
-                Assert.AreEqual(dpEnum.Freq(), Positions[i].Length);
+                Assert.Equal(-1, doc);
+                Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                Assert.NotNull(dpEnum);
+                Assert.Equal(dpEnum.Freq(), Positions[i].Length);
                 for (int j = 0; j < Positions[i].Length; j++)
                 {
-                    Assert.AreEqual(Positions[i][j], dpEnum.NextPosition());
-                    Assert.AreEqual(j * 10, dpEnum.StartOffset());
-                    Assert.AreEqual(j * 10 + TestTerms[i].Length, dpEnum.EndOffset());
+                    Assert.Equal(Positions[i][j], dpEnum.NextPosition());
+                    Assert.Equal(j * 10, dpEnum.StartOffset());
+                    Assert.Equal(j * 10 + TestTerms[i].Length, dpEnum.EndOffset());
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
             }
 
             Terms freqVector = reader.Get(0).Terms(TestFields[1]); //no pos, no offset
-            Assert.IsNotNull(freqVector);
-            Assert.AreEqual(TestTerms.Length, freqVector.Size());
+            Assert.NotNull(freqVector);
+            Assert.Equal(TestTerms.Length, freqVector.Size());
             termsEnum = freqVector.Iterator(null);
-            Assert.IsNotNull(termsEnum);
+            Assert.NotNull(termsEnum);
             for (int i = 0; i < TestTerms.Length; i++)
             {
                 BytesRef text = termsEnum.Next();
-                Assert.IsNotNull(text);
+                Assert.NotNull(text);
                 string term = text.Utf8ToString();
                 //System.out.println("Term: " + term);
-                Assert.AreEqual(TestTerms[i], term);
-                Assert.IsNotNull(termsEnum.Docs(null, null));
-                Assert.IsNull(termsEnum.DocsAndPositions(null, null)); // no pos
+                Assert.Equal(TestTerms[i], term);
+                Assert.NotNull(termsEnum.Docs(null, null));
+                Assert.Null(termsEnum.DocsAndPositions(null, null)); // no pos
             }
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOffsetReader()
         {
             TermVectorsReader reader = Codec.Default.TermVectorsFormat().VectorsReader(Dir, Seg.Info, FieldInfos, NewIOContext(Random()));
             Terms vector = reader.Get(0).Terms(TestFields[0]);
-            Assert.IsNotNull(vector);
+            Assert.NotNull(vector);
             TermsEnum termsEnum = vector.Iterator(null);
-            Assert.IsNotNull(termsEnum);
-            Assert.AreEqual(TestTerms.Length, vector.Size());
+            Assert.NotNull(termsEnum);
+            Assert.Equal(TestTerms.Length, vector.Size());
             DocsAndPositionsEnum dpEnum = null;
             for (int i = 0; i < TestTerms.Length; i++)
             {
                 BytesRef text = termsEnum.Next();
-                Assert.IsNotNull(text);
+                Assert.NotNull(text);
                 string term = text.Utf8ToString();
-                Assert.AreEqual(TestTerms[i], term);
+                Assert.Equal(TestTerms[i], term);
 
                 dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
-                Assert.IsNotNull(dpEnum);
-                Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                Assert.AreEqual(dpEnum.Freq(), Positions[i].Length);
+                Assert.NotNull(dpEnum);
+                Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                Assert.Equal(dpEnum.Freq(), Positions[i].Length);
                 for (int j = 0; j < Positions[i].Length; j++)
                 {
-                    Assert.AreEqual(Positions[i][j], dpEnum.NextPosition());
+                    Assert.Equal(Positions[i][j], dpEnum.NextPosition());
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
 
                 dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
-                Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                Assert.IsNotNull(dpEnum);
-                Assert.AreEqual(dpEnum.Freq(), Positions[i].Length);
+                Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                Assert.NotNull(dpEnum);
+                Assert.Equal(dpEnum.Freq(), Positions[i].Length);
                 for (int j = 0; j < Positions[i].Length; j++)
                 {
-                    Assert.AreEqual(Positions[i][j], dpEnum.NextPosition());
-                    Assert.AreEqual(j * 10, dpEnum.StartOffset());
-                    Assert.AreEqual(j * 10 + TestTerms[i].Length, dpEnum.EndOffset());
+                    Assert.Equal(Positions[i][j], dpEnum.NextPosition());
+                    Assert.Equal(j * 10, dpEnum.StartOffset());
+                    Assert.Equal(j * 10 + TestTerms[i].Length, dpEnum.EndOffset());
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dpEnum.NextDoc());
             }
             reader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalIndexableField()
         {
             Directory dir = NewDirectory();
@@ -419,12 +416,12 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(doc);
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (System.ArgumentException iae)
             {
                 // Expected
-                Assert.AreEqual("cannot index term vector payloads without term vector positions (field=\"field\")", iae.Message);
+                Assert.Equal("cannot index term vector payloads without term vector positions (field=\"field\")", iae.Message);
             }
 
             ft = new FieldType(TextField.TYPE_NOT_STORED);
@@ -435,12 +432,12 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(doc);
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (System.ArgumentException iae)
             {
                 // Expected
-                Assert.AreEqual("cannot index term vector offsets when term vectors are not indexed (field=\"field\")", iae.Message);
+                Assert.Equal("cannot index term vector offsets when term vectors are not indexed (field=\"field\")", iae.Message);
             }
 
             ft = new FieldType(TextField.TYPE_NOT_STORED);
@@ -451,12 +448,12 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(doc);
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (System.ArgumentException iae)
             {
                 // Expected
-                Assert.AreEqual("cannot index term vector positions when term vectors are not indexed (field=\"field\")", iae.Message);
+                Assert.Equal("cannot index term vector positions when term vectors are not indexed (field=\"field\")", iae.Message);
             }
 
             ft = new FieldType(TextField.TYPE_NOT_STORED);
@@ -467,12 +464,12 @@ namespace Lucene.Net.Index
             try
             {
                 w.AddDocument(doc);
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (System.ArgumentException iae)
             {
                 // Expected
-                Assert.AreEqual("cannot index term vector payloads when term vectors are not indexed (field=\"field\")", iae.Message);
+                Assert.Equal("cannot index term vector payloads when term vectors are not indexed (field=\"field\")", iae.Message);
             }
 
             w.Dispose();

@@ -1,6 +1,6 @@
-using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
 using System.Collections.Generic;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -21,32 +21,31 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestSentinelIntSet : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             SentinelIntSet set = new SentinelIntSet(10, -1);
-            Assert.IsFalse(set.Exists(50));
+            Assert.False(set.Exists(50));
             set.Put(50);
-            Assert.IsTrue(set.Exists(50));
-            Assert.AreEqual(1, set.Size());
-            Assert.AreEqual(-11, set.Find(10));
-            Assert.AreEqual(1, set.Size());
+            Assert.True(set.Exists(50));
+            Assert.Equal(1, set.Size());
+            Assert.Equal(-11, set.Find(10));
+            Assert.Equal(1, set.Size());
             set.Clear();
-            Assert.AreEqual(0, set.Size());
-            Assert.AreEqual(50, set.Hash(50));
+            Assert.Equal(0, set.Size());
+            Assert.Equal(50, set.Hash(50));
             //force a rehash
             for (int i = 0; i < 20; i++)
             {
                 set.Put(i);
             }
-            Assert.AreEqual(20, set.Size());
-            Assert.AreEqual(24, set.RehashCount);
+            Assert.Equal(20, set.Size());
+            Assert.Equal(24, set.RehashCount);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             for (int i = 0; i < 10000; i++)
@@ -63,12 +62,12 @@ namespace Lucene.Net.Util
                     int val = Random().Next(maxVal);
                     bool exists = !a.Add(val);
                     bool existsB = b.Exists(val);
-                    Assert.AreEqual(exists, existsB);
+                    Assert.Equal(exists, existsB);
                     int slot = b.Find(val);
-                    Assert.AreEqual(exists, slot >= 0);
+                    Assert.Equal(exists, slot >= 0);
                     b.Put(val);
 
-                    Assert.AreEqual(a.Count, b.Size());
+                    Assert.Equal(a.Count, b.Size());
                 }
             }
         }

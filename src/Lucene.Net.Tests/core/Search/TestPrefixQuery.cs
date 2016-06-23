@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
 
@@ -38,7 +38,7 @@ namespace Lucene.Net.Search
     [TestFixture]
     public class TestPrefixQuery : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestPrefixQuery_Mem()
         {
             Directory directory = NewDirectory();
@@ -56,17 +56,17 @@ namespace Lucene.Net.Search
             PrefixQuery query = new PrefixQuery(new Term("category", "/Computers"));
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length, "All documents in /Computers category and below");
+            Assert.Equal(3, hits.Length, "All documents in /Computers category and below");
 
             query = new PrefixQuery(new Term("category", "/Computers/Mac"));
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "One in /Computers/Mac");
+            Assert.Equal(1, hits.Length, "One in /Computers/Mac");
 
             query = new PrefixQuery(new Term("category", ""));
             Terms terms = MultiFields.GetTerms(searcher.IndexReader, "category");
-            Assert.IsFalse(query.GetTermsEnum(terms) is PrefixTermsEnum);
+            Assert.False(query.GetTermsEnum(terms) is PrefixTermsEnum);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length, "everything");
+            Assert.Equal(3, hits.Length, "everything");
             writer.Dispose();
             reader.Dispose();
             directory.Dispose();

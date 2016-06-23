@@ -1,6 +1,6 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
 using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -21,7 +21,6 @@ namespace Lucene.Net.Util
     /// limitations under the License.
     /// </summary>
 
-    [TestFixture]
     public class TestDoubleBarrelLRUCache : LuceneTestCase
     {
         private void TestCache(DoubleBarrelLRUCache<CloneableInteger, object> cache, int n)
@@ -36,7 +35,7 @@ namespace Lucene.Net.Util
             // access every 2nd item in cache
             for (int i = 0; i < n; i += 2)
             {
-                Assert.IsNotNull(cache.Get(new CloneableInteger(i)));
+                Assert.NotNull(cache.Get(new CloneableInteger(i)));
             }
 
             // add n/2 elements to cache, the ones that weren't
@@ -49,7 +48,7 @@ namespace Lucene.Net.Util
             // access every 4th item in cache
             for (int i = 0; i < n; i += 4)
             {
-                Assert.IsNotNull(cache.Get(new CloneableInteger(i)));
+                Assert.NotNull(cache.Get(new CloneableInteger(i)));
             }
 
             // add 3/4n elements to cache, the ones that weren't
@@ -62,11 +61,11 @@ namespace Lucene.Net.Util
             // access every 4th item in cache
             for (int i = 0; i < n; i += 4)
             {
-                Assert.IsNotNull(cache.Get(new CloneableInteger(i)));
+                Assert.NotNull(cache.Get(new CloneableInteger(i)));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLRUCache()
         {
             const int n = 100;
@@ -140,7 +139,7 @@ namespace Lucene.Net.Util
             TotHit += hit;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestThreadCorrectness()
         {
             const int NUM_THREADS = 4;

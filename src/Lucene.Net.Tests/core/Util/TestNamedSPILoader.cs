@@ -1,8 +1,9 @@
-using NUnit.Framework;
+
 using System.Collections.Generic;
 
 namespace Lucene.Net.Util
 {
+    using Xunit;
     using Codec = Lucene.Net.Codecs.Codec;
 
     /*
@@ -24,35 +25,27 @@ namespace Lucene.Net.Util
 
     // TODO: maybe we should test this with mocks, but its easy
     // enough to test the basics via Codec
-    [TestFixture]
     public class TestNamedSPILoader : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestLookup()
         {
             Codec codec = Codec.ForName("Lucene46");
-            Assert.AreEqual("Lucene46", codec.Name);
+            Assert.Equal("Lucene46", codec.Name);
         }
 
         // we want an exception if its not found.
-        [Test]
+        [Fact]
         public virtual void TestBogusLookup()
         {
-            try
-            {
-                Codec.ForName("dskfdskfsdfksdfdsf");
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-            }
+            Assert.Throws<System.ArgumentException>(() => Codec.ForName("dskfdskfsdfksdfdsf"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAvailableServices()
         {
             ISet<string> codecs = Codec.AvailableCodecs();
-            Assert.IsTrue(codecs.Contains("Lucene46"));
+            Assert.True(codecs.Contains("Lucene46"));
         }
     }
 }

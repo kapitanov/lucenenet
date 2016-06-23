@@ -68,7 +68,7 @@ namespace Lucene.Net.Facet
     public class TestDrillSideways : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -124,15 +124,15 @@ namespace Lucene.Net.Facet
             DrillDownQuery ddq = new DrillDownQuery(config);
             ddq.Add("Author", "Lisa");
             DrillSidewaysResult r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(2, r.Hits.TotalHits);
+            Assert.Equal(2, r.Hits.TotalHits);
             // Publish Date is only drill-down, and Lisa published
             // one in 2012 and one in 2010:
-            Assert.AreEqual("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
 
             // Author is drill-sideways + drill-down: Lisa
             // (drill-down) published twice, and Frank/Susan/Bob
             // published once:
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             // Same simple case, but no baseQuery (pure browse):
             // drill-down on a single field; in this case the
@@ -142,15 +142,15 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
             r = ds.Search(null, ddq, 10);
 
-            Assert.AreEqual(2, r.Hits.TotalHits);
+            Assert.Equal(2, r.Hits.TotalHits);
             // Publish Date is only drill-down, and Lisa published
             // one in 2012 and one in 2010:
-            Assert.AreEqual("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
 
             // Author is drill-sideways + drill-down: Lisa
             // (drill-down) published twice, and Frank/Susan/Bob
             // published once:
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             // Another simple case: drill-down on single fields
             // but OR of two values
@@ -158,33 +158,33 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
             ddq.Add("Author", "Bob");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(3, r.Hits.TotalHits);
+            Assert.Equal(3, r.Hits.TotalHits);
             // Publish Date is only drill-down: Lisa and Bob
             // (drill-down) published twice in 2010 and once in 2012:
-            Assert.AreEqual("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
             // Author is drill-sideways + drill-down: Lisa
             // (drill-down) published twice, and Frank/Susan/Bob
             // published once:
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             Assert.True(r.Facets is MultiFacets);
             IList<FacetResult> allResults = r.Facets.GetAllDims(10);
-            Assert.AreEqual(2, allResults.Count);
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", allResults[0].ToString());
-            Assert.AreEqual("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", allResults[1].ToString());
+            Assert.Equal(2, allResults.Count);
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", allResults[0].ToString());
+            Assert.Equal("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", allResults[1].ToString());
 
             // More interesting case: drill-down on two fields
             ddq = new DrillDownQuery(config);
             ddq.Add("Author", "Lisa");
             ddq.Add("Publish Date", "2010");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(1, r.Hits.TotalHits);
+            Assert.Equal(1, r.Hits.TotalHits);
             // Publish Date is drill-sideways + drill-down: Lisa
             // (drill-down) published once in 2010 and once in 2012:
-            Assert.AreEqual("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
             // Author is drill-sideways + drill-down:
             // only Lisa & Bob published (once each) in 2010:
-            Assert.AreEqual("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             // Even more interesting case: drill down on two fields,
             // but one of them is OR
@@ -195,19 +195,19 @@ namespace Lucene.Net.Facet
             ddq.Add("Publish Date", "2010");
             ddq.Add("Author", "Bob");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(2, r.Hits.TotalHits);
+            Assert.Equal(2, r.Hits.TotalHits);
             // Publish Date is both drill-sideways + drill-down:
             // Lisa or Bob published twice in 2010 and once in 2012:
-            Assert.AreEqual("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=3 childCount=2\n  2010 (2)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
             // Author is drill-sideways + drill-down:
             // only Lisa & Bob published (once each) in 2010:
-            Assert.AreEqual("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             // Test drilling down on invalid field:
             ddq = new DrillDownQuery(config);
             ddq.Add("Foobar", "Baz");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(0, r.Hits.TotalHits);
+            Assert.Equal(0, r.Hits.TotalHits);
             Assert.Null(r.Facets.GetTopChildren(10, "Publish Date"));
             Assert.Null(r.Facets.GetTopChildren(10, "Foobar"));
 
@@ -216,14 +216,14 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
             ddq.Add("Author", "Tom");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(2, r.Hits.TotalHits);
+            Assert.Equal(2, r.Hits.TotalHits);
             // Publish Date is only drill-down, and Lisa published
             // one in 2012 and one in 2010:
-            Assert.AreEqual("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
             // Author is drill-sideways + drill-down: Lisa
             // (drill-down) published twice, and Frank/Susan/Bob
             // published once:
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             // LUCENE-4915: test drilling down on a dimension but
             // NOT facet counting it:
@@ -231,23 +231,23 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
             ddq.Add("Author", "Tom");
             r = ds.Search(null, ddq, 10);
-            Assert.AreEqual(2, r.Hits.TotalHits);
+            Assert.Equal(2, r.Hits.TotalHits);
             // Publish Date is only drill-down, and Lisa published
             // one in 2012 and one in 2010:
-            Assert.AreEqual("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=2 childCount=2\n  2010 (1)\n  2012 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
 
             // Test main query gets null scorer:
             ddq = new DrillDownQuery(config, new TermQuery(new Term("foobar", "baz")));
             ddq.Add("Author", "Lisa");
             r = ds.Search(null, ddq, 10);
 
-            Assert.AreEqual(0, r.Hits.TotalHits);
+            Assert.Equal(0, r.Hits.TotalHits);
             Assert.Null(r.Facets.GetTopChildren(10, "Publish Date"));
             Assert.Null(r.Facets.GetTopChildren(10, "Author"));
             IOUtils.Close(searcher.IndexReader, taxoReader, writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSometimesInvalidDrillDown()
         {
             Directory dir = NewDirectory();
@@ -291,19 +291,19 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
             DrillSidewaysResult r = (new DrillSideways(searcher, config, taxoReader)).Search(null, ddq, 10);
 
-            Assert.AreEqual(1, r.Hits.TotalHits);
+            Assert.Equal(1, r.Hits.TotalHits);
             // Publish Date is only drill-down, and Lisa published
             // one in 2012 and one in 2010:
-            Assert.AreEqual("dim=Publish Date path=[] value=1 childCount=1\n  2010 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=1 childCount=1\n  2010 (1)\n", r.Facets.GetTopChildren(10, "Publish Date").ToString());
             // Author is drill-sideways + drill-down: Lisa
             // (drill-down) published once, and Bob
             // published once:
-            Assert.AreEqual("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", r.Facets.GetTopChildren(10, "Author").ToString());
 
             IOUtils.Close(searcher.IndexReader, taxoReader, writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultipleRequestsPerDim()
         {
             Directory dir = NewDirectory();
@@ -353,9 +353,9 @@ namespace Lucene.Net.Facet
             ddq.Add("dim", "a");
             DrillSidewaysResult r = (new DrillSideways(searcher, config, taxoReader)).Search(null, ddq, 10);
 
-            Assert.AreEqual(3, r.Hits.TotalHits);
-            Assert.AreEqual("dim=dim path=[] value=6 childCount=4\n  a (3)\n  b (1)\n  c (1)\n  d (1)\n", r.Facets.GetTopChildren(10, "dim").ToString());
-            Assert.AreEqual("dim=dim path=[a] value=3 childCount=3\n  x (1)\n  y (1)\n  z (1)\n", r.Facets.GetTopChildren(10, "dim", "a").ToString());
+            Assert.Equal(3, r.Hits.TotalHits);
+            Assert.Equal("dim=dim path=[] value=6 childCount=4\n  a (3)\n  b (1)\n  c (1)\n  d (1)\n", r.Facets.GetTopChildren(10, "dim").ToString());
+            Assert.Equal("dim=dim path=[a] value=3 childCount=3\n  x (1)\n  y (1)\n  z (1)\n", r.Facets.GetTopChildren(10, "dim", "a").ToString());
 
             IOUtils.Close(searcher.IndexReader, taxoReader, writer, taxoWriter, dir, taxoDir);
         }
@@ -421,7 +421,7 @@ namespace Lucene.Net.Facet
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
 
@@ -792,11 +792,11 @@ namespace Lucene.Net.Facet
 
                 // Make sure drill down doesn't change score:
                 TopDocs ddqHits = s.Search(ddq, filter, numDocs);
-                Assert.AreEqual(expected.Hits.Count, ddqHits.TotalHits);
+                Assert.Equal(expected.Hits.Count, ddqHits.TotalHits);
                 for (int i = 0; i < expected.Hits.Count; i++)
                 {
                     // Score should be IDENTICAL:
-                    Assert.AreEqual(scores[expected.Hits[i].id], ddqHits.ScoreDocs[i].Score);
+                    Assert.Equal(scores[expected.Hits[i].id], ddqHits.ScoreDocs[i].Score);
                 }
             }
 
@@ -1183,17 +1183,17 @@ namespace Lucene.Net.Facet
             {
                 Console.WriteLine("  verify totHits=" + expected.Hits.Count);
             }
-            Assert.AreEqual(expected.Hits.Count, actual.Hits.TotalHits);
-            Assert.AreEqual(expected.Hits.Count, actual.Hits.ScoreDocs.Length);
+            Assert.Equal(expected.Hits.Count, actual.Hits.TotalHits);
+            Assert.Equal(expected.Hits.Count, actual.Hits.ScoreDocs.Length);
             for (int i = 0; i < expected.Hits.Count; i++)
             {
                 if (VERBOSE)
                 {
                     Console.WriteLine("    hit " + i + " expected=" + expected.Hits[i].id);
                 }
-                Assert.AreEqual(expected.Hits[i].id, s.Doc(actual.Hits.ScoreDocs[i].Doc).Get("id"));
+                Assert.Equal(expected.Hits[i].id, s.Doc(actual.Hits.ScoreDocs[i].Doc).Get("id"));
                 // Score should be IDENTICAL:
-                Assert.AreEqual(scores[expected.Hits[i].id], actual.Hits.ScoreDocs[i].Score);
+                Assert.Equal(scores[expected.Hits[i].id], actual.Hits.ScoreDocs[i].Score);
             }
 
             for (int dim = 0; dim < expected.Counts.Length; dim++)
@@ -1220,7 +1220,7 @@ namespace Lucene.Net.Facet
                             idx++;
                         }
                     }
-                    Assert.AreEqual(expected.UniqueCounts[dim], fr.ChildCount, "dim=" + dim);
+                    Assert.Equal(expected.UniqueCounts[dim], fr.ChildCount, "dim=" + dim);
                 }
 
                 if (topN < dimValues[dim].Length)
@@ -1245,21 +1245,21 @@ namespace Lucene.Net.Facet
 
                     if (fr != null)
                     {
-                        Assert.AreEqual(topNIDs.Length, fr.LabelValues.Length);
+                        Assert.Equal(topNIDs.Length, fr.LabelValues.Length);
                     }
                     else
                     {
-                        Assert.AreEqual(0, topNIDs.Length);
+                        Assert.Equal(0, topNIDs.Length);
                     }
                     for (int i = 0; i < topNIDs.Length; i++)
                     {
                         int expectedOrd = topNIDs[i];
-                        Assert.AreEqual(expected.Counts[dim][expectedOrd], (int)fr.LabelValues[i].value);
+                        Assert.Equal(expected.Counts[dim][expectedOrd], (int)fr.LabelValues[i].value);
                         if (isSortedSetDV)
                         {
                             // Tie-break facet labels are only in unicode
                             // order with SortedSetDVFacets:
-                            Assert.AreEqual("value @ idx=" + i, dimValues[dim][expectedOrd], fr.LabelValues[i].label);
+                            Assert.Equal("value @ idx=" + i, dimValues[dim][expectedOrd], fr.LabelValues[i].label);
                         }
                     }
                 }
@@ -1288,7 +1288,7 @@ namespace Lucene.Net.Facet
                         if (expected.Counts[dim][i] != 0)
                         {
                             Assert.True(actualValues.ContainsKey(value));
-                            Assert.AreEqual(expected.Counts[dim][i], (int)actualValues[value]);
+                            Assert.Equal(expected.Counts[dim][i], (int)actualValues[value]);
                             setCount++;
                         }
                         else
@@ -1296,12 +1296,12 @@ namespace Lucene.Net.Facet
                             Assert.False(actualValues.ContainsKey(value));
                         }
                     }
-                    Assert.AreEqual(setCount, actualValues.Count);
+                    Assert.Equal(setCount, actualValues.Count);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyIndex()
         {
             // LUCENE-5045: make sure DrillSideways works with an empty index
@@ -1319,10 +1319,10 @@ namespace Lucene.Net.Facet
             ddq.Add("Author", "Lisa");
 
             DrillSidewaysResult r = ds.Search(ddq, 10); // this used to fail on IllegalArgEx
-            Assert.AreEqual(0, r.Hits.TotalHits);
+            Assert.Equal(0, r.Hits.TotalHits);
 
             r = ds.Search(ddq, null, null, 10, new Sort(new SortField("foo", SortField.Type_e.INT)), false, false); // this used to fail on IllegalArgEx
-            Assert.AreEqual(0, r.Hits.TotalHits);
+            Assert.Equal(0, r.Hits.TotalHits);
 
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, dir, taxoDir);
         }

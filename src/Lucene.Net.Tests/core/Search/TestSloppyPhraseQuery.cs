@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -35,7 +35,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestSloppyPhraseQuery : LuceneTestCase
     {
         private const string S_1 = "A A A";
@@ -61,7 +60,7 @@ namespace Lucene.Net.Search
         /// QUERY_4 has a fuzzy (len=1) match to DOC_4, so all slop values > 0 should succeed.
         /// But only the 3rd sequence of A's in DOC_4 will do.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc4_Query4_All_Slops_Should_match()
         {
             for (int slop = 0; slop < 30; slop++)
@@ -76,14 +75,14 @@ namespace Lucene.Net.Search
         /// QUERY_1 has an exact match to DOC_1, so all slop values should succeed.
         /// Before LUCENE-1310, a slop value of 1 did not succeed.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc1_Query1_All_Slops_Should_match()
         {
             for (int slop = 0; slop < 30; slop++)
             {
                 float freq1 = CheckPhraseQuery(DOC_1, QUERY_1, slop, 1);
                 float freq2 = CheckPhraseQuery(DOC_1_B, QUERY_1, slop, 1);
-                Assert.IsTrue(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than score1 " + freq1);
+                Assert.True(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than score1 " + freq1);
             }
         }
 
@@ -92,7 +91,7 @@ namespace Lucene.Net.Search
         /// 6 should be the minimum slop to make QUERY_1 match DOC_2.
         /// Before LUCENE-1310, 7 was the minimum.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc2_Query1_Slop_6_or_more_Should_match()
         {
             for (int slop = 0; slop < 30; slop++)
@@ -102,7 +101,7 @@ namespace Lucene.Net.Search
                 if (numResultsExpected > 0)
                 {
                     float freq2 = CheckPhraseQuery(DOC_2_B, QUERY_1, slop, 1);
-                    Assert.IsTrue(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
+                    Assert.True(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
                 }
             }
         }
@@ -112,14 +111,14 @@ namespace Lucene.Net.Search
         /// QUERY_2 has an exact match to DOC_2, so all slop values should succeed.
         /// Before LUCENE-1310, 0 succeeds, 1 through 7 fail, and 8 or greater succeeds.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc2_Query2_All_Slops_Should_match()
         {
             for (int slop = 0; slop < 30; slop++)
             {
                 float freq1 = CheckPhraseQuery(DOC_2, QUERY_2, slop, 1);
                 float freq2 = CheckPhraseQuery(DOC_2_B, QUERY_2, slop, 1);
-                Assert.IsTrue(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
+                Assert.True(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
             }
         }
 
@@ -127,20 +126,20 @@ namespace Lucene.Net.Search
         /// Test DOC_3 and QUERY_1.
         /// QUERY_1 has an exact match to DOC_3, so all slop values should succeed.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc3_Query1_All_Slops_Should_match()
         {
             for (int slop = 0; slop < 30; slop++)
             {
                 float freq1 = CheckPhraseQuery(DOC_3, QUERY_1, slop, 1);
                 float freq2 = CheckPhraseQuery(DOC_3_B, QUERY_1, slop, 1);
-                Assert.IsTrue(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
+                Assert.True(freq2 > freq1, "slop=" + slop + " freq2=" + freq2 + " should be greater than freq1 " + freq1);
             }
         }
 
         /// <summary>
         /// LUCENE-3412 </summary>
-        [Test]
+        [Fact]
         public virtual void TestDoc5_Query5_Any_Slop_Should_be_consistent()
         {
             int nRepeats = 5;
@@ -172,7 +171,7 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             MaxFreqCollector c = new MaxFreqCollector();
             searcher.Search(query, c);
-            Assert.AreEqual(expectedNumResults, c.TotalHits, "slop: " + slop + "  query: " + query + "  doc: " + doc + "  Wrong number of hits");
+            Assert.Equal(expectedNumResults, c.TotalHits, "slop: " + slop + "  query: " + query + "  doc: " + doc + "  Wrong number of hits");
 
             //QueryUtils.Check(query,searcher);
             writer.Dispose();
@@ -267,8 +266,8 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.IsFalse(float.IsInfinity(scorer.Freq()));
-                Assert.IsFalse(float.IsInfinity(scorer.Score()));
+                Assert.False(float.IsInfinity(scorer.Freq()));
+                Assert.False(float.IsInfinity(scorer.Score()));
             }
 
             public override AtomicReaderContext NextReader
@@ -286,7 +285,7 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-3215
-        [Test]
+        [Fact]
         public virtual void TestSlopWithHoles()
         {
             Directory dir = NewDirectory();
@@ -313,17 +312,17 @@ namespace Lucene.Net.Search
             pq.Add(new Term("lyrics", "drug"), 1);
             pq.Add(new Term("lyrics", "drug"), 4);
             pq.Slop = 0;
-            Assert.AreEqual(0, @is.Search(pq, 4).TotalHits);
+            Assert.Equal(0, @is.Search(pq, 4).TotalHits);
             pq.Slop = 1;
-            Assert.AreEqual(3, @is.Search(pq, 4).TotalHits);
+            Assert.Equal(3, @is.Search(pq, 4).TotalHits);
             pq.Slop = 2;
-            Assert.AreEqual(4, @is.Search(pq, 4).TotalHits);
+            Assert.Equal(4, @is.Search(pq, 4).TotalHits);
             ir.Dispose();
             dir.Dispose();
         }
 
         // LUCENE-3215
-        [Test]
+        [Fact]
         public virtual void TestInfiniteFreq1()
         {
             string document = "drug druggy drug drug drug";
@@ -348,7 +347,7 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-3215
-        [Test]
+        [Fact]
         public virtual void TestInfiniteFreq2()
         {
             string document = "So much fun to be had in my head " + "No more sunshine " + "So much fun just lying in my bed " + "No more sunshine " + "I can't face the sunlight and the dirt outside " + "Wanna stay in 666 where this darkness don't lie " + "Drug drug druggy " + "Got a feeling sweet like honey " + "Drug drug druggy " + "Need sensation like my baby " + "Show me your scars you're so aware " + "I'm not barbaric I just care " + "Drug drug drug " + "I need a reflection to prove I exist " + "No more sunshine " + "I am a victim of designer blitz " + "No more sunshine " + "Dance like a robot when you're chained at the knee " + "The C.I.A say you're all they'll ever need " + "Drug drug druggy " + "Got a feeling sweet like honey " + "Drug drug druggy " + "Need sensation like my baby " + "Snort your lines you're so aware " + "I'm not barbaric I just care " + "Drug drug druggy " + "Got a feeling sweet like honey " + "Drug drug druggy " + "Need sensation like my baby";

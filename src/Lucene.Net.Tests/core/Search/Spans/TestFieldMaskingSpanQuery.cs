@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search.Spans
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -89,7 +89,7 @@ namespace Lucene.Net.Search.Spans
             CheckHits.CheckHitCollector(Random(), q, null, Searcher, docs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewrite0()
         {
             SpanQuery q = new FieldMaskingSpanQuery(new SpanTermQuery(new Term("last", "sally")), "first");
@@ -100,10 +100,10 @@ namespace Lucene.Net.Search.Spans
 
             HashSet<Term> terms = new HashSet<Term>();
             qr.ExtractTerms(terms);
-            Assert.AreEqual(1, terms.Count);
+            Assert.Equal(1, terms.Count);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewrite1()
         {
             // mask an anon SpanQuery class that rewrites to something else.
@@ -115,7 +115,7 @@ namespace Lucene.Net.Search.Spans
 
             HashSet<Term> terms = new HashSet<Term>();
             qr.ExtractTerms(terms);
-            Assert.AreEqual(2, terms.Count);
+            Assert.Equal(2, terms.Count);
         }
 
         private class SpanTermQueryAnonymousInnerClassHelper : SpanTermQuery
@@ -134,7 +134,7 @@ namespace Lucene.Net.Search.Spans
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewrite2()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("last", "smith"));
@@ -146,10 +146,10 @@ namespace Lucene.Net.Search.Spans
 
             HashSet<Term> set = new HashSet<Term>();
             qr.ExtractTerms(set);
-            Assert.AreEqual(2, set.Count);
+            Assert.Equal(2, set.Count);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquality1()
         {
             SpanQuery q1 = new FieldMaskingSpanQuery(new SpanTermQuery(new Term("last", "sally")), "first");
@@ -170,7 +170,7 @@ namespace Lucene.Net.Search.Spans
             QueryUtils.CheckEqual(qA, qB);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoop0()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("last", "sally"));
@@ -178,7 +178,7 @@ namespace Lucene.Net.Search.Spans
             Check(q, new int[] { }); // :EMPTY:
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoop1()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("last", "smith"));
@@ -189,7 +189,7 @@ namespace Lucene.Net.Search.Spans
             Check(q, new int[] { 1, 2 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimple1()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("first", "james"));
@@ -204,7 +204,7 @@ namespace Lucene.Net.Search.Spans
             Check(q, new int[] { 0, 2 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimple2()
         {
             AssumeTrue("Broken scoring: LUCENE-3723", Searcher.Similarity is TFIDFSimilarity);
@@ -216,7 +216,7 @@ namespace Lucene.Net.Search.Spans
             Check(q, new int[] { 2, 4 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSpans0()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("gender", "female"));
@@ -226,37 +226,37 @@ namespace Lucene.Net.Search.Spans
 
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(0, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(0, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(1, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(1, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(1, 1, 2), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(1, 1, 2), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(2, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(2, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(2, 1, 2), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(2, 1, 2), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(2, 2, 3), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(2, 2, 3), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(3, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(3, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(4, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(4, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(4, 1, 2), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(4, 1, 2), s(span));
 
-            Assert.AreEqual(false, span.Next());
+            Assert.Equal(false, span.Next());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSpans1()
         {
             SpanQuery q1 = new SpanTermQuery(new Term("first", "sally"));
@@ -272,13 +272,13 @@ namespace Lucene.Net.Search.Spans
 
             while (spanA.Next())
             {
-                Assert.IsTrue(spanB.Next(), "spanB not still going");
-                Assert.AreEqual(s(spanA), s(spanB), "spanA not equal spanB");
+                Assert.True(spanB.Next(), "spanB not still going");
+                Assert.Equal(s(spanA), s(spanB), "spanA not equal spanB");
             }
-            Assert.IsTrue(!(spanB.Next()), "spanB still going even tough spanA is done");
+            Assert.True(!(spanB.Next()), "spanB still going even tough spanA is done");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSpans2()
         {
             AssumeTrue("Broken scoring: LUCENE-3723", Searcher.Similarity is TFIDFSimilarity);
@@ -291,22 +291,22 @@ namespace Lucene.Net.Search.Spans
 
             Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(0, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(0, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(1, 1, 2), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(1, 1, 2), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(2, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(2, 0, 1), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(2, 2, 3), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(2, 2, 3), s(span));
 
-            Assert.AreEqual(true, span.Next());
-            Assert.AreEqual(s(3, 0, 1), s(span));
+            Assert.Equal(true, span.Next());
+            Assert.Equal(s(3, 0, 1), s(span));
 
-            Assert.AreEqual(false, span.Next());
+            Assert.Equal(false, span.Next());
         }
 
         public virtual string s(Spans span)

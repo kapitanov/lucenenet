@@ -1,6 +1,6 @@
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
@@ -43,14 +43,14 @@ namespace Lucene.Net.Index
     /// Test indexes ~82M docs with 52 positions each, so you get > Integer.MAX_VALUE positions
     /// @lucene.experimental
     /// </summary>
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BPositions : LuceneTestCase
     // uses lots of space and takes a few minutes
     {
         //ORIGINAL LINE: @Ignore("Very slow. Enable manually by removing @Ignore.") public void test() throws Exception
-        [Test]
-        public virtual void Test([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void Test(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BPositions"));
             if (dir is MockDirectoryWrapper)

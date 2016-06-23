@@ -1,7 +1,8 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System.Collections;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,8 +23,7 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class TestWAH8DocIdSet : BaseDocIdSetTestCase<WAH8DocIdSet>
     {
         public override WAH8DocIdSet CopyOf(BitArray bs, int length)
@@ -40,11 +40,10 @@ namespace Lucene.Net.Util
         public override void AssertEquals(int numBits, BitArray ds1, WAH8DocIdSet ds2)
         {
             base.AssertEquals(numBits, ds1, ds2);
-            Assert.AreEqual(ds1.Cardinality(), ds2.Cardinality());
+            Assert.Equal(ds1.Cardinality(), ds2.Cardinality());
         }
 
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestUnion()
         {
             int numBits = TestUtil.NextInt(Random(), 100, 1 << 20);
@@ -72,8 +71,7 @@ namespace Lucene.Net.Util
             AssertEquals(numBits, expected, union);
         }
 
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestIntersection()
         {
             int numBits = TestUtil.NextInt(Random(), 100, 1 << 20);

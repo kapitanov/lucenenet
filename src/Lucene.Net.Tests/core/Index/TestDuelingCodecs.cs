@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
@@ -36,7 +36,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Compares one codec against another
     /// </summary>
-    [TestFixture]
     public class TestDuelingCodecs : LuceneTestCase
     {
         private Directory LeftDir;
@@ -49,11 +48,8 @@ namespace Lucene.Net.Index
 
         private string Info; // for debugging
 
-        [SetUp]
-        public override void SetUp()
+        public TestDuelingCodecs() : base()
         {
-            base.SetUp();
-
             // for now its SimpleText vs Lucene46(random postings format)
             // as this gives the best overall coverage. when we have more
             // codecs we should probably pick 2 from Codec.availableCodecs()
@@ -105,8 +101,7 @@ namespace Lucene.Net.Index
             Info = "left: " + LeftCodec.ToString() + " / right: " + RightCodec.ToString();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             if (LeftReader != null)
             {
@@ -126,7 +121,7 @@ namespace Lucene.Net.Index
                 RightDir.Dispose();
             }
 
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
@@ -165,7 +160,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// checks the two indexes are equivalent
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             AssertReaderEquals(Info, LeftReader, RightReader);

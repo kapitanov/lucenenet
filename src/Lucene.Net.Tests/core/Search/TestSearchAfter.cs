@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Util;
 
@@ -8,7 +7,7 @@ namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using BinaryDocValuesField = BinaryDocValuesField;
     using BytesRef = Lucene.Net.Util.BytesRef;
 
@@ -51,7 +50,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Tests IndexSearcher's searchAfter() method
     /// </summary>
-    [TestFixture]
     public class TestSearchAfter : LuceneTestCaseWithReducedFloatPrecision
     {
         private Directory Dir;
@@ -65,7 +63,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
 
             AllSortFields = new List<SortField>(Arrays.AsList(new SortField[] { new SortField("byte", SortField.Type_e.BYTE, false), new SortField("short", SortField.Type_e.SHORT, false), new SortField("int", SortField.Type_e.INT, false), new SortField("long", SortField.Type_e.LONG, false), new SortField("float", SortField.Type_e.FLOAT, false), new SortField("double", SortField.Type_e.DOUBLE, false), new SortField("bytes", SortField.Type_e.STRING, false), new SortField("bytesval", SortField.Type_e.STRING_VAL, false), new SortField("byte", SortField.Type_e.BYTE, true), new SortField("short", SortField.Type_e.SHORT, true), new SortField("int", SortField.Type_e.INT, true), new SortField("long", SortField.Type_e.LONG, true), new SortField("float", SortField.Type_e.FLOAT, true), new SortField("double", SortField.Type_e.DOUBLE, true), new SortField("bytes", SortField.Type_e.STRING, true), new SortField("bytesval", SortField.Type_e.STRING_VAL, true), SortField.FIELD_SCORE, SortField.FIELD_DOC }));
 
@@ -187,10 +185,11 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestQueries()
         {
             // because the first page has a null 'after', we get a normal collector.
@@ -312,12 +311,12 @@ namespace Lucene.Net.Search
                 pageStart += paged.ScoreDocs.Length;
                 lastBottom = paged.ScoreDocs[paged.ScoreDocs.Length - 1];
             }
-            Assert.AreEqual(all.ScoreDocs.Length, pageStart);
+            Assert.Equal(all.ScoreDocs.Length, pageStart);
         }
 
         internal virtual void AssertPage(int pageStart, TopDocs all, TopDocs paged)
         {
-            Assert.AreEqual(all.TotalHits, paged.TotalHits);
+            Assert.Equal(all.TotalHits, paged.TotalHits);
             for (int i = 0; i < paged.ScoreDocs.Length; i++)
             {
                 ScoreDoc sd1 = all.ScoreDocs[pageStart + i];
@@ -328,12 +327,12 @@ namespace Lucene.Net.Search
                     Console.WriteLine("      expected id=" + Searcher.Doc(sd1.Doc).Get("id") + " " + sd1);
                     Console.WriteLine("        actual id=" + Searcher.Doc(sd2.Doc).Get("id") + " " + sd2);
                 }
-                Assert.AreEqual(sd1.Doc, sd2.Doc);
-                Assert.AreEqual(sd1.Score, sd2.Score, 0f);
+                Assert.Equal(sd1.Doc, sd2.Doc);
+                Assert.Equal(sd1.Score, sd2.Score, 0f);
                 if (sd1 is FieldDoc)
                 {
-                    Assert.IsTrue(sd2 is FieldDoc);
-                    Assert.AreEqual(((FieldDoc)sd1).Fields, ((FieldDoc)sd2).Fields);
+                    Assert.True(sd2 is FieldDoc);
+                    Assert.Equal(((FieldDoc)sd1).Fields, ((FieldDoc)sd2).Fields);
                 }
             }
         }

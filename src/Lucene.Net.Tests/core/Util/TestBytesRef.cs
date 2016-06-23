@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -19,65 +19,64 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestBytesRef : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEmpty()
         {
             BytesRef b = new BytesRef();
-            Assert.AreEqual(BytesRef.EMPTY_BYTES, b.Bytes);
-            Assert.AreEqual(0, b.Offset);
-            Assert.AreEqual(0, b.Length);
+            Assert.Equal(BytesRef.EMPTY_BYTES, b.Bytes);
+            Assert.Equal(0, b.Offset);
+            Assert.Equal(0, b.Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFromBytes()
         {
             var bytes = new [] { (byte)'a', (byte)'b', (byte)'c', (byte)'d' };
             BytesRef b = new BytesRef(bytes);
-            Assert.AreEqual(bytes, b.Bytes);
-            Assert.AreEqual(0, b.Offset);
-            Assert.AreEqual(4, b.Length);
+            Assert.Equal(bytes, b.Bytes);
+            Assert.Equal(0, b.Offset);
+            Assert.Equal(4, b.Length);
 
             BytesRef b2 = new BytesRef(bytes, 1, 3);
-            Assert.AreEqual("bcd", b2.Utf8ToString());
+            Assert.Equal("bcd", b2.Utf8ToString());
 
-            Assert.IsFalse(b.Equals(b2));
+            Assert.False(b.Equals(b2));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFromChars()
         {
             for (int i = 0; i < 100; i++)
             {
                 string s = TestUtil.RandomUnicodeString(Random());
                 string s2 = (new BytesRef(s)).Utf8ToString();
-                Assert.AreEqual(s, s2);
+                Assert.Equal(s, s2);
             }
 
             // only for 4.x
-            Assert.AreEqual("\uFFFF", (new BytesRef("\uFFFF")).Utf8ToString());
+            Assert.Equal("\uFFFF", (new BytesRef("\uFFFF")).Utf8ToString());
         }
 
         // LUCENE-3590, AIOOBE if you append to a bytesref with offset != 0
-        [Test]
+        [Fact]
         public virtual void TestAppend()
         {
             var bytes = new[] { (byte)'a', (byte)'b', (byte)'c', (byte)'d' };
             BytesRef b = new BytesRef(bytes, 1, 3); // bcd
             b.Append(new BytesRef("e"));
-            Assert.AreEqual("bcde", b.Utf8ToString());
+            Assert.Equal("bcde", b.Utf8ToString());
         }
 
         // LUCENE-3590, AIOOBE if you copy to a bytesref with offset != 0
-        [Test]
+        [Fact]
         public virtual void TestCopyBytes()
         {
             var bytes = new[] { (byte)'a', (byte)'b', (byte)'c', (byte)'d' };
             BytesRef b = new BytesRef(bytes, 1, 3); // bcd
             b.CopyBytes(new BytesRef("bcde"));
-            Assert.AreEqual("bcde", b.Utf8ToString());
+            Assert.Equal("bcde", b.Utf8ToString());
         }
     }
 }

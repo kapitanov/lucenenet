@@ -69,7 +69,7 @@ namespace Lucene.Net.Tests.Join
             Directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestNextDocValidationForToParentBjq()
         {
             Query parentQueryWithRandomChild = CreateChildrenQueryWithOneParent(GetRandomChildNumber(0));
@@ -80,7 +80,7 @@ namespace Lucene.Net.Tests.Join
 
         }
 
-        [Test]
+        [Fact]
         public void TestAdvanceValidationForToParentBjq()
         {
             int randomChildNumber = GetRandomChildNumber(0);
@@ -99,7 +99,7 @@ namespace Lucene.Net.Tests.Join
             StringAssert.Contains("child query must only match non-parent docs", ex.Message);
         }
 
-        [Test]
+        [Fact]
         public void TestNextDocValidationForToChildBjq()
         {
             Query parentQueryWithRandomChild = CreateParentsQueryWithOneChild(GetRandomChildNumber(0));
@@ -109,7 +109,7 @@ namespace Lucene.Net.Tests.Join
             StringAssert.Contains(ToChildBlockJoinQuery.InvalidQueryMessage, ex.Message);
         }
         
-        [Test]
+        [Fact]
         public void TestAdvanceValidationForToChildBjq()
         {
             int randomChildNumber = GetRandomChildNumber(0);

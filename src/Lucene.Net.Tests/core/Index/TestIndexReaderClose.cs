@@ -1,10 +1,10 @@
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using Directory = Lucene.Net.Store.Directory;
@@ -29,10 +29,10 @@ namespace Lucene.Net.Index
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestIndexReaderClose : LuceneTestCase
     {
-        [Test, Repeat(10)]
+        [Fact]
+        [Repeat(10)]
         public virtual void TestCloseUnderException()
         {
             Directory dir = NewDirectory();
@@ -68,24 +68,24 @@ namespace Lucene.Net.Index
             try
             {
                 reader.Dispose();
-                Assert.Fail("expected Exception");
+                Assert.True(false, "expected Exception");
             }
             catch (InvalidOperationException ex)
             {
                 if (throwOnClose)
                 {
-                    Assert.AreEqual("BOOM!", ex.Message);
+                    Assert.Equal("BOOM!", ex.Message);
                 }
                 else
                 {
-                    Assert.AreEqual("GRRRRRRRRRRRR!", ex.Message);
+                    Assert.Equal("GRRRRRRRRRRRR!", ex.Message);
                 }
             }
 
             try
             {
                 var aaa = reader.Fields;
-                Assert.Fail("we are closed");
+                Assert.True(false, "we are closed");
             }
             catch (AlreadyClosedException ex)
             {
@@ -95,7 +95,7 @@ namespace Lucene.Net.Index
             {
                 reader.Dispose(); // call it again
             }
-            Assert.AreEqual(0, count.Get());
+            Assert.Equal(0, count.Get());
             wrap.Dispose();
             dir.Dispose();
         }

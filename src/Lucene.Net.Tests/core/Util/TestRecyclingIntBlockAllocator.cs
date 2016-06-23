@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -31,7 +31,7 @@ namespace Lucene.Net.Util
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
         }
 
         private RecyclingIntBlockAllocator NewAllocator()
@@ -39,29 +39,29 @@ namespace Lucene.Net.Util
             return new RecyclingIntBlockAllocator(1 << (2 + Random().Next(15)), Random().Next(97), Util.Counter.NewCounter());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllocate()
         {
             RecyclingIntBlockAllocator allocator = NewAllocator();
             HashSet<int[]> set = new HashSet<int[]>();
             int[] block = allocator.IntBlock;
             set.Add(block);
-            Assert.IsNotNull(block);
+            Assert.NotNull(block);
             int size = block.Length;
 
             int num = AtLeast(97);
             for (int i = 0; i < num; i++)
             {
                 block = allocator.IntBlock;
-                Assert.IsNotNull(block);
-                Assert.AreEqual(size, block.Length);
-                Assert.IsTrue(set.Add(block), "block is returned twice");
-                Assert.AreEqual(4 * size * (i + 2), allocator.BytesUsed()); // zero based + 1
-                Assert.AreEqual(0, allocator.NumBufferedBlocks());
+                Assert.NotNull(block);
+                Assert.Equal(size, block.Length);
+                Assert.True(set.Add(block), "block is returned twice");
+                Assert.Equal(4 * size * (i + 2), allocator.BytesUsed()); // zero based + 1
+                Assert.Equal(0, allocator.NumBufferedBlocks());
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllocateAndRecycle()
         {
             RecyclingIntBlockAllocator allocator = NewAllocator();
@@ -69,7 +69,7 @@ namespace Lucene.Net.Util
 
             int[] block = allocator.IntBlock;
             allocated.Add(block);
-            Assert.IsNotNull(block);
+            Assert.NotNull(block);
             int size = block.Length;
 
             int numIters = AtLeast(97);
@@ -79,10 +79,10 @@ namespace Lucene.Net.Util
                 for (int j = 0; j < num; j++)
                 {
                     block = allocator.IntBlock;
-                    Assert.IsNotNull(block);
-                    Assert.AreEqual(size, block.Length);
-                    Assert.IsTrue(allocated.Add(block), "block is returned twice");
-                    Assert.AreEqual(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed());
+                    Assert.NotNull(block);
+                    Assert.Equal(size, block.Length);
+                    Assert.True(allocated.Add(block), "block is returned twice");
+                    Assert.Equal(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed());
                 }
                 int[][] array = allocated.ToArray(/*new int[0][]*/);
                 int begin = Random().Next(array.Length);
@@ -95,15 +95,15 @@ namespace Lucene.Net.Util
                 allocator.RecycleIntBlocks(array, begin, end);
                 for (int j = begin; j < end; j++)
                 {
-                    Assert.IsNull(array[j]);
+                    Assert.Null(array[j]);
                     int[] b = selected[0];
                     selected.RemoveAt(0);
-                    Assert.IsTrue(allocated.Remove(b));
+                    Assert.True(allocated.Remove(b));
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllocateAndFree()
         {
             RecyclingIntBlockAllocator allocator = NewAllocator();
@@ -111,7 +111,7 @@ namespace Lucene.Net.Util
             int freeButAllocated = 0;
             int[] block = allocator.IntBlock;
             allocated.Add(block);
-            Assert.IsNotNull(block);
+            Assert.NotNull(block);
             int size = block.Length;
 
             int numIters = AtLeast(97);
@@ -122,10 +122,10 @@ namespace Lucene.Net.Util
                 {
                     block = allocator.IntBlock;
                     freeButAllocated = Math.Max(0, freeButAllocated - 1);
-                    Assert.IsNotNull(block);
-                    Assert.AreEqual(size, block.Length);
-                    Assert.IsTrue(allocated.Add(block), "block is returned twice");
-                    Assert.AreEqual(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed(), "" + (4 * size * (allocated.Count + allocator.NumBufferedBlocks()) - allocator.BytesUsed()));
+                    Assert.NotNull(block);
+                    Assert.Equal(size, block.Length);
+                    Assert.True(allocated.Add(block), "block is returned twice");
+                    Assert.Equal(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed(), "" + (4 * size * (allocated.Count + allocator.NumBufferedBlocks()) - allocator.BytesUsed()));
                 }
 
                 int[][] array = allocated.ToArray(/*new int[0][]*/);
@@ -134,17 +134,17 @@ namespace Lucene.Net.Util
                 for (int j = begin; j < end; j++)
                 {
                     int[] b = array[j];
-                    Assert.IsTrue(allocated.Remove(b));
+                    Assert.True(allocated.Remove(b));
                 }
                 allocator.RecycleIntBlocks(array, begin, end);
                 for (int j = begin; j < end; j++)
                 {
-                    Assert.IsNull(array[j]);
+                    Assert.Null(array[j]);
                 }
                 // randomly free blocks
                 int numFreeBlocks = allocator.NumBufferedBlocks();
                 int freeBlocks = allocator.FreeBlocks(Random().Next(7 + allocator.MaxBufferedBlocks()));
-                Assert.AreEqual(allocator.NumBufferedBlocks(), numFreeBlocks - freeBlocks);
+                Assert.Equal(allocator.NumBufferedBlocks(), numFreeBlocks - freeBlocks);
             }
         }
     }

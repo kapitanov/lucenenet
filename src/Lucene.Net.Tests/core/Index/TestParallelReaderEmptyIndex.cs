@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -34,14 +34,13 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Some tests for <seealso cref="ParallelAtomicReader"/>s with empty indexes
     /// </summary>
-    [TestFixture]
     public class TestParallelReaderEmptyIndex : LuceneTestCase
     {
         /// <summary>
         /// Creates two empty indexes and wraps a ParallelReader around. Adding this
         /// reader to a new index should not throw any exception.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyIndex()
         {
             Directory rd1 = NewDirectory();
@@ -85,7 +84,7 @@ namespace Lucene.Net.Index
         /// to have TermVectors. Adding this index to another index should not throw
         /// any exception.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyIndexWithVectors()
         {
             Directory rd1 = NewDirectory();
@@ -118,8 +117,8 @@ namespace Lucene.Net.Index
                 writer.DeleteDocuments(new Term("id", "1"));
                 writer.Dispose();
                 IndexReader ir = DirectoryReader.Open(rd1);
-                Assert.AreEqual(2, ir.MaxDoc);
-                Assert.AreEqual(1, ir.NumDocs);
+                Assert.Equal(2, ir.MaxDoc);
+                Assert.Equal(1, ir.NumDocs);
                 ir.Dispose();
 
                 iw = new IndexWriter(rd1, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetOpenMode(OpenMode_e.APPEND));
@@ -148,8 +147,8 @@ namespace Lucene.Net.Index
             pr.Dispose();
 
             // assert subreaders were closed
-            Assert.AreEqual(0, reader1.RefCount);
-            Assert.AreEqual(0, reader2.RefCount);
+            Assert.Equal(0, reader1.RefCount);
+            Assert.Equal(0, reader2.RefCount);
 
             rd1.Dispose();
             rd2.Dispose();

@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Globalization;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -24,7 +24,6 @@ namespace Lucene.Net.Util
 
     /// @deprecated Remove when IndexableBinaryStringTools is removed.
     [Obsolete("Remove when IndexableBinaryStringTools is removed.")]
-    [TestFixture]
     public class TestIndexableBinaryStringTools : LuceneTestCase
     {
         private static int NUM_RANDOM_TESTS;
@@ -37,7 +36,7 @@ namespace Lucene.Net.Util
             MAX_RANDOM_BINARY_LENGTH = AtLeast(300);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSingleBinaryRoundTrip()
         {
             sbyte[] binary = new sbyte[] { (sbyte)0x23, unchecked((sbyte)0x98), (sbyte)0x13, unchecked((sbyte)0xE4), (sbyte)0x76, (sbyte)0x41, unchecked((sbyte)0xB2), unchecked((sbyte)0xC9), (sbyte)0x7F, (sbyte)0x0A, unchecked((sbyte)0xA6), unchecked((sbyte)0xD8) };
@@ -50,10 +49,10 @@ namespace Lucene.Net.Util
             sbyte[] decoded = new sbyte[decodedLen];
             IndexableBinaryStringTools.Decode(encoded, 0, encoded.Length, decoded, 0, decoded.Length);
 
-            Assert.AreEqual(BinaryDump(binary, binary.Length), BinaryDump(decoded, decoded.Length), "Round trip decode/decode returned different results:\noriginal: " + BinaryDump(binary, binary.Length) + "\n encoded: " + CharArrayDump(encoded, encoded.Length) + "\n decoded: " + BinaryDump(decoded, decoded.Length));
+            Assert.Equal(BinaryDump(binary, binary.Length), BinaryDump(decoded, decoded.Length), "Round trip decode/decode returned different results:\noriginal: " + BinaryDump(binary, binary.Length) + "\n encoded: " + CharArrayDump(encoded, encoded.Length) + "\n decoded: " + BinaryDump(decoded, decoded.Length));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEncodedSortability()
         {
             sbyte[] originalArray1 = new sbyte[MAX_RANDOM_BINARY_LENGTH];
@@ -106,11 +105,11 @@ namespace Lucene.Net.Util
 
                 encodedComparison = encodedComparison < 0 ? -1 : encodedComparison > 0 ? 1 : 0;
 
-                Assert.AreEqual(originalComparison, encodedComparison, "Test #" + (testNum + 1) + ": Original bytes and encoded chars compare differently:" + " \nbinary 1: " + BinaryDump(originalArray1, numBytes1) + " \nbinary 2: " + BinaryDump(original2, numBytes2) + "\nencoded 1: " + CharArrayDump(encoded1, encodedLen1) + "\nencoded 2: " + CharArrayDump(encoded2, encodedLen2));
+                Assert.Equal(originalComparison, encodedComparison, "Test #" + (testNum + 1) + ": Original bytes and encoded chars compare differently:" + " \nbinary 1: " + BinaryDump(originalArray1, numBytes1) + " \nbinary 2: " + BinaryDump(original2, numBytes2) + "\nencoded 1: " + CharArrayDump(encoded1, encodedLen1) + "\nencoded 2: " + CharArrayDump(encoded2, encodedLen2));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyInput()
         {
             sbyte[] binary = new sbyte[0];
@@ -123,10 +122,10 @@ namespace Lucene.Net.Util
             sbyte[] decoded = new sbyte[decodedLen];
             IndexableBinaryStringTools.Decode(encoded, 0, encoded.Length, decoded, 0, decoded.Length);
 
-            Assert.AreEqual(decoded.Length, 0, "decoded empty input was not empty");
+            Assert.Equal(decoded.Length, 0, "decoded empty input was not empty");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllNullInput()
         {
             sbyte[] binary = new sbyte[] { 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -139,10 +138,10 @@ namespace Lucene.Net.Util
             sbyte[] decoded = new sbyte[decodedLen];
             IndexableBinaryStringTools.Decode(encoded, 0, encoded.Length, decoded, 0, decoded.Length);
 
-            Assert.AreEqual(BinaryDump(binary, binary.Length), BinaryDump(decoded, decoded.Length), "Round trip decode/decode returned different results:" + "\n  original: " + BinaryDump(binary, binary.Length) + "\ndecodedBuf: " + BinaryDump(decoded, decoded.Length));
+            Assert.Equal(BinaryDump(binary, binary.Length), BinaryDump(decoded, decoded.Length), "Round trip decode/decode returned different results:" + "\n  original: " + BinaryDump(binary, binary.Length) + "\ndecodedBuf: " + BinaryDump(decoded, decoded.Length));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomBinaryRoundTrip()
         {
             sbyte[] binary = new sbyte[MAX_RANDOM_BINARY_LENGTH];
@@ -167,7 +166,7 @@ namespace Lucene.Net.Util
                 int decodedLen = IndexableBinaryStringTools.GetDecodedLength(encoded, 0, encodedLen);
                 IndexableBinaryStringTools.Decode(encoded, 0, encodedLen, decoded, 0, decodedLen);
 
-                Assert.AreEqual(BinaryDump(binary, numBytes), BinaryDump(decoded, decodedLen), "Test #" + (testNum + 1) + ": Round trip decode/decode returned different results:" + "\n  original: " + BinaryDump(binary, numBytes) + "\nencodedBuf: " + CharArrayDump(encoded, encodedLen) + "\ndecodedBuf: " + BinaryDump(decoded, decodedLen));
+                Assert.Equal(BinaryDump(binary, numBytes), BinaryDump(decoded, decodedLen), "Test #" + (testNum + 1) + ": Round trip decode/decode returned different results:" + "\n  original: " + BinaryDump(binary, numBytes) + "\nencodedBuf: " + CharArrayDump(encoded, encodedLen) + "\ndecodedBuf: " + BinaryDump(decoded, decodedLen));
             }
         }
 

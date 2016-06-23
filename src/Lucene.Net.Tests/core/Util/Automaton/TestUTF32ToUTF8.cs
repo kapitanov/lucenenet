@@ -1,10 +1,9 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
 using System;
 using System.Diagnostics;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -25,15 +24,8 @@ namespace Lucene.Net.Util.Automaton
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestUTF32ToUTF8 : LuceneTestCase
     {
-        [SetUp]
-        public override void SetUp()
-        {
-            base.SetUp();
-        }
-
         private const int MAX_UNICODE = 0x10FFFF;
 
         internal readonly BytesRef b = new BytesRef(4);
@@ -97,7 +89,7 @@ namespace Lucene.Net.Util.Automaton
                 Debug.Assert(code >= startCode && code <= endCode, "code=" + code + " start=" + startCode + " end=" + endCode);
                 Debug.Assert(!IsSurrogate(code));
 
-                Assert.IsTrue(Matches(a, code), "DFA for range " + startCode + "-" + endCode + " failed to match code=" + code);
+                Assert.True(Matches(a, code), "DFA for range " + startCode + "-" + endCode + " failed to match code=" + code);
             }
 
             // Verify invalid ints are not accepted
@@ -121,7 +113,7 @@ namespace Lucene.Net.Util.Automaton
                         iter--;
                         continue;
                     }
-                    Assert.IsFalse(Matches(a, code), "DFA for range " + startCode + "-" + endCode + " matched invalid code=" + code);
+                    Assert.False(Matches(a, code), "DFA for range " + startCode + "-" + endCode + " matched invalid code=" + code);
                 }
             }
         }
@@ -151,7 +143,7 @@ namespace Lucene.Net.Util.Automaton
             return code >= UnicodeUtil.UNI_SUR_HIGH_START && code <= UnicodeUtil.UNI_SUR_LOW_END;
         }
 
-        [Test]
+        [Fact]
         public void TestRandomRanges()
         {
             Random r = Random();
@@ -189,7 +181,7 @@ namespace Lucene.Net.Util.Automaton
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSpecialCase()
         {
             RegExp re = new RegExp(".?");
@@ -197,16 +189,16 @@ namespace Lucene.Net.Util.Automaton
             CharacterRunAutomaton cra = new CharacterRunAutomaton(automaton);
             ByteRunAutomaton bra = new ByteRunAutomaton(automaton);
             // make sure character dfa accepts empty string
-            Assert.IsTrue(cra.IsAccept(cra.InitialState));
-            Assert.IsTrue(cra.Run(""));
-            Assert.IsTrue(cra.Run(new char[0], 0, 0));
+            Assert.True(cra.IsAccept(cra.InitialState));
+            Assert.True(cra.Run(""));
+            Assert.True(cra.Run(new char[0], 0, 0));
 
             // make sure byte dfa accepts empty string
-            Assert.IsTrue(bra.IsAccept(bra.InitialState));
-            Assert.IsTrue(bra.Run(new byte[0], 0, 0));
+            Assert.True(bra.IsAccept(bra.InitialState));
+            Assert.True(bra.Run(new byte[0], 0, 0));
         }
 
-        [Test]
+        [Fact]
         public void TestSpecialCase2()
         {
             RegExp re = new RegExp(".+\u0775");
@@ -215,13 +207,13 @@ namespace Lucene.Net.Util.Automaton
             CharacterRunAutomaton cra = new CharacterRunAutomaton(automaton);
             ByteRunAutomaton bra = new ByteRunAutomaton(automaton);
 
-            Assert.IsTrue(cra.Run(input));
+            Assert.True(cra.Run(input));
 
             var bytes = input.GetBytes(Encoding.UTF8);
-            Assert.IsTrue(bra.Run(bytes, 0, bytes.Length)); // this one fails!
+            Assert.True(bra.Run(bytes, 0, bytes.Length)); // this one fails!
         }
 
-        [Test]
+        [Fact]
         public void TestSpecialCase3()
         {
             RegExp re = new RegExp("(\\鯺)*(.)*\\Ӕ");
@@ -230,13 +222,14 @@ namespace Lucene.Net.Util.Automaton
             CharacterRunAutomaton cra = new CharacterRunAutomaton(automaton);
             ByteRunAutomaton bra = new ByteRunAutomaton(automaton);
 
-            Assert.IsTrue(cra.Run(input));
+            Assert.True(cra.Run(input));
 
             var bytes = input.GetBytes(Encoding.UTF8);
-            Assert.IsTrue(bra.Run(bytes, 0, bytes.Length));
+            Assert.True(bra.Run(bytes, 0, bytes.Length));
         }
 
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public void TestRandomRegexes()
         {
             int num = AtLeast(250);
@@ -280,7 +273,7 @@ namespace Lucene.Net.Util.Automaton
                     }
                 }
                 var bytes = s.GetBytes(Encoding.UTF8);
-                Assert.AreEqual(cra.Run(s), bra.Run(bytes, 0, bytes.Length));
+                Assert.Equal(cra.Run(s), bra.Run(bytes, 0, bytes.Length));
             }
         }
     }

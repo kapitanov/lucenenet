@@ -1,6 +1,6 @@
 namespace Lucene.Net.Store
 {
-    using NUnit.Framework;
+    using Xunit;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
     /*
@@ -25,10 +25,9 @@ namespace Lucene.Net.Store
     /// <summary>
     /// Simple testcase for RateLimiter.SimpleRateLimiter
     /// </summary>
-    [TestFixture]
     public sealed class TestRateLimiter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestPause()
         {
             SimpleRateLimiter limiter = new SimpleRateLimiter(10); // 10 MB / Sec
@@ -42,8 +41,8 @@ namespace Lucene.Net.Store
 
             // 1000000 Milliseconds per nanosecond
             long convert = pause / 1000000;
-            Assert.IsTrue(convert < 2000L, "we should sleep less than 2 seconds but did: " + convert + " millis");
-            Assert.IsTrue(convert > 1000L, "we should sleep at least 1 second but did only: " + convert + " millis");
+            Assert.True(convert < 2000L, "we should sleep less than 2 seconds but did: " + convert + " millis");
+            Assert.True(convert > 1000L, "we should sleep at least 1 second but did only: " + convert + " millis");
         }
     }
 }

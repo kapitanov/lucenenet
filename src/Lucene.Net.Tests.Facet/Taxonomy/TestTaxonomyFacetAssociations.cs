@@ -102,7 +102,7 @@ namespace Lucene.Net.Facet.Taxonomy
             taxoDir = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntSumAssociation()
         {
 
@@ -112,12 +112,12 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(new MatchAllDocsQuery(), fc);
 
             Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
-            Assert.AreEqual("dim=int path=[] value=-1 childCount=2\n  a (200)\n  b (150)\n", facets.GetTopChildren(10, "int").ToString());
-            Assert.AreEqual(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.AreEqual(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            Assert.Equal("dim=int path=[] value=-1 childCount=2\n  a (200)\n  b (150)\n", facets.GetTopChildren(10, "int").ToString());
+            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFloatSumAssociation()
         {
             FacetsCollector fc = new FacetsCollector();
@@ -126,16 +126,16 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(new MatchAllDocsQuery(), fc);
 
             Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", taxoReader, config, fc);
-            Assert.AreEqual("dim=float path=[] value=-1.0 childCount=2\n  a (50.0)\n  b (9.999995)\n", facets.GetTopChildren(10, "float").ToString());
-            Assert.AreEqual(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
-            Assert.AreEqual(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
+            Assert.Equal("dim=float path=[] value=-1.0 childCount=2\n  a (50.0)\n  b (9.999995)\n", facets.GetTopChildren(10, "float").ToString());
+            Assert.Equal(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
+            Assert.Equal(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
         }
 
         /// <summary>
         /// Make sure we can test both int and float assocs in one
         ///  index, as long as we send each to a different field. 
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestIntAndFloatAssocation()
         {
             FacetsCollector fc = new FacetsCollector();
@@ -144,16 +144,16 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(new MatchAllDocsQuery(), fc);
 
             Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", taxoReader, config, fc);
-            Assert.AreEqual(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
-            Assert.AreEqual(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
+            Assert.Equal(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
+            Assert.Equal(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
 
             facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
-            Assert.AreEqual(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.AreEqual(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
         }
 
         
-        [Test]
+        [Fact]
         public virtual void TestWrongIndexFieldName()
         {
             FacetsCollector fc = new FacetsCollector();
@@ -164,7 +164,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 facets.GetSpecificValue("float");
-                Fail("should have hit exc");
+                True(false, "should have hit exc");
             }
             catch (System.ArgumentException)
             {
@@ -174,7 +174,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 facets.GetTopChildren(10, "float");
-                Fail("should have hit exc");
+                True(false, "should have hit exc");
             }
             catch (System.ArgumentException)
             {
@@ -182,7 +182,7 @@ namespace Lucene.Net.Facet.Taxonomy
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMixedTypesInSameIndexField()
         {
             Store.Directory dir = NewDirectory();
@@ -198,7 +198,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 writer.AddDocument(config.Build(taxoWriter, doc));
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -207,7 +207,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoHierarchy()
         {
             Store.Directory dir = NewDirectory();
@@ -223,7 +223,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 writer.AddDocument(config.Build(taxoWriter, doc));
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -232,7 +232,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRequireDimCount()
         {
             Store.Directory dir = NewDirectory();
@@ -248,7 +248,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 writer.AddDocument(config.Build(taxoWriter, doc));
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -257,7 +257,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntSumAssociationDrillDown()
         {
             FacetsCollector fc = new FacetsCollector();
@@ -268,9 +268,9 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(q, fc);
 
             Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
-            Assert.AreEqual("dim=int path=[] value=-1 childCount=2\n  b (150)\n  a (100)\n", facets.GetTopChildren(10, "int").ToString());
-            Assert.AreEqual(100, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.AreEqual(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            Assert.Equal("dim=int path=[] value=-1 childCount=2\n  b (150)\n  a (100)\n", facets.GetTopChildren(10, "int").ToString());
+            Assert.Equal(100, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
         }
 
     }

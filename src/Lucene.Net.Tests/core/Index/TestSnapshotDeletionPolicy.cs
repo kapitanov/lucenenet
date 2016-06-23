@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using FieldType = FieldType;
@@ -37,7 +37,6 @@ namespace Lucene.Net.Index
     // this was developed for Lucene In Action,
     // http://lucenebook.com
     //
-    [TestFixture]
     public class TestSnapshotDeletionPolicy : LuceneTestCase
     {
         public const string INDEX_PATH = "test.snapshots";
@@ -55,7 +54,7 @@ namespace Lucene.Net.Index
         protected internal virtual void CheckSnapshotExists(Directory dir, IndexCommit c)
         {
             string segFileName = c.SegmentsFileName;
-            Assert.IsTrue(SlowFileExists(dir, segFileName), "segments file not found in directory: " + segFileName);
+            Assert.True(SlowFileExists(dir, segFileName), "segments file not found in directory: " + segFileName);
         }
 
         protected internal virtual void CheckMaxDoc(IndexCommit commit, int expectedMaxDoc)
@@ -63,7 +62,7 @@ namespace Lucene.Net.Index
             IndexReader reader = DirectoryReader.Open(commit);
             try
             {
-                Assert.AreEqual(expectedMaxDoc, reader.MaxDoc);
+                Assert.Equal(expectedMaxDoc, reader.MaxDoc);
             }
             finally
             {
@@ -99,27 +98,23 @@ namespace Lucene.Net.Index
                 CheckSnapshotExists(dir, snapshot);
                 if (checkIndexCommitSame)
                 {
-                    Assert.AreSame(snapshot, sdp.GetIndexCommit(snapshot.Generation));
+                    Assert.Same(snapshot, sdp.GetIndexCommit(snapshot.Generation));
                 }
                 else
                 {
-                    Assert.AreEqual(snapshot.Generation, sdp.GetIndexCommit(snapshot.Generation).Generation);
+                    Assert.Equal(snapshot.Generation, sdp.GetIndexCommit(snapshot.Generation).Generation);
                 }
             }
         }
 
         protected internal IList<IndexCommit> Snapshots;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSnapshotDeletionPolicy() : base()
         {
-            base.SetUp();
-
             this.Snapshots = new List<IndexCommit>();
         }
 
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestSnapshotDeletionPolicy_Mem()
         {
             Directory fsDir = NewDirectory();
@@ -139,7 +134,7 @@ namespace Lucene.Net.Index
             try
             {
                 dp.Snapshot();
-                Assert.Fail("did not hit exception");
+                Assert.True(false, "did not hit exception");
             }
             catch (InvalidOperationException ise)
             {
@@ -209,7 +204,7 @@ namespace Lucene.Net.Index
                         catch (Exception t)
                         {
                             Console.WriteLine(t.StackTrace);
-                            Assert.Fail("addDocument failed");
+                            Assert.True(false, "addDocument failed");
                         }
                         if (i % 2 == 0)
                         {
@@ -312,7 +307,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasicSnapshots()
         {
             int numSnapshots = 3;
@@ -324,8 +319,8 @@ namespace Lucene.Net.Index
             PrepareIndexAndSnapshots(sdp, writer, numSnapshots);
             writer.Dispose();
 
-            Assert.AreEqual(numSnapshots, sdp.Snapshots.Count);
-            Assert.AreEqual(numSnapshots, sdp.SnapshotCount);
+            Assert.Equal(numSnapshots, sdp.Snapshots.Count);
+            Assert.Equal(numSnapshots, sdp.SnapshotCount);
             AssertSnapshotExists(dir, sdp, numSnapshots, true);
 
             // open a reader on a snapshot - should succeed.
@@ -336,11 +331,11 @@ namespace Lucene.Net.Index
             writer = new IndexWriter(dir, GetConfig(Random(), sdp));
             writer.DeleteUnusedFiles();
             writer.Dispose();
-            Assert.AreEqual(1, DirectoryReader.ListCommits(dir).Count, "no snapshots should exist");
+            Assert.Equal(1, DirectoryReader.ListCommits(dir).Count); //, "no snapshots should exist");
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultiThreadedSnapshotting()
         {
             Directory dir = NewDirectory();
@@ -375,7 +370,7 @@ namespace Lucene.Net.Index
                 sdp.Release(snapshots[i]);
                 writer.DeleteUnusedFiles();
             }
-            Assert.AreEqual(1, DirectoryReader.ListCommits(dir).Count);
+            Assert.Equal(1, DirectoryReader.ListCommits(dir).Count);
             writer.Dispose();
             dir.Dispose();
         }
@@ -413,7 +408,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRollbackToOldSnapshot()
         {
             int numSnapshots = 2;
@@ -434,12 +429,12 @@ namespace Lucene.Net.Index
 
             // but 'snapshot1' files will still exist (need to release snapshot before they can be deleted).
             string segFileName = Snapshots[1].SegmentsFileName;
-            Assert.IsTrue(SlowFileExists(dir, segFileName), "snapshot files should exist in the directory: " + segFileName);
+            Assert.True(SlowFileExists(dir, segFileName), "snapshot files should exist in the directory: " + segFileName);
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReleaseSnapshot()
         {
             Directory dir = NewDirectory();
@@ -457,11 +452,11 @@ namespace Lucene.Net.Index
             sdp.Release(Snapshots[0]);
             writer.DeleteUnusedFiles();
             writer.Dispose();
-            Assert.IsFalse(SlowFileExists(dir, segFileName), "segments file should not be found in dirctory: " + segFileName);
+            Assert.False(SlowFileExists(dir, segFileName), "segments file should not be found in dirctory: " + segFileName);
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSnapshotLastCommitTwice()
         {
             Directory dir = NewDirectory();
@@ -473,7 +468,7 @@ namespace Lucene.Net.Index
 
             IndexCommit s1 = sdp.Snapshot();
             IndexCommit s2 = sdp.Snapshot();
-            Assert.AreSame(s1, s2); // should be the same instance
+            Assert.Same(s1, s2); // should be the same instance
 
             // create another commit
             writer.AddDocument(new Document());
@@ -488,7 +483,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMissingCommits()
         {
             // Tests the behavior of SDP when commits that are given at ctor are missing
@@ -508,7 +503,7 @@ namespace Lucene.Net.Index
             // commit.
             (new IndexWriter(dir, GetConfig(Random(), null))).Dispose();
 
-            Assert.IsFalse(SlowFileExists(dir, s1.SegmentsFileName), "snapshotted commit should not exist");
+            Assert.False(SlowFileExists(dir, s1.SegmentsFileName), "snapshotted commit should not exist");
             dir.Dispose();
         }
     }

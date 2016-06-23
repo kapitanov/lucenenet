@@ -7,7 +7,6 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -42,7 +41,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestDirectoryReaderReopen : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestReopen_Mem()
         {
             Directory dir1 = NewDirectory();
@@ -109,7 +108,7 @@ namespace Lucene.Net.Index
         // at the end of every iteration, commit the index and reopen/recreate the reader.
         // in each iteration verify the work of previous iteration.
         // try this once with reopen once recreate, on both RAMDir and FSDir.
-        [Test]
+        [Fact]
         public virtual void TestCommitReopen()
         {
             Directory dir = NewDirectory();
@@ -117,7 +116,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCommitRecreate()
         {
             Directory dir = NewDirectory();
@@ -154,9 +153,9 @@ namespace Lucene.Net.Index
                             int k = i - 1;
                             int n = j + k * M;
                             Document prevItereationDoc = reader.Document(n);
-                            Assert.IsNotNull(prevItereationDoc);
+                            Assert.NotNull(prevItereationDoc);
                             string id = prevItereationDoc.Get("id");
-                            Assert.AreEqual(k + "_" + j, id);
+                            Assert.Equal(k + "_" + j, id);
                         }
                     }
                     iwriter.Commit();
@@ -195,7 +194,7 @@ namespace Lucene.Net.Index
             // verify that reopen() does not return a new reader instance
             // in case the index has no changes
             ReaderCouple couple = RefreshReader(index2, false);
-            Assert.IsTrue(couple.RefreshedReader == index2);
+            Assert.True(couple.RefreshedReader == index2);
 
             couple = RefreshReader(index2, test, 0, true);
             index1.Dispose();
@@ -231,7 +230,7 @@ namespace Lucene.Net.Index
             AssertReaderClosed(index2, true);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestThreadSafety()
         {
             Directory dir = NewDirectory();
@@ -305,7 +304,7 @@ namespace Lucene.Net.Index
                     if (threads[i].Error != null)
                     {
                         string msg = "Error occurred in thread " + threads[i].Name + ":\n" + threads[i].Error.Message;
-                        Assert.Fail(msg);
+                        Assert.True(false, msg);
                     }
                 }
             }
@@ -544,14 +543,14 @@ namespace Lucene.Net.Index
                 {
                     if (refreshed == reader)
                     {
-                        Assert.Fail("No new DirectoryReader instance created during refresh.");
+                        Assert.True(false, "No new DirectoryReader instance created during refresh.");
                     }
                 }
                 else
                 {
                     if (refreshed != reader)
                     {
-                        Assert.Fail("New DirectoryReader instance created during refresh even though index had no changes.");
+                        Assert.True(false, "New DirectoryReader instance created during refresh even though index had no changes.");
                     }
                 }
 
@@ -583,11 +582,11 @@ namespace Lucene.Net.Index
             DirectoryReader r = DirectoryReader.Open(dir);
             if (multiSegment)
             {
-                Assert.IsTrue(r.Leaves.Count > 1);
+                Assert.True(r.Leaves.Count > 1);
             }
             else
             {
-                Assert.IsTrue(r.Leaves.Count == 1);
+                Assert.True(r.Leaves.Count == 1);
             }
             r.Dispose();
         }
@@ -660,7 +659,7 @@ namespace Lucene.Net.Index
 
         internal static void AssertReaderClosed(IndexReader reader, bool checkSubReaders)
         {
-            Assert.AreEqual(0, reader.RefCount);
+            Assert.Equal(0, reader.RefCount);
 
             if (checkSubReaders && reader is CompositeReader)
             {
@@ -693,7 +692,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReopenOnCommit()
         {
             Directory dir = NewDirectory();
@@ -719,14 +718,14 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             DirectoryReader r = DirectoryReader.Open(dir);
-            Assert.AreEqual(0, r.NumDocs);
+            Assert.Equal(0, r.NumDocs);
 
             ICollection<IndexCommit> commits = DirectoryReader.ListCommits(dir);
             foreach (IndexCommit commit in commits)
             {
                 DirectoryReader r2 = DirectoryReader.OpenIfChanged(r, commit);
-                Assert.IsNotNull(r2);
-                Assert.IsTrue(r2 != r);
+                Assert.NotNull(r2);
+                Assert.True(r2 != r);
 
                 IDictionary<string, string> s = commit.UserData;
                 int v;
@@ -741,11 +740,11 @@ namespace Lucene.Net.Index
                 }
                 if (v < 4)
                 {
-                    Assert.AreEqual(1 + v, r2.NumDocs);
+                    Assert.Equal(1 + v, r2.NumDocs);
                 }
                 else
                 {
-                    Assert.AreEqual(7 - v, r2.NumDocs);
+                    Assert.Equal(7 - v, r2.NumDocs);
                 }
                 r.Dispose();
                 r = r2;
@@ -754,7 +753,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOpenIfChangedNRTToCommit()
         {
             Directory dir = NewDirectory();
@@ -766,15 +765,15 @@ namespace Lucene.Net.Index
             w.AddDocument(doc);
             w.Commit();
             IList<IndexCommit> commits = DirectoryReader.ListCommits(dir);
-            Assert.AreEqual(1, commits.Count);
+            Assert.Equal(1, commits.Count);
             w.AddDocument(doc);
             DirectoryReader r = DirectoryReader.Open(w, true);
 
-            Assert.AreEqual(2, r.NumDocs);
+            Assert.Equal(2, r.NumDocs);
             IndexReader r2 = DirectoryReader.OpenIfChanged(r, commits[0]);
-            Assert.IsNotNull(r2);
+            Assert.NotNull(r2);
             r.Dispose();
-            Assert.AreEqual(1, r2.NumDocs);
+            Assert.Equal(1, r2.NumDocs);
             w.Dispose();
             r2.Dispose();
             dir.Dispose();

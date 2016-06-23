@@ -65,7 +65,7 @@ namespace Lucene.Net.Tests.Join
             return job;
         }
 
-        [Test]
+        [Fact]
         public void TestEmptyChildFilter()
         {
             Directory dir = NewDirectory();
@@ -127,7 +127,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSimple()
         {
             Directory dir = NewDirectory();
@@ -217,7 +217,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestBugCausedByRewritingTwice()
         {
             Directory dir = NewDirectory();
@@ -274,7 +274,7 @@ namespace Lucene.Net.Tests.Join
             return new QueryWrapperFilter(new TermQuery(new Term("skill", skill)));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleFilter()
         {
             Directory dir = NewDirectory();
@@ -372,7 +372,7 @@ namespace Lucene.Net.Tests.Join
             return leaf.AtomicReader.Document(bits.NextSetBit(childDocID - leaf.DocBase));
         }
 
-        [Test]
+        [Fact]
         public void TestBoostBug()
         {
             Directory dir = NewDirectory();
@@ -392,7 +392,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestNestedDocScoringWithDeletes()
         {
             Directory dir = NewDirectory();
@@ -499,7 +499,7 @@ namespace Lucene.Net.Tests.Join
             return new Sort(sortFields.ToArray());
         }
 
-        [Test]
+        [Fact]
         public void TestRandom()
         {
             // We build two indices at once: one normalized (which
@@ -1121,7 +1121,7 @@ namespace Lucene.Net.Tests.Join
             }
         }
 
-        [Test]
+        [Fact]
         public void TestMultiChildTypes()
         {
             Directory dir = NewDirectory();
@@ -1208,7 +1208,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestAdvanceSingleParentSingleChild()
         {
             Directory dir = NewDirectory();
@@ -1232,7 +1232,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestAdvanceSingleParentNoChild()
         {
             Directory dir = NewDirectory();
@@ -1266,7 +1266,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestGetTopGroups()
         {
 
@@ -1361,7 +1361,7 @@ namespace Lucene.Net.Tests.Join
         }
 
         // LUCENE-4968
-        [Test]
+        [Fact]
         public void TestSometimesParentOnlyMatches()
         {
             Directory d = NewDirectory();
@@ -1426,7 +1426,7 @@ namespace Lucene.Net.Tests.Join
         }
 
         // LUCENE-4968
-        [Test]
+        [Fact]
         public void TestChildQueryNeverMatches()
         {
             Directory d = NewDirectory();
@@ -1492,7 +1492,7 @@ namespace Lucene.Net.Tests.Join
         }
 
         // LUCENE-4968
-        [Test]
+        [Fact]
         public void TestChildQueryMatchesParent()
         {
             Directory d = NewDirectory();
@@ -1543,7 +1543,7 @@ namespace Lucene.Net.Tests.Join
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestAdvanceSingleDeletedParentNoChild()
         {
             Directory dir = NewDirectory();

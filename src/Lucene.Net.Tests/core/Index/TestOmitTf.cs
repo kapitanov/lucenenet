@@ -1,11 +1,10 @@
 using System;
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -44,7 +43,6 @@ namespace Lucene.Net.Index
     using TextField = TextField;
     using TFIDFSimilarity = Lucene.Net.Search.Similarities.TFIDFSimilarity;
 
-    [TestFixture]
     public class TestOmitTf : LuceneTestCase
     {
         public class SimpleSimilarity : TFIDFSimilarity
@@ -110,7 +108,7 @@ namespace Lucene.Net.Index
 
         // Tests whether the DocumentWriter correctly enable the
         // omitTermFreqAndPositions bit in the FieldInfo
-        [Test]
+        [Fact]
         public virtual void TestOmitTermFreqAndPositions()
         {
             Directory ram = NewDirectory();
@@ -148,8 +146,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions, "OmitTermFreqAndPositions field bit should be set.");
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions, "OmitTermFreqAndPositions field bit should be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -157,7 +155,7 @@ namespace Lucene.Net.Index
 
         // Tests whether merging of docs that have different
         // omitTermFreqAndPositions for the same field works
-        [Test]
+        [Fact]
         public virtual void TestMixedMerge()
         {
             Directory ram = NewDirectory();
@@ -201,8 +199,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions, "OmitTermFreqAndPositions field bit should be set.");
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions, "OmitTermFreqAndPositions field bit should be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f1").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -211,7 +209,7 @@ namespace Lucene.Net.Index
         // Make sure first adding docs that do not omitTermFreqAndPositions for
         // field X, then adding docs that do omitTermFreqAndPositions for that same
         // field,
-        [Test]
+        [Fact]
         public virtual void TestMixedRAM()
         {
             Directory ram = NewDirectory();
@@ -245,8 +243,8 @@ namespace Lucene.Net.Index
 
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(ram));
             FieldInfos fi = reader.FieldInfos;
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, fi.FieldInfo("f1").FieldIndexOptions, "OmitTermFreqAndPositions field bit should not be set.");
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions, "OmitTermFreqAndPositions field bit should be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, fi.FieldInfo("f1").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should not be set.");
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_ONLY, fi.FieldInfo("f2").FieldIndexOptions); //, "OmitTermFreqAndPositions field bit should be set.");
 
             reader.Dispose();
             ram.Dispose();
@@ -257,13 +255,13 @@ namespace Lucene.Net.Index
             string[] files = dir.ListAll();
             for (int i = 0; i < files.Length; i++)
             {
-                Assert.IsFalse(files[i].EndsWith(".prx"));
-                Assert.IsFalse(files[i].EndsWith(".pos"));
+                Assert.False(files[i].EndsWith(".prx"));
+                Assert.False(files[i].EndsWith(".pos"));
             }
         }
 
         // Verifies no *.prx exists when all fields omit term freq:
-        [Test]
+        [Fact]
         public virtual void TestNoPrxFile()
         {
             Directory ram = NewDirectory();
@@ -307,7 +305,7 @@ namespace Lucene.Net.Index
         }
 
         // Test scores with one field with Term Freqs and one without, otherwise with equal content
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -357,7 +355,7 @@ namespace Lucene.Net.Index
             try
             {
                 searcher.Search(pq, 10);
-                Assert.Fail("did not hit expected exception");
+                Assert.True(false, "did not hit expected exception");
             }
             catch (Exception e)
             {
@@ -390,7 +388,7 @@ namespace Lucene.Net.Index
             bq.Add(q4, Occur.MUST);
 
             searcher.Search(bq, new CountingHitCollectorAnonymousInnerClassHelper5(this));
-            Assert.AreEqual(15, CountingHitCollector.Count);
+            Assert.Equal(15, CountingHitCollector.Count);
 
             reader.Dispose();
             dir.Dispose();
@@ -419,7 +417,7 @@ namespace Lucene.Net.Index
             {
                 //System.out.println("Q1: Doc=" + doc + " score=" + score);
                 float score = scorer.Score();
-                Assert.IsTrue(score == 1.0f, "got score=" + score);
+                Assert.True(score == 1.0f, "got score=" + score);
                 base.Collect(doc);
             }
         }
@@ -447,7 +445,7 @@ namespace Lucene.Net.Index
             {
                 //System.out.println("Q2: Doc=" + doc + " score=" + score);
                 float score = scorer.Score();
-                Assert.AreEqual(1.0f + doc, score, 0.00001f);
+                Assert.Equal(1.0f + doc, score); //, 0.00001f);
                 base.Collect(doc);
             }
         }
@@ -475,8 +473,8 @@ namespace Lucene.Net.Index
             {
                 //System.out.println("Q1: Doc=" + doc + " score=" + score);
                 float score = scorer.Score();
-                Assert.IsTrue(score == 1.0f);
-                Assert.IsFalse(doc % 2 == 0);
+                Assert.True(score == 1.0f);
+                Assert.False(doc % 2 == 0);
                 base.Collect(doc);
             }
         }
@@ -504,8 +502,8 @@ namespace Lucene.Net.Index
             {
                 float score = scorer.Score();
                 //System.out.println("Q1: Doc=" + doc + " score=" + score);
-                Assert.IsTrue(score == 1.0f);
-                Assert.IsTrue(doc % 2 == 0);
+                Assert.True(score == 1.0f);
+                Assert.True(doc % 2 == 0);
                 base.Collect(doc);
             }
         }
@@ -583,7 +581,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// test that when freqs are omitted, that totalTermFreq and sumTotalTermFreq are -1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestStats()
         {
             Directory dir = NewDirectory();
@@ -597,8 +595,8 @@ namespace Lucene.Net.Index
             iw.AddDocument(doc);
             IndexReader ir = iw.Reader;
             iw.Dispose();
-            Assert.AreEqual(-1, ir.TotalTermFreq(new Term("foo", new BytesRef("bar"))));
-            Assert.AreEqual(-1, ir.GetSumTotalTermFreq("foo"));
+            Assert.Equal(-1, ir.TotalTermFreq(new Term("foo", new BytesRef("bar"))));
+            Assert.Equal(-1, ir.GetSumTotalTermFreq("foo"));
             ir.Dispose();
             dir.Dispose();
         }

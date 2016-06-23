@@ -2,10 +2,10 @@ using System;
 using System.Linq;
 using System.Reflection;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -134,7 +134,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Tests the IndexReader.getFieldNames implementation </summary>
         /// <exception cref="Exception"> on error </exception>
-        [Test]
+        [Fact]
         public virtual void TestFilterIndexReader()
         {
             Directory directory = NewDirectory();
@@ -170,15 +170,15 @@ namespace Lucene.Net.Index
             TermsEnum terms = MultiFields.GetTerms(reader, "default").Iterator(null);
             while (terms.Next() != null)
             {
-                Assert.IsTrue(terms.Term().Utf8ToString().IndexOf('e') != -1);
+                Assert.True(terms.Term().Utf8ToString().IndexOf('e') != -1);
             }
 
-            Assert.AreEqual(TermsEnum.SeekStatus.FOUND, terms.SeekCeil(new BytesRef("one")));
+            Assert.Equal(TermsEnum.SeekStatus.FOUND, terms.SeekCeil(new BytesRef("one")));
 
             DocsAndPositionsEnum positions = terms.DocsAndPositions(MultiFields.GetLiveDocs(reader), null);
             while (positions.NextDoc() != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.IsTrue((positions.DocID() % 2) == 1);
+                Assert.True((positions.DocID() % 2) == 1);
             }
 
             reader.Dispose();
@@ -203,12 +203,12 @@ namespace Lucene.Net.Index
                 MethodInfo subM = clazz.GetMethod(m.Name, m.GetParameters().Select(p => p.ParameterType).ToArray());
                 if (subM.DeclaringType == clazz && m.DeclaringType != typeof(object) && m.DeclaringType != subM.DeclaringType)
                 {
-                    Assert.Fail(clazz + " overrides " + m + " although it has a default impl");
+                    Assert.True(false, clazz + " overrides " + m + " although it has a default impl");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOverrideMethods()
         {
             CheckOverrideMethods(typeof(FilterAtomicReader));

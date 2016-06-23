@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -39,7 +39,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TFIDFSimilarity = Lucene.Net.Search.Similarities.TFIDFSimilarity;
 
-    [TestFixture]
     public class TestSimilarityProvider : LuceneTestCase
     {
         private Directory Directory;
@@ -49,7 +48,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Directory = NewDirectory();
             PerFieldSimilarityWrapper sim = new ExampleSimilarityProvider(this);
             IndexWriterConfig iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetSimilarity(sim);
@@ -77,10 +76,10 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasics()
         {
             // sanity check of norms writer
@@ -90,15 +89,15 @@ namespace Lucene.Net.Search
             NumericDocValues barNorms = slow.GetNormValues("bar");
             for (int i = 0; i < slow.MaxDoc; i++)
             {
-                Assert.IsFalse(fooNorms.Get(i) == barNorms.Get(i));
+                Assert.False(fooNorms.Get(i) == barNorms.Get(i));
             }
 
             // sanity check of searching
             TopDocs foodocs = Searcher.Search(new TermQuery(new Term("foo", "brown")), 10);
-            Assert.IsTrue(foodocs.TotalHits > 0);
+            Assert.True(foodocs.TotalHits > 0);
             TopDocs bardocs = Searcher.Search(new TermQuery(new Term("bar", "brown")), 10);
-            Assert.IsTrue(bardocs.TotalHits > 0);
-            Assert.IsTrue(foodocs.ScoreDocs[0].Score < bardocs.ScoreDocs[0].Score);
+            Assert.True(bardocs.TotalHits > 0);
+            Assert.True(foodocs.ScoreDocs[0].Score < bardocs.ScoreDocs[0].Score);
         }
 
         private class ExampleSimilarityProvider : PerFieldSimilarityWrapper

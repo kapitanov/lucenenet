@@ -1,9 +1,10 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
+    using System;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -48,58 +49,20 @@ namespace Lucene.Net.Search
     /// </p>
     /// </summary>
     /// <seealso cref= "Subclasses for actual tests" </seealso>
-    [TestFixture]
-    public class TestExplanations : LuceneTestCaseWithReducedFloatPrecision
+    public class TestExplanations : LuceneTestCaseWithReducedFloatPrecision, IClassFixture<TestExplanationsFixture>
     {
-        protected internal static IndexSearcher Searcher;
-        protected internal static IndexReader Reader;
-        protected internal static Directory Directory;
+        protected readonly TestExplanationsFixture _fixture;
 
-        public const string KEY = "KEY";
-
-        // boost on this field is the same as the iterator for the doc
-        public const string FIELD = "field";
-
-        // same contents, but no field boost
-        public const string ALTFIELD = "alt";
-
-        [TestFixtureTearDown]
-        public static void AfterClassTestExplanations()
+        public TestExplanations(TestExplanationsFixture fixture)
         {
-            Searcher = null;
-            Reader.Dispose();
-            Reader = null;
-            Directory.Dispose();
-            Directory = null;
+            _fixture = fixture;
         }
-
-        [TestFixtureSetUp]
-        public static void BeforeClassTestExplanations()
-        {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
-            for (int i = 0; i < DocFields.Length; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewStringField(KEY, "" + i, Field.Store.NO));
-                Field f = NewTextField(FIELD, DocFields[i], Field.Store.NO);
-                f.Boost = i;
-                doc.Add(f);
-                doc.Add(NewTextField(ALTFIELD, DocFields[i], Field.Store.NO));
-                writer.AddDocument(doc);
-            }
-            Reader = writer.Reader;
-            writer.Dispose();
-            Searcher = NewSearcher(Reader);
-        }
-
-        protected internal static readonly string[] DocFields = new string[] { "w1 w2 w3 w4 w5", "w1 w3 w2 w3 zz", "w1 xx w2 yy w3", "w1 w3 xx w2 yy w3 zz" };
 
         /// <summary>
         /// check the expDocNrs first, then check the query (and the explanations) </summary>
         public virtual void Qtest(Query q, int[] expDocNrs)
         {
-            CheckHits.CheckHitCollector(Random(), q, FIELD, Searcher, expDocNrs);
+            CheckHits.CheckHitCollector(Random(), q, TestExplanationsFixture.FIELD, _fixture.Searcher, expDocNrs);
         }
 
         /// <summary>
@@ -134,7 +97,7 @@ namespace Lucene.Net.Search
             }
 
             public ItemizedFilter(int[] keys)
-                : base(KEY, Int2str(keys))
+                : base(TestExplanationsFixture.KEY, Int2str(keys))
             {
             }
         }
@@ -146,7 +109,7 @@ namespace Lucene.Net.Search
             Term[] t = new Term[s.Length];
             for (int i = 0; i < s.Length; i++)
             {
-                t[i] = new Term(FIELD, s[i]);
+                t[i] = new Term(TestExplanationsFixture.FIELD, s[i]);
             }
             return t;
         }
@@ -155,7 +118,7 @@ namespace Lucene.Net.Search
         /// MACRO for SpanTermQuery </summary>
         public virtual SpanTermQuery St(string s)
         {
-            return new SpanTermQuery(new Term(FIELD, s));
+            return new SpanTermQuery(new Term(TestExplanationsFixture.FIELD, s));
         }
 
         /// <summary>
@@ -248,7 +211,7 @@ namespace Lucene.Net.Search
         {
             BooleanQuery bq = new BooleanQuery(true);
             bq.Add(q, BooleanClause.Occur.MUST);
-            bq.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            bq.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
             return bq;
         }
 
@@ -256,10 +219,56 @@ namespace Lucene.Net.Search
         /// Placeholder: JUnit freaks if you don't have one test ... making
         /// class abstract doesn't help
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestNoop()
         {
             /* NOOP */
+        }
+    }
+
+    public class TestExplanationsFixture : IDisposable
+    {
+        internal readonly string[] DocFields = new string[] { "w1 w2 w3 w4 w5", "w1 w3 w2 w3 zz", "w1 xx w2 yy w3", "w1 w3 xx w2 yy w3 zz" };
+
+        internal IndexSearcher Searcher;
+        internal IndexReader Reader;
+        internal Directory Directory;
+
+        public const string KEY = "KEY";
+
+        // boost on this field is the same as the iterator for the doc
+        public const string FIELD = "field";
+
+        // same contents, but no field boost
+        public const string ALTFIELD = "alt";
+
+        public TestExplanationsFixture()
+        {
+            var random = LuceneTestCase.Random();
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(random, Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random)).SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+            for (int i = 0; i < DocFields.Length; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewStringField(KEY, "" + i, Field.Store.NO));
+                Field f = LuceneTestCase.NewTextField(FIELD, DocFields[i], Field.Store.NO);
+                f.Boost = i;
+                doc.Add(f);
+                doc.Add(LuceneTestCase.NewTextField(ALTFIELD, DocFields[i], Field.Store.NO));
+                writer.AddDocument(doc);
+            }
+            Reader = writer.Reader;
+            writer.Dispose();
+            Searcher = LuceneTestCase.NewSearcher(Reader);
+        }
+
+        public void Dispose()
+        {
+            Searcher = null;
+            Reader.Dispose();
+            Reader = null;
+            Directory.Dispose();
+            Directory = null;
         }
     }
 }

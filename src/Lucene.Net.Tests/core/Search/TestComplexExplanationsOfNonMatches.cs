@@ -1,4 +1,4 @@
-using NUnit.Framework;
+
 
 namespace Lucene.Net.Search
 {
@@ -22,16 +22,19 @@ namespace Lucene.Net.Search
     /// <summary>
     /// subclass of TestSimpleExplanations that verifies non matches.
     /// </summary>
-    [TestFixture]
     public class TestComplexExplanationsOfNonMatches : TestComplexExplanations
     {
+        public TestComplexExplanationsOfNonMatches(TestExplanationsFixture fixture) : base(fixture)
+        {
+        }
+
         /// <summary>
         /// Overrides superclass to ignore matches and focus on non-matches
         /// </summary>
         /// <seealso cref= CheckHits#checkNoMatchExplanations </seealso>
         public override void Qtest(Query q, int[] expDocNrs)
         {
-            CheckHits.CheckNoMatchExplanations(q, FIELD, Searcher, expDocNrs);
+            CheckHits.CheckNoMatchExplanations(q, TestExplanationsFixture.FIELD, _fixture.Searcher, expDocNrs);
         }
     }
 }

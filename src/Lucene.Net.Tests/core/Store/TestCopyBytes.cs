@@ -1,6 +1,6 @@
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.IO;
 
@@ -26,7 +26,6 @@ namespace Lucene.Net.Store
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestCopyBytes : LuceneTestCase
     {
         private byte Value(int idx)
@@ -34,7 +33,7 @@ namespace Lucene.Net.Store
             return unchecked((byte)((idx % 256) * (1 + (idx / 256))));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCopyBytesMem()
         {
             int num = AtLeast(10);
@@ -64,9 +63,9 @@ namespace Lucene.Net.Store
                 }
 
                 @out.WriteBytes(bytes, 0, byteUpto);
-                Assert.AreEqual(size, @out.FilePointer);
+                Assert.Equal(size, @out.FilePointer);
                 @out.Dispose();
-                Assert.AreEqual(size, dir.FileLength("test"));
+                Assert.Equal(size, dir.FileLength("test"));
 
                 // copy from test -> test2
                 IndexInput @in = dir.OpenInput("test", NewIOContext(Random()));
@@ -88,7 +87,7 @@ namespace Lucene.Net.Store
                         upto += chunk;
                     }
                 }
-                Assert.AreEqual(size, upto);
+                Assert.Equal(size, upto);
                 @out.Dispose();
                 @in.Dispose();
 
@@ -100,7 +99,7 @@ namespace Lucene.Net.Store
                     if (Random().NextBoolean())
                     {
                         var v = in2.ReadByte();
-                        Assert.AreEqual(Value(upto), v);
+                        Assert.Equal(Value(upto), v);
                         upto++;
                     }
                     else
@@ -109,7 +108,7 @@ namespace Lucene.Net.Store
                         in2.ReadBytes(bytes, 0, limit);
                         for (int byteIdx = 0; byteIdx < limit; byteIdx++)
                         {
-                            Assert.AreEqual(Value(upto), bytes[byteIdx]);
+                            Assert.Equal(Value(upto), bytes[byteIdx]);
                             upto++;
                         }
                     }
@@ -124,7 +123,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3541
-        [Test]
+        [Fact]
         public virtual void TestCopyBytesWithThreads()
         {
             int datalen = TestUtil.NextInt(Random(), 101, 10000);
@@ -165,7 +164,7 @@ namespace Lucene.Net.Store
                 byte[] dataCopy = new byte[datalen];
                 System.Buffer.BlockCopy(data, 0, dataCopy, 0, 100); // copy the header for easy testing
                 copiedData.ReadBytes(dataCopy, 100, datalen - 100);
-                Assert.AreEqual(data, dataCopy);
+                Assert.Equal(data, dataCopy);
                 copiedData.Dispose();
             }
             input.Dispose();

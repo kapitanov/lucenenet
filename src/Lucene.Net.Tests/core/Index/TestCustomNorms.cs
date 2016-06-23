@@ -1,10 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
     using CollectionStatistics = Lucene.Net.Search.CollectionStatistics;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -43,7 +44,7 @@ namespace Lucene.Net.Index
         internal readonly string FloatTestField = "normsTestFloat";
         internal readonly string ExceptionTestField = "normsTestExcp";
 
-        [Test]
+        [Fact]
         public virtual void TestFloatNorms()
         {
             Directory dir = NewDirectory();
@@ -76,12 +77,12 @@ namespace Lucene.Net.Index
             writer.Dispose();
             AtomicReader open = SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir));
             NumericDocValues norms = open.GetNormValues(FloatTestField);
-            Assert.IsNotNull(norms);
+            Assert.NotNull(norms);
             for (int i = 0; i < open.MaxDoc; i++)
             {
                 Document document = open.Document(i);
                 float expected = Convert.ToSingle(document.Get(FloatTestField));
-                Assert.AreEqual(expected, Number.IntBitsToFloat((int)norms.Get(i)), 0.0f);
+                Assert.Equal(expected, Number.IntBitsToFloat((int)norms.Get(i))); //, 0.0f);
             }
             open.Dispose();
             dir.Dispose();

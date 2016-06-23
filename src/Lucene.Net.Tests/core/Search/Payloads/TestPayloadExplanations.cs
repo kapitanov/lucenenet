@@ -1,7 +1,6 @@
-using NUnit.Framework;
-
 namespace Lucene.Net.Search.Payloads
 {
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using SpanQuery = Lucene.Net.Search.Spans.SpanQuery;
@@ -36,7 +35,7 @@ namespace Lucene.Net.Search.Payloads
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
         }
 
@@ -64,7 +63,7 @@ namespace Lucene.Net.Search.Payloads
 
         /* simple PayloadTermQueries */
 
-        [Test]
+        [Fact]
         public virtual void TestPT1()
         {
             foreach (PayloadFunction fn in Functions)
@@ -74,7 +73,7 @@ namespace Lucene.Net.Search.Payloads
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPT2()
         {
             foreach (PayloadFunction fn in Functions)
@@ -88,7 +87,7 @@ namespace Lucene.Net.Search.Payloads
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPT4()
         {
             foreach (PayloadFunction fn in Functions)
@@ -98,7 +97,7 @@ namespace Lucene.Net.Search.Payloads
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPT5()
         {
             foreach (PayloadFunction fn in Functions)

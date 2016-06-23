@@ -1,11 +1,11 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Threading;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Automaton = Lucene.Net.Util.Automaton.Automaton;
     using AutomatonTestUtil = Lucene.Net.Util.Automaton.AutomatonTestUtil;
     using BasicAutomata = Lucene.Net.Util.Automaton.BasicAutomata;
@@ -41,7 +41,6 @@ namespace Lucene.Net.Search
     using TermsEnum = Lucene.Net.Index.TermsEnum;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestAutomatonQuery : LuceneTestCase
     {
         private Directory Directory;
@@ -50,10 +49,8 @@ namespace Lucene.Net.Search
 
         private readonly string FN = "field";
 
-        [SetUp]
-        public override void SetUp()
+        public TestAutomatonQuery() : base()
         {
-            base.SetUp();
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
             Document doc = new Document();
@@ -73,12 +70,11 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private Term NewTerm(string value)
@@ -100,22 +96,22 @@ namespace Lucene.Net.Search
             AutomatonQuery query = new AutomatonQuery(NewTerm("bogus"), automaton);
 
             query.SetRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
 
             query.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT);
-            Assert.AreEqual(expected, AutomatonQueryNrHits(query));
+            Assert.Equal(expected, AutomatonQueryNrHits(query));
         }
 
         /// <summary>
         /// Test some very simple automata.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestBasicAutomata()
         {
             AssertAutomatonHits(0, BasicAutomata.MakeEmpty());
@@ -136,7 +132,7 @@ namespace Lucene.Net.Search
         /// Test that a nondeterministic automaton works correctly. (It should will be
         /// determinized)
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestNFA()
         {
             // accept this or three, the union is an NFA (two transitions for 't' from
@@ -145,7 +141,7 @@ namespace Lucene.Net.Search
             AssertAutomatonHits(2, nfa);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             AutomatonQuery a1 = new AutomatonQuery(NewTerm("foobar"), BasicAutomata.MakeString("foobar"));
@@ -158,43 +154,43 @@ namespace Lucene.Net.Search
             // different than a1 (different term, same language)
             AutomatonQuery a5 = new AutomatonQuery(NewTerm("blah"), BasicAutomata.MakeString("foobar"));
 
-            Assert.AreEqual(a1.GetHashCode(), a2.GetHashCode());
-            Assert.AreEqual(a1, a2);
+            Assert.Equal(a1.GetHashCode(), a2.GetHashCode());
+            Assert.Equal(a1, a2);
 
-            Assert.AreEqual(a1.GetHashCode(), a3.GetHashCode());
-            Assert.AreEqual(a1, a3);
+            Assert.Equal(a1.GetHashCode(), a3.GetHashCode());
+            Assert.Equal(a1, a3);
 
             // different class
             AutomatonQuery w1 = new WildcardQuery(NewTerm("foobar"));
             // different class
             AutomatonQuery w2 = new RegexpQuery(NewTerm("foobar"));
 
-            Assert.IsFalse(a1.Equals(w1));
-            Assert.IsFalse(a1.Equals(w2));
-            Assert.IsFalse(w1.Equals(w2));
-            Assert.IsFalse(a1.Equals(a4));
-            Assert.IsFalse(a1.Equals(a5));
-            Assert.IsFalse(a1.Equals(null));
+            Assert.False(a1.Equals(w1));
+            Assert.False(a1.Equals(w2));
+            Assert.False(w1.Equals(w2));
+            Assert.False(a1.Equals(a4));
+            Assert.False(a1.Equals(a5));
+            Assert.False(a1.Equals(null));
         }
 
         /// <summary>
         /// Test that rewriting to a single term works as expected, preserves
         /// MultiTermQuery semantics.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestRewriteSingleTerm()
         {
             AutomatonQuery aq = new AutomatonQuery(NewTerm("bogus"), BasicAutomata.MakeString("piece"));
             Terms terms = MultiFields.GetTerms(Searcher.IndexReader, FN);
-            Assert.IsTrue(aq.GetTermsEnum(terms) is SingleTermsEnum);
-            Assert.AreEqual(1, AutomatonQueryNrHits(aq));
+            Assert.True(aq.GetTermsEnum(terms) is SingleTermsEnum);
+            Assert.Equal(1, AutomatonQueryNrHits(aq));
         }
 
         /// <summary>
         /// Test that rewriting to a prefix query works as expected, preserves
         /// MultiTermQuery semantics.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestRewritePrefix()
         {
             Automaton pfx = BasicAutomata.MakeString("do");
@@ -204,25 +200,25 @@ namespace Lucene.Net.Search
             Terms terms = MultiFields.GetTerms(Searcher.IndexReader, FN);
 
             var en = aq.GetTermsEnum(terms);
-            Assert.IsTrue(en is PrefixTermsEnum, "Expected type PrefixTermEnum but was {0}", en.GetType().Name);
-            Assert.AreEqual(3, AutomatonQueryNrHits(aq));
+            Assert.True(en is PrefixTermsEnum, string.Format("Expected type PrefixTermEnum but was {0}", en.GetType().Name));
+            Assert.Equal(3, AutomatonQueryNrHits(aq));
         }
 
         /// <summary>
         /// Test handling of the empty language
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyOptimization()
         {
             AutomatonQuery aq = new AutomatonQuery(NewTerm("bogus"), BasicAutomata.MakeEmpty());
-            // not yet available: Assert.IsTrue(aq.getEnum(searcher.getIndexReader())
+            // not yet available: Assert.True(aq.getEnum(searcher.getIndexReader())
             // instanceof EmptyTermEnum);
             Terms terms = MultiFields.GetTerms(Searcher.IndexReader, FN);
-            Assert.AreSame(TermsEnum.EMPTY, aq.GetTermsEnum(terms));
-            Assert.AreEqual(0, AutomatonQueryNrHits(aq));
+            Assert.Same(TermsEnum.EMPTY, aq.GetTermsEnum(terms));
+            Assert.Equal(0, AutomatonQueryNrHits(aq));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHashCodeWithThreads()
         {
             AutomatonQuery[] queries = new AutomatonQuery[1000];

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -22,12 +22,11 @@ namespace Lucene.Net.Util.Automaton
     /// <summary>
     /// this test builds some randomish NFA/DFA and minimizes them.
     /// </summary>
-    [TestFixture]
     public class TestMinimize : LuceneTestCase
     {
         /// <summary>
         /// the minimal and non-minimal are compared to ensure they are the same. </summary>
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             int num = AtLeast(200);
@@ -36,7 +35,7 @@ namespace Lucene.Net.Util.Automaton
                 Automaton a = AutomatonTestUtil.RandomAutomaton(Random());
                 Automaton b = (Automaton)a.Clone();
                 MinimizationOperations.Minimize(b);
-                Assert.IsTrue(BasicOperations.SameLanguage(a, b));
+                Assert.True(BasicOperations.SameLanguage(a, b));
             }
         }
 
@@ -45,8 +44,7 @@ namespace Lucene.Net.Util.Automaton
         /// we check not only that they are the same, but that #states/#transitions
         /// are the same.
         /// </summary>
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestAgainstBrzozowski()
         {
             int num = AtLeast(200);
@@ -56,15 +54,15 @@ namespace Lucene.Net.Util.Automaton
                 AutomatonTestUtil.MinimizeSimple(a);
                 Automaton b = (Automaton)a.Clone();
                 MinimizationOperations.Minimize(b);
-                Assert.IsTrue(BasicOperations.SameLanguage(a, b));
-                Assert.AreEqual(a.NumberOfStates, b.NumberOfStates);
-                Assert.AreEqual(a.NumberOfTransitions, b.NumberOfTransitions);
+                Assert.True(BasicOperations.SameLanguage(a, b));
+                Assert.Equal(a.NumberOfStates, b.NumberOfStates);
+                Assert.Equal(a.NumberOfTransitions, b.NumberOfTransitions);
             }
         }
 
         /// <summary>
         /// n^2 space usage in Hopcroft minimization? </summary>
-        [Test]
+        [Fact]
         public virtual void TestMinimizeHuge()
         {
             (new RegExp("+-*(A|.....|BC)*]", RegExp.NONE)).ToAutomaton();

@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Support;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using FieldType = FieldType;
@@ -69,7 +69,7 @@ namespace Lucene.Net.Index
             CommittedModel.PutAll(Model);
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             // update variables
@@ -485,7 +485,7 @@ namespace Lucene.Net.Index
                                     r.DecRef();
                                     continue;
                                 }
-                                Assert.Fail("No documents or tombstones found for id " + id + ", expected at least " + val + " reader=" + r);
+                                Assert.True(false, "No documents or tombstones found for id " + id + ", expected at least " + val + " reader=" + r);
                             }
                         }
 
@@ -504,13 +504,13 @@ namespace Lucene.Net.Index
                                     Document doc = r.Document(sd.Doc);
                                     Console.WriteLine("  docID=" + sd.Doc + " id:" + doc.Get("id") + " foundVal=" + doc.Get(OuterInstance.Field));
                                 }
-                                Assert.Fail("id=" + id + " reader=" + r + " totalHits=" + results.TotalHits);
+                                Assert.True(false, "id=" + id + " reader=" + r + " totalHits=" + results.TotalHits);
                             }
                             Document doc_ = searcher.Doc(results.ScoreDocs[0].Doc);
                             long foundVal = Convert.ToInt64(doc_.Get(OuterInstance.Field));
                             if (foundVal < Math.Abs(val))
                             {
-                                Assert.Fail("foundVal=" + foundVal + " val=" + val + " id=" + id + " reader=" + r);
+                                Assert.True(false, "foundVal=" + foundVal + " val=" + val + " id=" + id + " reader=" + r);
                             }
                         }
 

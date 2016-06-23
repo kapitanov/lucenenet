@@ -1,10 +1,10 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using CompoundFileDirectory = Lucene.Net.Store.CompoundFileDirectory;
     using Directory = Lucene.Net.Store.Directory;
@@ -36,25 +36,21 @@ namespace Lucene.Net.Index
     using SimpleFSDirectory = Lucene.Net.Store.SimpleFSDirectory;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestCompoundFile : LuceneTestCase
     {
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestCompoundFile() : base()
         {
-            base.SetUp();
             DirectoryInfo file = CreateTempDir("testIndex");
             // use a simple FSDir here, to be sure to have SimpleFSInputs
             Dir = new SimpleFSDirectory(file, null);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
@@ -88,10 +84,10 @@ namespace Lucene.Net.Index
 
         private void AssertSameStreams(string msg, IndexInput expected, IndexInput test)
         {
-            Assert.IsNotNull(expected, msg + " null expected");
-            Assert.IsNotNull(test, msg + " null test");
-            Assert.AreEqual(expected.Length(), test.Length(), msg + " length");
-            Assert.AreEqual(expected.FilePointer, test.FilePointer, msg + " position");
+            Assert.NotNull(expected); //, msg + " null expected");
+            Assert.NotNull(test); //, msg + " null test");
+            Assert.Equal(expected.Length(), test.Length()); //, msg + " length");
+            Assert.Equal(expected.FilePointer, test.FilePointer); //, msg + " position");
 
             var expectedBuffer = new byte[512];
             var testBuffer = new byte[expectedBuffer.Length];
@@ -146,12 +142,12 @@ namespace Lucene.Net.Index
 
         private void AssertEqualArrays(string msg, byte[] expected, byte[] test, int start, int len)
         {
-            Assert.IsNotNull(expected, msg + " null expected");
-            Assert.IsNotNull(test, msg + " null test");
+            Assert.NotNull(expected); //, msg + " null expected");
+            Assert.NotNull(test); //, msg + " null test");
 
             for (int i = start; i < len; i++)
             {
-                Assert.AreEqual(expected[i], test[i], msg + " " + i);
+                Assert.Equal(expected[i], test[i]); //, msg + " " + i);
             }
         }
 
@@ -163,7 +159,7 @@ namespace Lucene.Net.Index
         /// this test creates compound file based on a single file.
         ///  Files of different sizes are tested: 0, 1, 10, 100 bytes.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingleFile()
         {
             int[] data = new int[] { 0, 1, 10, 100 };
@@ -190,7 +186,7 @@ namespace Lucene.Net.Index
         /// this test creates compound file based on two files.
         ///
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestTwoFiles()
         {
             CreateSequenceFile(Dir, "d1", (sbyte)0, 15);
@@ -225,7 +221,7 @@ namespace Lucene.Net.Index
         ///  logic in the file reading code. For this the chunk variable is set to
         ///  the length of the buffer used internally by the compound file logic.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestRandomFiles()
         {
             // Setup the test segment
@@ -289,7 +285,7 @@ namespace Lucene.Net.Index
             cw.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReadAfterClose()
         {
             try
@@ -332,7 +328,7 @@ namespace Lucene.Net.Index
                 // OK: this call correctly fails. We are now past the 1024 internal
                 // buffer, so an actual IO is attempted, which fails
                 @in.ReadByte();
-                Assert.Fail("expected readByte() to throw exception");
+                Assert.True(false, "expected readByte() to throw exception");
             }
             catch (IOException e)
             {
@@ -340,7 +336,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestClonedStreamsClosing()
         {
             SetUp_2();
@@ -350,8 +346,8 @@ namespace Lucene.Net.Index
             IndexInput expected = Dir.OpenInput("f11", NewIOContext(Random()));
 
             // this test only works for FSIndexInput
-            Assert.IsTrue(TestHelper.IsSimpleFSIndexInput(expected));
-            Assert.IsTrue(TestHelper.IsSimpleFSIndexInputOpen(expected));
+            Assert.True(TestHelper.IsSimpleFSIndexInput(expected));
+            Assert.True(TestHelper.IsSimpleFSIndexInputOpen(expected));
 
             IndexInput one = cr.OpenInput("f11", NewIOContext(Random()));
 
@@ -392,7 +388,7 @@ namespace Lucene.Net.Index
         /// this test opens two files from a compound stream and verifies that
         ///  their file positions are independent of each other.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestRandomAccess()
         {
             SetUp_2();
@@ -408,60 +404,60 @@ namespace Lucene.Net.Index
             // Seek the first pair
             e1.Seek(100);
             a1.Seek(100);
-            Assert.AreEqual(100, e1.FilePointer);
-            Assert.AreEqual(100, a1.FilePointer);
+            Assert.Equal(100, e1.FilePointer);
+            Assert.Equal(100, a1.FilePointer);
             byte be1 = e1.ReadByte();
             byte ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now seek the second pair
             e2.Seek(1027);
             a2.Seek(1027);
-            Assert.AreEqual(1027, e2.FilePointer);
-            Assert.AreEqual(1027, a2.FilePointer);
+            Assert.Equal(1027, e2.FilePointer);
+            Assert.Equal(1027, a2.FilePointer);
             byte be2 = e2.ReadByte();
             byte ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Now make sure the first one didn't move
-            Assert.AreEqual(101, e1.FilePointer);
-            Assert.AreEqual(101, a1.FilePointer);
+            Assert.Equal(101, e1.FilePointer);
+            Assert.Equal(101, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now more the first one again, past the buffer length
             e1.Seek(1910);
             a1.Seek(1910);
-            Assert.AreEqual(1910, e1.FilePointer);
-            Assert.AreEqual(1910, a1.FilePointer);
+            Assert.Equal(1910, e1.FilePointer);
+            Assert.Equal(1910, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now make sure the second set didn't move
-            Assert.AreEqual(1028, e2.FilePointer);
-            Assert.AreEqual(1028, a2.FilePointer);
+            Assert.Equal(1028, e2.FilePointer);
+            Assert.Equal(1028, a2.FilePointer);
             be2 = e2.ReadByte();
             ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Move the second set back, again cross the buffer size
             e2.Seek(17);
             a2.Seek(17);
-            Assert.AreEqual(17, e2.FilePointer);
-            Assert.AreEqual(17, a2.FilePointer);
+            Assert.Equal(17, e2.FilePointer);
+            Assert.Equal(17, a2.FilePointer);
             be2 = e2.ReadByte();
             ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Finally, make sure the first set didn't move
             // Now make sure the first one didn't move
-            Assert.AreEqual(1911, e1.FilePointer);
-            Assert.AreEqual(1911, a1.FilePointer);
+            Assert.Equal(1911, e1.FilePointer);
+            Assert.Equal(1911, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             e1.Dispose();
             e2.Dispose();
@@ -474,7 +470,7 @@ namespace Lucene.Net.Index
         /// this test opens two files from a compound stream and verifies that
         ///  their file positions are independent of each other.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestRandomAccessClones()
         {
             SetUp_2();
@@ -490,60 +486,60 @@ namespace Lucene.Net.Index
             // Seek the first pair
             e1.Seek(100);
             a1.Seek(100);
-            Assert.AreEqual(100, e1.FilePointer);
-            Assert.AreEqual(100, a1.FilePointer);
+            Assert.Equal(100, e1.FilePointer);
+            Assert.Equal(100, a1.FilePointer);
             byte be1 = e1.ReadByte();
             byte ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now seek the second pair
             e2.Seek(1027);
             a2.Seek(1027);
-            Assert.AreEqual(1027, e2.FilePointer);
-            Assert.AreEqual(1027, a2.FilePointer);
+            Assert.Equal(1027, e2.FilePointer);
+            Assert.Equal(1027, a2.FilePointer);
             byte be2 = e2.ReadByte();
             byte ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Now make sure the first one didn't move
-            Assert.AreEqual(101, e1.FilePointer);
-            Assert.AreEqual(101, a1.FilePointer);
+            Assert.Equal(101, e1.FilePointer);
+            Assert.Equal(101, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now more the first one again, past the buffer length
             e1.Seek(1910);
             a1.Seek(1910);
-            Assert.AreEqual(1910, e1.FilePointer);
-            Assert.AreEqual(1910, a1.FilePointer);
+            Assert.Equal(1910, e1.FilePointer);
+            Assert.Equal(1910, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             // Now make sure the second set didn't move
-            Assert.AreEqual(1028, e2.FilePointer);
-            Assert.AreEqual(1028, a2.FilePointer);
+            Assert.Equal(1028, e2.FilePointer);
+            Assert.Equal(1028, a2.FilePointer);
             be2 = e2.ReadByte();
             ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Move the second set back, again cross the buffer size
             e2.Seek(17);
             a2.Seek(17);
-            Assert.AreEqual(17, e2.FilePointer);
-            Assert.AreEqual(17, a2.FilePointer);
+            Assert.Equal(17, e2.FilePointer);
+            Assert.Equal(17, a2.FilePointer);
             be2 = e2.ReadByte();
             ba2 = a2.ReadByte();
-            Assert.AreEqual(be2, ba2);
+            Assert.Equal(be2, ba2);
 
             // Finally, make sure the first set didn't move
             // Now make sure the first one didn't move
-            Assert.AreEqual(1911, e1.FilePointer);
-            Assert.AreEqual(1911, a1.FilePointer);
+            Assert.Equal(1911, e1.FilePointer);
+            Assert.Equal(1911, a1.FilePointer);
             be1 = e1.ReadByte();
             ba1 = a1.ReadByte();
-            Assert.AreEqual(be1, ba1);
+            Assert.Equal(be1, ba1);
 
             e1.Dispose();
             e2.Dispose();
@@ -552,28 +548,22 @@ namespace Lucene.Net.Index
             cr.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFileNotFound()
         {
             SetUp_2();
             CompoundFileDirectory cr = new CompoundFileDirectory(Dir, "f.comp", NewIOContext(Random()), false);
 
             // Open two files
-            try
+			Assert.ThrowsAny<Exception>(() =>
             {
                 cr.OpenInput("bogus", NewIOContext(Random()));
-                Assert.Fail("File not found");
-            }
-            catch (Exception e)
-            {
-                /* success */
-                //System.out.println("SUCCESS: File Not Found: " + e);
-            }
+            });
 
             cr.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReadPastEOF()
         {
             SetUp_2();
@@ -586,7 +576,7 @@ namespace Lucene.Net.Index
             try
             {
                 @is.ReadByte();
-                Assert.Fail("Single byte read past end of file");
+                Assert.True(false, "Single byte read past end of file");
             }
             catch (IOException e)
             {
@@ -598,7 +588,7 @@ namespace Lucene.Net.Index
             try
             {
                 @is.ReadBytes(b, 0, 50);
-                Assert.Fail("Block read past end of file");
+                Assert.True(false, "Block read past end of file");
             }
             catch (IOException e)
             {
@@ -614,7 +604,7 @@ namespace Lucene.Net.Index
         /// this test that writes larger than the size of the buffer output
         /// will correctly increment the file pointer.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestLargeWrites()
         {
             IndexOutput os = Dir.CreateOutput("testBufferStart.txt", NewIOContext(Random()));
@@ -630,7 +620,7 @@ namespace Lucene.Net.Index
 
             try
             {
-                Assert.AreEqual(currentPos + largeBuf.Length, os.FilePointer);
+                Assert.Equal(currentPos + largeBuf.Length, os.FilePointer);
             }
             finally
             {
@@ -638,7 +628,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddExternalFile()
         {
             CreateSequenceFile(Dir, "d1", (sbyte)0, 15);
@@ -660,7 +650,7 @@ namespace Lucene.Net.Index
             newDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAppend()
         {
             Directory newDir = NewDirectory();
@@ -675,23 +665,23 @@ namespace Lucene.Net.Index
                 }
                 os.Dispose();
                 string[] listAll = newDir.ListAll();
-                Assert.AreEqual(1, listAll.Length);
-                Assert.AreEqual("d.cfs", listAll[0]);
+                Assert.Equal(1, listAll.Length);
+                Assert.Equal("d.cfs", listAll[0]);
             }
             CreateSequenceFile(Dir, "d1", (sbyte)0, 15);
             Dir.Copy(csw, "d1", "d1", NewIOContext(Random()));
             string[] listAll_ = newDir.ListAll();
-            Assert.AreEqual(1, listAll_.Length);
-            Assert.AreEqual("d.cfs", listAll_[0]);
+            Assert.Equal(1, listAll_.Length);
+            Assert.Equal("d.cfs", listAll_[0]);
             csw.Dispose();
             CompoundFileDirectory csr = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
             for (int j = 0; j < 2; j++)
             {
                 IndexInput openInput = csr.OpenInput("seg_" + j + "_foo.txt", NewIOContext(Random()));
-                Assert.AreEqual(size * 4, openInput.Length());
+                Assert.Equal(size * 4, openInput.Length());
                 for (int i = 0; i < size; i++)
                 {
-                    Assert.AreEqual(i * j, openInput.ReadInt());
+                    Assert.Equal(i * j, openInput.ReadInt());
                 }
 
                 openInput.Dispose();
@@ -706,7 +696,7 @@ namespace Lucene.Net.Index
             newDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAppendTwice()
         {
             Directory newDir = NewDirectory();
@@ -715,19 +705,19 @@ namespace Lucene.Net.Index
             IndexOutput @out = csw.CreateOutput("d.xyz", NewIOContext(Random()));
             @out.WriteInt(0);
             @out.Dispose();
-            Assert.AreEqual(1, csw.ListAll().Length);
-            Assert.AreEqual("d.xyz", csw.ListAll()[0]);
+            Assert.Equal(1, csw.ListAll().Length);
+            Assert.Equal("d.xyz", csw.ListAll()[0]);
 
             csw.Dispose();
 
             CompoundFileDirectory cfr = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
-            Assert.AreEqual(1, cfr.ListAll().Length);
-            Assert.AreEqual("d.xyz", cfr.ListAll()[0]);
+            Assert.Equal(1, cfr.ListAll().Length);
+            Assert.Equal("d.xyz", cfr.ListAll()[0]);
             cfr.Dispose();
             newDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyCFS()
         {
             Directory newDir = NewDirectory();
@@ -735,13 +725,13 @@ namespace Lucene.Net.Index
             csw.Dispose();
 
             CompoundFileDirectory csr = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
-            Assert.AreEqual(0, csr.ListAll().Length);
+            Assert.Equal(0, csr.ListAll().Length);
             csr.Dispose();
 
             newDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReadNestedCFP()
         {
             Directory newDir = NewDirectory();
@@ -760,25 +750,25 @@ namespace Lucene.Net.Index
             newDir.DeleteFile("b.cfe");
             csw.Dispose();
 
-            Assert.AreEqual(2, newDir.ListAll().Length);
+            Assert.Equal(2, newDir.ListAll().Length);
             csw = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
 
-            Assert.AreEqual(2, csw.ListAll().Length);
+            Assert.Equal(2, csw.ListAll().Length);
             nested = new CompoundFileDirectory(csw, "b.cfs", NewIOContext(Random()), false);
 
-            Assert.AreEqual(2, nested.ListAll().Length);
+            Assert.Equal(2, nested.ListAll().Length);
             IndexInput openInput = nested.OpenInput("b.xyz", NewIOContext(Random()));
-            Assert.AreEqual(0, openInput.ReadInt());
+            Assert.Equal(0, openInput.ReadInt());
             openInput.Dispose();
             openInput = nested.OpenInput("b_1.xyz", NewIOContext(Random()));
-            Assert.AreEqual(1, openInput.ReadInt());
+            Assert.Equal(1, openInput.ReadInt());
             openInput.Dispose();
             nested.Dispose();
             csw.Dispose();
             newDir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDoubleClose()
         {
             Directory newDir = NewDirectory();
@@ -793,7 +783,7 @@ namespace Lucene.Net.Index
 
             csw = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
             IndexInput openInput = csw.OpenInput("d.xyz", NewIOContext(Random()));
-            Assert.AreEqual(0, openInput.ReadInt());
+            Assert.Equal(0, openInput.ReadInt());
             openInput.Dispose();
             csw.Dispose();
             // close a second time - must have no effect according to IDisposable
@@ -804,7 +794,7 @@ namespace Lucene.Net.Index
 
         // Make sure we don't somehow use more than 1 descriptor
         // when reading a CFS with many subs:
-        [Test]
+        [Fact]
         public virtual void TestManySubFiles()
         {
             Directory d = NewFSDirectory(CreateTempDir("CFSManySubFiles"));
@@ -834,7 +824,7 @@ namespace Lucene.Net.Index
 
             for (int fileIdx = 0; fileIdx < FILE_COUNT; fileIdx++)
             {
-                Assert.AreEqual((byte)fileIdx, ins[fileIdx].ReadByte());
+                Assert.Equal((byte)fileIdx, ins[fileIdx].ReadByte());
             }
 
             for (int fileIdx = 0; fileIdx < FILE_COUNT; fileIdx++)
@@ -845,7 +835,7 @@ namespace Lucene.Net.Index
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestListAll()
         {
             Directory dir = NewDirectory();

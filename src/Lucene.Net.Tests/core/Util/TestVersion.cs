@@ -14,37 +14,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-using NUnit.Framework;
 using System;
 using System.Linq;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
-    [TestFixture]
     public class TestVersion : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             foreach (LuceneVersion v in Enum.GetValues(typeof(LuceneVersion)))
             {
-                Assert.IsTrue(LuceneVersion.LUCENE_CURRENT.OnOrAfter(v), "LUCENE_CURRENT must be always onOrAfter(" + v + ")");
+                Assert.True(LuceneVersion.LUCENE_CURRENT.OnOrAfter(v), "LUCENE_CURRENT must be always onOrAfter(" + v + ")");
             }
-            Assert.IsTrue(LuceneVersion.LUCENE_40.OnOrAfter(LuceneVersion.LUCENE_31));
-            Assert.IsTrue(LuceneVersion.LUCENE_40.OnOrAfter(LuceneVersion.LUCENE_40));
-            Assert.IsFalse(LuceneVersion.LUCENE_30.OnOrAfter(LuceneVersion.LUCENE_31));
+            Assert.True(LuceneVersion.LUCENE_40.OnOrAfter(LuceneVersion.LUCENE_31));
+            Assert.True(LuceneVersion.LUCENE_40.OnOrAfter(LuceneVersion.LUCENE_40));
+            Assert.False(LuceneVersion.LUCENE_30.OnOrAfter(LuceneVersion.LUCENE_31));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestParseLeniently()
         {
-            Assert.AreEqual(LuceneVersion.LUCENE_40, LuceneVersionHelpers.ParseLeniently("4.0"));
-            Assert.AreEqual(LuceneVersion.LUCENE_40, LuceneVersionHelpers.ParseLeniently("LUCENE_40"));
-            Assert.AreEqual(LuceneVersion.LUCENE_CURRENT, LuceneVersionHelpers.ParseLeniently("LUCENE_CURRENT"));
+            Assert.Equal(LuceneVersion.LUCENE_40, LuceneVersionHelpers.ParseLeniently("4.0"));
+            Assert.Equal(LuceneVersion.LUCENE_40, LuceneVersionHelpers.ParseLeniently("LUCENE_40"));
+            Assert.Equal(LuceneVersion.LUCENE_CURRENT, LuceneVersionHelpers.ParseLeniently("LUCENE_CURRENT"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeprecations()
         {
             LuceneVersion[] values = Enum.GetValues(typeof(LuceneVersion)).Cast<LuceneVersion>().ToArray();
@@ -53,28 +51,28 @@ namespace Lucene.Net.Util
             {
                 if (i + 1 == values.Length)
                 {
-                    Assert.AreEqual(LuceneVersion.LUCENE_CURRENT, values[i], "Last constant must be LUCENE_CURRENT");
+                    Assert.Equal(LuceneVersion.LUCENE_CURRENT, values[i], "Last constant must be LUCENE_CURRENT");
                 }
                 /*bool dep = typeof(Version).GetField(values[i].Name()).isAnnotationPresent(typeof(Deprecated));
                 if (i + 2 != values.Length)
                 {
-                  Assert.IsTrue(values[i].name() + " should be deprecated", dep);
+                  Assert.True(values[i].name() + " should be deprecated", dep);
                 }
                 else
                 {
-                  Assert.IsFalse(values[i].name() + " should not be deprecated", dep);
+                  Assert.False(values[i].name() + " should not be deprecated", dep);
                 }*/
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAgainstMainVersionConstant()
         {
             LuceneVersion[] values = Enum.GetValues(typeof(LuceneVersion)).Cast<LuceneVersion>().ToArray();
-            Assert.IsTrue(values.Length >= 2);
+            Assert.True(values.Length >= 2);
             string mainVersionWithoutAlphaBeta = Constants.MainVersionWithoutAlphaBeta();
             LuceneVersion mainVersionParsed = LuceneVersionHelpers.ParseLeniently(mainVersionWithoutAlphaBeta);
-            Assert.AreEqual(mainVersionParsed, values[values.Length - 2], "Constant one before last must be the same as the parsed LUCENE_MAIN_VERSION (without alpha/beta) constant: " + mainVersionWithoutAlphaBeta);
+            Assert.Equal(mainVersionParsed, values[values.Length - 2], "Constant one before last must be the same as the parsed LUCENE_MAIN_VERSION (without alpha/beta) constant: " + mainVersionWithoutAlphaBeta);
         }
     }
 }

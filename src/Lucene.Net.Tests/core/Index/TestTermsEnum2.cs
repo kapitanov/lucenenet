@@ -6,7 +6,7 @@ namespace Lucene.Net.Index
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
     using Lucene.Net.Util.Automaton;
-    using NUnit.Framework;
+    using Xunit;
     using AutomatonQuery = Lucene.Net.Search.AutomatonQuery;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using CheckHits = Lucene.Net.Search.CheckHits;
@@ -52,7 +52,7 @@ namespace Lucene.Net.Index
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             // we generate aweful regexps: good for testing.
             // but for preflex codec, the test can be very slow, so use less iterations.
             NumIterations = Codec.Default.Name.Equals("Lucene3x") ? 10 * RANDOM_MULTIPLIER : AtLeast(50);
@@ -84,12 +84,12 @@ namespace Lucene.Net.Index
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
         /// tests a pre-intersected automaton against the original </summary>
-        [Test]
+        [Fact]
         public virtual void TestFiniteVersusInfinite()
         {
             for (int i = 0; i < NumIterations; i++)
@@ -117,7 +117,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// seeks to every term accepted by some automata </summary>
-        [Test]
+        [Fact]
         public virtual void TestSeeking()
         {
             for (int i = 0; i < NumIterations; i++)
@@ -136,13 +136,13 @@ namespace Lucene.Net.Index
                         if (Random().NextBoolean())
                         {
                             // seek exact
-                            Assert.IsTrue(te.SeekExact(term));
+                            Assert.True(te.SeekExact(term));
                         }
                         else
                         {
                             // seek ceil
-                            Assert.AreEqual(SeekStatus.FOUND, te.SeekCeil(term));
-                            Assert.AreEqual(term, te.Term());
+                            Assert.Equal(SeekStatus.FOUND, te.SeekCeil(term));
+                            Assert.Equal(term, te.Term());
                         }
                     }
                 }
@@ -151,7 +151,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// mixes up seek and next for all terms </summary>
-        [Test]
+        [Fact]
         public virtual void TestSeekingAndNexting()
         {
             for (int i = 0; i < NumIterations; i++)
@@ -163,16 +163,16 @@ namespace Lucene.Net.Index
                     int c = Random().Next(3);
                     if (c == 0)
                     {
-                        Assert.AreEqual(term, te.Next());
+                        Assert.Equal(term, te.Next());
                     }
                     else if (c == 1)
                     {
-                        Assert.AreEqual(SeekStatus.FOUND, te.SeekCeil(term));
-                        Assert.AreEqual(term, te.Term());
+                        Assert.Equal(SeekStatus.FOUND, te.SeekCeil(term));
+                        Assert.Equal(term, te.Term());
                     }
                     else
                     {
-                        Assert.IsTrue(te.SeekExact(term));
+                        Assert.True(te.SeekExact(term));
                     }
                 }
             }
@@ -180,7 +180,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// tests intersect: TODO start at a random term! </summary>
-        [Test]
+        [Fact]
         public virtual void TestIntersect()
         {
             for (int i = 0; i < NumIterations; i++)
@@ -197,7 +197,7 @@ namespace Lucene.Net.Index
                 }
 
                 Automaton actual = BasicAutomata.MakeStringUnion(found);
-                Assert.IsTrue(BasicOperations.SameLanguage(expected, actual));
+                Assert.True(BasicOperations.SameLanguage(expected, actual));
             }
         }
     }

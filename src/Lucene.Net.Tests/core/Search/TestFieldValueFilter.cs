@@ -1,9 +1,9 @@
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
@@ -33,10 +33,9 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
 
     ///
-    [TestFixture]
     public class TestFieldValueFilter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestFieldValueFilterNoValue()
         {
             Directory directory = NewDirectory();
@@ -55,19 +54,19 @@ namespace Lucene.Net.Search
             IndexReader reader = DirectoryReader.Open(directory);
             IndexSearcher searcher = NewSearcher(reader);
             TopDocs search = searcher.Search(new TermQuery(new Term("all", "test")), new FieldValueFilter("some", true), docs);
-            Assert.AreEqual(search.TotalHits, numDocsNoValue);
+            Assert.Equal(search.TotalHits, numDocsNoValue);
 
             ScoreDoc[] scoreDocs = search.ScoreDocs;
             foreach (ScoreDoc scoreDoc in scoreDocs)
             {
-                Assert.IsNull(reader.Document(scoreDoc.Doc).Get("some"));
+                Assert.Null(reader.Document(scoreDoc.Doc).Get("some"));
             }
 
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFieldValueFilter_Mem()
         {
             Directory directory = NewDirectory();
@@ -85,12 +84,12 @@ namespace Lucene.Net.Search
             IndexReader reader = DirectoryReader.Open(directory);
             IndexSearcher searcher = NewSearcher(reader);
             TopDocs search = searcher.Search(new TermQuery(new Term("all", "test")), new FieldValueFilter("some"), docs);
-            Assert.AreEqual(search.TotalHits, numDocsWithValue);
+            Assert.Equal(search.TotalHits, numDocsWithValue);
 
             ScoreDoc[] scoreDocs = search.ScoreDocs;
             foreach (ScoreDoc scoreDoc in scoreDocs)
             {
-                Assert.AreEqual("value", reader.Document(scoreDoc.Doc).Get("some"));
+                Assert.Equal("value", reader.Document(scoreDoc.Doc).Get("some"));
             }
 
             reader.Dispose();

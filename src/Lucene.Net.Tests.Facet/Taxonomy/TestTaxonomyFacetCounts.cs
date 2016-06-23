@@ -54,7 +54,7 @@ namespace Lucene.Net.Facet.Taxonomy
     public class TestTaxonomyFacetCounts : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Store.Directory dir = NewDirectory();
@@ -112,8 +112,8 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = new FastTaxonomyFacetCounts(taxoReader, config, c);
 
             // Retrieve & verify results:
-            Assert.AreEqual("dim=Publish Date path=[] value=5 childCount=3\n  2010 (2)\n  2012 (2)\n  1999 (1)\n", facets.GetTopChildren(10, "Publish Date").ToString());
-            Assert.AreEqual("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Publish Date path=[] value=5 childCount=3\n  2010 (2)\n  2012 (2)\n  1999 (1)\n", facets.GetTopChildren(10, "Publish Date").ToString());
+            Assert.Equal("dim=Author path=[] value=5 childCount=4\n  Lisa (2)\n  Bob (1)\n  Susan (1)\n  Frank (1)\n", facets.GetTopChildren(10, "Author").ToString());
 
             // Now user drills down on Publish Date/2010:
             DrillDownQuery q2 = new DrillDownQuery(config);
@@ -121,9 +121,9 @@ namespace Lucene.Net.Facet.Taxonomy
             c = new FacetsCollector();
             searcher.Search(q2, c);
             facets = new FastTaxonomyFacetCounts(taxoReader, config, c);
-            Assert.AreEqual("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal("dim=Author path=[] value=2 childCount=2\n  Bob (1)\n  Lisa (1)\n", facets.GetTopChildren(10, "Author").ToString());
 
-            Assert.AreEqual(1, facets.GetSpecificValue("Author", "Lisa"));
+            Assert.Equal(1, facets.GetSpecificValue("Author", "Lisa"));
 
             Assert.Null(facets.GetTopChildren(10, "Non exitent dim"));
 
@@ -142,7 +142,7 @@ namespace Lucene.Net.Facet.Taxonomy
         }
 
         // LUCENE-5333
-        [Test]
+        [Fact]
         public virtual void TestSparseFacets()
         {
             Store.Directory dir = NewDirectory();
@@ -194,15 +194,15 @@ namespace Lucene.Net.Facet.Taxonomy
             // Ask for top 10 labels for any dims that have counts:
             IList<FacetResult> results = facets.GetAllDims(10);
 
-            Assert.AreEqual(3, results.Count);
-            Assert.AreEqual("dim=a path=[] value=3 childCount=3\n  foo1 (1)\n  foo2 (1)\n  foo3 (1)\n", results[0].ToString());
-            Assert.AreEqual("dim=b path=[] value=2 childCount=2\n  bar1 (1)\n  bar2 (1)\n", results[1].ToString());
-            Assert.AreEqual("dim=c path=[] value=1 childCount=1\n  baz1 (1)\n", results[2].ToString());
+            Assert.Equal(3, results.Count);
+            Assert.Equal("dim=a path=[] value=3 childCount=3\n  foo1 (1)\n  foo2 (1)\n  foo3 (1)\n", results[0].ToString());
+            Assert.Equal("dim=b path=[] value=2 childCount=2\n  bar1 (1)\n  bar2 (1)\n", results[1].ToString());
+            Assert.Equal("dim=c path=[] value=1 childCount=1\n  baz1 (1)\n", results[2].ToString());
 
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, taxoDir, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWrongIndexFieldName()
         {
             Store.Directory dir = NewDirectory();
@@ -252,7 +252,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 facets.GetSpecificValue("a");
-                Fail("should have hit exc");
+                True(false, "should have hit exc");
             }
             catch (System.ArgumentException)
             {
@@ -262,7 +262,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 facets.GetTopChildren(10, "a");
-                Fail("should have hit exc");
+                True(false, "should have hit exc");
             }
             catch (System.ArgumentException)
             {
@@ -272,7 +272,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, taxoDir, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReallyNoNormsForDrillDown()
         {
             Store.Directory dir = NewDirectory();
@@ -304,12 +304,12 @@ namespace Lucene.Net.Facet.Taxonomy
 
             public override Similarity Get(string name)
             {
-                Assert.AreEqual("field", name);
+                Assert.Equal("field", name);
                 return sim;
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultiValuedHierarchy()
         {
             Store.Directory dir = NewDirectory();
@@ -345,7 +345,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 facets.GetSpecificValue("a");
-                Fail("didn't hit expected exception");
+                True(false, "didn't hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -353,13 +353,13 @@ namespace Lucene.Net.Facet.Taxonomy
             }
 
             FacetResult result = facets.GetTopChildren(10, "a");
-            Assert.AreEqual(1, result.LabelValues.Length);
-            Assert.AreEqual(1, (int)result.LabelValues[0].value);
+            Assert.Equal(1, result.LabelValues.Length);
+            Assert.Equal(1, (int)result.LabelValues[0].value);
 
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLabelWithDelimiter()
         {
             Store.Directory dir = NewDirectory();
@@ -386,15 +386,15 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(new MatchAllDocsQuery(), c);
 
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, c);
-            Assert.AreEqual(1, facets.GetSpecificValue("dim", "test\u001Fone"));
-            Assert.AreEqual(1, facets.GetSpecificValue("dim", "test\u001Etwo"));
+            Assert.Equal(1, facets.GetSpecificValue("dim", "test\u001Fone"));
+            Assert.Equal(1, facets.GetSpecificValue("dim", "test\u001Etwo"));
 
             FacetResult result = facets.GetTopChildren(10, "dim");
-            Assert.AreEqual("dim=dim path=[] value=-1 childCount=2\n  test\u001Fone (1)\n  test\u001Etwo (1)\n", result.ToString());
+            Assert.Equal("dim=dim path=[] value=-1 childCount=2\n  test\u001Fone (1)\n  test\u001Etwo (1)\n", result.ToString());
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRequireDimCount()
         {
             Store.Directory dir = NewDirectory();
@@ -431,26 +431,26 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(new MatchAllDocsQuery(), c);
 
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, c);
-            Assert.AreEqual(1, facets.GetTopChildren(10, "dim").Value);
-            Assert.AreEqual(1, facets.GetTopChildren(10, "dim2").Value);
-            Assert.AreEqual(1, facets.GetTopChildren(10, "dim3").Value);
+            Assert.Equal(1, facets.GetTopChildren(10, "dim").Value);
+            Assert.Equal(1, facets.GetTopChildren(10, "dim2").Value);
+            Assert.Equal(1, facets.GetTopChildren(10, "dim3").Value);
             try
             {
-                Assert.AreEqual(1, facets.GetSpecificValue("dim"));
-                Fail("didn't hit expected exception");
+                Assert.Equal(1, facets.GetSpecificValue("dim"));
+                True(false, "didn't hit expected exception");
             }
             catch (System.ArgumentException)
             {
                 // expected
             }
-            Assert.AreEqual(1, facets.GetSpecificValue("dim2"));
-            Assert.AreEqual(1, facets.GetSpecificValue("dim3"));
+            Assert.Equal(1, facets.GetSpecificValue("dim2"));
+            Assert.Equal(1, facets.GetSpecificValue("dim3"));
             IOUtils.Close(writer, taxoWriter, searcher.IndexReader, taxoReader, dir, taxoDir);
         }
 
         // LUCENE-4583: make sure if we require > 32 KB for one
         // document, we don't hit exc when using Facet42DocValuesFormat
-        [Test]
+        [Fact]
         public virtual void TestManyFacetsInOneDocument()
         {
             AssumeTrue("default Codec doesn't support huge BinaryDocValues", TestUtil.FieldSupportsHugeBinaryDocValues(FacetsConfig.DEFAULT_INDEX_FIELD_NAME));
@@ -490,21 +490,21 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, c);
 
             FacetResult result = facets.GetTopChildren(int.MaxValue, "dim");
-            Assert.AreEqual(numLabels, result.LabelValues.Length);
+            Assert.Equal(numLabels, result.LabelValues.Length);
             var allLabels = new HashSet<string>();
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
                 allLabels.Add(labelValue.label);
-                Assert.AreEqual(1, (int)labelValue.value);
+                Assert.Equal(1, (int)labelValue.value);
             }
-            Assert.AreEqual(numLabels, allLabels.Count);
+            Assert.Equal(numLabels, allLabels.Count);
 
             IOUtils.Close(searcher.IndexReader, taxoWriter, writer, taxoReader, dir, taxoDir);
         }
 
         // Make sure we catch when app didn't declare field as
         // hierarchical but it was:
-        [Test]
+        [Fact]
         public virtual void TestDetectHierarchicalField()
         {
             Store.Directory dir = NewDirectory();
@@ -519,7 +519,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 config.Build(taxoWriter, doc);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -530,7 +530,7 @@ namespace Lucene.Net.Facet.Taxonomy
 
         // Make sure we catch when app didn't declare field as
         // multi-valued but it was:
-        [Test]
+        [Fact]
         public virtual void TestDetectMultiValuedField()
         {
             Store.Directory dir = NewDirectory();
@@ -546,7 +546,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 config.Build(taxoWriter, doc);
-                Fail("did not hit expected exception");
+                True(false, "did not hit expected exception");
             }
             catch (System.ArgumentException)
             {
@@ -555,7 +555,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(writer, taxoWriter, dir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeparateIndexedFields()
         {
             Store.Directory indexDir = NewDirectory();
@@ -582,12 +582,12 @@ namespace Lucene.Net.Facet.Taxonomy
             NewSearcher(r).Search(new MatchAllDocsQuery(), sfc);
             Facets facets1 = GetTaxonomyFacetCounts(taxoReader, config, sfc);
             Facets facets2 = GetTaxonomyFacetCounts(taxoReader, config, sfc, "$b");
-            Assert.AreEqual(r.MaxDoc, (int)facets1.GetTopChildren(10, "a").Value);
-            Assert.AreEqual(r.MaxDoc, (int)facets2.GetTopChildren(10, "b").Value);
+            Assert.Equal(r.MaxDoc, (int)facets1.GetTopChildren(10, "a").Value);
+            Assert.Equal(r.MaxDoc, (int)facets2.GetTopChildren(10, "b").Value);
             IOUtils.Close(taxoWriter, iw, taxoReader, taxoDir, r, indexDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCountRoot()
         {
             // LUCENE-4882: FacetsAccumulator threw NPE if a FacetRequest was defined on CP.EMPTY
@@ -613,13 +613,13 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, sfc);
             foreach (FacetResult result in facets.GetAllDims(10))
             {
-                Assert.AreEqual(r.NumDocs, (int)result.Value);
+                Assert.Equal(r.NumDocs, (int)result.Value);
             }
 
             IOUtils.Close(taxoWriter, iw, taxoReader, taxoDir, r, indexDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGetFacetResultsTwice()
         {
             // LUCENE-4893: counts were multiplied as many times as getFacetResults was called.
@@ -644,12 +644,12 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, sfc);
             IList<FacetResult> res1 = facets.GetAllDims(10);
             IList<FacetResult> res2 = facets.GetAllDims(10);
-            Assert.AreEqual(res1, res2, "calling getFacetResults twice should return the .equals()=true result");
+            Assert.Equal(res1, res2, "calling getFacetResults twice should return the .equals()=true result");
 
             IOUtils.Close(taxoWriter, iw, taxoReader, taxoDir, r, indexDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestChildCount()
         {
             // LUCENE-4885: FacetResult.numValidDescendants was not set properly by FacetsAccumulator
@@ -673,7 +673,7 @@ namespace Lucene.Net.Facet.Taxonomy
             NewSearcher(r).Search(new MatchAllDocsQuery(), sfc);
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, sfc);
 
-            Assert.AreEqual(10, facets.GetTopChildren(2, "a").ChildCount);
+            Assert.Equal(10, facets.GetTopChildren(2, "a").ChildCount);
 
             IOUtils.Close(taxoWriter, iw, taxoReader, taxoDir, r, indexDir);
         }
@@ -701,7 +701,7 @@ namespace Lucene.Net.Facet.Taxonomy
             indexWriter.Commit();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSegmentsWithoutCategoriesOrResults()
         {
             // tests the accumulator when there are segments with no results
@@ -733,16 +733,16 @@ namespace Lucene.Net.Facet.Taxonomy
             indexSearcher.Search(q, sfc);
             Facets facets = GetTaxonomyFacetCounts(taxoReader, config, sfc);
             FacetResult result = facets.GetTopChildren(10, "A");
-            Assert.AreEqual(2, result.LabelValues.Length, "wrong number of children");
+            Assert.Equal(2, result.LabelValues.Length, "wrong number of children");
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(2, (int)labelValue.value, "wrong weight for child " + labelValue.label);
+                Assert.Equal(2, (int)labelValue.value, "wrong weight for child " + labelValue.label);
             }
 
             IOUtils.Close(indexReader, taxoReader, indexDir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             string[] tokens = GetRandomTokens(10);
@@ -841,7 +841,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 // Messy: fixup ties
                 SortTies(actual);
 
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
             }
 
             IOUtils.Close(w, tw, searcher.IndexReader, tr, indexDir, taxoDir);

@@ -3,17 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
 using System.Threading;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
-
-    /*
+        /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
          * this work for additional information regarding copyright ownership.
@@ -48,11 +46,10 @@ namespace Lucene.Net.Index
     using TermQuery = Lucene.Net.Search.TermQuery;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestIndexWriterDelete : LuceneTestCase
     {
         // test the simple case
-        [Test]
+        [Fact]
         public virtual void TestSimpleCase()
         {
             string[] keywords = new string[] { "1", "2" };
@@ -79,7 +76,7 @@ namespace Lucene.Net.Index
 
             Term term = new Term("city", "Amsterdam");
             int hitCount = GetHitCount(dir, term);
-            Assert.AreEqual(1, hitCount);
+            Assert.Equal(1, hitCount);
             if (VERBOSE)
             {
                 Console.WriteLine("\nTEST: now delete by term=" + term);
@@ -92,14 +89,14 @@ namespace Lucene.Net.Index
                 Console.WriteLine("\nTEST: now getHitCount");
             }
             hitCount = GetHitCount(dir, term);
-            Assert.AreEqual(0, hitCount);
+            Assert.Equal(0, hitCount);
 
             modifier.Dispose();
             dir.Dispose();
         }
 
         // test when delete terms only apply to disk segments
-        [Test]
+        [Fact]
         public virtual void TestNonRAMDelete()
         {
             Directory dir = NewDirectory();
@@ -113,13 +110,13 @@ namespace Lucene.Net.Index
             }
             modifier.Commit();
 
-            Assert.AreEqual(0, modifier.NumBufferedDocuments);
-            Assert.IsTrue(0 < modifier.SegmentCount);
+            Assert.Equal(0, modifier.NumBufferedDocuments);
+            Assert.True(0 < modifier.SegmentCount);
 
             modifier.Commit();
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             modifier.DeleteDocuments(new Term("value", Convert.ToString(value)));
@@ -127,13 +124,13 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(0, reader.NumDocs);
+            Assert.Equal(0, reader.NumDocs);
             reader.Dispose();
             modifier.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMaxBufferedDeletes()
         {
             Directory dir = NewDirectory();
@@ -143,13 +140,13 @@ namespace Lucene.Net.Index
             writer.DeleteDocuments(new Term("foobar", "1"));
             writer.DeleteDocuments(new Term("foobar", "1"));
             writer.DeleteDocuments(new Term("foobar", "1"));
-            Assert.AreEqual(3, writer.FlushDeletesCount);
+            Assert.Equal(3, writer.FlushDeletesCount);
             writer.Dispose();
             dir.Dispose();
         }
 
         // test when delete terms only apply to ram segments
-        [Test]
+        [Fact]
         public virtual void TestRAMDeletes()
         {
             for (int t = 0; t < 2; t++)
@@ -176,8 +173,8 @@ namespace Lucene.Net.Index
                 if (0 == t)
                 {
                     modifier.DeleteDocuments(new Term("value", Convert.ToString(value)));
-                    Assert.AreEqual(2, modifier.NumBufferedDeleteTerms);
-                    Assert.AreEqual(1, modifier.BufferedDeleteTermsSize);
+                    Assert.Equal(2, modifier.NumBufferedDeleteTerms);
+                    Assert.Equal(1, modifier.BufferedDeleteTermsSize);
                 }
                 else
                 {
@@ -185,14 +182,14 @@ namespace Lucene.Net.Index
                 }
 
                 AddDoc(modifier, ++id, value);
-                Assert.AreEqual(0, modifier.SegmentCount);
+                Assert.Equal(0, modifier.SegmentCount);
                 modifier.Commit();
 
                 IndexReader reader = DirectoryReader.Open(dir);
-                Assert.AreEqual(1, reader.NumDocs);
+                Assert.Equal(1, reader.NumDocs);
 
                 int hitCount = GetHitCount(dir, new Term("id", Convert.ToString(id)));
-                Assert.AreEqual(1, hitCount);
+                Assert.Equal(1, hitCount);
                 reader.Dispose();
                 modifier.Dispose();
                 dir.Dispose();
@@ -200,7 +197,7 @@ namespace Lucene.Net.Index
         }
 
         // test when delete terms apply to both disk and ram segments
-        [Test]
+        [Fact]
         public virtual void TestBothDeletes()
         {
             Directory dir = NewDirectory();
@@ -230,14 +227,14 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(5, reader.NumDocs);
+            Assert.Equal(5, reader.NumDocs);
             modifier.Dispose();
             reader.Dispose();
             dir.Dispose();
         }
 
         // test that batched delete terms are flushed together
-        [Test]
+        [Fact]
         public virtual void TestBatchDeletes()
         {
             Directory dir = NewDirectory();
@@ -253,7 +250,7 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             id = 0;
@@ -263,7 +260,7 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(5, reader.NumDocs);
+            Assert.Equal(5, reader.NumDocs);
             reader.Dispose();
 
             Term[] terms = new Term[3];
@@ -274,7 +271,7 @@ namespace Lucene.Net.Index
             modifier.DeleteDocuments(terms);
             modifier.Commit();
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(2, reader.NumDocs);
+            Assert.Equal(2, reader.NumDocs);
             reader.Dispose();
 
             modifier.Dispose();
@@ -282,7 +279,7 @@ namespace Lucene.Net.Index
         }
 
         // test deleteAll()
-        [Test]
+        [Fact]
         public virtual void TestDeleteAll()
         {
             Directory dir = NewDirectory();
@@ -298,7 +295,7 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             // Add 1 doc (so we will have something buffered)
@@ -309,7 +306,7 @@ namespace Lucene.Net.Index
 
             // Delete all shouldn't be on disk yet
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             // Add a doc and update a doc (after the deleteAll, before the commit)
@@ -321,14 +318,14 @@ namespace Lucene.Net.Index
 
             // Validate there are no docs left
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(2, reader.NumDocs);
+            Assert.Equal(2, reader.NumDocs);
             reader.Dispose();
 
             modifier.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteAllNoDeadLock()
         {
             Directory dir = NewDirectory();
@@ -362,9 +359,9 @@ namespace Lucene.Net.Index
 
             modifier.Dispose();
             DirectoryReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(reader.MaxDoc, 0);
-            Assert.AreEqual(reader.NumDocs, 0);
-            Assert.AreEqual(reader.NumDeletedDocs, 0);
+            Assert.Equal(reader.MaxDoc, 0);
+            Assert.Equal(reader.NumDocs, 0);
+            Assert.Equal(reader.NumDeletedDocs, 0);
             reader.Dispose();
 
             dir.Dispose();
@@ -428,7 +425,7 @@ namespace Lucene.Net.Index
         }
 
         // test rollback of deleteAll()
-        [Test]
+        [Fact]
         public virtual void TestDeleteAllRollback()
         {
             Directory dir = NewDirectory();
@@ -446,7 +443,7 @@ namespace Lucene.Net.Index
             AddDoc(modifier, ++id, value);
 
             IndexReader reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             // Delete all
@@ -458,14 +455,14 @@ namespace Lucene.Net.Index
 
             // Validate that the docs are still there
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             dir.Dispose();
         }
 
         // test deleteAll() w/ near real-time reader
-        [Test]
+        [Fact]
         public virtual void TestDeleteAllNRT()
         {
             Directory dir = NewDirectory();
@@ -481,7 +478,7 @@ namespace Lucene.Net.Index
             modifier.Commit();
 
             IndexReader reader = modifier.Reader;
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             AddDoc(modifier, ++id, value);
@@ -491,7 +488,7 @@ namespace Lucene.Net.Index
             modifier.DeleteAll();
 
             reader = modifier.Reader;
-            Assert.AreEqual(0, reader.NumDocs);
+            Assert.Equal(0, reader.NumDocs);
             reader.Dispose();
 
             // Roll it back
@@ -500,7 +497,7 @@ namespace Lucene.Net.Index
 
             // Validate that the docs are still there
             reader = DirectoryReader.Open(dir);
-            Assert.AreEqual(7, reader.NumDocs);
+            Assert.Equal(7, reader.NumDocs);
             reader.Dispose();
 
             dir.Dispose();
@@ -541,16 +538,16 @@ namespace Lucene.Net.Index
             return hitCount;
         }
 
-        [Test]
-        public virtual void TestDeletesOnDiskFull(
-            [ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestDeletesOnDiskFull(IConcurrentMergeScheduler scheduler)
         {
             DoTestOperationsOnDiskFull(scheduler, false);
         }
 
-        [Test]
-        public virtual void TestUpdatesOnDiskFull(
-            [ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestUpdatesOnDiskFull(IConcurrentMergeScheduler scheduler)
         {
             DoTestOperationsOnDiskFull(scheduler, true);
         }
@@ -710,7 +707,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine(e.ToString());
                             Console.Write(e.StackTrace);
-                            Assert.Fail(testName + " hit IOException after disk space was freed up");
+                            Assert.True(false, testName + " hit IOException after disk space was freed up");
                         }
                     }
                     // prevent throwing a random exception here!!
@@ -753,7 +750,7 @@ namespace Lucene.Net.Index
                     {
                         Console.WriteLine(e.ToString());
                         Console.Write(e.StackTrace);
-                        Assert.Fail(testName + ":exception when creating IndexReader after disk full during close: " + e);
+                        Assert.True(false, testName + ":exception when creating IndexReader after disk full during close: " + e);
                     }
 
                     IndexSearcher searcher = NewSearcher(newReader);
@@ -766,14 +763,14 @@ namespace Lucene.Net.Index
                     {
                         Console.WriteLine(e.ToString());
                         Console.Write(e.StackTrace);
-                        Assert.Fail(testName + ": exception when searching: " + e);
+                        Assert.True(false, testName + ": exception when searching: " + e);
                     }
                     int result2 = hits.Length;
                     if (success)
                     {
                         if (x == 0 && result2 != END_COUNT)
                         {
-                            Assert.Fail(testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + END_COUNT);
+                            Assert.True(false, testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + END_COUNT);
                         }
                         else if (x == 1 && result2 != START_COUNT && result2 != END_COUNT)
                         {
@@ -783,7 +780,7 @@ namespace Lucene.Net.Index
                             // then re-flushing (with plenty of disk
                             // space) will succeed in flushing the
                             // deletes:
-                            Assert.Fail(testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + START_COUNT + " or " + END_COUNT);
+                            Assert.True(false, testName + ": method did not throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + START_COUNT + " or " + END_COUNT);
                         }
                     }
                     else
@@ -794,7 +791,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine(err.ToString());
                             Console.Write(err.StackTrace);
-                            Assert.Fail(testName + ": method did throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + START_COUNT + " or " + END_COUNT);
+                            Assert.True(false, testName + ": method did throw exception but hits.Length for search on term 'aaa' is " + result2 + " instead of expected " + START_COUNT + " or " + END_COUNT);
                         }
                     }
                     newReader.Dispose();
@@ -814,7 +811,7 @@ namespace Lucene.Net.Index
 
         // this test tests that buffered deletes are cleared when
         // an Exception is hit during flush.
-        [Test]
+        [Fact]
         public virtual void TestErrorAfterApplyDeletes()
         {
             MockDirectoryWrapper.Failure failure = new FailureAnonymousInnerClassHelper(this);
@@ -863,7 +860,7 @@ namespace Lucene.Net.Index
 
             Term term = new Term("city", "Amsterdam");
             int hitCount = GetHitCount(dir, term);
-            Assert.AreEqual(1, hitCount);
+            Assert.Equal(1, hitCount);
 
             // open the writer again (closed above)
 
@@ -914,7 +911,7 @@ namespace Lucene.Net.Index
                 failed = true;
             }
 
-            Assert.IsTrue(failed);
+            Assert.True(failed);
 
             // The commit above failed, so we need to retry it (which will
             // succeed, because the failure is a one-shot)
@@ -924,7 +921,7 @@ namespace Lucene.Net.Index
             hitCount = GetHitCount(dir, term);
 
             // Make sure the delete was successfully flushed:
-            Assert.AreEqual(0, hitCount);
+            Assert.Equal(0, hitCount);
 
             modifier.Dispose();
             dir.Dispose();
@@ -1009,8 +1006,7 @@ namespace Lucene.Net.Index
 
         // this test tests that the files created by the docs writer before
         // a segment is written are cleaned up if there's an i/o error
-
-        [Test]
+        [Fact]
         public virtual void TestErrorInDocsWriterAdd()
         {
             MockDirectoryWrapper.Failure failure = new FailureAnonymousInnerClassHelper2(this);
@@ -1084,7 +1080,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteNullQuery()
         {
             Directory dir = NewDirectory();
@@ -1097,12 +1093,12 @@ namespace Lucene.Net.Index
 
             modifier.DeleteDocuments(new TermQuery(new Term("nada", "nada")));
             modifier.Commit();
-            Assert.AreEqual(5, modifier.NumDocs());
+            Assert.Equal(5, modifier.NumDocs());
             modifier.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteAllSlowly()
         {
             Directory dir = NewDirectory();
@@ -1132,7 +1128,7 @@ namespace Lucene.Net.Index
                     w.DeleteDocuments(new Term("id", "" + ids[upto++]));
                 }
                 IndexReader r = w.Reader;
-                Assert.AreEqual(NUM_DOCS - upto, r.NumDocs);
+                Assert.Equal(NUM_DOCS - upto, r.NumDocs);
                 r.Dispose();
             }
 
@@ -1140,7 +1136,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIndexingThenDeleting()
         {
             // TODO: move this test to its own class and just @SuppressCodecs?
@@ -1186,7 +1182,7 @@ namespace Lucene.Net.Index
                         count++;
                     }
                 }
-                Assert.IsTrue(count > 2500, "flush happened too quickly during " + (doIndexing ? "indexing" : "deleting") + " count=" + count);
+                Assert.True(count > 2500, "flush happened too quickly during " + (doIndexing ? "indexing" : "deleting") + " count=" + count);
             }
             w.Dispose();
             dir.Dispose();
@@ -1210,7 +1206,7 @@ namespace Lucene.Net.Index
         // LUCENE-3340: make sure deletes that we don't apply
         // during flush (ie are just pushed into the stream) are
         // in fact later flushed due to their RAM usage:
-        [Test]
+        [Fact]
         public virtual void TestFlushPushedDeletesByRAM()
         {
             Directory dir = NewDirectory();
@@ -1253,7 +1249,7 @@ namespace Lucene.Net.Index
                 // del term we're unlikely to go over 100K:
                 if (count > 100000)
                 {
-                    Assert.Fail("delete's were not applied");
+                    Assert.True(false, "delete's were not applied");
                 }
             }
             w.Dispose();
@@ -1263,7 +1259,7 @@ namespace Lucene.Net.Index
         // LUCENE-3340: make sure deletes that we don't apply
         // during flush (ie are just pushed into the stream) are
         // in fact later flushed due to their RAM usage:
-        [Test]
+        [Fact]
         public virtual void TestFlushPushedDeletesByCount()
         {
             Directory dir = NewDirectory();
@@ -1298,7 +1294,7 @@ namespace Lucene.Net.Index
                 count++;
                 if (count > flushAtDelCount)
                 {
-                    Assert.Fail("delete's were not applied at count=" + flushAtDelCount);
+                    Assert.True(false, "delete's were not applied at count=" + flushAtDelCount);
                 }
             }
             w.Dispose();
@@ -1307,7 +1303,9 @@ namespace Lucene.Net.Index
 
         // Make sure buffered (pushed) deletes don't use up so
         // much RAM that it forces long tail of tiny segments:
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestApplyDeletesOnFlush()
         {
             Directory dir = NewDirectory();
@@ -1346,7 +1344,7 @@ namespace Lucene.Net.Index
                 id++;
             }
             closing.Set(true);
-            Assert.IsTrue(sawAfterFlush.Get());
+            Assert.True(sawAfterFlush.Get());
             w.Dispose();
             dir.Dispose();
         }
@@ -1370,14 +1368,14 @@ namespace Lucene.Net.Index
 
             protected override void DoAfterFlush()
             {
-                Assert.IsTrue(Closing.Get() || DocsInSegment.Get() >= 7, "only " + DocsInSegment.Get() + " in segment");
+                Assert.True(Closing.Get() || DocsInSegment.Get() >= 7, "only " + DocsInSegment.Get() + " in segment");
                 DocsInSegment.Set(0);
                 SawAfterFlush.Set(true);
             }
         }
 
         // LUCENE-4455
-        [Test]
+        [Fact]
         public virtual void TestDeletesCheckIndexOutput()
         {
             Directory dir = NewDirectory();
@@ -1392,11 +1390,11 @@ namespace Lucene.Net.Index
             doc.Add(NewField("field", "1", StringField.TYPE_NOT_STORED));
             w.AddDocument(doc);
             w.Commit();
-            Assert.AreEqual(1, w.SegmentCount);
+            Assert.Equal(1, w.SegmentCount);
 
             w.DeleteDocuments(new Term("field", "0"));
             w.Commit();
-            Assert.AreEqual(1, w.SegmentCount);
+            Assert.Equal(1, w.SegmentCount);
             w.Dispose();
 
             ByteArrayOutputStream bos = new ByteArrayOutputStream(1024);
@@ -1404,12 +1402,12 @@ namespace Lucene.Net.Index
             CheckIndex checker = new CheckIndex(dir);
             checker.InfoStream = new StreamWriter(bos, Encoding.UTF8);
             CheckIndex.Status indexStatus = checker.DoCheckIndex(null);
-            Assert.IsTrue(indexStatus.Clean);
+            Assert.True(indexStatus.Clean);
             checker.FlushInfoStream();
             string s = bos.ToString();
 
             // Segment should have deletions:
-            Assert.IsTrue(s.Contains("has deletions"), "string was: " + s);
+            Assert.True(s.Contains("has deletions"), "string was: " + s);
             w = new IndexWriter(dir, (IndexWriterConfig)iwc.Clone());
             w.ForceMerge(1);
             w.Dispose();
@@ -1417,14 +1415,14 @@ namespace Lucene.Net.Index
             bos = new ByteArrayOutputStream(1024);
             checker.InfoStream = new StreamWriter(bos, Encoding.UTF8);
             indexStatus = checker.DoCheckIndex(null);
-            Assert.IsTrue(indexStatus.Clean);
+            Assert.True(indexStatus.Clean);
             checker.FlushInfoStream();
             s = bos.ToString();
-            Assert.IsFalse(s.Contains("has deletions"));
+            Assert.False(s.Contains("has deletions"));
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTryDeleteDocument()
         {
             Directory d = NewDirectory();
@@ -1441,14 +1439,14 @@ namespace Lucene.Net.Index
             iwc.SetOpenMode(IndexWriterConfig.OpenMode_e.APPEND);
             w = new IndexWriter(d, iwc);
             IndexReader r = DirectoryReader.Open(w, false);
-            Assert.IsTrue(w.TryDeleteDocument(r, 1));
-            Assert.IsTrue(w.TryDeleteDocument(r.Leaves[0].Reader, 0));
+            Assert.True(w.TryDeleteDocument(r, 1));
+            Assert.True(w.TryDeleteDocument(r.Leaves[0].Reader, 0));
             r.Dispose();
             w.Dispose();
 
             r = DirectoryReader.Open(d);
-            Assert.AreEqual(2, r.NumDeletedDocs);
-            Assert.IsNotNull(MultiFields.GetLiveDocs(r));
+            Assert.Equal(2, r.NumDeletedDocs);
+            Assert.NotNull(MultiFields.GetLiveDocs(r));
             r.Dispose();
             d.Dispose();
         }

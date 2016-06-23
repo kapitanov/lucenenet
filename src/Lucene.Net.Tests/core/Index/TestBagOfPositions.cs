@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using System.Threading;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -46,7 +47,7 @@ namespace Lucene.Net.Index
     public class TestBagOfPositions : LuceneTestCase // at night this makes like 200k/300k docs and will make Direct's heart beat!
     // Lucene3x doesnt have totalTermFreq, so the test isn't interesting there.
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             IList<string> postingsList = new List<string>();
@@ -128,17 +129,17 @@ namespace Lucene.Net.Index
 
             iw.ForceMerge(1);
             DirectoryReader ir = iw.Reader;
-            Assert.AreEqual(1, ir.Leaves.Count);
+            Assert.Equal(1, ir.Leaves.Count);
             AtomicReader air = (AtomicReader)ir.Leaves[0].Reader;
             Terms terms = air.Terms("field");
             // numTerms-1 because there cannot be a term 0 with 0 postings:
-            Assert.AreEqual(numTerms - 1, terms.Size());
+            Assert.Equal(numTerms - 1, terms.Size());
             TermsEnum termsEnum = terms.Iterator(null);
             BytesRef termBR;
             while ((termBR = termsEnum.Next()) != null)
             {
                 int value = Convert.ToInt32(termBR.Utf8ToString());
-                Assert.AreEqual(value, termsEnum.TotalTermFreq());
+                Assert.Equal(value, termsEnum.TotalTermFreq());
                 // don't really need to check more than this, as CheckIndex
                 // will verify that totalTermFreq == total number of positions seen
                 // from a docsAndPositionsEnum.

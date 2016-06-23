@@ -15,14 +15,14 @@
  * limitations under the License.
  */
 
-using Lucene.Net.Attributes;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System;
 
 namespace Lucene.Net.Util
 {
+    using Xunit;
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using DataInput = Lucene.Net.Store.DataInput;
     using DataOutput = Lucene.Net.Store.DataOutput;
@@ -31,13 +31,13 @@ namespace Lucene.Net.Util
     using IOContext = Lucene.Net.Store.IOContext;
     using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
 
-    [TestFixture]
     public class TestPagedBytes : LuceneTestCase
     {
         // Writes random byte/s to "normal" file in dir, then
         // copies into PagedBytes and verifies with
         // PagedBytes.Reader:
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestDataInputOutput()
         {
             Random random = Random();
@@ -93,7 +93,7 @@ namespace Lucene.Net.Util
                         read += chunk;
                     }
                 }
-                Assert.IsTrue(Arrays.Equals(answer, verify));
+                Assert.True(Arrays.Equals(answer, verify));
 
                 BytesRef slice = new BytesRef();
                 for (int iter2 = 0; iter2 < 100; iter2++)
@@ -103,7 +103,7 @@ namespace Lucene.Net.Util
                     reader.FillSlice(slice, pos, len);
                     for (int byteUpto = 0; byteUpto < len; byteUpto++)
                     {
-                        Assert.AreEqual(answer[pos + byteUpto], (byte)slice.Bytes[slice.Offset + byteUpto]);
+                        Assert.Equal(answer[pos + byteUpto], (byte)slice.Bytes[slice.Offset + byteUpto]);
                     }
                 }
                 input.Dispose();
@@ -114,7 +114,8 @@ namespace Lucene.Net.Util
         // Writes random byte/s into PagedBytes via
         // .getDataOutput(), then verifies with
         // PagedBytes.getDataInput():
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestDataInputOutput2()
         {
             Random random = Random();
@@ -162,7 +163,7 @@ namespace Lucene.Net.Util
                         read += chunk;
                     }
                 }
-                Assert.IsTrue(Arrays.Equals(answer, verify));
+                Assert.True(Arrays.Equals(answer, verify));
 
                 BytesRef slice = new BytesRef();
                 for (int iter2 = 0; iter2 < 100; iter2++)
@@ -172,14 +173,14 @@ namespace Lucene.Net.Util
                     reader.FillSlice(slice, pos, len);
                     for (int byteUpto = 0; byteUpto < len; byteUpto++)
                     {
-                        Assert.AreEqual(answer[pos + byteUpto], (byte)slice.Bytes[slice.Offset + byteUpto]);
+                        Assert.Equal(answer[pos + byteUpto], (byte)slice.Bytes[slice.Offset + byteUpto]);
                     }
                 }
             }
         }
 
-        [Test]
-        [LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestOverflow() // memory hole
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("testOverflow"));
@@ -199,12 +200,12 @@ namespace Lucene.Net.Util
             var @out = dir.CreateOutput("foo", IOContext.DEFAULT);
             for (long i = 0; i < numBytes; )
             {
-                Assert.AreEqual(i, @out.FilePointer);
+                Assert.Equal(i, @out.FilePointer);
                 int len = (int)Math.Min(arr.Length, numBytes - i);
                 @out.WriteBytes(arr, len);
                 i += len;
             }
-            Assert.AreEqual(numBytes, @out.FilePointer);
+            Assert.Equal(numBytes, @out.FilePointer);
             @out.Dispose();
             IndexInput @in = dir.OpenInput("foo", IOContext.DEFAULT);
             p.Copy(@in, numBytes);
@@ -214,7 +215,7 @@ namespace Lucene.Net.Util
             {
                 BytesRef b = new BytesRef();
                 reader.FillSlice(b, offset, 1);
-                Assert.AreEqual(arr[(int)(offset % arr.Length)], b.Bytes[b.Offset]);
+                Assert.Equal(arr[(int)(offset % arr.Length)], b.Bytes[b.Offset]);
             }
             @in.Dispose();
             dir.Dispose();

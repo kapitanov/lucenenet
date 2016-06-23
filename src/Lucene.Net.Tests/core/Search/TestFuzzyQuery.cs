@@ -5,7 +5,7 @@ using Lucene.Net.Util;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -37,12 +37,10 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Tests <seealso cref="FuzzyQuery"/>.
-    ///
     /// </summary>
-    [TestFixture]
     public class TestFuzzyQuery : LuceneTestCaseWithReducedFloatPrecision
     {
-        [Test]
+        [Fact]
         public virtual void TestFuzziness()
         {
             Directory directory = NewDirectory();
@@ -61,142 +59,142 @@ namespace Lucene.Net.Search
 
             FuzzyQuery query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 0);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
 
             // same with prefix
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 1);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 2);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 3);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 4);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 5);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 6);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             // test scoring
             query = new FuzzyQuery(new Term("field", "bbbbb"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length, "3 documents should match");
+            Assert.Equal(3, hits.Length); //, "3 documents should match");
             IList<string> order = Arrays.AsList("bbbbb", "abbbb", "aabbb");
             for (int i = 0; i < hits.Length; i++)
             {
                 string term = searcher.Doc(hits[i].Doc).Get("field");
                 //System.out.println(hits[i].Score);
-                Assert.AreEqual(order[i], term);
+                Assert.Equal(order[i], term);
             }
 
             // test pq size by supplying maxExpansions=2
             // this query would normally return 3 documents, because 3 terms match (see above):
             query = new FuzzyQuery(new Term("field", "bbbbb"), FuzzyQuery.DefaultMaxEdits, 0, 2, false);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length, "only 2 documents should match");
+            Assert.Equal(2, hits.Length); //, "only 2 documents should match");
             order = Arrays.AsList("bbbbb", "abbbb");
             for (int i = 0; i < hits.Length; i++)
             {
                 string term = searcher.Doc(hits[i].Doc).Get("field");
                 //System.out.println(hits[i].Score);
-                Assert.AreEqual(order[i], term);
+                Assert.Equal(order[i], term);
             }
 
             // not similar enough:
             query = new FuzzyQuery(new Term("field", "xxxxx"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
             query = new FuzzyQuery(new Term("field", "aaccc"), FuzzyQuery.DefaultMaxEdits, 0); // edit distance to "aaaaa" = 3
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // query identical to a word in the index:
             query = new FuzzyQuery(new Term("field", "aaaaa"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
             // default allows for up to two edits:
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
-            Assert.AreEqual(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
 
             // query similar to a word in the index:
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
-            Assert.AreEqual(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
 
             // now with prefix
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 1);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
-            Assert.AreEqual(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 2);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
-            Assert.AreEqual(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 3);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
-            Assert.AreEqual(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(searcher.Doc(hits[2].Doc).Get("field"), ("aaabb"));
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 4);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
-            Assert.AreEqual(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
+            Assert.Equal(2, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("aaaaa"));
+            Assert.Equal(searcher.Doc(hits[1].Doc).Get("field"), ("aaaab"));
             query = new FuzzyQuery(new Term("field", "aaaac"), FuzzyQuery.DefaultMaxEdits, 5);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
 
             // now with prefix
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 1);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 2);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 3);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 4);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal(searcher.Doc(hits[0].Doc).Get("field"), ("ddddd"));
             query = new FuzzyQuery(new Term("field", "ddddX"), FuzzyQuery.DefaultMaxEdits, 5);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             // different field = no match:
             query = new FuzzyQuery(new Term("anotherfield", "ddddX"), FuzzyQuery.DefaultMaxEdits, 0);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
 
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void Test2()
         {
             Directory directory = NewDirectory();
@@ -227,7 +225,7 @@ namespace Lucene.Net.Search
             FuzzyQuery query = new FuzzyQuery(new Term("field", "WEBER"), 2, 1);
             //query.setRewriteMethod(FuzzyQuery.SCORING_BOOLEAN_QUERY_REWRITE);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(8, hits.Length);
+            Assert.Equal(8, hits.Length);
 
             reader.Dispose();
             directory.Dispose();
@@ -240,7 +238,7 @@ namespace Lucene.Net.Search
         /// FuzzyQuery optimizes itself around this information, if the attribute
         /// is not implemented correctly, there will be problems!
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestTieBreaker()
         {
             Directory directory = NewDirectory();
@@ -266,7 +264,7 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(mr);
             FuzzyQuery fq = new FuzzyQuery(new Term("field", "z123456"), 1, 0, 2, false);
             TopDocs docs = searcher.Search(fq, 2);
-            Assert.AreEqual(5, docs.TotalHits); // 5 docs, from the a and b's
+            Assert.Equal(5, docs.TotalHits); // 5 docs, from the a and b's
             mr.Dispose();
             ir1.Dispose();
             ir2.Dispose();
@@ -278,7 +276,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// Test the TopTermsBoostOnlyBooleanQueryRewrite rewrite method. </summary>
-        [Test]
+        [Fact]
         public virtual void TestBoostOnlyRewrite()
         {
             Directory directory = NewDirectory();
@@ -294,16 +292,16 @@ namespace Lucene.Net.Search
             FuzzyQuery query = new FuzzyQuery(new Term("field", "lucene"));
             query.SetRewriteMethod(new MultiTermQuery.TopTermsBoostOnlyBooleanQueryRewrite(50));
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             // normally, 'Lucenne' would be the first result as IDF will skew the score.
-            Assert.AreEqual("Lucene", reader.Document(hits[0].Doc).Get("field"));
-            Assert.AreEqual("Lucene", reader.Document(hits[1].Doc).Get("field"));
-            Assert.AreEqual("Lucenne", reader.Document(hits[2].Doc).Get("field"));
+            Assert.Equal("Lucene", reader.Document(hits[0].Doc).Get("field"));
+            Assert.Equal("Lucene", reader.Document(hits[1].Doc).Get("field"));
+            Assert.Equal("Lucenne", reader.Document(hits[2].Doc).Get("field"));
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGiga()
         {
             MockAnalyzer analyzer = new MockAnalyzer(Random());
@@ -335,13 +333,13 @@ namespace Lucene.Net.Search
             // 3. search
             IndexSearcher searcher = NewSearcher(r);
             ScoreDoc[] hits = searcher.Search(q, 10).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual("Giga byte", searcher.Doc(hits[0].Doc).Get("field"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal("Giga byte", searcher.Doc(hits[0].Doc).Get("field"));
             r.Dispose();
             index.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDistanceAsEditsSearching()
         {
             Directory index = NewDirectory();
@@ -355,23 +353,15 @@ namespace Lucene.Net.Search
 
             FuzzyQuery q = new FuzzyQuery(new Term("field", "fouba"), 2);
             ScoreDoc[] hits = searcher.Search(q, 10).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual("foobar", searcher.Doc(hits[0].Doc).Get("field"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal("foobar", searcher.Doc(hits[0].Doc).Get("field"));
 
             q = new FuzzyQuery(new Term("field", "foubara"), 2);
             hits = searcher.Search(q, 10).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
-            Assert.AreEqual("foobar", searcher.Doc(hits[0].Doc).Get("field"));
+            Assert.Equal(1, hits.Length);
+            Assert.Equal("foobar", searcher.Doc(hits[0].Doc).Get("field"));
 
-            try
-            {
-                q = new FuzzyQuery(new Term("field", "t"), 3);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            Assert.Throws<System.ArgumentException>(() => q = new FuzzyQuery(new Term("field", "t"), 3));
 
             reader.Dispose();
             index.Dispose();

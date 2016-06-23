@@ -1,9 +1,9 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -34,7 +34,6 @@ namespace Lucene.Net.Search
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestBooleanOr : LuceneTestCase
     {
         private static string FIELD_T = "T";
@@ -55,20 +54,20 @@ namespace Lucene.Net.Search
             return Searcher.Search(q, null, 1000).TotalHits;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestElements()
         {
-            Assert.AreEqual(1, Search(T1));
-            Assert.AreEqual(1, Search(T2));
-            Assert.AreEqual(1, Search(C1));
-            Assert.AreEqual(1, Search(C2));
+            Assert.Equal(1, Search(T1));
+            Assert.Equal(1, Search(T2));
+            Assert.Equal(1, Search(C1));
+            Assert.Equal(1, Search(C2));
         }
 
         /// <summary>
         /// <code>T:files T:deleting C:production C:optimize </code>
         /// it works.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestFlat()
         {
             BooleanQuery q = new BooleanQuery();
@@ -76,14 +75,14 @@ namespace Lucene.Net.Search
             q.Add(new BooleanClause(T2, BooleanClause.Occur.SHOULD));
             q.Add(new BooleanClause(C1, BooleanClause.Occur.SHOULD));
             q.Add(new BooleanClause(C2, BooleanClause.Occur.SHOULD));
-            Assert.AreEqual(1, Search(q));
+            Assert.Equal(1, Search(q));
         }
 
         /// <summary>
         /// <code>(T:files T:deleting) (+C:production +C:optimize)</code>
         /// it works.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestParenthesisMust()
         {
             BooleanQuery q3 = new BooleanQuery();
@@ -95,14 +94,14 @@ namespace Lucene.Net.Search
             BooleanQuery q2 = new BooleanQuery();
             q2.Add(q3, BooleanClause.Occur.SHOULD);
             q2.Add(q4, BooleanClause.Occur.SHOULD);
-            Assert.AreEqual(1, Search(q2));
+            Assert.Equal(1, Search(q2));
         }
 
         /// <summary>
         /// <code>(T:files T:deleting) +(C:production C:optimize)</code>
         /// not working. results NO HIT.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestParenthesisMust2()
         {
             BooleanQuery q3 = new BooleanQuery();
@@ -114,14 +113,14 @@ namespace Lucene.Net.Search
             BooleanQuery q2 = new BooleanQuery();
             q2.Add(q3, BooleanClause.Occur.SHOULD);
             q2.Add(q4, BooleanClause.Occur.MUST);
-            Assert.AreEqual(1, Search(q2));
+            Assert.Equal(1, Search(q2));
         }
 
         /// <summary>
         /// <code>(T:files T:deleting) (C:production C:optimize)</code>
         /// not working. results NO HIT.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestParenthesisShould()
         {
             BooleanQuery q3 = new BooleanQuery();
@@ -133,14 +132,11 @@ namespace Lucene.Net.Search
             BooleanQuery q2 = new BooleanQuery();
             q2.Add(q3, BooleanClause.Occur.SHOULD);
             q2.Add(q4, BooleanClause.Occur.SHOULD);
-            Assert.AreEqual(1, Search(q2));
+            Assert.Equal(1, Search(q2));
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestBooleanOr() : base()
         {
-            base.SetUp();
-
             //
             Dir = NewDirectory();
 
@@ -161,15 +157,14 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanScorerMax()
         {
             Directory dir = NewDirectory();
@@ -195,7 +190,7 @@ namespace Lucene.Net.Search
 
             Weight w = s.CreateNormalizedWeight(bq);
 
-            Assert.AreEqual(1, s.IndexReader.Leaves.Count);
+            Assert.Equal(1, s.IndexReader.Leaves.Count);
             BulkScorer scorer = w.BulkScorer(s.IndexReader.Leaves[0], false, null);
 
             FixedBitSet hits = new FixedBitSet(docCount);
@@ -209,7 +204,7 @@ namespace Lucene.Net.Search
                 scorer.Score(c, end.Get());
             }
 
-            Assert.AreEqual(docCount, hits.Cardinality());
+            Assert.Equal(docCount, hits.Cardinality());
             r.Dispose();
             dir.Dispose();
         }
@@ -239,7 +234,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.IsTrue(doc < End.Get(), "collected doc=" + doc + " beyond max=" + End);
+                Assert.True(doc < End.Get(), "collected doc=" + doc + " beyond max=" + End);
                 Hits.Set(doc);
             }
 

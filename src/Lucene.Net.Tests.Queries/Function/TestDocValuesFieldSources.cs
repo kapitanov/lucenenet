@@ -132,7 +132,7 @@ namespace Lucene.Net.Tests.Queries.Function
             d.Dispose();
         }
         
-        [Test]
+        [Fact]
         public void Test()
         {
             var values = Enum.GetValues(typeof(FieldInfo.DocValuesType_e));

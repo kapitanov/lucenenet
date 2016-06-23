@@ -1,7 +1,5 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -18,7 +16,7 @@ namespace Lucene.Net.Search
          * See the License for the specific language governing permissions and
          * limitations under the License.
          */
-
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
     using IndexReader = Lucene.Net.Index.IndexReader;
@@ -26,7 +24,6 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestScoreCachingWrappingScorer : LuceneTestCase
     {
         private sealed class SimpleScorer : Scorer
@@ -124,7 +121,7 @@ namespace Lucene.Net.Search
 
         private static readonly float[] Scores = new float[] { 0.7767749f, 1.7839992f, 8.9925785f, 7.9608946f, 0.07948637f, 2.6356435f, 7.4950366f, 7.1490803f, 8.108544f, 4.961808f, 2.2423935f, 7.285586f, 4.6699767f };
 
-        [Test]
+        [Fact]
         public virtual void TestGetScores()
         {
             Directory directory = NewDirectory();
@@ -147,7 +144,7 @@ namespace Lucene.Net.Search
 
             for (int i = 0; i < Scores.Length; i++)
             {
-                Assert.AreEqual(Scores[i], scc.Mscores[i], 0f);
+                Assert.Equal(Scores[i], scc.Mscores[i]); //, 0f);
             }
             ir.Dispose();
             directory.Dispose();

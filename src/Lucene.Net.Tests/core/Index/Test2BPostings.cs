@@ -1,7 +1,6 @@
 using Lucene.Net.Analysis.Tokenattributes;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 
 namespace Lucene.Net.Index
@@ -39,12 +38,14 @@ namespace Lucene.Net.Index
     /// Test indexes ~82M docs with 26 terms each, so you get > Integer.MAX_VALUE terms/docs pairs
     /// @lucene.experimental
     /// </summary>
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BPostings : LuceneTestCase
     {
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
-        public virtual void Test([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Trait("Category", "LongRunningTest")]
+        [Theory(Skip = "Long running test cases. Test2BPostings class is skipped.")]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void Test(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BPostings"));
             if (dir is MockDirectoryWrapper)

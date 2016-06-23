@@ -1,6 +1,6 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
     using Term = Lucene.Net.Index.Term;
 
@@ -24,7 +24,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Basic equivalence tests for core queries
     /// </summary>
-    [TestFixture]
     public class TestSimpleSearchEquivalence : SearchEquivalenceTestBase
     {
         // TODO: we could go a little crazy for a lot of these,
@@ -33,7 +32,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// A ⊆ (A B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestTermVersusBooleanOr()
         {
             Term t1 = RandomTerm();
@@ -47,7 +46,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// A ⊆ (+A B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestTermVersusBooleanReqOpt()
         {
             Term t1 = RandomTerm();
@@ -61,7 +60,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// (A -B) ⊆ A </summary>
-        [Test]
+        [Fact]
         public virtual void TestBooleanReqExclVersusTerm()
         {
             Term t1 = RandomTerm();
@@ -75,7 +74,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// (+A +B) ⊆ (A B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestBooleanAndVersusBooleanOr()
         {
             Term t1 = RandomTerm();
@@ -91,7 +90,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// (A B) = (A | B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestDisjunctionSumVersusDisjunctionMax()
         {
             Term t1 = RandomTerm();
@@ -107,7 +106,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A B" ⊆ (+A +B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestExactPhraseVersusBooleanAnd()
         {
             Term t1 = RandomTerm();
@@ -123,7 +122,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as above, with posincs </summary>
-        [Test]
+        [Fact]
         public virtual void TestExactPhraseVersusBooleanAndWithHoles()
         {
             Term t1 = RandomTerm();
@@ -139,7 +138,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A B" ⊆ "A B"~1 </summary>
-        [Test]
+        [Fact]
         public virtual void TestPhraseVersusSloppyPhrase()
         {
             Term t1 = RandomTerm();
@@ -156,7 +155,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as above, with posincs </summary>
-        [Test]
+        [Fact]
         public virtual void TestPhraseVersusSloppyPhraseWithHoles()
         {
             Term t1 = RandomTerm();
@@ -173,7 +172,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A B" ⊆ "A (B C)" </summary>
-        [Test]
+        [Fact]
         public virtual void TestExactPhraseVersusMultiPhrase()
         {
             Term t1 = RandomTerm();
@@ -190,7 +189,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// same as above, with posincs </summary>
-        [Test]
+        [Fact]
         public virtual void TestExactPhraseVersusMultiPhraseWithHoles()
         {
             Term t1 = RandomTerm();
@@ -207,7 +206,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// "A B"~∞ = +A +B if A != B </summary>
-        [Test]
+        [Fact]
         public virtual void TestSloppyPhraseVersusBooleanAnd()
         {
             Term t1 = RandomTerm();

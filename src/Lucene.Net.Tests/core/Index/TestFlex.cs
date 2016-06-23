@@ -1,4 +1,5 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -24,14 +25,13 @@ namespace Lucene.Net.Index
 
     using Lucene.Net.Store;
     using Lucene.Net.Util;
-    using NUnit.Framework;
     using Lucene41PostingsFormat = Lucene.Net.Codecs.Lucene41.Lucene41PostingsFormat;
 
     [TestFixture]
     public class TestFlex : LuceneTestCase
     {
         // Test non-flex API emulated on flex index
-        [Test]
+        [Fact]
         public virtual void TestNonFlex()
         {
             Directory d = NewDirectory();
@@ -62,7 +62,7 @@ namespace Lucene.Net.Index
                 IndexReader r = w.Reader;
 
                 TermsEnum terms = MultiFields.GetTerms(r, "field3").Iterator(null);
-                Assert.AreEqual(TermsEnum.SeekStatus.END, terms.SeekCeil(new BytesRef("abc")));
+                Assert.Equal(TermsEnum.SeekStatus.END, terms.SeekCeil(new BytesRef("abc")));
                 r.Dispose();
             }
 
@@ -70,7 +70,7 @@ namespace Lucene.Net.Index
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermOrd()
         {
             Directory d = NewDirectory();
@@ -81,10 +81,10 @@ namespace Lucene.Net.Index
             w.ForceMerge(1);
             DirectoryReader r = w.Reader;
             TermsEnum terms = GetOnlySegmentReader(r).Fields.Terms("f").Iterator(null);
-            Assert.IsTrue(terms.Next() != null);
+            Assert.True(terms.Next() != null);
             try
             {
-                Assert.AreEqual(0, terms.Ord());
+                Assert.Equal(0, terms.Ord());
             }
             catch (System.NotSupportedException uoe)
             {

@@ -98,10 +98,10 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
 
         private static void AssertEqualsInternal(string msg, StringBuilder expected, CharBlockArray actual)
         {
-            Assert.AreEqual(expected.Length, actual.Length, msg);
+            Assert.Equal(expected.Length, actual.Length, msg);
             for (int i = 0; i < expected.Length; i++)
             {
-                Assert.AreEqual(expected[i], actual.CharAt(i), msg);
+                Assert.Equal(expected[i], actual.CharAt(i), msg);
             }
         }
         */

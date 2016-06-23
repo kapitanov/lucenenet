@@ -1,8 +1,8 @@
 using System;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using ByteArrayDataInput = Lucene.Net.Store.ByteArrayDataInput;
     using ByteArrayDataOutput = Lucene.Net.Store.ByteArrayDataOutput;
@@ -31,7 +31,6 @@ namespace Lucene.Net.Index
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestIndexInput : LuceneTestCase
     {
         internal static readonly byte[] READ_TEST_BYTES = new byte[] { unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), 0x7F, unchecked((byte)(sbyte)0x80), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0x81), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x0F, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x7F, 0x06, (byte)'L', (byte)'u', (byte)'c', (byte)'e', (byte)'n', (byte)'e', 0x02, unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), 0x0A, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)(sbyte)'c', (byte)'e', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)'n', (byte)'e', 0x03, unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), 0x0C, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x04, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), 0x08, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), 0x0E, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x01, 0x00, 0x08, (byte)'L', (byte)'u', 0x00, (byte)'c', (byte)'e', 0x00, (byte)'n', (byte)'e', unchecked((byte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x17, (byte)0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x01 };
@@ -80,67 +79,67 @@ namespace Lucene.Net.Index
 
         private void CheckReads(DataInput @is, Type expectedEx)
         {
-            Assert.AreEqual(128, @is.ReadVInt());
-            Assert.AreEqual(16383, @is.ReadVInt());
-            Assert.AreEqual(16384, @is.ReadVInt());
-            Assert.AreEqual(16385, @is.ReadVInt());
-            Assert.AreEqual(int.MaxValue, @is.ReadVInt());
-            Assert.AreEqual(-1, @is.ReadVInt());
-            Assert.AreEqual((long)int.MaxValue, @is.ReadVLong());
-            Assert.AreEqual(long.MaxValue, @is.ReadVLong());
-            Assert.AreEqual("Lucene", @is.ReadString());
+            Assert.Equal(128, @is.ReadVInt());
+            Assert.Equal(16383, @is.ReadVInt());
+            Assert.Equal(16384, @is.ReadVInt());
+            Assert.Equal(16385, @is.ReadVInt());
+            Assert.Equal(int.MaxValue, @is.ReadVInt());
+            Assert.Equal(-1, @is.ReadVInt());
+            Assert.Equal((long)int.MaxValue, @is.ReadVLong());
+            Assert.Equal(long.MaxValue, @is.ReadVLong());
+            Assert.Equal("Lucene", @is.ReadString());
 
-            Assert.AreEqual("\u00BF", @is.ReadString());
-            Assert.AreEqual("Lu\u00BFce\u00BFne", @is.ReadString());
+            Assert.Equal("\u00BF", @is.ReadString());
+            Assert.Equal("Lu\u00BFce\u00BFne", @is.ReadString());
 
-            Assert.AreEqual("\u2620", @is.ReadString());
-            Assert.AreEqual("Lu\u2620ce\u2620ne", @is.ReadString());
+            Assert.Equal("\u2620", @is.ReadString());
+            Assert.Equal("Lu\u2620ce\u2620ne", @is.ReadString());
 
-            Assert.AreEqual("\uD834\uDD1E", @is.ReadString());
-            Assert.AreEqual("\uD834\uDD1E\uD834\uDD60", @is.ReadString());
-            Assert.AreEqual("Lu\uD834\uDD1Ece\uD834\uDD60ne", @is.ReadString());
+            Assert.Equal("\uD834\uDD1E", @is.ReadString());
+            Assert.Equal("\uD834\uDD1E\uD834\uDD60", @is.ReadString());
+            Assert.Equal("Lu\uD834\uDD1Ece\uD834\uDD60ne", @is.ReadString());
 
-            Assert.AreEqual("\u0000", @is.ReadString());
-            Assert.AreEqual("Lu\u0000ce\u0000ne", @is.ReadString());
+            Assert.Equal("\u0000", @is.ReadString());
+            Assert.Equal("Lu\u0000ce\u0000ne", @is.ReadString());
 
             try
             {
                 @is.ReadVInt();
-                Assert.Fail("Should throw " + expectedEx.Name);
+                Assert.True(false, "Should throw " + expectedEx.Name);
             }
             catch (Exception e)
             {
-                Assert.IsTrue(e.Message.StartsWith("Invalid vInt"));
-                Assert.IsTrue(expectedEx.IsInstanceOfType(e));
+                Assert.True(e.Message.StartsWith("Invalid vInt"));
+                Assert.True(expectedEx.IsInstanceOfType(e));
             }
-            Assert.AreEqual(1, @is.ReadVInt()); // guard value
+            Assert.Equal(1, @is.ReadVInt()); // guard value
 
             try
             {
                 @is.ReadVLong();
-                Assert.Fail("Should throw " + expectedEx.Name);
+                Assert.True(false, "Should throw " + expectedEx.Name);
             }
             catch (Exception e)
             {
-                Assert.IsTrue(e.Message.StartsWith("Invalid vLong"));
-                Assert.IsTrue(expectedEx.IsInstanceOfType(e));
+                Assert.True(e.Message.StartsWith("Invalid vLong"));
+                Assert.True(expectedEx.IsInstanceOfType(e));
             }
-            Assert.AreEqual(1L, @is.ReadVLong()); // guard value
+            Assert.Equal(1L, @is.ReadVLong()); // guard value
         }
 
         private void CheckRandomReads(DataInput @is)
         {
             for (int i = 0; i < COUNT; i++)
             {
-                Assert.AreEqual(INTS[i], @is.ReadVInt());
-                Assert.AreEqual(INTS[i], @is.ReadInt());
-                Assert.AreEqual(LONGS[i], @is.ReadVLong());
-                Assert.AreEqual(LONGS[i], @is.ReadLong());
+                Assert.Equal(INTS[i], @is.ReadVInt());
+                Assert.Equal(INTS[i], @is.ReadInt());
+                Assert.Equal(LONGS[i], @is.ReadVLong());
+                Assert.Equal(LONGS[i], @is.ReadLong());
             }
         }
 
         // this test only checks BufferedIndexInput because MockIndexInput extends BufferedIndexInput
-        [Test]
+        [Fact]
         public virtual void TestBufferedIndexInputRead()
         {
             IndexInput @is = new MockIndexInput(READ_TEST_BYTES);
@@ -152,7 +151,7 @@ namespace Lucene.Net.Index
         }
 
         // this test checks the raw IndexInput methods as it uses RAMIndexInput which extends IndexInput directly
-        [Test]
+        [Fact]
         public virtual void TestRawIndexInputRead()
         {
             Random random = Random();
@@ -173,7 +172,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestByteArrayDataInput()
         {
             ByteArrayDataInput @is = new ByteArrayDataInput((byte[])(Array)READ_TEST_BYTES);

@@ -20,7 +20,7 @@ namespace Lucene.Net.Tests.Queries.Mlt
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory);
 
@@ -38,7 +38,7 @@ namespace Lucene.Net.Tests.Queries.Mlt
         {
             reader.Dispose();
             directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
         
         private static void AddDoc(RandomIndexWriter writer, string text)
@@ -48,7 +48,7 @@ namespace Lucene.Net.Tests.Queries.Mlt
             writer.AddDocument(doc);
         }
         
-        [Test]
+        [Fact]
         public void TestBoostFactor()
         {
             IDictionary<string, float?> originalValues = OriginalValues;
@@ -107,7 +107,7 @@ namespace Lucene.Net.Tests.Queries.Mlt
         }
 
         // LUCENE-3326
-        [Test]
+        [Fact]
         public void TestMultiFields()
         {
             MoreLikeThis mlt = new MoreLikeThis(reader);
@@ -122,7 +122,7 @@ namespace Lucene.Net.Tests.Queries.Mlt
         /// <summary>
         /// just basic equals/hashcode etc
         /// </summary>
-        [Test]
+        [Fact]
         public void TestMoreLikeThisQuery()
         {
             Query query = new MoreLikeThisQuery("this is a test", new[] { "text" }, new MockAnalyzer(Random()), "text");

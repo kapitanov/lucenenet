@@ -1,5 +1,5 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -39,10 +39,9 @@ namespace Lucene.Net.Store
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestNRTCachingDirectory : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNRTAndCommit()
         {
             Directory dir = NewDirectory();
@@ -81,7 +80,7 @@ namespace Lucene.Net.Store
                             r = r2;
                         }
                     }
-                    Assert.AreEqual(1 + docCount, r.NumDocs);
+                    Assert.Equal(1 + docCount, r.NumDocs);
                     IndexSearcher s = NewSearcher(r);
                     // Just make sure search can run; we can't assert
                     // totHits since it could be 0
@@ -103,12 +102,12 @@ namespace Lucene.Net.Store
             {
                 Console.WriteLine("FAIL: cached file " + file + " remains after sync");
             }
-            Assert.AreEqual(0, cachedFiles.Length);
+            Assert.Equal(0, cachedFiles.Length);
 
             r = DirectoryReader.Open(dir);
             foreach (BytesRef id in ids)
             {
-                Assert.AreEqual(1, r.DocFreq(new Term("docid", id)));
+                Assert.Equal(1, r.DocFreq(new Term("docid", id)));
             }
             r.Dispose();
             cachedDir.Dispose();
@@ -127,18 +126,18 @@ namespace Lucene.Net.Store
             IndexWriter writer = new IndexWriter(cachedFSDir, conf);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDeleteFile()
         {
             Directory dir = new NRTCachingDirectory(NewDirectory(), 2.0, 25.0);
             dir.CreateOutput("foo.txt", IOContext.DEFAULT).Dispose();
             dir.DeleteFile("foo.txt");
-            Assert.AreEqual(0, dir.ListAll().Length);
+            Assert.Equal(0, dir.ListAll().Length);
             dir.Dispose();
         }
 
         // LUCENE-3382 -- make sure we get exception if the directory really does not exist.
-        [Test]
+        [Fact]
         public virtual void TestNoDir()
         {
             // LUCENENET TODO mysterious failure - FSDirectory recreates the folder by design, not sure why this passes for Java Lucene
@@ -151,7 +150,7 @@ namespace Lucene.Net.Store
                 {
                     Assert.False(System.IO.Directory.Exists(tempDir));
                     DirectoryReader.Open(dir);
-                    Assert.Fail("did not hit expected exception");
+                    Assert.True(false, "did not hit expected exception");
                 }
                 catch (NoSuchDirectoryException)
                 {
@@ -161,7 +160,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3382 test that we can add a file, and then when we call list() we get it back
-        [Test]
+        [Fact]
         public virtual void TestDirectoryFilter()
         {
             Directory dir = new NRTCachingDirectory(NewFSDirectory(CreateTempDir("foo")), 2.0, 25.0);
@@ -169,8 +168,8 @@ namespace Lucene.Net.Store
             try
             {
                 dir.CreateOutput(name, NewIOContext(Random())).Dispose();
-                Assert.IsTrue(SlowFileExists(dir, name));
-                Assert.IsTrue(Arrays.AsList(dir.ListAll()).Contains(name));
+                Assert.True(SlowFileExists(dir, name));
+                Assert.True(Arrays.AsList(dir.ListAll()).Contains(name));
             }
             finally
             {
@@ -179,7 +178,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3382 test that delegate compound files correctly.
-        [Test]
+        [Fact]
         public virtual void TestCompoundFileAppendTwice()
         {
             Directory newDir = new NRTCachingDirectory(NewDirectory(), 2.0, 25.0);
@@ -188,14 +187,14 @@ namespace Lucene.Net.Store
             IndexOutput @out = csw.CreateOutput("d.xyz", NewIOContext(Random()));
             @out.WriteInt(0);
             @out.Dispose();
-            Assert.AreEqual(1, csw.ListAll().Length);
-            Assert.AreEqual("d.xyz", csw.ListAll()[0]);
+            Assert.Equal(1, csw.ListAll().Length);
+            Assert.Equal("d.xyz", csw.ListAll()[0]);
 
             csw.Dispose();
 
             CompoundFileDirectory cfr = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
-            Assert.AreEqual(1, cfr.ListAll().Length);
-            Assert.AreEqual("d.xyz", cfr.ListAll()[0]);
+            Assert.Equal(1, cfr.ListAll().Length);
+            Assert.Equal("d.xyz", cfr.ListAll()[0]);
             cfr.Dispose();
             newDir.Dispose();
         }

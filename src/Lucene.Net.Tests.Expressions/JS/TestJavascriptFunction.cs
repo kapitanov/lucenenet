@@ -17,7 +17,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AreEqual(expected, actual, DELTA);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAbsMethod()
 		{
 			AssertEvaluatesTo("abs(0)", 0);
@@ -27,7 +27,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("abs(-1)", 1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAcosMethod()
 		{
 			AssertEvaluatesTo("acos(-1)", Math.PI);
@@ -41,7 +41,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("acos(1)", 0);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAcoshMethod()
 		{
 			AssertEvaluatesTo("acosh(1)", 0);
@@ -49,7 +49,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("acosh(1234567.89)", 14.719378760739708);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAsinMethod()
 		{
 			AssertEvaluatesTo("asin(-1)", -Math.PI / 2);
@@ -63,7 +63,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("asin(1)", Math.PI / 2);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAsinhMethod()
 		{
 			AssertEvaluatesTo("asinh(-1234567.89)", -14.719378760740035);
@@ -75,7 +75,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("asinh(1234567.89)", 14.719378760740035);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAtanMethod()
 		{
 			AssertEvaluatesTo("atan(-1.732050808)", -Math.PI / 3);
@@ -87,7 +87,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("atan(1.732050808)", Math.PI / 3);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAtan2Method()
 		{
 			AssertEvaluatesTo("atan2(+0,+0)", +0.0);
@@ -100,7 +100,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("atan2(-2,-2)", -Math.PI * 3 / 4);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestAtanhMethod()
 		{
 			AssertEvaluatesTo("atanh(-1)", double.NegativeInfinity);
@@ -110,7 +110,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("atanh(1)", double.PositiveInfinity);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestCeilMethod()
 		{
 			AssertEvaluatesTo("ceil(0)", 0);
@@ -122,7 +122,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("ceil(-1.1)", -1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestCosMethod()
 		{
 			AssertEvaluatesTo("cos(0)", 1);
@@ -136,7 +136,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("cos(" + -Math.PI / 6 + ")", 0.8660254);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestCoshMethod()
 		{
 			AssertEvaluatesTo("cosh(0)", 1);
@@ -148,7 +148,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("cosh(12.3456789)", 114982.09728671524);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestExpMethod()
 		{
 			AssertEvaluatesTo("exp(0)", 1);
@@ -160,7 +160,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("exp(12.3456789)", 229964.194569);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestFloorMethod()
 		{
 			AssertEvaluatesTo("floor(0)", 0);
@@ -172,14 +172,14 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("floor(-1.1)", -2);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestHaversinMethod()
 		{
 			AssertEvaluatesTo("haversin(40.7143528,-74.0059731,40.759011,-73.9844722)", 5.284299568309
 				);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestLnMethod()
 		{
 			AssertEvaluatesTo("ln(0)", double.NegativeInfinity);
@@ -190,7 +190,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("ln(12.3456789)", 2.51330611521);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestLog10Method()
 		{
 			AssertEvaluatesTo("log10(0)", double.NegativeInfinity);
@@ -200,7 +200,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("log10(12.3456789)", 1.0915149771692705);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestLognMethod()
 		{
 			AssertEvaluatesTo("logn(2, 0)", double.NegativeInfinity);
@@ -215,7 +215,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("logn(2.5, 12.3456789)", 2.7429133874016745);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestMaxMethod()
 		{
 			AssertEvaluatesTo("max(0, 0)", 0);
@@ -225,7 +225,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("max(25, 23)", 25);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestMinMethod()
 		{
 			AssertEvaluatesTo("min(0, 0)", 0);
@@ -235,7 +235,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("min(25, 23)", 23);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestPowMethod()
 		{
 			AssertEvaluatesTo("pow(0, 0)", 1);
@@ -247,7 +247,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("pow(-1.1, 2)", 1.21);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestSinMethod()
 		{
 			AssertEvaluatesTo("sin(0)", 0);
@@ -261,7 +261,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("sin(" + -Math.PI / 6 + ")", -0.5);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestSinhMethod()
 		{
 			AssertEvaluatesTo("sinh(0)", 0);
@@ -273,7 +273,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("sinh(12.3456789)", 114982.09728236674);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestSqrtMethod()
 		{
 			AssertEvaluatesTo("sqrt(0)", 0);
@@ -282,7 +282,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("sqrt(49)", 7);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestTanMethod()
 		{
 			AssertEvaluatesTo("tan(0)", 0);
@@ -294,7 +294,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			AssertEvaluatesTo("tan(1.3)", 3.60210244797);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestTanhMethod()
 		{
 			AssertEvaluatesTo("tanh(0)", 0);

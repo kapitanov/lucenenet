@@ -1,7 +1,7 @@
 namespace Lucene.Net.Search.Spans
 {
     using Lucene.Net.Search;
-    using NUnit.Framework;
+    using Xunit;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using IndexReader = Lucene.Net.Index.IndexReader;
@@ -48,7 +48,7 @@ namespace Lucene.Net.Search.Spans
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
 
             // create test index
             RandomIndexWriter writer = new RandomIndexWriter(Random(), MDirectory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET)).SetOpenMode(OpenMode.APPEND).SetMergePolicy(NewLogMergePolicy()).SetSimilarity(new DefaultSimilarity()));
@@ -68,24 +68,24 @@ namespace Lucene.Net.Search.Spans
         public override void TearDown()
         {
             Reader2.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
         /// Verifies that the index has the correct number of documents.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestVerifyIndex()
         {
             IndexReader reader = DirectoryReader.Open(MDirectory);
-            Assert.AreEqual(8, reader.NumDocs);
+            Assert.Equal(8, reader.NumDocs);
             reader.Dispose();
         }
 
         /// <summary>
         /// Tests a single span query that matches multiple documents.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingleSpanQuery()
         {
             Query spanQuery = new SpanTermQuery(new Term(FIELD_TEXT, "should"));
@@ -97,7 +97,7 @@ namespace Lucene.Net.Search.Spans
         /// <summary>
         /// Tests a single span query that matches multiple documents.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMultipleDifferentSpanQueries()
         {
             Query spanQuery1 = new SpanTermQuery(new Term(FIELD_TEXT, "should"));
@@ -115,7 +115,7 @@ namespace Lucene.Net.Search.Spans
         /// <summary>
         /// Tests two span queries.
         /// </summary>
-        [Test]
+        [Fact]
         public override void TestBooleanQueryWithSpanQueries()
         {
             DoTestBooleanQueryWithSpanQueries(Searcher2, 0.73500174f);

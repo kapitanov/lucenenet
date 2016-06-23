@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
+using Xunit;
 
 namespace Lucene.Net.Search.Similarities
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -46,7 +46,7 @@ namespace Lucene.Net.Search.Similarities
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Sims = new List<Similarity>();
             Sims.Add(new DefaultSimilarity());
             Sims.Add(new BM25Similarity());
@@ -80,7 +80,7 @@ namespace Lucene.Net.Search.Similarities
         /// because of stupid things like querynorm, its possible we computeStats on a field that doesnt exist at all
         ///  test this against a totally empty index, to make sure sims handle it
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyIndex()
         {
             Directory dir = NewDirectory();
@@ -92,7 +92,7 @@ namespace Lucene.Net.Search.Similarities
             foreach (Similarity sim in Sims)
             {
                 @is.Similarity = sim;
-                Assert.AreEqual(0, @is.Search(new TermQuery(new Term("foo", "bar")), 10).TotalHits);
+                Assert.Equal(0, @is.Search(new TermQuery(new Term("foo", "bar")), 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -100,7 +100,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// similar to the above, but ORs the query with a real field </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyField()
         {
             Directory dir = NewDirectory();
@@ -118,7 +118,7 @@ namespace Lucene.Net.Search.Similarities
                 BooleanQuery query = new BooleanQuery(true);
                 query.Add(new TermQuery(new Term("foo", "bar")), BooleanClause.Occur.SHOULD);
                 query.Add(new TermQuery(new Term("bar", "baz")), BooleanClause.Occur.SHOULD);
-                Assert.AreEqual(1, @is.Search(query, 10).TotalHits);
+                Assert.Equal(1, @is.Search(query, 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -126,7 +126,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// similar to the above, however the field exists, but we query with a term that doesnt exist too </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyTerm()
         {
             Directory dir = NewDirectory();
@@ -144,7 +144,7 @@ namespace Lucene.Net.Search.Similarities
                 BooleanQuery query = new BooleanQuery(true);
                 query.Add(new TermQuery(new Term("foo", "bar")), BooleanClause.Occur.SHOULD);
                 query.Add(new TermQuery(new Term("foo", "baz")), BooleanClause.Occur.SHOULD);
-                Assert.AreEqual(1, @is.Search(query, 10).TotalHits);
+                Assert.Equal(1, @is.Search(query, 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -152,7 +152,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// make sure we can retrieve when norms are disabled </summary>
-        [Test]
+        [Fact]
         public virtual void TestNoNorms()
         {
             Directory dir = NewDirectory();
@@ -172,7 +172,7 @@ namespace Lucene.Net.Search.Similarities
                 @is.Similarity = sim;
                 BooleanQuery query = new BooleanQuery(true);
                 query.Add(new TermQuery(new Term("foo", "bar")), BooleanClause.Occur.SHOULD);
-                Assert.AreEqual(1, @is.Search(query, 10).TotalHits);
+                Assert.Equal(1, @is.Search(query, 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -180,7 +180,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// make sure all sims work if TF is omitted </summary>
-        [Test]
+        [Fact]
         public virtual void TestOmitTF()
         {
             Directory dir = NewDirectory();
@@ -201,7 +201,7 @@ namespace Lucene.Net.Search.Similarities
                 @is.Similarity = sim;
                 BooleanQuery query = new BooleanQuery(true);
                 query.Add(new TermQuery(new Term("foo", "bar")), BooleanClause.Occur.SHOULD);
-                Assert.AreEqual(1, @is.Search(query, 10).TotalHits);
+                Assert.Equal(1, @is.Search(query, 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -209,7 +209,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// make sure all sims work if TF and norms is omitted </summary>
-        [Test]
+        [Fact]
         public virtual void TestOmitTFAndNorms()
         {
             Directory dir = NewDirectory();
@@ -231,7 +231,7 @@ namespace Lucene.Net.Search.Similarities
                 @is.Similarity = sim;
                 BooleanQuery query = new BooleanQuery(true);
                 query.Add(new TermQuery(new Term("foo", "bar")), BooleanClause.Occur.SHOULD);
-                Assert.AreEqual(1, @is.Search(query, 10).TotalHits);
+                Assert.Equal(1, @is.Search(query, 10).TotalHits);
             }
             ir.Dispose();
             dir.Dispose();
@@ -239,7 +239,7 @@ namespace Lucene.Net.Search.Similarities
 
         /// <summary>
         /// make sure all sims work with spanOR(termX, termY) where termY does not exist </summary>
-        [Test]
+        [Fact]
         public virtual void TestCrazySpans()
         {
             // The problem: "normal" lucene queries create scorers, returning null if terms dont exist
@@ -263,10 +263,10 @@ namespace Lucene.Net.Search.Similarities
                 SpanTermQuery s2 = new SpanTermQuery(new Term("foo", "baz"));
                 Query query = new SpanOrQuery(s1, s2);
                 TopDocs td = @is.Search(query, 10);
-                Assert.AreEqual(1, td.TotalHits);
+                Assert.Equal(1, td.TotalHits);
                 float score = td.ScoreDocs[0].Score;
-                Assert.IsTrue(score >= 0.0f);
-                Assert.IsFalse(float.IsInfinity(score), "inf score for " + sim);
+                Assert.True(score >= 0.0f);
+                Assert.False(float.IsInfinity(score), "inf score for " + sim);
             }
             ir.Dispose();
             dir.Dispose();

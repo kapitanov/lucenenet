@@ -1,6 +1,6 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -27,17 +27,14 @@ namespace Lucene.Net.Search
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestTopFieldCollector : LuceneTestCase
     {
         private IndexSearcher @is;
         private IndexReader Ir;
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestTopFieldCollector() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
             int numDocs = AtLeast(100);
@@ -51,15 +48,14 @@ namespace Lucene.Net.Search
             @is = NewSearcher(Ir);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Ir.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortWithoutFillFields()
         {
             // There was previously a bug in TopFieldCollector when fillFields was set
@@ -78,12 +74,12 @@ namespace Lucene.Net.Search
                 ScoreDoc[] sd = tdc.TopDocs().ScoreDocs;
                 for (int j = 1; j < sd.Length; j++)
                 {
-                    Assert.IsTrue(sd[j].Doc != sd[j - 1].Doc);
+                    Assert.True(sd[j].Doc != sd[j - 1].Doc);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortWithoutScoreTracking()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -99,13 +95,13 @@ namespace Lucene.Net.Search
                 ScoreDoc[] sd = td.ScoreDocs;
                 for (int j = 0; j < sd.Length; j++)
                 {
-                    Assert.IsTrue(float.IsNaN(sd[j].Score));
+                    Assert.True(float.IsNaN(sd[j].Score));
                 }
-                Assert.IsTrue(float.IsNaN(td.MaxScore));
+                Assert.True(float.IsNaN(td.MaxScore));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortWithScoreNoMaxScoreTracking()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -121,14 +117,14 @@ namespace Lucene.Net.Search
                 ScoreDoc[] sd = td.ScoreDocs;
                 for (int j = 0; j < sd.Length; j++)
                 {
-                    Assert.IsTrue(!float.IsNaN(sd[j].Score));
+                    Assert.True(!float.IsNaN(sd[j].Score));
                 }
-                Assert.IsTrue(float.IsNaN(td.MaxScore));
+                Assert.True(float.IsNaN(td.MaxScore));
             }
         }
 
         // MultiComparatorScoringNoMaxScoreCollector
-        [Test]
+        [Fact]
         public virtual void TestSortWithScoreNoMaxScoreTrackingMulti()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -144,13 +140,13 @@ namespace Lucene.Net.Search
                 ScoreDoc[] sd = td.ScoreDocs;
                 for (int j = 0; j < sd.Length; j++)
                 {
-                    Assert.IsTrue(!float.IsNaN(sd[j].Score));
+                    Assert.True(!float.IsNaN(sd[j].Score));
                 }
-                Assert.IsTrue(float.IsNaN(td.MaxScore));
+                Assert.True(float.IsNaN(td.MaxScore));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortWithScoreAndMaxScoreTracking()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -166,13 +162,13 @@ namespace Lucene.Net.Search
                 ScoreDoc[] sd = td.ScoreDocs;
                 for (int j = 0; j < sd.Length; j++)
                 {
-                    Assert.IsTrue(!float.IsNaN(sd[j].Score));
+                    Assert.True(!float.IsNaN(sd[j].Score));
                 }
-                Assert.IsTrue(!float.IsNaN(td.MaxScore));
+                Assert.True(!float.IsNaN(td.MaxScore));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOutOfOrderDocsScoringSort()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -193,19 +189,19 @@ namespace Lucene.Net.Search
                 {
                     TopDocsCollector<Entry> tdc = TopFieldCollector.Create(sort[i], 10, tfcOptions[j][0], tfcOptions[j][1], tfcOptions[j][2], false);
 
-                    Assert.IsTrue(tdc.GetType().Name.EndsWith(actualTFCClasses[j]));
+                    Assert.True(tdc.GetType().Name.EndsWith(actualTFCClasses[j]));
 
                     @is.Search(bq, tdc);
 
                     TopDocs td = tdc.TopDocs();
                     ScoreDoc[] sd = td.ScoreDocs;
-                    Assert.AreEqual(10, sd.Length);
+                    Assert.Equal(10, sd.Length);
                 }
             }
         }
 
         // OutOfOrderMulti*Collector
-        [Test]
+        [Fact]
         public virtual void TestOutOfOrderDocsScoringSortMulti()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -226,18 +222,18 @@ namespace Lucene.Net.Search
                 {
                     TopDocsCollector<Entry> tdc = TopFieldCollector.Create(sort[i], 10, tfcOptions[j][0], tfcOptions[j][1], tfcOptions[j][2], false);
 
-                    Assert.IsTrue(tdc.GetType().Name.EndsWith(actualTFCClasses[j]));
+                    Assert.True(tdc.GetType().Name.EndsWith(actualTFCClasses[j]));
 
                     @is.Search(bq, tdc);
 
                     TopDocs td = tdc.TopDocs();
                     ScoreDoc[] sd = td.ScoreDocs;
-                    Assert.AreEqual(10, sd.Length);
+                    Assert.Equal(10, sd.Length);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSortWithScoreAndMaxScoreTrackingNoResults()
         {
             // Two Sort criteria to instantiate the multi/single comparators.
@@ -246,8 +242,8 @@ namespace Lucene.Net.Search
             {
                 TopDocsCollector<Entry> tdc = TopFieldCollector.Create(sort[i], 10, true, true, true, true);
                 TopDocs td = tdc.TopDocs();
-                Assert.AreEqual(0, td.TotalHits);
-                Assert.IsTrue(float.IsNaN(td.MaxScore));
+                Assert.Equal(0, td.TotalHits);
+                Assert.True(float.IsNaN(td.MaxScore));
             }
         }
     }

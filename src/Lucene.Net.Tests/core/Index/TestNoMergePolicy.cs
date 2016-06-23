@@ -1,9 +1,8 @@
 using System.Reflection;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -23,38 +22,37 @@ namespace Lucene.Net.Index
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestNoMergePolicy : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNoMergePolicy_Mem()
         {
             MergePolicy mp = NoMergePolicy.NO_COMPOUND_FILES;
-            Assert.IsNull(mp.FindMerges(null, (SegmentInfos)null));
-            Assert.IsNull(mp.FindForcedMerges(null, 0, null));
-            Assert.IsNull(mp.FindForcedDeletesMerges(null));
-            Assert.IsFalse(mp.UseCompoundFile(null, null));
+            Assert.Null(mp.FindMerges(null, (SegmentInfos)null));
+            Assert.Null(mp.FindForcedMerges(null, 0, null));
+            Assert.Null(mp.FindForcedDeletesMerges(null));
+            Assert.False(mp.UseCompoundFile(null, null));
             mp.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCompoundFiles()
         {
-            Assert.IsFalse(NoMergePolicy.NO_COMPOUND_FILES.UseCompoundFile(null, null));
-            Assert.IsTrue(NoMergePolicy.COMPOUND_FILES.UseCompoundFile(null, null));
+            Assert.False(NoMergePolicy.NO_COMPOUND_FILES.UseCompoundFile(null, null));
+            Assert.True(NoMergePolicy.COMPOUND_FILES.UseCompoundFile(null, null));
         }
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestFinalSingleton()
 	    {
-		    Assert.IsTrue(Modifier.isFinal(typeof(NoMergePolicy).Modifiers));
+		    Assert.True(Modifier.isFinal(typeof(NoMergePolicy).Modifiers));
 		    Constructor<?>[] ctors = typeof(NoMergePolicy).DeclaredConstructors;
-		    Assert.AreEqual("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
-		    Assert.IsTrue("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
+		    Assert.Equal("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
+		    Assert.True("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
 	    }*/
 
-        [Test]
+        [Fact]
         public virtual void TestMethodsOverridden()
         {
             // Ensures that all methods of MergePolicy are overridden. That's important
@@ -73,7 +71,7 @@ namespace Lucene.Net.Index
                 }
                 if (m.DeclaringType != typeof(object) && !m.IsFinal)
                 {
-                    Assert.IsTrue(m.DeclaringType == typeof(NoMergePolicy), m + " is not overridden ! Declaring Type: " + m.DeclaringType);
+                    Assert.True(m.DeclaringType == typeof(NoMergePolicy), m + " is not overridden ! Declaring Type: " + m.DeclaringType);
                 }
             }
         }

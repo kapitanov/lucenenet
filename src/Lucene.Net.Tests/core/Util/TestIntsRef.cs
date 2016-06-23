@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -19,31 +19,30 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestIntsRef : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEmpty()
         {
             IntsRef i = new IntsRef();
-            Assert.AreEqual(IntsRef.EMPTY_INTS, i.Ints);
-            Assert.AreEqual(0, i.Offset);
-            Assert.AreEqual(0, i.Length);
+            Assert.Equal(IntsRef.EMPTY_INTS, i.Ints);
+            Assert.Equal(0, i.Offset);
+            Assert.Equal(0, i.Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFromInts()
         {
             int[] ints = new int[] { 1, 2, 3, 4 };
             IntsRef i = new IntsRef(ints, 0, 4);
-            Assert.AreEqual(ints, i.Ints);
-            Assert.AreEqual(0, i.Offset);
-            Assert.AreEqual(4, i.Length);
+            Assert.Equal(ints, i.Ints);
+            Assert.Equal(0, i.Offset);
+            Assert.Equal(4, i.Length);
 
             IntsRef i2 = new IntsRef(ints, 1, 3);
-            Assert.AreEqual(new IntsRef(new int[] { 2, 3, 4 }, 0, 3), i2);
+            Assert.Equal(new IntsRef(new int[] { 2, 3, 4 }, 0, 3), i2);
 
-            Assert.IsFalse(i.Equals(i2));
+            Assert.False(i.Equals(i2));
         }
     }
 }

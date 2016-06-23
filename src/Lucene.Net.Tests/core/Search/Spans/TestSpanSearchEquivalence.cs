@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Search.Spans
 {
@@ -35,7 +35,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanTermQuery(A) = TermQuery(A) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanTermVersusTerm()
         {
             Term t1 = RandomTerm();
@@ -44,7 +44,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanOrQuery(A, B) = (A B) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanOrVersusBoolean()
         {
             Term t1 = RandomTerm();
@@ -58,7 +58,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanNotQuery(A, B) ⊆ SpanTermQuery(A) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNotVersusSpanTerm()
         {
             Term t1 = RandomTerm();
@@ -68,7 +68,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanFirstQuery(A, 10) ⊆ SpanTermQuery(A) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanFirstVersusSpanTerm()
         {
             Term t1 = RandomTerm();
@@ -77,7 +77,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanNearQuery([A, B], 0, true) = "A B" </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearVersusPhrase()
         {
             Term t1 = RandomTerm();
@@ -92,7 +92,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanNearQuery([A, B], ∞, false) = +A +B </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearVersusBooleanAnd()
         {
             Term t1 = RandomTerm();
@@ -107,7 +107,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanNearQuery([A B], 0, false) ⊆ SpanNearQuery([A B], 1, false) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearVersusSloppySpanNear()
         {
             Term t1 = RandomTerm();
@@ -120,7 +120,7 @@ namespace Lucene.Net.Search.Spans
 
         /// <summary>
         /// SpanNearQuery([A B], 3, true) ⊆ SpanNearQuery([A B], 3, false) </summary>
-        [Test]
+        [Fact]
         public virtual void TestSpanNearInOrderVersusOutOfOrder()
         {
             Term t1 = RandomTerm();

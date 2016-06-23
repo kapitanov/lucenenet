@@ -1,10 +1,10 @@
 using System;
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -182,7 +182,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPad()
         {
             int[] tests = new int[] { -9999999, -99560, -100, -3, -1, 0, 3, 9, 10, 1000, 999999999 };
@@ -193,8 +193,8 @@ namespace Lucene.Net.Search
                 string aa = Pad(a);
                 string bb = Pad(b);
                 string label = a + ":" + aa + " vs " + b + ":" + bb;
-                Assert.AreEqual(aa.Length, bb.Length, "i=" + i + ": length of " + label);
-                Assert.IsTrue(System.String.Compare(aa, bb, System.StringComparison.Ordinal) < 0, "i=" + i + ": compare less than " + label);
+                Assert.Equal(aa.Length, bb.Length, "i=" + i + ": length of " + label);
+                Assert.True(System.String.Compare(aa, bb, System.StringComparison.Ordinal) < 0, "i=" + i + ": compare less than " + label);
             }
         }
     }

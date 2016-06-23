@@ -1,8 +1,7 @@
-using System.Collections.Generic;
-using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -49,7 +48,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSuppressedExceptions()
         {
             // test with prior exception
@@ -60,12 +59,12 @@ namespace Lucene.Net.Util
             }
             catch (TestException e1)
             {
-                Assert.IsTrue(e1.Data.Contains("SuppressedExceptions"));
-                Assert.IsTrue(((List<Exception>) e1.Data["SuppressedExceptions"]).Count == 2);
+                Assert.True(e1.Data.Contains("SuppressedExceptions"));
+                Assert.True(((List<Exception>) e1.Data["SuppressedExceptions"]).Count == 2);
             }
             catch (Exception e2)
             {
-                Assert.Fail("Exception should not be thrown here");
+                Assert.True(false, "Exception should not be thrown here");
             }
 
             // test without prior exception
@@ -75,12 +74,12 @@ namespace Lucene.Net.Util
             }
             catch (IOException e1)
             {
-                Assert.IsTrue(e1.Data.Contains("SuppressedExceptions"));
-                Assert.IsTrue(((List<Exception>)e1.Data["SuppressedExceptions"]).Count == 1);
+                Assert.True(e1.Data.Contains("SuppressedExceptions"));
+                Assert.True(((List<Exception>)e1.Data["SuppressedExceptions"]).Count == 1);
             }
             catch (Exception e2)
             {
-                Assert.Fail("Exception should not be thrown here");
+                Assert.True(false, "Exception should not be thrown here");
             }
         }
     }

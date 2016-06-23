@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 
@@ -41,7 +41,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Tests the DocTermOrdsRangeFilter
     /// </summary>
-    [TestFixture]
     public class TestDocTermOrdsRangeFilter : LuceneTestCase
     {
         protected internal IndexSearcher Searcher1;
@@ -50,10 +49,8 @@ namespace Lucene.Net.Search
         private Directory Dir;
         protected internal string FieldName;
 
-        [SetUp]
-        public override void SetUp()
+        public TestDocTermOrdsRangeFilter() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             FieldName = Random().NextBoolean() ? "field" : ""; // sometimes use an empty string as field name
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
@@ -101,17 +98,16 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
         /// test a bunch of random ranges </summary>
-        [Test]
+        [Fact]
         public virtual void TestRanges()
         {
             int num = AtLeast(1000);

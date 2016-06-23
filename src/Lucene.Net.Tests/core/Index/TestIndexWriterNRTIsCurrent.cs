@@ -1,12 +1,12 @@
 using System;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -43,7 +43,7 @@ namespace Lucene.Net.Index
             internal volatile bool Stop = false;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIsCurrentWithThreads()
         {
             Directory dir = NewDirectory();
@@ -77,7 +77,7 @@ namespace Lucene.Net.Index
                     failed = true;
                 }
             }
-            Assert.IsFalse(failed);
+            Assert.False(failed);
             writer.Dispose();
             dir.Dispose();
         }
@@ -219,7 +219,7 @@ namespace Lucene.Net.Index
                                 Console.WriteLine("Thread: " + Thread.CurrentThread + " Reader: " + reader + " isCurrent:" + current);
                             }
 
-                            Assert.IsFalse(current);
+                            Assert.False(current);
                         }
                         catch (Exception e)
                         {

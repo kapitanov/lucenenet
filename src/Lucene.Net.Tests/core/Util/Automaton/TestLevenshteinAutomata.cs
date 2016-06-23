@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -22,24 +22,23 @@ namespace Lucene.Net.Util.Automaton
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestLevenshteinAutomata : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestLev0()
         {
             AssertLev("", 0);
             AssertCharVectors(0);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLev1()
         {
             AssertLev("", 1);
             AssertCharVectors(1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLev2()
         {
             AssertLev("", 2);
@@ -47,7 +46,7 @@ namespace Lucene.Net.Util.Automaton
         }
 
         // LUCENE-3094
-        [Test]
+        [Fact]
         public virtual void TestNoWastedStates()
         {
             AutomatonTestUtil.AssertNoDetachedStates((new LevenshteinAutomata("abc", false)).ToAutomaton(1));
@@ -84,38 +83,38 @@ namespace Lucene.Net.Util.Automaton
             {
                 automata[n] = builder.ToAutomaton(n);
                 tautomata[n] = tbuilder.ToAutomaton(n);
-                Assert.IsNotNull(automata[n]);
-                Assert.IsNotNull(tautomata[n]);
-                Assert.IsTrue(automata[n].Deterministic);
-                Assert.IsTrue(tautomata[n].Deterministic);
-                Assert.IsTrue(SpecialOperations.IsFinite(automata[n]));
-                Assert.IsTrue(SpecialOperations.IsFinite(tautomata[n]));
+                Assert.NotNull(automata[n]);
+                Assert.NotNull(tautomata[n]);
+                Assert.True(automata[n].Deterministic);
+                Assert.True(tautomata[n].Deterministic);
+                Assert.True(SpecialOperations.IsFinite(automata[n]));
+                Assert.True(SpecialOperations.IsFinite(tautomata[n]));
                 AutomatonTestUtil.AssertNoDetachedStates(automata[n]);
                 AutomatonTestUtil.AssertNoDetachedStates(tautomata[n]);
                 // check that the dfa for n-1 accepts a subset of the dfa for n
                 if (n > 0)
                 {
-                    Assert.IsTrue(automata[n - 1].SubsetOf(automata[n]));
-                    Assert.IsTrue(automata[n - 1].SubsetOf(tautomata[n]));
-                    Assert.IsTrue(tautomata[n - 1].SubsetOf(automata[n]));
-                    Assert.IsTrue(tautomata[n - 1].SubsetOf(tautomata[n]));
-                    Assert.AreNotSame(automata[n - 1], automata[n]);
+                    Assert.True(automata[n - 1].SubsetOf(automata[n]));
+                    Assert.True(automata[n - 1].SubsetOf(tautomata[n]));
+                    Assert.True(tautomata[n - 1].SubsetOf(automata[n]));
+                    Assert.True(tautomata[n - 1].SubsetOf(tautomata[n]));
+                    Assert.NotSame(automata[n - 1], automata[n]);
                 }
                 // check that Lev(N) is a subset of LevT(N)
-                Assert.IsTrue(automata[n].SubsetOf(tautomata[n]));
+                Assert.True(automata[n].SubsetOf(tautomata[n]));
                 // special checks for specific n
                 switch (n)
                 {
                     case 0:
                         // easy, matches the string itself
-                        Assert.IsTrue(BasicOperations.SameLanguage(BasicAutomata.MakeString(s), automata[0]));
-                        Assert.IsTrue(BasicOperations.SameLanguage(BasicAutomata.MakeString(s), tautomata[0]));
+                        Assert.True(BasicOperations.SameLanguage(BasicAutomata.MakeString(s), automata[0]));
+                        Assert.True(BasicOperations.SameLanguage(BasicAutomata.MakeString(s), tautomata[0]));
                         break;
 
                     case 1:
                         // generate a lev1 naively, and check the accepted lang is the same.
-                        Assert.IsTrue(BasicOperations.SameLanguage(NaiveLev1(s), automata[1]));
-                        Assert.IsTrue(BasicOperations.SameLanguage(NaiveLev1T(s), tautomata[1]));
+                        Assert.True(BasicOperations.SameLanguage(NaiveLev1(s), automata[1]));
+                        Assert.True(BasicOperations.SameLanguage(NaiveLev1T(s), tautomata[1]));
                         break;
 
                     default:
@@ -258,11 +257,11 @@ namespace Lucene.Net.Util.Automaton
                 bool accepts = ra.Run(encoded);
                 if (accepts)
                 {
-                    Assert.IsTrue(GetDistance(input, encoded) <= distance);
+                    Assert.True(GetDistance(input, encoded) <= distance);
                 }
                 else
                 {
-                    Assert.IsTrue(GetDistance(input, encoded) > distance);
+                    Assert.True(GetDistance(input, encoded) > distance);
                 }
             }
         }
@@ -278,11 +277,11 @@ namespace Lucene.Net.Util.Automaton
                 bool accepts = ra.Run(encoded);
                 if (accepts)
                 {
-                    Assert.IsTrue(GetTDistance(input, encoded) <= distance);
+                    Assert.True(GetTDistance(input, encoded) <= distance);
                 }
                 else
                 {
-                    Assert.IsTrue(GetTDistance(input, encoded) > distance);
+                    Assert.True(GetTDistance(input, encoded) > distance);
                 }
             }
         }

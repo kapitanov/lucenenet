@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
+using Lucene.Net.Store;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    using Lucene.Net.Store;
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Document = Documents.Document;
@@ -33,12 +33,11 @@ namespace Lucene.Net.Search
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestElevationComparator : LuceneTestCase
     {
         private readonly IDictionary<BytesRef, int?> Priority = new Dictionary<BytesRef, int?>();
 
-        [Test]
+        [Fact]
         public virtual void TestSorting()
         {
             Directory directory = NewDirectory();
@@ -80,21 +79,21 @@ namespace Lucene.Net.Search
             TopDocs topDocs = topCollector.TopDocs(0, 10);
             int nDocsReturned = topDocs.ScoreDocs.Length;
 
-            Assert.AreEqual(4, nDocsReturned);
+            Assert.Equal(4, nDocsReturned);
 
             // 0 & 3 were elevated
-            Assert.AreEqual(0, topDocs.ScoreDocs[0].Doc);
-            Assert.AreEqual(3, topDocs.ScoreDocs[1].Doc);
+            Assert.Equal(0, topDocs.ScoreDocs[0].Doc);
+            Assert.Equal(3, topDocs.ScoreDocs[1].Doc);
 
             if (reversed)
             {
-                Assert.AreEqual(2, topDocs.ScoreDocs[2].Doc);
-                Assert.AreEqual(1, topDocs.ScoreDocs[3].Doc);
+                Assert.Equal(2, topDocs.ScoreDocs[2].Doc);
+                Assert.Equal(1, topDocs.ScoreDocs[3].Doc);
             }
             else
             {
-                Assert.AreEqual(1, topDocs.ScoreDocs[2].Doc);
-                Assert.AreEqual(2, topDocs.ScoreDocs[3].Doc);
+                Assert.Equal(1, topDocs.ScoreDocs[2].Doc);
+                Assert.Equal(2, topDocs.ScoreDocs[3].Doc);
             }
 
             /*

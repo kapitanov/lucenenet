@@ -1,13 +1,13 @@
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using System.Collections.Generic;
-using System.Diagnostics;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Support;
-    using NUnit.Framework;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BooleanWeight = Lucene.Net.Search.BooleanQuery.BooleanWeight;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -154,45 +154,45 @@ namespace Lucene.Net.Search
         {
             if (actual == null)
             {
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, expected.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, expected.NextDoc());
                 return;
             }
             int doc;
             while ((doc = expected.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.AreEqual(doc, actual.NextDoc());
-                Assert.AreEqual(expected.Freq(), actual.Freq());
+                Assert.Equal(doc, actual.NextDoc());
+                Assert.Equal(expected.Freq(), actual.Freq());
                 float expectedScore = expected.Score();
                 float actualScore = actual.Score();
-                Assert.AreEqual(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
+                Assert.Equal(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
             }
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, actual.NextDoc());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, actual.NextDoc());
         }
 
         private void AssertAdvance(Scorer expected, Scorer actual, int amount)
         {
             if (actual == null)
             {
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, expected.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, expected.NextDoc());
                 return;
             }
             int prevDoc = 0;
             int doc;
             while ((doc = expected.Advance(prevDoc + amount)) != DocIdSetIterator.NO_MORE_DOCS)
             {
-                Assert.AreEqual(doc, actual.Advance(prevDoc + amount));
-                Assert.AreEqual(expected.Freq(), actual.Freq());
+                Assert.Equal(doc, actual.Advance(prevDoc + amount));
+                Assert.Equal(expected.Freq(), actual.Freq());
                 float expectedScore = expected.Score();
                 float actualScore = actual.Score();
-                Assert.AreEqual(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
+                Assert.Equal(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
                 prevDoc = doc;
             }
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, actual.Advance(prevDoc + amount));
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, actual.Advance(prevDoc + amount));
         }
 
         /// <summary>
         /// simple test for next(): minShouldMatch=2 on 3 terms (one common, one medium, one rare) </summary>
-        [Test]
+        [Fact]
         public virtual void TestNextCMR2()
         {
             for (int common = 0; common < CommonTerms.Length; common++)
@@ -211,7 +211,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// simple test for advance(): minShouldMatch=2 on 3 terms (one common, one medium, one rare) </summary>
-        [Test]
+        [Fact]
         public virtual void TestAdvanceCMR2()
         {
             for (int amount = 25; amount < 200; amount += 25)
@@ -233,7 +233,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test next with giant bq of all terms with varying minShouldMatch </summary>
-        [Test]
+        [Fact]
         public virtual void TestNextAllTerms()
         {
             IList<string> termsList = new List<string>();
@@ -252,7 +252,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test advance with giant bq of all terms with varying minShouldMatch </summary>
-        [Test]
+        [Fact]
         public virtual void TestAdvanceAllTerms()
         {
             IList<string> termsList = new List<string>();
@@ -274,7 +274,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test next with varying numbers of terms with varying minShouldMatch </summary>
-        [Test]
+        [Fact]
         public virtual void TestNextVaryingNumberOfTerms()
         {
             IList<string> termsList = new List<string>();
@@ -297,7 +297,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test advance with varying numbers of terms with varying minShouldMatch </summary>
-        [Test]
+        [Fact]
         public virtual void TestAdvanceVaryingNumberOfTerms()
         {
             IList<string> termsList = new List<string>();

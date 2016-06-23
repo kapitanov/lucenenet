@@ -1,8 +1,7 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using System;
-
+    using Xunit;
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements.  See the NOTICE file distributed with
@@ -99,7 +98,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             foreach (bool cacheScores in new bool[] { false, true })
@@ -146,7 +145,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.AreEqual(prevDocID + 1, doc);
+                Assert.Equal(prevDocID + 1, doc);
                 prevDocID = doc;
             }
 
@@ -156,7 +155,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalStateOnReplay()
         {
             CachingCollector cc = CachingCollector.Create(new NoOpCollector(false), true, 50 * ONE_BYTE);
@@ -168,12 +167,12 @@ namespace Lucene.Net.Search
                 cc.Collect(i);
             }
 
-            Assert.IsFalse(cc.Cached, "CachingCollector should not be cached due to low memory limit");
+            Assert.False(cc.Cached, "CachingCollector should not be cached due to low memory limit");
 
             try
             {
                 cc.Replay(new NoOpCollector(false));
-                Assert.Fail("replay should fail if CachingCollector is not cached");
+                Assert.True(false, "replay should fail if CachingCollector is not cached");
             }
             catch (InvalidOperationException e)
             {
@@ -181,7 +180,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalCollectorOnReplay()
         {
             // tests that the Collector passed to replay() has an out-of-order mode that
@@ -208,7 +207,7 @@ namespace Lucene.Net.Search
             try
             {
                 cc.Replay(new NoOpCollector(false)); // this call should fail
-                Assert.Fail("should have failed if an in-order Collector was given to replay(), " + "while CachingCollector was initialized with out-of-order collection");
+                Assert.True(false, "should have failed if an in-order Collector was given to replay(), " + "while CachingCollector was initialized with out-of-order collection");
             }
             catch (System.ArgumentException e)
             {
@@ -216,7 +215,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCachedArraysAllocation()
         {
             // tests the cached arrays allocation -- if the 'nextLength' was too high,
@@ -233,15 +232,15 @@ namespace Lucene.Net.Search
                 {
                     cc.Collect(i);
                 }
-                Assert.IsTrue(cc.Cached);
+                Assert.True(cc.Cached);
 
                 // The 151's document should terminate caching
                 cc.Collect(numDocs);
-                Assert.IsFalse(cc.Cached);
+                Assert.False(cc.Cached);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoWrappedCollector()
         {
             foreach (bool cacheScores in new bool[] { false, true })
@@ -252,7 +251,7 @@ namespace Lucene.Net.Search
                 cc.Scorer = new MockScorer();
                 cc.Collect(0);
 
-                Assert.IsTrue(cc.Cached);
+                Assert.True(cc.Cached);
                 cc.Replay(new NoOpCollector(true));
             }
         }

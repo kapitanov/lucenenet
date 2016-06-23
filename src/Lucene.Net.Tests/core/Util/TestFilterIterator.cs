@@ -16,24 +16,23 @@
  */
 
 using Lucene.Net.Support;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
-    [TestFixture]
     public class TestFilterIterator : LuceneTestCase
     {
         private static readonly SortedSet<string> Set = new SortedSet<string>(Arrays.AsList("a", "b", "c"));
 
         private static void AssertNoMore<T1>(IEnumerator<T1> it)
         {
-            Assert.IsFalse(it.MoveNext());
-            Assert.IsFalse(it.MoveNext());
+            Assert.False(it.MoveNext());
+            Assert.False(it.MoveNext());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmpty()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper(this, Set.GetEnumerator());
@@ -56,12 +55,12 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestA1()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper2(this, Set.GetEnumerator());
-            Assert.IsTrue(it.MoveNext());
-            Assert.AreEqual("a", it.Current);
+            Assert.True(it.MoveNext());
+            Assert.Equal("a", it.Current);
             AssertNoMore(it);
         }
 
@@ -81,13 +80,13 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestA2()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper3(this, Set.GetEnumerator());
-            // this time without check: Assert.IsTrue(it.hasNext());
+            // this time without check: Assert.True(it.hasNext());
             it.MoveNext();
-            Assert.AreEqual("a", it.Current);
+            Assert.Equal("a", it.Current);
             AssertNoMore(it);
         }
 
@@ -107,12 +106,12 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestB1()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper4(this, Set.GetEnumerator());
-            Assert.IsTrue(it.MoveNext());
-            Assert.AreEqual("b", it.Current);
+            Assert.True(it.MoveNext());
+            Assert.Equal("b", it.Current);
             AssertNoMore(it);
         }
 
@@ -132,13 +131,13 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestB2()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper5(this, Set.GetEnumerator());
-            // this time without check: Assert.IsTrue(it.hasNext());
+            // this time without check: Assert.True(it.hasNext());
             it.MoveNext();
-            Assert.AreEqual("b", it.Current);
+            Assert.Equal("b", it.Current);
             AssertNoMore(it);
         }
 
@@ -158,16 +157,16 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAll1()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper6(this, Set.GetEnumerator());
-            Assert.IsTrue(it.MoveNext());
-            Assert.AreEqual("a", it.Current);
-            Assert.IsTrue(it.MoveNext());
-            Assert.AreEqual("b", it.Current);
-            Assert.IsTrue(it.MoveNext());
-            Assert.AreEqual("c", it.Current);
+            Assert.True(it.MoveNext());
+            Assert.Equal("a", it.Current);
+            Assert.True(it.MoveNext());
+            Assert.Equal("b", it.Current);
+            Assert.True(it.MoveNext());
+            Assert.Equal("c", it.Current);
             AssertNoMore(it);
         }
 
@@ -187,16 +186,16 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAll2()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper7(this, Set.GetEnumerator());
             it.MoveNext();
-            Assert.AreEqual("a", it.Current);
+            Assert.Equal("a", it.Current);
             it.MoveNext();
-            Assert.AreEqual("b", it.Current);
+            Assert.Equal("b", it.Current);
             it.MoveNext();
-            Assert.AreEqual("c", it.Current);
+            Assert.Equal("c", it.Current);
             AssertNoMore(it);
         }
 
@@ -216,16 +215,16 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUnmodifiable()
         {
             IEnumerator<string> it = new FilterIteratorAnonymousInnerClassHelper8(this, Set.GetEnumerator());
             it.MoveNext();
-            Assert.AreEqual("a", it.Current);
+            Assert.Equal("a", it.Current);
             try
             {
                 it.Reset();
-                Assert.Fail("Should throw UnsupportedOperationException");
+                Assert.True(false, "Should throw UnsupportedOperationException");
             }
             catch (NotImplementedException)
             {

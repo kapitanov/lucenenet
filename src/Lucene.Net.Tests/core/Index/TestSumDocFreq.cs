@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -32,10 +32,9 @@ namespace Lucene.Net.Index
     /// Tests <seealso cref="Terms#getSumDocFreq()"/>
     /// @lucene.experimental
     /// </summary>
-    [TestFixture]
     public class TestSumDocFreq : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSumDocFreq_Mem()
         {
             int numDocs = AtLeast(500);
@@ -105,7 +104,7 @@ namespace Lucene.Net.Index
                 {
                     computedSumDocFreq += termsEnum.DocFreq();
                 }
-                Assert.AreEqual(computedSumDocFreq, sumDocFreq);
+                Assert.Equal(computedSumDocFreq, sumDocFreq);
             }
         }
     }

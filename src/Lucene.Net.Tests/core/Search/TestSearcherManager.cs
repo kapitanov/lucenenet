@@ -8,7 +8,7 @@ namespace Lucene.Net.Search
     using Index;
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
     using Directory = Lucene.Net.Store.Directory;
@@ -42,14 +42,13 @@ namespace Lucene.Net.Search
     using TestUtil = Lucene.Net.Util.TestUtil;
     using ThreadedIndexingAndSearchingTestCase = Lucene.Net.Index.ThreadedIndexingAndSearchingTestCase;
 
-    [TestFixture]
     public class TestSearcherManager : ThreadedIndexingAndSearchingTestCase
     {
         internal bool WarmCalled;
 
         private SearcherLifetimeManager.Pruner Pruner;
 
-        [Test]
+        [Fact]
         public virtual void TestSearcherManager_Mem()
         {
             Pruner = new SearcherLifetimeManager.PruneByAge(TEST_NIGHTLY ? TestUtil.NextInt(Random(), 1, 20) : 1);
@@ -64,7 +63,7 @@ namespace Lucene.Net.Search
                 {
                     Writer.Commit();
                 }
-                Assert.IsTrue(Mgr.MaybeRefresh() || Mgr.SearcherCurrent);
+                Assert.True(Mgr.MaybeRefresh() || Mgr.SearcherCurrent);
                 return Mgr.Acquire();
             }
         }
@@ -247,7 +246,7 @@ namespace Lucene.Net.Search
 
         protected override void DoClose()
         {
-            Assert.IsTrue(WarmCalled);
+            Assert.True(WarmCalled);
             if (VERBOSE)
             {
                 Console.WriteLine("TEST: now close SearcherManager");
@@ -257,7 +256,7 @@ namespace Lucene.Net.Search
         }
 
         //LUCENE TODO: Compilation Problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestIntermediateClose()
         {
             Directory dir = NewDirectory();
@@ -278,7 +277,7 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = searcherManager.Acquire();
             try
             {
-                Assert.AreEqual(1, searcher.IndexReader.NumDocs);
+                Assert.Equal(1, searcher.IndexReader.NumDocs);
             }
             finally
             {
@@ -305,15 +304,15 @@ namespace Lucene.Net.Search
             try
             {
                 searcherManager.Acquire();
-                Assert.Fail("already closed");
+                Assert.True(false, "already closed");
             }
             catch (AlreadyClosedException ex)
             {
                 // expected
             }
-            Assert.IsFalse(success.Get());
-            Assert.IsTrue(triedReopen.Get());
-            Assert.IsNull(exc[0], "" + exc[0]);
+            Assert.False(success.Get());
+            Assert.True(triedReopen.Get());
+            Assert.Null(exc[0], "" + exc[0]);
             writer.Dispose();
             dir.Dispose();
             if (es != null)
@@ -407,7 +406,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloseTwice()
         {
             // test that we can close SM twice (per IDisposable's contract).
@@ -419,8 +418,9 @@ namespace Lucene.Net.Search
             dir.Dispose();
         }
 
-        [Test]
-        public virtual void TestReferenceDecrementIllegally([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestReferenceDecrementIllegally(IConcurrentMergeScheduler scheduler)
         {
             Directory dir = NewDirectory();
             var config = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))
@@ -440,14 +440,14 @@ namespace Lucene.Net.Search
             acquire.IndexReader.DecRef();
             sm.Release(acquire);
 
-            Assert.Throws<InvalidOperationException>(() => sm.Acquire(), "acquire should have thrown an InvalidOperationException since we modified the refCount outside of the manager");
+            Assert.Throws<InvalidOperationException>(() => sm.Acquire()); //, "acquire should have thrown an InvalidOperationException since we modified the refCount outside of the manager");
 
             // sm.Dispose(); -- already closed
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEnsureOpen()
         {
             Directory dir = NewDirectory();
@@ -481,7 +481,7 @@ namespace Lucene.Net.Search
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestListenerCalled()
         {
             Directory dir = NewDirectory();
@@ -491,9 +491,9 @@ namespace Lucene.Net.Search
             sm.AddListener(new RefreshListenerAnonymousInnerClassHelper(this, afterRefreshCalled));
             iw.AddDocument(new Document());
             iw.Commit();
-            Assert.IsFalse(afterRefreshCalled.Get());
+            Assert.False(afterRefreshCalled.Get());
             sm.MaybeRefreshBlocking();
-            Assert.IsTrue(afterRefreshCalled.Get());
+            Assert.True(afterRefreshCalled.Get());
             sm.Dispose();
             iw.Dispose();
             dir.Dispose();
@@ -524,7 +524,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEvilSearcherFactory()
         {
             Random random = Random();
@@ -575,7 +575,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMaybeRefreshBlockingLock()
         {
             // make sure that maybeRefreshBlocking releases the lock, otherwise other
@@ -591,7 +591,7 @@ namespace Lucene.Net.Search
             t.Join();
 
             // if maybeRefreshBlocking didn't release the lock, this will fail.
-            Assert.IsTrue(sm.MaybeRefresh(), "failde to obtain the refreshLock!");
+            Assert.True(sm.MaybeRefresh(), "failde to obtain the refreshLock!");
 
             sm.Dispose();
             dir.Dispose();

@@ -1,12 +1,12 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using CannedTokenStream = Lucene.Net.Analysis.CannedTokenStream;
     using Directory = Lucene.Net.Store.Directory;
@@ -39,7 +39,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestCheckIndex : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDeletedDocs()
         {
             Directory dir = NewDirectory();
@@ -72,44 +72,44 @@ namespace Lucene.Net.Index
                 Console.WriteLine("CheckIndex failed");
                 checker.FlushInfoStream();
                 Console.WriteLine(bos.ToString());
-                Assert.Fail();
+                Assert.True(false);
             }
 
             CheckIndex.Status.SegmentInfoStatus seg = indexStatus.SegmentInfos[0];
-            Assert.IsTrue(seg.OpenReaderPassed);
+            Assert.True(seg.OpenReaderPassed);
 
-            Assert.IsNotNull(seg.Diagnostics);
+            Assert.NotNull(seg.Diagnostics);
 
-            Assert.IsNotNull(seg.FieldNormStatus);
-            Assert.IsNull(seg.FieldNormStatus.Error);
-            Assert.AreEqual(1, seg.FieldNormStatus.TotFields);
+            Assert.NotNull(seg.FieldNormStatus);
+            Assert.Null(seg.FieldNormStatus.Error);
+            Assert.Equal(1, seg.FieldNormStatus.TotFields);
 
-            Assert.IsNotNull(seg.TermIndexStatus);
-            Assert.IsNull(seg.TermIndexStatus.Error);
-            Assert.AreEqual(18, seg.TermIndexStatus.TermCount);
-            Assert.AreEqual(18, seg.TermIndexStatus.TotFreq);
-            Assert.AreEqual(18, seg.TermIndexStatus.TotPos);
+            Assert.NotNull(seg.TermIndexStatus);
+            Assert.Null(seg.TermIndexStatus.Error);
+            Assert.Equal(18, seg.TermIndexStatus.TermCount);
+            Assert.Equal(18, seg.TermIndexStatus.TotFreq);
+            Assert.Equal(18, seg.TermIndexStatus.TotPos);
 
-            Assert.IsNotNull(seg.StoredFieldStatus);
-            Assert.IsNull(seg.StoredFieldStatus.Error);
-            Assert.AreEqual(18, seg.StoredFieldStatus.DocCount);
-            Assert.AreEqual(18, seg.StoredFieldStatus.TotFields);
+            Assert.NotNull(seg.StoredFieldStatus);
+            Assert.Null(seg.StoredFieldStatus.Error);
+            Assert.Equal(18, seg.StoredFieldStatus.DocCount);
+            Assert.Equal(18, seg.StoredFieldStatus.TotFields);
 
-            Assert.IsNotNull(seg.TermVectorStatus);
-            Assert.IsNull(seg.TermVectorStatus.Error);
-            Assert.AreEqual(18, seg.TermVectorStatus.DocCount);
-            Assert.AreEqual(18, seg.TermVectorStatus.TotVectors);
+            Assert.NotNull(seg.TermVectorStatus);
+            Assert.Null(seg.TermVectorStatus.Error);
+            Assert.Equal(18, seg.TermVectorStatus.DocCount);
+            Assert.Equal(18, seg.TermVectorStatus.TotVectors);
 
-            Assert.IsTrue(seg.Diagnostics.Count > 0);
+            Assert.True(seg.Diagnostics.Count > 0);
             IList<string> onlySegments = new List<string>();
             onlySegments.Add("_0");
 
-            Assert.IsTrue(checker.DoCheckIndex(onlySegments).Clean == true);
+            Assert.True(checker.DoCheckIndex(onlySegments).Clean == true);
             dir.Dispose();
         }
 
         // LUCENE-4221: we have to let these thru, for now
-        [Test]
+        [Fact]
         public virtual void TestBogusTermVectors()
         {
             Directory dir = NewDirectory();

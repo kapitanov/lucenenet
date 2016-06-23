@@ -1,7 +1,7 @@
+using System;
 using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
-using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,7 +22,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestSetOnce : LuceneTestCase
     {
         private sealed class SetOnceThread : ThreadClass
@@ -44,11 +43,11 @@ namespace Lucene.Net.Util
                     Set.Set(new int?(Convert.ToInt32(Name.Substring(2))));
                     Success = true;
                 }
-                catch (ThreadInterruptedException e)
+                catch (ThreadInterruptedException)
                 {
                     // ignore
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     // TODO: change exception type
                     // expected.
@@ -57,33 +56,31 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyCtor()
         {
             SetOnce<int?> set = new SetOnce<int?>();
-            Assert.IsNull(set.Get());
+            Assert.Null(set.Get());
         }
 
-        [Test]
-        [ExpectedException(typeof(SetOnce<int?>.AlreadySetException))]
+        [Fact]
         public virtual void TestSettingCtor()
         {
             SetOnce<int?> set = new SetOnce<int?>(new int?(5));
-            Assert.AreEqual(5, (int)set.Get());
-            set.Set(new int?(7));
+            Assert.Equal(5, (int)set.Get());
+            Assert.Throws<SetOnce<int?>.AlreadySetException>(() => set.Set(new int?(7)));
         }
 
-        [Test]
-        [ExpectedException(typeof(SetOnce<int?>.AlreadySetException))]
+        [Fact]
         public virtual void TestSetOnce_mem()
         {
             SetOnce<int?> set = new SetOnce<int?>();
             set.Set(new int?(5));
-            Assert.AreEqual(5, (int)set.Get());
-            set.Set(new int?(7));
+            Assert.Equal(5, (int)set.Get());
+            Assert.Throws<SetOnce<int?>.AlreadySetException>(() => set.Set(new int?(7)));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSetMultiThreaded()
         {
             SetOnce<int?> set = new SetOnce<int?>();
@@ -111,7 +108,7 @@ namespace Lucene.Net.Util
                 if (t.Success)
                 {
                     int expectedVal = Convert.ToInt32(t.Name.Substring(2));
-                    Assert.AreEqual(expectedVal, t.Set.Get(), "thread " + t.Name);
+                    Assert.Equal(expectedVal, t.Set.Get(), "thread " + t.Name);
                 }
             }
         }

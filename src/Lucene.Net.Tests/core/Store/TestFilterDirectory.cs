@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Xunit;
 
 namespace Lucene.Net.Store
 {
@@ -24,10 +24,9 @@ namespace Lucene.Net.Store
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestFilterDirectory : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestOverrides()
         {
             // verify that all methods of Directory are overridden by FilterDirectory,
@@ -40,7 +39,7 @@ namespace Lucene.Net.Store
             {
                 if (m.DeclaringType == typeof(Directory))
                 {
-                    Assert.IsTrue(exclude.Contains(m), "method " + m.Name + " not overridden!");
+                    Assert.True(exclude.Contains(m), "method " + m.Name + " not overridden!");
                 }
             }
         }

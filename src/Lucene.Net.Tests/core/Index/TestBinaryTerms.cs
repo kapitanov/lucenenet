@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
-
+using Xunit;
+	
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
 
@@ -38,8 +38,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestBinaryTerms : LuceneTestCase
     {
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestBinary()
         {
             Directory dir = NewDirectory();
@@ -71,19 +70,19 @@ namespace Lucene.Net.Index
                 bytes.Bytes[1] = unchecked((byte)(255 - i));
                 bytes.Length = 2;
                 TopDocs docs = @is.Search(new TermQuery(new Term("bytes", bytes)), 5);
-                Assert.AreEqual(1, docs.TotalHits);
-                Assert.AreEqual("" + i, @is.Doc(docs.ScoreDocs[0].Doc).Get("id"));
+                Assert.Equal(1, docs.TotalHits);
+                Assert.Equal("" + i, @is.Doc(docs.ScoreDocs[0].Doc).Get("id"));
             }
 
             ir.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToString()
         {
             Term term = new Term("foo", new BytesRef(new[] { unchecked((byte)0xff), unchecked((byte)0xfe) }));
-            Assert.AreEqual("foo:[ff fe]", term.ToString());
+            Assert.Equal("foo:[ff fe]", term.ToString());
         }
     }
 }

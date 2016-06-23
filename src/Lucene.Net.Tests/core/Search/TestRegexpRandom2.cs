@@ -5,7 +5,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using AttributeSource = Lucene.Net.Util.AttributeSource;
     using Automaton = Lucene.Net.Util.Automaton.Automaton;
     using AutomatonTestUtil = Lucene.Net.Util.Automaton.AutomatonTestUtil;
@@ -51,7 +51,6 @@ namespace Lucene.Net.Search
     /// Create an index with random unicode terms
     /// Generates random regexps, and validates against a simple impl.
     /// </summary>
-    [TestFixture]
     public class TestRegexpRandom2 : LuceneTestCase
     {
         protected internal IndexSearcher Searcher1;
@@ -63,7 +62,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
             FieldName = Random().NextBoolean() ? "field" : ""; // sometimes use an empty string as field name
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
@@ -102,7 +101,7 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
@@ -165,7 +164,7 @@ namespace Lucene.Net.Search
 
         /// <summary>
         /// test a bunch of random regular expressions </summary>
-        [Test]
+        [Fact]
         public virtual void TestRegexps()
         {
             // we generate aweful regexps: good for testing.

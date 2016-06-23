@@ -1,11 +1,10 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Store;
     using Lucene.Net.Util;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -26,18 +25,14 @@ namespace Lucene.Net.Index
     using Document = Documents.Document;
     using Field = Field;
 
-    [TestFixture]
     public class TestIsCurrent : LuceneTestCase
     {
         private RandomIndexWriter Writer;
 
         private Directory Directory;
 
-        [SetUp]
-        public override void SetUp()
+        public TestIsCurrent() : base()
         {
-            base.SetUp();
-
             // initialize directory
             Directory = NewDirectory();
             Writer = new RandomIndexWriter(Random(), Directory);
@@ -49,10 +44,9 @@ namespace Lucene.Net.Index
             Writer.Commit();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
-            base.TearDown();
+            base.Dispose();
             Writer.Dispose();
             Directory.Dispose();
         }
@@ -60,15 +54,15 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Failing testcase showing the trouble
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDeleteByTermIsCurrent()
         {
             // get reader
             DirectoryReader reader = Writer.Reader;
 
             // assert index has a document and reader is up2date
-            Assert.AreEqual(1, Writer.NumDocs(), "One document should be in the index");
-            Assert.IsTrue(reader.Current, "One document added, reader should be current");
+            Assert.Equal(1, Writer.NumDocs()); //, "One document should be in the index");
+            Assert.True(reader.Current, "One document added, reader should be current");
 
             // remove document
             Term idTerm = new Term("UUID", "1");
@@ -76,8 +70,8 @@ namespace Lucene.Net.Index
             Writer.Commit();
 
             // assert document has been deleted (index changed), reader is stale
-            Assert.AreEqual(0, Writer.NumDocs(), "Document should be removed");
-            Assert.IsFalse(reader.Current, "Reader should be stale");
+            Assert.Equal(0, Writer.NumDocs()); //, "Document should be removed");
+            Assert.False(reader.Current, "Reader should be stale");
 
             reader.Dispose();
         }
@@ -85,23 +79,23 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Testcase for example to show that writer.deleteAll() is working as expected
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestDeleteAllIsCurrent()
         {
             // get reader
             DirectoryReader reader = Writer.Reader;
 
             // assert index has a document and reader is up2date
-            Assert.AreEqual(1, Writer.NumDocs(), "One document should be in the index");
-            Assert.IsTrue(reader.Current, "Document added, reader should be stale ");
+            Assert.Equal(1, Writer.NumDocs()); //, "One document should be in the index");
+            Assert.True(reader.Current, "Document added, reader should be stale ");
 
             // remove all documents
             Writer.DeleteAll();
             Writer.Commit();
 
             // assert document has been deleted (index changed), reader is stale
-            Assert.AreEqual(0, Writer.NumDocs(), "Document should be removed");
-            Assert.IsFalse(reader.Current, "Reader should be stale");
+            Assert.Equal(0, Writer.NumDocs()); //, "Document should be removed");
+            Assert.False(reader.Current, "Reader should be stale");
 
             reader.Dispose();
         }

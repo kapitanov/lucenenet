@@ -1,9 +1,9 @@
 using System.Diagnostics;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -39,7 +39,7 @@ namespace Lucene.Net.Search
     [TestFixture]
     public class TestConstantScoreQuery : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestCSQ()
         {
             Query q1 = new ConstantScoreQuery(new TermQuery(new Term("a", "b")));
@@ -60,7 +60,7 @@ namespace Lucene.Net.Search
         {
             int[] count = new int[1];
             searcher.Search(q, new CollectorAnonymousInnerClassHelper(this, expectedScore, scorerClassName, innerScorerClassName, count));
-            Assert.AreEqual(1, count[0], "invalid number of results");
+            Assert.Equal(1, count[0], "invalid number of results");
         }
 
         private class CollectorAnonymousInnerClassHelper : Collector
@@ -88,18 +88,18 @@ namespace Lucene.Net.Search
                 set
                 {
                     this.scorer = value;
-                    Assert.AreEqual(ScorerClassName, value.GetType().Name, "Scorer is implemented by wrong class");
+                    Assert.Equal(ScorerClassName, value.GetType().Name, "Scorer is implemented by wrong class");
                     if (InnerScorerClassName != null && value is ConstantScoreQuery.ConstantScorer)
                     {
                         ConstantScoreQuery.ConstantScorer innerScorer = (ConstantScoreQuery.ConstantScorer)value;
-                        Assert.AreEqual(InnerScorerClassName, innerScorer.GetDocIDIteratorTypeName(), "inner Scorer is implemented by wrong class");
+                        Assert.Equal(InnerScorerClassName, innerScorer.GetDocIDIteratorTypeName(), "inner Scorer is implemented by wrong class");
                     }
                 }
             }
 
             public override void Collect(int doc)
             {
-                Assert.AreEqual(ExpectedScore, this.scorer.Score(), 0, "Score differs from expected");
+                Assert.Equal(ExpectedScore, this.scorer.Score(), 0, "Score differs from expected");
                 Count[0]++;
             }
 
@@ -116,7 +116,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWrapped2Times()
         {
             Directory directory = null;
@@ -187,7 +187,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConstantScoreQueryAndFilter()
         {
             Directory d = NewDirectory();
@@ -205,12 +205,12 @@ namespace Lucene.Net.Search
             Query query = new ConstantScoreQuery(filterB);
 
             IndexSearcher s = NewSearcher(r);
-            Assert.AreEqual(1, s.Search(query, filterB, 1).TotalHits); // Query for field:b, Filter field:b
+            Assert.Equal(1, s.Search(query, filterB, 1).TotalHits); // Query for field:b, Filter field:b
 
             Filter filterA = new CachingWrapperFilter(new QueryWrapperFilter(new TermQuery(new Term("field", "a"))));
             query = new ConstantScoreQuery(filterA);
 
-            Assert.AreEqual(0, s.Search(query, filterB, 1).TotalHits); // Query field:b, Filter field:a
+            Assert.Equal(0, s.Search(query, filterB, 1).TotalHits); // Query field:b, Filter field:a
 
             r.Dispose();
             d.Dispose();
@@ -218,7 +218,7 @@ namespace Lucene.Net.Search
 
         // LUCENE-5307
         // don't reuse the scorer of filters since they have been created with bulkScorer=false
-        [Test]
+        [Fact]
         public virtual void TestQueryWrapperFilter()
         {
             Directory d = NewDirectory();
@@ -237,8 +237,8 @@ namespace Lucene.Net.Search
 
             // check the rewrite
             Query rewritten = (new ConstantScoreQuery(filter)).Rewrite(r);
-            Assert.IsTrue(rewritten is ConstantScoreQuery);
-            Assert.IsTrue(((ConstantScoreQuery)rewritten).Query is AssertingQuery);
+            Assert.True(rewritten is ConstantScoreQuery);
+            Assert.True(((ConstantScoreQuery)rewritten).Query is AssertingQuery);
 
             r.Dispose();
             d.Dispose();

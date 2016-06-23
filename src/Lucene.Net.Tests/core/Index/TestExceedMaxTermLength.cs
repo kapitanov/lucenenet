@@ -1,10 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -57,7 +57,7 @@ namespace Lucene.Net.Index
             Dir = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             IndexWriter w = new IndexWriter(Dir, NewIndexWriterConfig(Random(), TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
@@ -88,15 +88,15 @@ namespace Lucene.Net.Index
                 try
                 {
                     w.AddDocument(doc);
-                    Assert.Fail("Did not get an exception from adding a monster term");
+                    Assert.True(false, "Did not get an exception from adding a monster term");
                 }
                 catch (System.ArgumentException e)
                 {
                     string maxLengthMsg = Convert.ToString(IndexWriter.MAX_TERM_LENGTH);
                     string msg = e.Message;
-                    Assert.IsTrue(msg.Contains("immense term"), "IllegalArgumentException didn't mention 'immense term': " + msg);
-                    Assert.IsTrue(msg.Contains(maxLengthMsg), "IllegalArgumentException didn't mention max length (" + maxLengthMsg + "): " + msg);
-                    Assert.IsTrue(msg.Contains(name), "IllegalArgumentException didn't mention field name (" + name + "): " + msg);
+                    Assert.True(msg.Contains("immense term"), "IllegalArgumentException didn't mention 'immense term': " + msg);
+                    Assert.True(msg.Contains(maxLengthMsg), "IllegalArgumentException didn't mention max length (" + maxLengthMsg + "): " + msg);
+                    Assert.True(msg.Contains(name), "IllegalArgumentException didn't mention field name (" + name + "): " + msg);
                 }
             }
             finally

@@ -42,7 +42,7 @@ namespace Lucene.Net.Facet
     public class TestRandomSamplingFacetsCollector : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestRandomSampling()
         {
             Directory dir = NewDirectory();
@@ -80,7 +80,7 @@ namespace Lucene.Net.Facet
             // There should be no results at all
             foreach (MatchingDocs doc in collectRandomZeroResults.GetMatchingDocs)
             {
-                Assert.AreEqual(0, doc.totalHits);
+                Assert.Equal(0, doc.totalHits);
             }
 
             // Now start searching and retrieve results.
@@ -112,7 +112,7 @@ namespace Lucene.Net.Facet
             FacetResult random100Result = random100FacetCounts.GetTopChildren(10, "iMod10");
             FacetResult exactResult = exactFacetCounts.GetTopChildren(10, "iMod10");
 
-            Assert.AreEqual(random100Result, exactResult);
+            Assert.Equal(random100Result, exactResult);
 
             // we should have five children, but there is a small chance we have less.
             // (see above).

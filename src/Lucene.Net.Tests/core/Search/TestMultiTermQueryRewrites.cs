@@ -4,7 +4,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using AttributeSource = Lucene.Net.Util.AttributeSource;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -38,7 +38,6 @@ namespace Lucene.Net.Search
     using Terms = Lucene.Net.Index.Terms;
     using TermsEnum = Lucene.Net.Index.TermsEnum;
 
-    [TestFixture]
     public class TestMultiTermQueryRewrites : LuceneTestCase
     {
         internal static Directory Dir, Sdir1, Sdir2;
@@ -119,7 +118,7 @@ namespace Lucene.Net.Search
                 act = ExtractTerm(clause.Query);
                 if (last != null)
                 {
-                    Assert.IsTrue(last.CompareTo(act) < 0, "sort order of terms in BQ violated");
+                    Assert.True(last.CompareTo(act) < 0, "sort order of terms in BQ violated");
                 }
                 last = act;
             }
@@ -139,14 +138,14 @@ namespace Lucene.Net.Search
                 Console.WriteLine("multi segment: " + q2);
                 Console.WriteLine("multi segment with duplicates: " + q3);
             }
-            Assert.IsTrue(q1.Equals(q2), "The multi-segment case must produce same rewritten query");
-            Assert.IsTrue(q1.Equals(q3), "The multi-segment case with duplicates must produce same rewritten query");
+            Assert.True(q1.Equals(q2), "The multi-segment case must produce same rewritten query");
+            Assert.True(q1.Equals(q3), "The multi-segment case with duplicates must produce same rewritten query");
             CheckBooleanQueryOrder(q1);
             CheckBooleanQueryOrder(q2);
             CheckBooleanQueryOrder(q3);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewritesWithDuplicateTerms()
         {
             CheckDuplicateTerms(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
@@ -169,7 +168,7 @@ namespace Lucene.Net.Search
             foreach (BooleanClause clause in bq.Clauses)
             {
                 TermQuery mtq = (TermQuery)clause.Query;
-                Assert.AreEqual(Convert.ToSingle(mtq.Term.Text()), mtq.Boost, 0, "Parallel sorting of boosts in rewrite mode broken");
+                Assert.Equal(Convert.ToSingle(mtq.Term.Text()), mtq.Boost, 0, "Parallel sorting of boosts in rewrite mode broken");
             }
         }
 
@@ -187,8 +186,8 @@ namespace Lucene.Net.Search
                 Console.WriteLine("multi segment: " + q2);
                 Console.WriteLine("multi segment with duplicates: " + q3);
             }
-            Assert.IsTrue(q1.Equals(q2), "The multi-segment case must produce same rewritten query");
-            Assert.IsTrue(q1.Equals(q3), "The multi-segment case with duplicates must produce same rewritten query");
+            Assert.True(q1.Equals(q2), "The multi-segment case must produce same rewritten query");
+            Assert.True(q1.Equals(q3), "The multi-segment case with duplicates must produce same rewritten query");
             CheckBooleanQueryBoosts((BooleanQuery)q1);
             CheckBooleanQueryBoosts((BooleanQuery)q2);
             CheckBooleanQueryBoosts((BooleanQuery)q3);
@@ -235,7 +234,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBoosts()
         {
             CheckBoosts(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
@@ -254,12 +253,12 @@ namespace Lucene.Net.Search
             try
             {
                 MultiSearcherDupls.Rewrite(mtq);
-                Assert.Fail("Should throw BooleanQuery.TooManyClauses");
+                Assert.True(false, "Should throw BooleanQuery.TooManyClauses");
             }
             catch (BooleanQuery.TooManyClauses e)
             {
                 //  Maybe remove this assert in later versions, when internal API changes:
-                Assert.AreEqual("CheckMaxClauseCount", new StackTrace(e).GetFrames()[0].GetMethod().Name, "Should throw BooleanQuery.TooManyClauses with a stacktrace containing checkMaxClauseCount()");
+                Assert.Equals("CheckMaxClauseCount", new StackTrace(e).GetFrames()[0].GetMethod().Name, "Should throw BooleanQuery.TooManyClauses with a stacktrace containing checkMaxClauseCount()");
             }
             finally
             {
@@ -284,7 +283,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMaxClauseLimitations()
         {
             CheckMaxClauseLimitation(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);

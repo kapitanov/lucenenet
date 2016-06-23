@@ -14,41 +14,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
-    [TestFixture]
     public class TestIDisposableThreadLocal : LuceneTestCase
     {
         public const string TEST_VALUE = "initvaluetest";
 
-        [Test]
+        [Fact]
         public virtual void TestInitValue()
         {
             InitValueThreadLocal tl = new InitValueThreadLocal(this);
             string str = (string)tl.Get();
-            Assert.AreEqual(TEST_VALUE, str);
+            Assert.Equal(TEST_VALUE, str);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullValue()
         {
             // Tests that null can be set as a valid value (LUCENE-1805). this
             // previously failed in get().
             IDisposableThreadLocal<object> ctl = new IDisposableThreadLocal<object>();
             ctl.Set(null);
-            Assert.IsNull(ctl.Get());
+            Assert.Null(ctl.Get());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDefaultValueWithoutSetting()
         {
             // LUCENE-1805: make sure default get returns null,
             // twice in a row
             IDisposableThreadLocal<object> ctl = new IDisposableThreadLocal<object>();
-            Assert.IsNull(ctl.Get());
+            Assert.Null(ctl.Get());
         }
 
         public class InitValueThreadLocal : IDisposableThreadLocal<object>

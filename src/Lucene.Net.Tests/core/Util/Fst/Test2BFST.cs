@@ -1,5 +1,5 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System;
 
 namespace Lucene.Net.Util.Fst
@@ -21,6 +21,7 @@ namespace Lucene.Net.Util.Fst
      * limitations under the License.
      */
 
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using IndexInput = Lucene.Net.Store.IndexInput;
     using IndexOutput = Lucene.Net.Store.IndexOutput;
@@ -29,13 +30,12 @@ namespace Lucene.Net.Util.Fst
     using PackedInts = Lucene.Net.Util.Packed.PackedInts;
 
     //ORIGINAL LINE: @TimeoutSuite(millis = 100 * TimeUnits.HOUR) public class Test2BFST extends Lucene.Net.Util.LuceneTestCase
-    [Ignore("Requires tons of heap to run (420G works)")]
-    [TestFixture]
+    [Trait("Category", "Ignore")] // "Requires tons of heap to run (420G works)")]
     public class Test2BFST : LuceneTestCase
     {
         private static long LIMIT = 3L * 1024 * 1024 * 1024;
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             int[] ints = new int[7];
@@ -99,7 +99,7 @@ namespace Lucene.Net.Util.Fst
                             {
                                 ints2[j] = r.Next(256);
                             }
-                            Assert.AreEqual(NO_OUTPUT, Util.Get(fst, input2));
+                            Assert.Equal(NO_OUTPUT, Util.Get(fst, input2));
                             NextInput(r, ints2);
                         }
 
@@ -120,12 +120,12 @@ namespace Lucene.Net.Util.Fst
                             {
                                 ints2[j] = r.Next(256);
                             }
-                            Assert.AreEqual(input2, pair.Input);
-                            Assert.AreEqual(NO_OUTPUT, pair.Output);
+                            Assert.Equal(input2, pair.Input);
+                            Assert.Equal(NO_OUTPUT, pair.Output);
                             upto++;
                             NextInput(r, ints2);
                         }
-                        Assert.AreEqual(count, upto);
+                        Assert.Equal(count, upto);
 
                         if (verify == 0)
                         {
@@ -188,7 +188,7 @@ namespace Lucene.Net.Util.Fst
                                 Console.WriteLine(i + "...: ");
                             }
                             r.NextBytes((byte[])(Array)outputBytes);
-                            Assert.AreEqual(output, Util.Get(fst, input));
+                            Assert.Equal(output, Util.Get(fst, input));
                             NextInput(r, ints);
                         }
 
@@ -205,13 +205,13 @@ namespace Lucene.Net.Util.Fst
                             {
                                 break;
                             }
-                            Assert.AreEqual(input, pair.Input);
+                            Assert.Equal(input, pair.Input);
                             r.NextBytes((byte[])(Array)outputBytes);
-                            Assert.AreEqual(output, pair.Output);
+                            Assert.Equal(output, pair.Output);
                             upto++;
                             NextInput(r, ints);
                         }
-                        Assert.AreEqual(count, upto);
+                        Assert.Equal(count, upto);
 
                         if (verify == 0)
                         {
@@ -277,9 +277,9 @@ namespace Lucene.Net.Util.Fst
                             }
 
                             // forward lookup:
-                            Assert.AreEqual(output, (long)Util.Get(fst, input));
+                            Assert.Equal(output, (long)Util.Get(fst, input));
                             // reverse lookup:
-                            Assert.AreEqual(input, Util.GetByOutput(fst, output));
+                            Assert.Equal(input, Util.GetByOutput(fst, output));
                             output += 1 + r.Next(10);
                             NextInput(r, ints);
                         }
@@ -298,13 +298,13 @@ namespace Lucene.Net.Util.Fst
                             {
                                 break;
                             }
-                            Assert.AreEqual(input, pair.Input);
-                            Assert.AreEqual(output, pair.Output.Value);
+                            Assert.Equal(input, pair.Input);
+                            Assert.Equal(output, pair.Output.Value);
                             output += 1 + r.Next(10);
                             upto++;
                             NextInput(r, ints);
                         }
-                        Assert.AreEqual(count, upto);
+                        Assert.Equal(count, upto);
 
                         if (verify == 0)
                         {

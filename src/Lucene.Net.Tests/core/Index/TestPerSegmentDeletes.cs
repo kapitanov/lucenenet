@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using ArrayUtil = Lucene.Net.Util.ArrayUtil;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -34,10 +34,9 @@ namespace Lucene.Net.Index
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestPerSegmentDeletes : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDeletes1()
         {
             //IndexWriter.debug2 = System.out;
@@ -56,7 +55,7 @@ namespace Lucene.Net.Index
             }
             //System.out.println("commit1");
             writer.Commit();
-            Assert.AreEqual(1, writer.SegmentCount);
+            Assert.Equal(1, writer.SegmentCount);
             for (int x = 5; x < 10; x++)
             {
                 writer.AddDocument(DocHelper.CreateDocument(x, "2", 2));
@@ -64,7 +63,7 @@ namespace Lucene.Net.Index
             }
             //System.out.println("commit2");
             writer.Commit();
-            Assert.AreEqual(2, writer.SegmentCount);
+            Assert.Equal(2, writer.SegmentCount);
 
             for (int x = 10; x < 15; x++)
             {
@@ -79,12 +78,12 @@ namespace Lucene.Net.Index
             // flushing without applying deletes means
             // there will still be deletes in the segment infos
             writer.Flush(false, false);
-            Assert.IsTrue(writer.BufferedUpdatesStreamAny);
+            Assert.True(writer.BufferedUpdatesStreamAny);
 
             // get reader flushes pending deletes
             // so there should not be anymore
             IndexReader r1 = writer.Reader;
-            Assert.IsFalse(writer.BufferedUpdatesStreamAny);
+            Assert.False(writer.BufferedUpdatesStreamAny);
             r1.Dispose();
 
             // delete id:2 from the first segment
@@ -98,13 +97,13 @@ namespace Lucene.Net.Index
             fsmp.Length = 2;
             writer.MaybeMerge();
 
-            Assert.AreEqual(2, writer.SegmentCount);
+            Assert.Equal(2, writer.SegmentCount);
 
             // id:2 shouldn't exist anymore because
             // it's been applied in the merge and now it's gone
             IndexReader r2 = writer.Reader;
             int[] id2docs = ToDocsArray(new Term("id", "2"), null, r2);
-            Assert.IsTrue(id2docs == null);
+            Assert.True(id2docs == null);
             r2.Dispose();
 
             /*
@@ -113,7 +112,7 @@ namespace Lucene.Net.Index
             ///  writer.AddDocument(TestIndexWriterReader.CreateDocument(x, "4", 2));
             ///  System.out.println("numRamDocs(" + x + ")" + writer.numRamDocs());
             /// }
-            /// Assert.IsTrue(writer.numRamDocs() > 0);
+            /// Assert.True(writer.numRamDocs() > 0);
             /// // delete from the ram buffer
             /// writer.DeleteDocuments(new Term("id", Integer.toString(13)));
             ///
@@ -122,12 +121,12 @@ namespace Lucene.Net.Index
             /// // delete from the 1st segment
             /// writer.DeleteDocuments(id3);
             ///
-            /// Assert.IsTrue(writer.numRamDocs() > 0);
+            /// Assert.True(writer.numRamDocs() > 0);
             ///
             /// //System.out
             /// //    .println("segdels1:" + writer.docWriter.deletesToString());
             ///
-            /// //Assert.IsTrue(writer.docWriter.segmentDeletes.Size() > 0);
+            /// //Assert.True(writer.docWriter.segmentDeletes.Size() > 0);
             ///
             /// // we cause a merge to happen
             /// fsmp.doMerge = true;
@@ -141,17 +140,17 @@ namespace Lucene.Net.Index
             /// writer.MaybeMerge();
             /// System.out.println("maybeMerge after "+writer.SegmentInfos);
             /// // there should be docs in RAM
-            /// Assert.IsTrue(writer.numRamDocs() > 0);
+            /// Assert.True(writer.numRamDocs() > 0);
             ///
             /// // assert we've merged the 1 and 2 segments
             /// // and still have a segment leftover == 2
-            /// Assert.AreEqual(2, writer.SegmentInfos.Size());
-            /// Assert.IsFalse(segThere(info0, writer.SegmentInfos));
-            /// Assert.IsFalse(segThere(info1, writer.SegmentInfos));
+            /// Assert.Equal(2, writer.SegmentInfos.Size());
+            /// Assert.False(segThere(info0, writer.SegmentInfos));
+            /// Assert.False(segThere(info1, writer.SegmentInfos));
             ///
             /// //System.out.println("segdels2:" + writer.docWriter.deletesToString());
             ///
-            /// //Assert.IsTrue(writer.docWriter.segmentDeletes.Size() > 0);
+            /// //Assert.True(writer.docWriter.segmentDeletes.Size() > 0);
             ///
             /// IndexReader r = writer.GetReader();
             /// IndexReader r1 = r.getSequentialSubReaders()[0];
@@ -159,7 +158,7 @@ namespace Lucene.Net.Index
             /// int[] docs = toDocsArray(id3, null, r);
             /// System.out.println("id3 docs:"+Arrays.toString(docs));
             /// // there shouldn't be any docs for id:3
-            /// Assert.IsTrue(docs == null);
+            /// Assert.True(docs == null);
             /// r.Dispose();
             ///
             /// part2(writer, fsmp);
@@ -212,7 +211,7 @@ namespace Lucene.Net.Index
             // merge should have no deletes because they were applied in
             // the merge
             //SegmentInfo info1 = writer.SegmentInfos.Info(1);
-            //Assert.IsFalse(exists(info1, writer.docWriter.segmentDeletes));
+            //Assert.False(exists(info1, writer.docWriter.segmentDeletes));
 
             //System.out.println("infos4:"+writer.SegmentInfos);
             //System.out.println("segdels4:" + writer.docWriter.deletesToString());

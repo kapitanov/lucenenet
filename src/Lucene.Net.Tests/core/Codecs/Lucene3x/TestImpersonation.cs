@@ -1,6 +1,8 @@
+using Xunit;
+
 namespace Lucene.Net.Codecs.Lucene3x
 {
-    using NUnit.Framework;
+    
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -29,11 +31,11 @@ namespace Lucene.Net.Codecs.Lucene3x
     [TestFixture]
     public class TestImpersonation : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Codec codec = Codec.ForName("Lucene3x");
-            Assert.IsTrue(codec is PreFlexRWCodec);
+            Assert.True(codec is PreFlexRWCodec);
         }
     }
 }

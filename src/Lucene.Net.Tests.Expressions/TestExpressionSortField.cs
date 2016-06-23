@@ -7,7 +7,7 @@ namespace Lucene.Net.Tests.Expressions
 {
 	public class TestExpressionSortField : Util.LuceneTestCase
 	{
-		[Test]
+		[Fact]
 		public virtual void TestToString()
 		{
 			Expression expr = JavascriptCompiler.Compile("sqrt(_score) + ln(popularity)");
@@ -18,7 +18,7 @@ namespace Lucene.Net.Tests.Expressions
 			AreEqual("<expr \"sqrt(_score) + ln(popularity)\">!", sf.ToString());
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestEquals()
 		{
 			Expression expr = JavascriptCompiler.Compile("sqrt(_score) + ln(popularity)");
@@ -45,7 +45,7 @@ namespace Lucene.Net.Tests.Expressions
 			AreEqual(sf1, sf1);
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestNeedsScores()
 		{
 			SimpleBindings bindings = new SimpleBindings();

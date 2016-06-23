@@ -1,4 +1,4 @@
-using NUnit.Framework;
+
 
 namespace Lucene.Net.Codecs.Lucene42
 {

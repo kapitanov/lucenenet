@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -29,10 +29,9 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using StringField = StringField;
 
-    [TestFixture]
     public class TestTotalHitCountCollector : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestBasics()
         {
             Directory indexStore = NewDirectory();
@@ -50,7 +49,7 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             TotalHitCountCollector c = new TotalHitCountCollector();
             searcher.Search(new MatchAllDocsQuery(), null, c);
-            Assert.AreEqual(5, c.TotalHits);
+            Assert.Equal(5, c.TotalHits);
             reader.Dispose();
             indexStore.Dispose();
         }

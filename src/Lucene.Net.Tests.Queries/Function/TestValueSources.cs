@@ -10,7 +10,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Search.Similarities;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {
@@ -31,11 +31,8 @@ namespace Lucene.Net.Tests.Queries.Function
             new[] { "1", "12", "5.65", "9.3", "54", "1954", "123", "bar", "second test" }
         };
 
-        [SetUp]
-        public override void SetUp()
+        public TestValueSources() : base()
         {
-            base.SetUp();
-
             dir = NewDirectory();
             IndexWriterConfig iwConfig = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             iwConfig.SetMergePolicy(NewLogMergePolicy());
@@ -79,10 +76,9 @@ namespace Lucene.Net.Tests.Queries.Function
             iw.Dispose();
         }
         
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
-            base.TearDown();
+            base.Dispose();
 
             searcher = null;
             reader.Dispose();
@@ -91,49 +87,49 @@ namespace Lucene.Net.Tests.Queries.Function
             dir = null;
         }
         
-        [Test]
+        [Fact]
         public void TestByte()
         {
             AssertHits(new FunctionQuery(new ByteFieldSource("byte")), new[] { 5f, 12f });
         }
 
-        [Test]
+        [Fact]
         public void TestConst()
         {
             AssertHits(new FunctionQuery(new ConstValueSource(0.3f)), new[] { 0.3f, 0.3f });
         }
 
-        [Test]
+        [Fact]
         public void TestDiv()
         {
             AssertHits(new FunctionQuery(new DivFloatFunction(new ConstValueSource(10f), new ConstValueSource(5f))), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestDocFreq()
         {
             AssertHits(new FunctionQuery(new DocFreqValueSource("bogus", "bogus", "text", new BytesRef("test"))), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestDoubleConst()
         {
             AssertHits(new FunctionQuery(new DoubleConstValueSource(0.3d)), new[] { 0.3f, 0.3f });
         }
 
-        [Test]
+        [Fact]
         public void TestDouble()
         {
             AssertHits(new FunctionQuery(new DoubleFieldSource("double")), new[] { 3.63f, 5.65f });
         }
 
-        [Test]
+        [Fact]
         public void TestFloat()
         {
             AssertHits(new FunctionQuery(new FloatFieldSource("float")), new[] { 5.2f, 9.3f });
         }
 
-        [Test]
+        [Fact]
         public void TestIDF()
         {
             Similarity saved = searcher.Similarity;
@@ -148,7 +144,7 @@ namespace Lucene.Net.Tests.Queries.Function
             }
         }
 
-        [Test]
+        [Fact]
         public void TestIf()
         {
             AssertHits(new FunctionQuery(new IfFunction(new BytesRefFieldSource("id"), new ConstValueSource(1.0f), new ConstValueSource(2.0f)
@@ -158,49 +154,49 @@ namespace Lucene.Net.Tests.Queries.Function
                )), new[] { 1f, 1f });
         }
 
-        [Test]
+        [Fact]
         public void TestInt()
         {
             AssertHits(new FunctionQuery(new IntFieldSource("int")), new[] { 35f, 54f });
         }
 
-        [Test]
+        [Fact]
         public void TestJoinDocFreq()
         {
             AssertHits(new FunctionQuery(new JoinDocFreqValueSource("string", "text")), new[] { 2f, 0f });
         }
 
-        [Test]
+        [Fact]
         public void TestLinearFloat()
         {
             AssertHits(new FunctionQuery(new LinearFloatFunction(new ConstValueSource(2.0f), 3, 1)), new[] { 7f, 7f });
         }
 
-        [Test]
+        [Fact]
         public void TestLong()
         {
             AssertHits(new FunctionQuery(new LongFieldSource("long")), new[] { 4343f, 1954f });
         }
 
-        [Test]
+        [Fact]
         public void TestMaxDoc()
         {
             AssertHits(new FunctionQuery(new MaxDocValueSource()), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestMaxFloat()
         {
             AssertHits(new FunctionQuery(new MaxFloatFunction(new ValueSource[] { new ConstValueSource(1f), new ConstValueSource(2f) })), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestMinFloat()
         {
             AssertHits(new FunctionQuery(new MinFloatFunction(new ValueSource[] { new ConstValueSource(1f), new ConstValueSource(2f) })), new[] { 1f, 1f });
         }
 
-        [Test]
+        [Fact]
         public void TestNorm()
         {
             Similarity saved = searcher.Similarity;
@@ -216,62 +212,62 @@ namespace Lucene.Net.Tests.Queries.Function
             }
         }
 
-        [Test]
+        [Fact]
         public void TestNumDocs()
         {
             AssertHits(new FunctionQuery(new NumDocsValueSource()), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestPow()
         {
             AssertHits(new FunctionQuery(new PowFloatFunction(new ConstValueSource(2f), new ConstValueSource(3f))), new[] { 8f, 8f });
         }
 
-        [Test]
+        [Fact]
         public void TestProduct()
         {
             AssertHits(new FunctionQuery(new ProductFloatFunction(new ValueSource[] { new ConstValueSource(2f), new ConstValueSource(3f) })), new[] { 6f, 6f });
         }
 
-        [Test]
+        [Fact]
         public void TestQuery()
         {
             AssertHits(new FunctionQuery(new QueryValueSource(new FunctionQuery(new ConstValueSource(2f)), 0f)), new[] { 2f, 2f });
         }
 
-        [Test]
+        [Fact]
         public void TestRangeMap()
         {
             AssertHits(new FunctionQuery(new RangeMapFloatFunction(new FloatFieldSource("float"), 5, 6, 1, 0f)), new[] { 1f, 0f });
             AssertHits(new FunctionQuery(new RangeMapFloatFunction(new FloatFieldSource("float"), 5, 6, new SumFloatFunction(new ValueSource[] { new ConstValueSource(1f), new ConstValueSource(2f) }), new ConstValueSource(11f))), new[] { 3f, 11f });
         }
 
-        [Test]
+        [Fact]
         public void TestReciprocal()
         {
             AssertHits(new FunctionQuery(new ReciprocalFloatFunction(new ConstValueSource(2f), 3, 1, 4)), new[] { 0.1f, 0.1f });
         }
 
-        [Test]
+        [Fact]
         public void TestScale()
         {
             AssertHits(new FunctionQuery(new ScaleFloatFunction(new IntFieldSource("int"), 0, 1)), new[] { 0.0f, 1.0f });
         }
 
-        [Test]
+        [Fact]
         public void TestShort()
         {
             AssertHits(new FunctionQuery(new ShortFieldSource("short")), new[] { 945f, 123f });
         }
 
-        [Test]
+        [Fact]
         public void TestSumFloat()
         {
             AssertHits(new FunctionQuery(new SumFloatFunction(new ValueSource[] { new ConstValueSource(1f), new ConstValueSource(2f) })), new[] { 3f, 3f });
         }
 
-        [Test]
+        [Fact]
         public void TestSumTotalTermFreq()
         {
             if (Codec.Default.Name.Equals("Lucene3x"))
@@ -284,14 +280,14 @@ namespace Lucene.Net.Tests.Queries.Function
             }
         }
 
-        [Test]
+        [Fact]
         public void TestTermFreq()
         {
             AssertHits(new FunctionQuery(new TermFreqValueSource("bogus", "bogus", "text", new BytesRef("test"))), new[] { 3f, 1f });
             AssertHits(new FunctionQuery(new TermFreqValueSource("bogus", "bogus", "string", new BytesRef("bar"))), new[] { 0f, 1f });
         }
 
-        [Test]
+        [Fact]
         public void TestTF()
         {
             Similarity saved = searcher.Similarity;
@@ -308,7 +304,7 @@ namespace Lucene.Net.Tests.Queries.Function
             }
         }
 
-        [Test]
+        [Fact]
         public void TestTotalTermFreq()
         {
             if (Codec.Default.Name.Equals("Lucene3x"))

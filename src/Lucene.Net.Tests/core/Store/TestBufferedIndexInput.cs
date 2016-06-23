@@ -1,6 +1,6 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -76,7 +76,7 @@ namespace Lucene.Net.Store
             MyBufferedIndexInput input = new MyBufferedIndexInput();
             for (int i = 0; i < BufferedIndexInput.BUFFER_SIZE * 10; i++)
             {
-                Assert.AreEqual(input.ReadByte(), Byten(i));
+                Assert.Equal(input.ReadByte(), Byten(i));
             }
         }
 
@@ -84,7 +84,7 @@ namespace Lucene.Net.Store
         // larger than the buffer size), and see that it returns the bytes we expect.
         // Our input comes from a dynamically generated "file" -
         // see MyBufferedIndexInput below.
-        [Test]
+        [Fact]
         public virtual void TestReadBytes()
         {
             MyBufferedIndexInput input = new MyBufferedIndexInput();
@@ -153,7 +153,7 @@ namespace Lucene.Net.Store
             // add an arbitrary offset at the beginning of the array
             int offset = size % 10; // arbitrary
             Buffer = ArrayUtil.Grow(Buffer, offset + size);
-            Assert.AreEqual(pos, input.FilePointer);
+            Assert.Equal(pos, input.FilePointer);
             long left = TEST_FILE_LENGTH - input.FilePointer;
             if (left <= 0)
             {
@@ -164,17 +164,17 @@ namespace Lucene.Net.Store
                 size = (int)left;
             }
             input.ReadBytes(Buffer, offset, size);
-            Assert.AreEqual(pos + size, input.FilePointer);
+            Assert.Equal(pos + size, input.FilePointer);
             for (int i = 0; i < size; i++)
             {
-                Assert.AreEqual(Byten(pos + i), (byte)Buffer[offset + i], "pos=" + i + " filepos=" + (pos + i));
+                Assert.Equal(Byten(pos + i), (byte)Buffer[offset + i], "pos=" + i + " filepos=" + (pos + i));
             }
         }
 
         // this tests that attempts to readBytes() past an EOF will fail, while
         // reads up to the EOF will succeed. The EOF is determined by the
         // BufferedIndexInput's arbitrary length() value.
-        [Test]
+        [Fact]
         public virtual void TestEOF()
         {
             MyBufferedIndexInput input = new MyBufferedIndexInput(1024);
@@ -189,7 +189,7 @@ namespace Lucene.Net.Store
             try
             {
                 CheckReadBytes(input, 11, pos);
-                Assert.Fail("Block read past end of file");
+                Assert.True(false, "Block read past end of file");
             }
             catch (IOException e)
             {
@@ -199,7 +199,7 @@ namespace Lucene.Net.Store
             try
             {
                 CheckReadBytes(input, 50, pos);
-                Assert.Fail("Block read past end of file");
+                Assert.True(false, "Block read past end of file");
             }
             catch (IOException e)
             {
@@ -209,7 +209,7 @@ namespace Lucene.Net.Store
             try
             {
                 CheckReadBytes(input, 100000, pos);
-                Assert.Fail("Block read past end of file");
+                Assert.True(false, "Block read past end of file");
             }
             catch (IOException e)
             {
@@ -265,7 +265,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSetBufferSize()
         {
             var indexDir = CreateTempDir("testSetBufferSize");
@@ -299,7 +299,7 @@ namespace Lucene.Net.Store
                 var searcher = NewSearcher(reader);
                 var hits = searcher.Search(new TermQuery(bbb), null, 1000).ScoreDocs;
                 dir.TweakBufferSizes();
-                Assert.AreEqual(36, hits.Length);
+                Assert.Equal(36, hits.Length);
 
                 reader.Dispose();
 
@@ -310,14 +310,14 @@ namespace Lucene.Net.Store
 
                 hits = searcher.Search(new TermQuery(bbb), null, 1000).ScoreDocs;
                 dir.TweakBufferSizes();
-                Assert.AreEqual(35, hits.Length);
+                Assert.Equal(35, hits.Length);
                 dir.TweakBufferSizes();
                 hits = searcher.Search(new TermQuery(new Term("id", "33")), null, 1000).ScoreDocs;
                 dir.TweakBufferSizes();
-                Assert.AreEqual(1, hits.Length);
+                Assert.Equal(1, hits.Length);
                 hits = searcher.Search(new TermQuery(aaa), null, 1000).ScoreDocs;
                 dir.TweakBufferSizes();
-                Assert.AreEqual(35, hits.Length);
+                Assert.Equal(35, hits.Length);
                 writer.Dispose();
                 reader.Dispose();
             }

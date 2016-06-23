@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -41,7 +41,7 @@ namespace Lucene.Net.Search
     public class TestPhrasePrefixQuery : LuceneTestCase
     {
         ///
-        [Test]
+        [Fact]
         public virtual void TestPhrasePrefix()
         {
             Directory indexStore = NewDirectory();
@@ -97,10 +97,10 @@ namespace Lucene.Net.Search
 
             ScoreDoc[] result;
             result = searcher.Search(query1, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, result.Length);
+            Assert.Equal(2, result.Length);
 
             result = searcher.Search(query2, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
             reader.Dispose();
             indexStore.Dispose();
         }

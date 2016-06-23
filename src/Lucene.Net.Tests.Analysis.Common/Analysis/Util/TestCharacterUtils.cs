@@ -3,7 +3,7 @@ using System.IO;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
@@ -27,10 +27,9 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
     /// <summary>
     /// TestCase for the <seealso cref="CharacterUtils"/> class.
     /// </summary>
-    [TestFixture]
     public class TestCharacterUtils : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestCodePointAtCharSequenceInt()
         {
             var java4 = CharacterUtils.GetInstance(LuceneVersion.LUCENE_30);
@@ -63,7 +62,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCodePointAtCharArrayIntInt()
         {
             var java4 = CharacterUtils.GetInstance(LuceneVersion.LUCENE_30);
@@ -79,7 +78,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             assertEquals((int)'\ud801', java5.CodePointAt(highSurrogateAt3, 3, 4));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCodePointCount()
         {
             var java4 = CharacterUtils.Java4Instance;
@@ -90,7 +89,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             assertEquals(Character.CodePointCount(s, 0, s.Length), java5.CodePointCount(s));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOffsetByCodePoint()
         {
             var java4 = CharacterUtils.Java4Instance;
@@ -135,7 +134,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConversions()
         {
             var java4 = CharacterUtils.Java4Instance;
@@ -161,7 +160,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             assertArrayEquals(Arrays.CopyOfRange(orig, o1, o1 + charCount), Arrays.CopyOfRange(restored, o3, o3 + charCount));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNewCharacterBuffer()
         {
             var newCharacterBuffer = CharacterUtils.NewCharacterBuffer(1024);
@@ -184,7 +183,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFillNoHighSurrogate()
         {
             var versions = new LuceneVersion[] { LuceneVersion.LUCENE_30, TEST_VERSION_CURRENT };
@@ -206,7 +205,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFillJava15()
         {
             const string input = "1234\ud801\udc1c789123\ud801\ud801\udc1c\ud801";
@@ -229,7 +228,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             assertEquals(0, buffer.Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFillJava14()
         {
             var input = "1234\ud801\udc1c789123\ud801\ud801\udc1c\ud801";

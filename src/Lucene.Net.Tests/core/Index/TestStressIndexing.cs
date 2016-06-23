@@ -1,11 +1,10 @@
 using System;
 using System.Threading;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
 
 namespace Lucene.Net.Index
 {
-    
+
     using Lucene.Net.Search;
     using Lucene.Net.Store;
     using Lucene.Net.Support;
@@ -27,11 +26,10 @@ namespace Lucene.Net.Index
         */
 
     using Lucene.Net.Util;
-    using NUnit.Framework;
+    using Xunit;
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
 
-    [TestFixture]
     public class TestStressIndexing : LuceneTestCase
     {
         private abstract class TimedThread : ThreadClass
@@ -184,7 +182,7 @@ namespace Lucene.Net.Index
 
             for (int i = 0; i < numThread; i++)
             {
-                Assert.IsTrue(!threads[i].Failed);
+                Assert.True(!threads[i].Failed);
             }
 
             //System.out.println("    Writer: " + indexerThread.count + " iterations");
@@ -197,8 +195,9 @@ namespace Lucene.Net.Index
           FSDirectory.
         */
 
-        [Test]
-        public virtual void TestStressIndexAndSearching([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestStressIndexAndSearching(IConcurrentMergeScheduler scheduler)
         {
             Directory directory = NewDirectory();
             MockDirectoryWrapper wrapper = directory as MockDirectoryWrapper;

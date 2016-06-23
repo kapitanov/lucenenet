@@ -3,7 +3,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
+    using Xunit;
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using Document = Documents.Document;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
@@ -34,13 +34,13 @@ namespace Lucene.Net.Index
     using TimeoutSuite = com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;*/
 
     //@TimeoutSuite(millis = 80 * TimeUnits.HOUR) @Ignore("takes ~ 30 minutes") @SuppressCodecs("Lucene3x") public class Test2BNumericDocValues extends Lucene.Net.Util.LuceneTestCase
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BNumericDocValues : LuceneTestCase
     {
         // indexes Integer.MAX_VALUE docs with an increasing dv field
-        [Test]
-        public virtual void TestNumerics([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestNumerics(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BNumerics"));
             if (dir is MockDirectoryWrapper)
@@ -80,7 +80,7 @@ namespace Lucene.Net.Index
                 NumericDocValues dv = reader.GetNumericDocValues("dv");
                 for (int i = 0; i < reader.MaxDoc; i++)
                 {
-                    Assert.AreEqual(expectedValue, dv.Get(i));
+                    Assert.Equal(expectedValue, dv.Get(i));
                     expectedValue++;
                 }
             }

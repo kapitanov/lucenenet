@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -31,7 +31,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestCodecHoldsOpenFiles : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory d = NewDirectory();
@@ -69,7 +69,7 @@ namespace Lucene.Net.Index
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExposeUnclosedFiles()
         {
             Directory d = NewDirectory();

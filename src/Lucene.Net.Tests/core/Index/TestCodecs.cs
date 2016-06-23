@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Codec = Lucene.Net.Codecs.Codec;
     using Constants = Lucene.Net.Util.Constants;
@@ -375,7 +375,7 @@ namespace Lucene.Net.Index
             return terms;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFixedPostings()
         {
             const int NUM_TERMS = 100;
@@ -402,9 +402,9 @@ namespace Lucene.Net.Index
             IEnumerator<string> fieldsEnum = reader.GetEnumerator();
             fieldsEnum.MoveNext();
             string fieldName = fieldsEnum.Current;
-            Assert.IsNotNull(fieldName);
+            Assert.NotNull(fieldName);
             Terms terms2 = reader.Terms(fieldName);
-            Assert.IsNotNull(terms2);
+            Assert.NotNull(terms2);
 
             TermsEnum termsEnum = terms2.Iterator(null);
 
@@ -412,8 +412,8 @@ namespace Lucene.Net.Index
             for (int i = 0; i < NUM_TERMS; i++)
             {
                 BytesRef term = termsEnum.Next();
-                Assert.IsNotNull(term);
-                Assert.AreEqual(terms[i].Text2, term.Utf8ToString());
+                Assert.NotNull(term);
+                Assert.Equal(terms[i].Text2, term.Utf8ToString());
 
                 // do this twice to stress test the codec's reuse, ie,
                 // make sure it properly fully resets (rewinds) its
@@ -421,23 +421,23 @@ namespace Lucene.Net.Index
                 for (int iter = 0; iter < 2; iter++)
                 {
                     docsEnum = TestUtil.Docs(Random(), termsEnum, null, docsEnum, DocsEnum.FLAG_NONE);
-                    Assert.AreEqual(terms[i].Docs[0], docsEnum.NextDoc());
-                    Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
+                    Assert.Equal(terms[i].Docs[0], docsEnum.NextDoc());
+                    Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
                 }
             }
-            Assert.IsNull(termsEnum.Next());
+            Assert.Null(termsEnum.Next());
 
             for (int i = 0; i < NUM_TERMS; i++)
             {
-                Assert.AreEqual(termsEnum.SeekCeil(new BytesRef(terms[i].Text2)), TermsEnum.SeekStatus.FOUND);
+                Assert.Equal(termsEnum.SeekCeil(new BytesRef(terms[i].Text2)), TermsEnum.SeekStatus.FOUND);
             }
 
-            Assert.IsFalse(fieldsEnum.MoveNext());
+            Assert.False(fieldsEnum.MoveNext());
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomPostings()
         {
             FieldInfos.Builder builder = new FieldInfos.Builder();
@@ -513,8 +513,8 @@ namespace Lucene.Net.Index
             writer.Commit();
 
             ScoreDoc[] results = this.Search(writer, pq, 5);
-            Assert.AreEqual(1, results.Length);
-            Assert.AreEqual(0, results[0].Doc);
+            Assert.Equal(1, results.Length);
+            Assert.Equal(0, results[0].Doc);
 
             // add document and force commit for creating a second segment
             writer.AddDocument(doc);
@@ -522,15 +522,15 @@ namespace Lucene.Net.Index
 
             // at this point, there should be at least two segments
             results = this.Search(writer, pq, 5);
-            Assert.AreEqual(2, results.Length);
-            Assert.AreEqual(0, results[0].Doc);
+            Assert.Equal(2, results.Length);
+            Assert.Equal(0, results[0].Doc);
 
             writer.ForceMerge(1);
 
             // optimise to merge the segments.
             results = this.Search(writer, pq, 5);
-            Assert.AreEqual(2, results.Length);
-            Assert.AreEqual(0, results[0].Doc);
+            Assert.Equal(2, results.Length);
+            Assert.Equal(0, results[0].Doc);
           }
           finally
           {
@@ -588,14 +588,14 @@ namespace Lucene.Net.Index
                 for (int i = 0; i < docs.Length; i++)
                 {
                     int doc = docsEnum.NextDoc();
-                    Assert.IsTrue(doc != DocIdSetIterator.NO_MORE_DOCS);
-                    Assert.AreEqual(docs[i], doc);
+                    Assert.True(doc != DocIdSetIterator.NO_MORE_DOCS);
+                    Assert.Equal(docs[i], doc);
                     if (doPos)
                     {
                         this.VerifyPositions(positions[i], ((DocsAndPositionsEnum)docsEnum));
                     }
                 }
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
             }
 
             internal sbyte[] Data = new sbyte[10];
@@ -605,20 +605,20 @@ namespace Lucene.Net.Index
                 for (int i = 0; i < positions.Length; i++)
                 {
                     int pos = posEnum.NextPosition();
-                    Assert.AreEqual(positions[i].Pos, pos);
+                    Assert.Equal(positions[i].Pos, pos);
                     if (positions[i].Payload != null)
                     {
-                        Assert.IsNotNull(posEnum.Payload);
+                        Assert.NotNull(posEnum.Payload);
                         if (Random().Next(3) < 2)
                         {
                             // Verify the payload bytes
                             BytesRef otherPayload = posEnum.Payload;
-                            Assert.IsTrue(positions[i].Payload.Equals(otherPayload), "expected=" + positions[i].Payload.ToString() + " got=" + otherPayload.ToString());
+                            Assert.True(positions[i].Payload.Equals(otherPayload), "expected=" + positions[i].Payload.ToString() + " got=" + otherPayload.ToString());
                         }
                     }
                     else
                     {
-                        Assert.IsNull(posEnum.Payload);
+                        Assert.Null(posEnum.Payload);
                     }
                 }
             }
@@ -645,15 +645,15 @@ namespace Lucene.Net.Index
                             break;
                         }
                         BytesRef expected = new BytesRef(field.Terms[upto++].Text2);
-                        Assert.IsTrue(expected.BytesEquals(term), "expected=" + expected + " vs actual " + term);
+                        Assert.True(expected.BytesEquals(term), "expected=" + expected + " vs actual " + term);
                     }
-                    Assert.AreEqual(upto, field.Terms.Length);
+                    Assert.Equal(upto, field.Terms.Length);
 
                     // Test random seek:
                     TermData term2 = field.Terms[Random().Next(field.Terms.Length)];
                     TermsEnum.SeekStatus status = termsEnum.SeekCeil(new BytesRef(term2.Text2));
-                    Assert.AreEqual(status, TermsEnum.SeekStatus.FOUND);
-                    Assert.AreEqual(term2.Docs.Length, termsEnum.DocFreq());
+                    Assert.Equal(status, TermsEnum.SeekStatus.FOUND);
+                    Assert.Equal(term2.Docs.Length, termsEnum.DocFreq());
                     if (field.OmitTF)
                     {
                         this.VerifyDocs(term2.Docs, term2.Positions, TestUtil.Docs(Random(), termsEnum, null, null, DocsEnum.FLAG_NONE), false);
@@ -678,9 +678,9 @@ namespace Lucene.Net.Index
                     }
                     if (success)
                     {
-                        Assert.AreEqual(status, TermsEnum.SeekStatus.FOUND);
-                        Assert.IsTrue(termsEnum.Term().BytesEquals(new BytesRef(term2.Text2)));
-                        Assert.AreEqual(term2.Docs.Length, termsEnum.DocFreq());
+                        Assert.Equal(status, TermsEnum.SeekStatus.FOUND);
+                        Assert.True(termsEnum.Term().BytesEquals(new BytesRef(term2.Text2)));
+                        Assert.Equal(term2.Docs.Length, termsEnum.DocFreq());
                         if (field.OmitTF)
                         {
                             this.VerifyDocs(term2.Docs, term2.Positions, TestUtil.Docs(Random(), termsEnum, null, null, DocsEnum.FLAG_NONE), false);
@@ -700,7 +700,7 @@ namespace Lucene.Net.Index
                     {
                         string text2 = TestUtil.RandomUnicodeString(Random()) + ".";
                         status = termsEnum.SeekCeil(new BytesRef(text2));
-                        Assert.IsTrue(status == TermsEnum.SeekStatus.NOT_FOUND || status == TermsEnum.SeekStatus.END);
+                        Assert.True(status == TermsEnum.SeekStatus.NOT_FOUND || status == TermsEnum.SeekStatus.END);
                     }
 
                     // Seek to each term, backwards:
@@ -710,8 +710,8 @@ namespace Lucene.Net.Index
                     }
                     for (int i = field.Terms.Length - 1; i >= 0; i--)
                     {
-                        Assert.AreEqual(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef(field.Terms[i].Text2)), Thread.CurrentThread.Name + ": field=" + field.FieldInfo.Name + " term=" + field.Terms[i].Text2);
-                        Assert.AreEqual(field.Terms[i].Docs.Length, termsEnum.DocFreq());
+                        Assert.Equal(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef(field.Terms[i].Text2)), Thread.CurrentThread.Name + ": field=" + field.FieldInfo.Name + " term=" + field.Terms[i].Text2);
+                        Assert.Equal(field.Terms[i].Docs.Length, termsEnum.DocFreq());
                     }
 
                     // Seek to each term by ord, backwards
@@ -720,8 +720,8 @@ namespace Lucene.Net.Index
                         try
                         {
                             termsEnum.SeekExact(i);
-                            Assert.AreEqual(field.Terms[i].Docs.Length, termsEnum.DocFreq());
-                            Assert.IsTrue(termsEnum.Term().BytesEquals(new BytesRef(field.Terms[i].Text2)));
+                            Assert.Equal(field.Terms[i].Docs.Length, termsEnum.DocFreq());
+                            Assert.True(termsEnum.Term().BytesEquals(new BytesRef(field.Terms[i].Text2)));
                         }
                         catch (System.NotSupportedException uoe)
                         {
@@ -730,11 +730,11 @@ namespace Lucene.Net.Index
 
                     // Seek to non-existent empty-string term
                     status = termsEnum.SeekCeil(new BytesRef(""));
-                    Assert.IsNotNull(status);
-                    //Assert.AreEqual(TermsEnum.SeekStatus.NOT_FOUND, status);
+                    Assert.NotNull(status);
+                    //Assert.Equal(TermsEnum.SeekStatus.NOT_FOUND, status);
 
                     // Make sure we're now pointing to first term
-                    Assert.IsTrue(termsEnum.Term().BytesEquals(new BytesRef(field.Terms[0].Text2)));
+                    Assert.True(termsEnum.Term().BytesEquals(new BytesRef(field.Terms[0].Text2)));
 
                     // Test docs enum
                     termsEnum.SeekCeil(new BytesRef(""));
@@ -765,7 +765,7 @@ namespace Lucene.Net.Index
                                 docsAndFreqs = null;
                                 docs = TestUtil.Docs(Random(), termsEnum, null, null, DocsEnum.FLAG_NONE);
                             }
-                            Assert.IsNotNull(docs);
+                            Assert.NotNull(docs);
                             int upto2 = -1;
                             bool ended = false;
                             while (upto2 < term2.Docs.Length - 1)
@@ -780,7 +780,7 @@ namespace Lucene.Net.Index
                                     if (Random().Next(2) == 1)
                                     {
                                         doc = docs.Advance(term2.Docs[upto2]);
-                                        Assert.AreEqual(term2.Docs[upto2], doc);
+                                        Assert.Equal(term2.Docs[upto2], doc);
                                     }
                                     else
                                     {
@@ -806,13 +806,13 @@ namespace Lucene.Net.Index
                                 else
                                 {
                                     doc = docs.NextDoc();
-                                    Assert.IsTrue(doc != -1);
+                                    Assert.True(doc != -1);
                                     upto2++;
                                 }
-                                Assert.AreEqual(term2.Docs[upto2], doc);
+                                Assert.Equal(term2.Docs[upto2], doc);
                                 if (!field.OmitTF)
                                 {
-                                    Assert.AreEqual(term2.Positions[upto2].Length, postings.Freq());
+                                    Assert.Equal(term2.Positions[upto2].Length, postings.Freq());
                                     if (Random().Next(2) == 1)
                                     {
                                         this.VerifyPositions(term2.Positions[upto2], postings);
@@ -822,13 +822,13 @@ namespace Lucene.Net.Index
 
                             if (!ended)
                             {
-                                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docs.NextDoc());
+                                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docs.NextDoc());
                             }
                         }
                         upto++;
                     } while (termsEnum.Next() != null);
 
-                    Assert.AreEqual(upto, field.Terms.Length);
+                    Assert.Equal(upto, field.Terms.Length);
                 }
             }
         }
@@ -854,7 +854,7 @@ namespace Lucene.Net.Index
             consumer.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDocsOnlyFreq()
         {
             // tests that when fields are indexed with DOCS_ONLY, the Codec
@@ -879,7 +879,7 @@ namespace Lucene.Net.Index
                 DocsEnum de = ((AtomicReader)ctx.Reader).TermDocsEnum(term);
                 while (de.NextDoc() != DocIdSetIterator.NO_MORE_DOCS)
                 {
-                    Assert.AreEqual(1, de.Freq(), "wrong freq for doc " + de.DocID());
+                    Assert.Equal(1, de.Freq(), "wrong freq for doc " + de.DocID());
                 }
             }
             reader.Dispose();
@@ -887,7 +887,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDisableImpersonation()
         {
             Codec[] oldCodecs = new Codec[] { new Lucene40RWCodec(), new Lucene41RWCodec(), new Lucene42RWCodec() };
@@ -905,7 +905,7 @@ namespace Lucene.Net.Index
             try
             {
                 writer.Dispose();
-                Assert.Fail("should not have succeeded to impersonate an old format!");
+                Assert.True(false, "should not have succeeded to impersonate an old format!");
             }
             catch (System.NotSupportedException e)
             {

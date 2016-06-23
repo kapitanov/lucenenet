@@ -1,4 +1,3 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
 using System;
@@ -9,7 +8,7 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Util;
-    using NUnit.Framework;
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using CharsRef = Lucene.Net.Util.CharsRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -37,7 +36,6 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using UnicodeUtil = Lucene.Net.Util.UnicodeUtil;
 
-    [TestFixture]
     public class TestIndexWriterUnicode : LuceneTestCase
     {
         internal readonly string[] Utf8Data = new string[] { "ab\udc17cd", "ab\ufffdcd", "\udc17abcd", "\ufffdabcd", "\udc17", "\ufffd", "ab\udc17\udc17cd", "ab\ufffd\ufffdcd", "\udc17\udc17abcd", "\ufffd\ufffdabcd", "\udc17\udc17", "\ufffd\ufffd", "ab\ud917cd", "ab\ufffdcd", "\ud917abcd", "\ufffdabcd", "\ud917", "\ufffd", "ab\ud917\ud917cd", "ab\ufffd\ufffdcd", "\ud917\ud917abcd", "\ufffd\ufffdabcd", "\ud917\ud917", "\ufffd\ufffd", "ab\udc17\ud917cd", "ab\ufffd\ufffdcd", "\udc17\ud917abcd", "\ufffd\ufffdabcd", "\udc17\ud917", "\ufffd\ufffd", "ab\udc17\ud917\udc17\ud917cd", "ab\ufffd\ud917\udc17\ufffdcd", "\udc17\ud917\udc17\ud917abcd", "\ufffd\ud917\udc17\ufffdabcd", "\udc17\ud917\udc17\ud917", "\ufffd\ud917\udc17\ufffd" };
@@ -135,7 +133,7 @@ namespace Lucene.Net.Index
         private string TermDesc(string s)
         {
             string s0;
-            Assert.IsTrue(s.Length <= 2);
+            Assert.True(s.Length <= 2);
             if (s.Length == 1)
             {
                 s0 = AsUnicodeChar(s[0]);
@@ -163,17 +161,17 @@ namespace Lucene.Net.Index
                     break;
                 }
 
-                Assert.IsTrue(last.CompareTo(term) < 0);
+                Assert.True(last.CompareTo(term) < 0);
                 last.CopyBytes(term);
 
                 string s = term.Utf8ToString();
-                Assert.IsTrue(allTerms.Contains(s), "term " + TermDesc(s) + " was not added to index (count=" + allTerms.Count + ")");
+                Assert.True(allTerms.Contains(s), "term " + TermDesc(s) + " was not added to index (count=" + allTerms.Count + ")");
                 seenTerms.Add(s);
             }
 
             if (isTop)
             {
-                Assert.IsTrue(allTerms.SetEquals(seenTerms));
+                Assert.True(allTerms.SetEquals(seenTerms));
             }
 
             // Test seeking:
@@ -181,12 +179,13 @@ namespace Lucene.Net.Index
             while (it.MoveNext())
             {
                 BytesRef tr = new BytesRef(it.Current);
-                Assert.AreEqual(TermsEnum.SeekStatus.FOUND, terms.SeekCeil(tr), "seek failed for term=" + TermDesc(tr.Utf8ToString()));
+                Assert.Equal(TermsEnum.SeekStatus.FOUND, terms.SeekCeil(tr)); //, "seek failed for term=" + TermDesc(tr.Utf8ToString()));
             }
         }
 
         // LUCENE-510
-        [Test, LongRunningTest]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestRandomUnicodeStrings()
         {
             char[] buffer = new char[20];
@@ -204,24 +203,24 @@ namespace Lucene.Net.Index
                 if (!hasIllegal)
                 {
                     var b = (new string(buffer, 0, 20)).GetBytes(IOUtils.CHARSET_UTF_8);
-                    Assert.AreEqual(b.Length, utf8.Length);
+                    Assert.Equal(b.Length, utf8.Length);
                     for (int i = 0; i < b.Length; i++)
                     {
-                        Assert.AreEqual(b[i], utf8.Bytes[i]);
+                        Assert.Equal(b[i], utf8.Bytes[i]);
                     }
                 }
 
                 UnicodeUtil.UTF8toUTF16(utf8.Bytes, 0, utf8.Length, utf16);
-                Assert.AreEqual(utf16.Length, 20);
+                Assert.Equal(utf16.Length, 20);
                 for (int i = 0; i < 20; i++)
                 {
-                    Assert.AreEqual(expected[i], utf16.Chars[i]);
+                    Assert.Equal(expected[i], utf16.Chars[i]);
                 }
             }
         }
 
         // LUCENE-510
-        [Test]
+        [Fact]
         public virtual void TestAllUnicodeChars()
         {
             BytesRef utf8 = new BytesRef(10);
@@ -250,21 +249,21 @@ namespace Lucene.Net.Index
 
                 string s1 = new string(chars, 0, len);
                 string s2 = Encoding.UTF8.GetString(utf8.Bytes, utf8.Offset, utf8.Length);
-                Assert.AreEqual(s1, s2, "codepoint " + ch);
+                Assert.Equal(s1, s2); //, "codepoint " + ch);
 
                 UnicodeUtil.UTF8toUTF16(utf8.Bytes, 0, utf8.Length, utf16);
-                Assert.AreEqual(s1, new string(utf16.Chars, 0, utf16.Length), "codepoint " + ch);
+                Assert.Equal(s1, new string(utf16.Chars, 0, utf16.Length)); //, "codepoint " + ch);
 
                 var b = s1.GetBytes(Encoding.UTF8);
-                Assert.AreEqual(utf8.Length, b.Length);
+                Assert.Equal(utf8.Length, b.Length);
                 for (int j = 0; j < utf8.Length; j++)
                 {
-                    Assert.AreEqual(utf8.Bytes[j], b[j]);
+                    Assert.Equal(utf8.Bytes[j], b[j]);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmbeddedFFFF()
         {
             Directory d = NewDirectory();
@@ -276,15 +275,14 @@ namespace Lucene.Net.Index
             doc.Add(NewTextField("field", "a", Field.Store.NO));
             w.AddDocument(doc);
             IndexReader r = w.Reader;
-            Assert.AreEqual(1, r.DocFreq(new Term("field", "a\uffffb")));
+            Assert.Equal(1, r.DocFreq(new Term("field", "a\uffffb")));
             r.Dispose();
             w.Dispose();
             d.Dispose();
         }
 
         // LUCENE-510
-        [Ignore]
-        [Test]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestInvalidUTF16()
         {
             Directory dir = NewDirectory();
@@ -303,8 +301,8 @@ namespace Lucene.Net.Index
             Document doc2 = ir.Document(0);
             for (int i = 0; i < count; i++)
             {
-                Assert.AreEqual(1, ir.DocFreq(new Term("f" + i, Utf8Data[2 * i + 1])), "field " + i + " was not indexed correctly");
-                Assert.AreEqual(Utf8Data[2 * i + 1], doc2.GetField("f" + i).StringValue, "field " + i + " is incorrect");
+                Assert.Equal(1, ir.DocFreq(new Term("f" + i, Utf8Data[2 * i + 1]))); //, "field " + i + " was not indexed correctly");
+                Assert.Equal(Utf8Data[2 * i + 1], doc2.GetField("f" + i).StringValue); //, "field " + i + " is incorrect");
             }
             ir.Dispose();
             dir.Dispose();
@@ -312,7 +310,7 @@ namespace Lucene.Net.Index
 
         // Make sure terms, including ones with surrogate pairs,
         // sort in codepoint sort order by default
-        [Test]
+        [Fact]
         public virtual void TestTermUTF16SortOrder()
         {
             Random rnd = Random();
@@ -348,7 +346,7 @@ namespace Lucene.Net.Index
                 {
                     // Surrogate pair
                     chars[0] = (char)GetInt(rnd, UnicodeUtil.UNI_SUR_HIGH_START, UnicodeUtil.UNI_SUR_HIGH_END);
-                    Assert.IsTrue(((int)chars[0]) >= UnicodeUtil.UNI_SUR_HIGH_START && ((int)chars[0]) <= UnicodeUtil.UNI_SUR_HIGH_END);
+                    Assert.True(((int)chars[0]) >= UnicodeUtil.UNI_SUR_HIGH_START && ((int)chars[0]) <= UnicodeUtil.UNI_SUR_HIGH_END);
                     chars[1] = (char)GetInt(rnd, UnicodeUtil.UNI_SUR_LOW_START, UnicodeUtil.UNI_SUR_LOW_END);
                     s = new string(chars, 0, 2);
                 }

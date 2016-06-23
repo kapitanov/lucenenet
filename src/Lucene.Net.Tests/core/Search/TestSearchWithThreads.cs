@@ -6,7 +6,7 @@ namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -33,7 +33,6 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestSearchWithThreads : LuceneTestCase
     {
         internal int NUM_DOCS;
@@ -43,12 +42,12 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             NUM_DOCS = AtLeast(10000);
             RUN_TIME_MSEC = AtLeast(1000);
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();
@@ -148,7 +147,7 @@ namespace Lucene.Net.Search
                         totHits += col.TotalHits;
                         totSearch++;
                     }
-                    Assert.IsTrue(totSearch > 0 && totHits > 0);
+                    Assert.True(totSearch > 0 && totHits > 0);
                     NetSearch.AddAndGet(totSearch);
                 }
                 catch (Exception exc)

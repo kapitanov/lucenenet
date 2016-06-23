@@ -1,10 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using FailOnNonBulkMergesInfoStream = Lucene.Net.Util.FailOnNonBulkMergesInfoStream;
@@ -37,7 +37,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestConsistentFieldNumbers : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSameFieldNumbersAcrossSegments()
         {
             for (int i = 0; i < 2; i++)
@@ -73,17 +73,17 @@ namespace Lucene.Net.Index
 
                 SegmentInfos sis = new SegmentInfos();
                 sis.Read(dir);
-                Assert.AreEqual(2, sis.Size());
+                Assert.Equal(2, sis.Size());
 
                 FieldInfos fis1 = SegmentReader.ReadFieldInfos(sis.Info(0));
                 FieldInfos fis2 = SegmentReader.ReadFieldInfos(sis.Info(1));
 
-                Assert.AreEqual("f1", fis1.FieldInfo(0).Name);
-                Assert.AreEqual("f2", fis1.FieldInfo(1).Name);
-                Assert.AreEqual("f1", fis2.FieldInfo(0).Name);
-                Assert.AreEqual("f2", fis2.FieldInfo(1).Name);
-                Assert.AreEqual("f3", fis2.FieldInfo(2).Name);
-                Assert.AreEqual("f4", fis2.FieldInfo(3).Name);
+                Assert.Equal("f1", fis1.FieldInfo(0).Name);
+                Assert.Equal("f2", fis1.FieldInfo(1).Name);
+                Assert.Equal("f1", fis2.FieldInfo(0).Name);
+                Assert.Equal("f2", fis2.FieldInfo(1).Name);
+                Assert.Equal("f3", fis2.FieldInfo(2).Name);
+                Assert.Equal("f4", fis2.FieldInfo(3).Name);
 
                 writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
                 writer.ForceMerge(1);
@@ -91,20 +91,20 @@ namespace Lucene.Net.Index
 
                 sis = new SegmentInfos();
                 sis.Read(dir);
-                Assert.AreEqual(1, sis.Size());
+                Assert.Equal(1, sis.Size());
 
                 FieldInfos fis3 = SegmentReader.ReadFieldInfos(sis.Info(0));
 
-                Assert.AreEqual("f1", fis3.FieldInfo(0).Name);
-                Assert.AreEqual("f2", fis3.FieldInfo(1).Name);
-                Assert.AreEqual("f3", fis3.FieldInfo(2).Name);
-                Assert.AreEqual("f4", fis3.FieldInfo(3).Name);
+                Assert.Equal("f1", fis3.FieldInfo(0).Name);
+                Assert.Equal("f2", fis3.FieldInfo(1).Name);
+                Assert.Equal("f3", fis3.FieldInfo(2).Name);
+                Assert.Equal("f4", fis3.FieldInfo(3).Name);
 
                 dir.Dispose();
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddIndexes()
         {
             Directory dir1 = NewDirectory();
@@ -136,24 +136,24 @@ namespace Lucene.Net.Index
 
             SegmentInfos sis = new SegmentInfos();
             sis.Read(dir1);
-            Assert.AreEqual(2, sis.Size());
+            Assert.Equal(2, sis.Size());
 
             FieldInfos fis1 = SegmentReader.ReadFieldInfos(sis.Info(0));
             FieldInfos fis2 = SegmentReader.ReadFieldInfos(sis.Info(1));
 
-            Assert.AreEqual("f1", fis1.FieldInfo(0).Name);
-            Assert.AreEqual("f2", fis1.FieldInfo(1).Name);
+            Assert.Equal("f1", fis1.FieldInfo(0).Name);
+            Assert.Equal("f2", fis1.FieldInfo(1).Name);
             // make sure the ordering of the "external" segment is preserved
-            Assert.AreEqual("f2", fis2.FieldInfo(0).Name);
-            Assert.AreEqual("f1", fis2.FieldInfo(1).Name);
-            Assert.AreEqual("f3", fis2.FieldInfo(2).Name);
-            Assert.AreEqual("f4", fis2.FieldInfo(3).Name);
+            Assert.Equal("f2", fis2.FieldInfo(0).Name);
+            Assert.Equal("f1", fis2.FieldInfo(1).Name);
+            Assert.Equal("f3", fis2.FieldInfo(2).Name);
+            Assert.Equal("f4", fis2.FieldInfo(3).Name);
 
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFieldNumberGaps()
         {
             int numIters = AtLeast(13);
@@ -169,10 +169,10 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                     SegmentInfos sis = new SegmentInfos();
                     sis.Read(dir);
-                    Assert.AreEqual(1, sis.Size());
+                    Assert.Equal(1, sis.Size());
                     FieldInfos fis1 = SegmentReader.ReadFieldInfos(sis.Info(0));
-                    Assert.AreEqual("f1", fis1.FieldInfo(0).Name);
-                    Assert.AreEqual("f2", fis1.FieldInfo(1).Name);
+                    Assert.Equal("f1", fis1.FieldInfo(0).Name);
+                    Assert.Equal("f2", fis1.FieldInfo(1).Name);
                 }
 
                 {
@@ -184,14 +184,14 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                     SegmentInfos sis = new SegmentInfos();
                     sis.Read(dir);
-                    Assert.AreEqual(2, sis.Size());
+                    Assert.Equal(2, sis.Size());
                     FieldInfos fis1 = SegmentReader.ReadFieldInfos(sis.Info(0));
                     FieldInfos fis2 = SegmentReader.ReadFieldInfos(sis.Info(1));
-                    Assert.AreEqual("f1", fis1.FieldInfo(0).Name);
-                    Assert.AreEqual("f2", fis1.FieldInfo(1).Name);
-                    Assert.AreEqual("f1", fis2.FieldInfo(0).Name);
-                    Assert.IsNull(fis2.FieldInfo(1));
-                    Assert.AreEqual("f3", fis2.FieldInfo(2).Name);
+                    Assert.Equal("f1", fis1.FieldInfo(0).Name);
+                    Assert.Equal("f2", fis1.FieldInfo(1).Name);
+                    Assert.Equal("f1", fis2.FieldInfo(0).Name);
+                    Assert.Null(fis2.FieldInfo(1));
+                    Assert.Equal("f3", fis2.FieldInfo(2).Name);
                 }
 
                 {
@@ -204,18 +204,18 @@ namespace Lucene.Net.Index
                     writer.Dispose();
                     SegmentInfos sis = new SegmentInfos();
                     sis.Read(dir);
-                    Assert.AreEqual(3, sis.Size());
+                    Assert.Equal(3, sis.Size());
                     FieldInfos fis1 = SegmentReader.ReadFieldInfos(sis.Info(0));
                     FieldInfos fis2 = SegmentReader.ReadFieldInfos(sis.Info(1));
                     FieldInfos fis3 = SegmentReader.ReadFieldInfos(sis.Info(2));
-                    Assert.AreEqual("f1", fis1.FieldInfo(0).Name);
-                    Assert.AreEqual("f2", fis1.FieldInfo(1).Name);
-                    Assert.AreEqual("f1", fis2.FieldInfo(0).Name);
-                    Assert.IsNull(fis2.FieldInfo(1));
-                    Assert.AreEqual("f3", fis2.FieldInfo(2).Name);
-                    Assert.AreEqual("f1", fis3.FieldInfo(0).Name);
-                    Assert.AreEqual("f2", fis3.FieldInfo(1).Name);
-                    Assert.AreEqual("f3", fis3.FieldInfo(2).Name);
+                    Assert.Equal("f1", fis1.FieldInfo(0).Name);
+                    Assert.Equal("f2", fis1.FieldInfo(1).Name);
+                    Assert.Equal("f1", fis2.FieldInfo(0).Name);
+                    Assert.Null(fis2.FieldInfo(1));
+                    Assert.Equal("f3", fis2.FieldInfo(2).Name);
+                    Assert.Equal("f1", fis3.FieldInfo(0).Name);
+                    Assert.Equal("f2", fis3.FieldInfo(1).Name);
+                    Assert.Equal("f3", fis3.FieldInfo(2).Name);
                 }
 
                 {
@@ -233,16 +233,16 @@ namespace Lucene.Net.Index
 
                 SegmentInfos sis_ = new SegmentInfos();
                 sis_.Read(dir);
-                Assert.AreEqual(1, sis_.Size());
+                Assert.Equal(1, sis_.Size());
                 FieldInfos fis1_ = SegmentReader.ReadFieldInfos(sis_.Info(0));
-                Assert.AreEqual("f1", fis1_.FieldInfo(0).Name);
-                Assert.AreEqual("f2", fis1_.FieldInfo(1).Name);
-                Assert.AreEqual("f3", fis1_.FieldInfo(2).Name);
+                Assert.Equal("f1", fis1_.FieldInfo(0).Name);
+                Assert.Equal("f2", fis1_.FieldInfo(1).Name);
+                Assert.Equal("f3", fis1_.FieldInfo(2).Name);
                 dir.Dispose();
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestManyFields()
         {
             int NUM_DOCS = AtLeast(200);
@@ -283,8 +283,8 @@ namespace Lucene.Net.Index
                 foreach (FieldInfo fi in fis)
                 {
                     Field expected = GetField(Convert.ToInt32(fi.Name));
-                    Assert.AreEqual(expected.FieldType().Indexed, fi.Indexed);
-                    Assert.AreEqual(expected.FieldType().StoreTermVectors, fi.HasVectors());
+                    Assert.Equal(expected.FieldType().Indexed, fi.Indexed);
+                    Assert.Equal(expected.FieldType().StoreTermVectors, fi.HasVectors());
                 }
             }
 

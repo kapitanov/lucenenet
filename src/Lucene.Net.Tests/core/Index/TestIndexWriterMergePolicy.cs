@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -28,11 +28,10 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
 
-    [TestFixture]
     public class TestIndexWriterMergePolicy : LuceneTestCase
     {
         // Test the normal case
-        [Test]
+        [Fact]
         public virtual void TestNormalCase()
         {
             Directory dir = NewDirectory();
@@ -50,7 +49,7 @@ namespace Lucene.Net.Index
         }
 
         // Test to see if there is over merge
-        [Test]
+        [Fact]
         public virtual void TestNoOverMerge()
         {
             Directory dir = NewDirectory();
@@ -67,14 +66,14 @@ namespace Lucene.Net.Index
                     noOverMerge = true;
                 }
             }
-            Assert.IsTrue(noOverMerge);
+            Assert.True(noOverMerge);
 
             writer.Dispose();
             dir.Dispose();
         }
 
         // Test the case where flush is forced after every addDoc
-        [Test]
+        [Fact]
         public virtual void TestForceFlush()
         {
             Directory dir = NewDirectory();
@@ -101,7 +100,7 @@ namespace Lucene.Net.Index
         }
 
         // Test the case where mergeFactor changes
-        [Test]
+        [Fact]
         public virtual void TestMergeFactorChange()
         {
             Directory dir = NewDirectory();
@@ -129,7 +128,7 @@ namespace Lucene.Net.Index
         }
 
         // Test the case where both mergeFactor and maxBufferedDocs change
-        [Test]
+        [Fact]
         public virtual void TestMaxBufferedDocsChange()
         {
             Directory dir = NewDirectory();
@@ -177,8 +176,9 @@ namespace Lucene.Net.Index
         }
 
         // Test the case where a merge results in no doc at all
-        [Test]
-        public virtual void TestMergeDocCount0([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestMergeDocCount0(IConcurrentMergeScheduler scheduler)
         {
             Directory dir = NewDirectory();
 
@@ -216,7 +216,7 @@ namespace Lucene.Net.Index
             writer.WaitForMerges();
             writer.Commit();
             CheckInvariants(writer);
-            Assert.AreEqual(10, writer.MaxDoc);
+            Assert.Equal(10, writer.MaxDoc);
 
             writer.Dispose();
             dir.Dispose();
@@ -237,7 +237,7 @@ namespace Lucene.Net.Index
             int maxMergeDocs = ((LogMergePolicy)writer.Config.MergePolicy).MaxMergeDocs;
 
             int ramSegmentCount = writer.NumBufferedDocuments;
-            Assert.IsTrue(ramSegmentCount < maxBufferedDocs);
+            Assert.True(ramSegmentCount < maxBufferedDocs);
 
             int lowerBound = -1;
             int upperBound = maxBufferedDocs;
@@ -247,7 +247,7 @@ namespace Lucene.Net.Index
             for (int i = segmentCount - 1; i >= 0; i--)
             {
                 int docCount = writer.GetDocCount(i);
-                Assert.IsTrue(docCount > lowerBound, "docCount=" + docCount + " lowerBound=" + lowerBound + " upperBound=" + upperBound + " i=" + i + " segmentCount=" + segmentCount + " index=" + writer.SegString() + " config=" + writer.Config);
+                Assert.True(docCount > lowerBound, "docCount=" + docCount + " lowerBound=" + lowerBound + " upperBound=" + upperBound + " i=" + i + " segmentCount=" + segmentCount + " index=" + writer.SegString() + " config=" + writer.Config);
 
                 if (docCount <= upperBound)
                 {
@@ -257,7 +257,7 @@ namespace Lucene.Net.Index
                 {
                     if (upperBound * mergeFactor <= maxMergeDocs)
                     {
-                        Assert.IsTrue(numSegments < mergeFactor, "maxMergeDocs=" + maxMergeDocs + "; numSegments=" + numSegments + "; upperBound=" + upperBound + "; mergeFactor=" + mergeFactor + "; segs=" + writer.SegString() + " config=" + writer.Config);
+                        Assert.True(numSegments < mergeFactor, "maxMergeDocs=" + maxMergeDocs + "; numSegments=" + numSegments + "; upperBound=" + upperBound + "; mergeFactor=" + mergeFactor + "; segs=" + writer.SegString() + " config=" + writer.Config);
                     }
 
                     do
@@ -270,13 +270,13 @@ namespace Lucene.Net.Index
             }
             if (upperBound * mergeFactor <= maxMergeDocs)
             {
-                Assert.IsTrue(numSegments < mergeFactor);
+                Assert.True(numSegments < mergeFactor);
             }
         }
 
         private const double EPSILON = 1E-14;
 
-        [Test]
+        [Fact]
         public virtual void TestSetters()
         {
             AssertSetters(new LogByteSizeMergePolicy());
@@ -286,20 +286,20 @@ namespace Lucene.Net.Index
         private void AssertSetters(MergePolicy lmp)
         {
             lmp.MaxCFSSegmentSizeMB = 2.0;
-            Assert.AreEqual(2.0, lmp.MaxCFSSegmentSizeMB, EPSILON);
+            Assert.Equal(2.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON);
 
             lmp.MaxCFSSegmentSizeMB = double.PositiveInfinity;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON * long.MaxValue);
 
             lmp.MaxCFSSegmentSizeMB = long.MaxValue / 1024 / 1024.0;
-            Assert.AreEqual(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            Assert.Equal(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON * long.MaxValue);
 
             try
             {
                 lmp.MaxCFSSegmentSizeMB = -2.0;
-                Assert.Fail("Didn't throw IllegalArgumentException");
+                Assert.True(false, "Didn't throw IllegalArgumentException");
             }
-            catch (System.ArgumentException iae)
+            catch (System.ArgumentException)
             {
                 // pass
             }

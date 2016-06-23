@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -39,7 +39,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
             RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
             for (int i = 0; i < 100; i++)
@@ -56,7 +56,7 @@ namespace Lucene.Net.Search
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            base.Dispose();
             Reader.Dispose();
             Dir.Dispose();
         }
@@ -64,7 +64,7 @@ namespace Lucene.Net.Search
         //LUCENE TODO: Compilation problems
         /*
         // should not throw exception
-        [Test]
+        [Fact]
         public virtual void TestHugeN()
         {
             TaskScheduler service = new ThreadPoolExecutor(4, 4, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>(), new NamedThreadFactory("TestIndexSearcher"));
@@ -112,7 +112,7 @@ namespace Lucene.Net.Search
             TestUtil.ShutdownExecutorService(service);
         }*/
 
-        [Test]
+        [Fact]
         public virtual void TestSearchAfterPassedMaxDoc()
         {
             // LUCENE-5128: ensure we get a meaningful message if searchAfter exceeds maxDoc
@@ -126,7 +126,7 @@ namespace Lucene.Net.Search
             try
             {
                 s.SearchAfter(new ScoreDoc(r.MaxDoc, 0.54f), new MatchAllDocsQuery(), 10);
-                Assert.Fail("should have hit IllegalArgumentException when searchAfter exceeds maxDoc");
+                Assert.True(false, "should have hit IllegalArgumentException when searchAfter exceeds maxDoc");
             }
             catch (System.ArgumentException e)
             {

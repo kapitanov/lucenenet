@@ -1,9 +1,9 @@
 using System;
-
+using Xunit;
+	
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
 
     using ByteBlockPool = Lucene.Net.Util.ByteBlockPool;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
@@ -22,10 +22,10 @@ namespace Lucene.Net.Index
     /// See the License for the specific language governing permissions and
     /// limitations under the License.
     /// </summary>
-    [TestFixture]
     public class TestByteSlices : LuceneTestCase
     {
-        [Test, Timeout(300000)]
+        ////[Test, Timeout(300000)]
+        [Fact]
         public virtual void TestBasic()
         {
             ByteBlockPool pool = new ByteBlockPool(new RecyclingByteBlockAllocator(ByteBlockPool.BYTE_BLOCK_SIZE, Random().Next(100)));
@@ -122,7 +122,7 @@ namespace Lucene.Net.Index
                         for (int j = 0; j < counters[stream]; j++)
                         {
                             reader.ReadVInt();
-                            Assert.AreEqual(j, reader.ReadVInt());
+                            Assert.Equal(j, reader.ReadVInt());
                         }
                     }
                 }

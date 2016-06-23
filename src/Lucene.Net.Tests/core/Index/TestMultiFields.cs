@@ -1,16 +1,14 @@
-using Lucene.Net.Documents;
-using Lucene.Net.Randomized.Generators;
 using System;
 using System.Collections.Generic;
+using Lucene.Net.Analysis;
+using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Store;
+using Lucene.Net.Util;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Analysis;
-    
-    using Lucene.Net.Store;
-    using Lucene.Net.Util;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -33,7 +31,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestMultiFields : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             int num = AtLeast(2);
@@ -139,7 +137,7 @@ namespace Lucene.Net.Index
                 Bits liveDocs = MultiFields.GetLiveDocs(reader);
                 foreach (int delDoc in deleted)
                 {
-                    Assert.IsFalse(liveDocs.Get(delDoc));
+                    Assert.False(liveDocs.Get(delDoc));
                 }
 
                 for (int i = 0; i < 100; i++)
@@ -151,16 +149,16 @@ namespace Lucene.Net.Index
                     }
 
                     DocsEnum docsEnum = TestUtil.Docs(Random(), reader, "field", term, liveDocs, null, DocsEnum.FLAG_NONE);
-                    Assert.IsNotNull(docsEnum);
+                    Assert.NotNull(docsEnum);
 
                     foreach (int docID in docs[term])
                     {
                         if (!deleted.Contains(docID))
                         {
-                            Assert.AreEqual(docID, docsEnum.NextDoc());
+                            Assert.Equal(docID, docsEnum.NextDoc());
                         }
                     }
-                    Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
+                    Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docsEnum.NextDoc());
                 }
 
                 reader.Dispose();
@@ -177,13 +175,13 @@ namespace Lucene.Net.Index
                                          null,
                                          false);
           for(int docID : expected) {
-            Assert.AreEqual(docID, docs.NextDoc());
+            Assert.Equal(docID, docs.NextDoc());
           }
-          Assert.AreEqual(docs.NO_MORE_DOCS, docs.NextDoc());
+          Assert.Equal(docs.NO_MORE_DOCS, docs.NextDoc());
         }
         */
 
-        [Test]
+        [Fact]
         public virtual void TestSeparateEnums()
         {
             Directory dir = NewDirectory();
@@ -197,13 +195,13 @@ namespace Lucene.Net.Index
             w.Dispose();
             DocsEnum d1 = TestUtil.Docs(Random(), r, "f", new BytesRef("j"), null, null, DocsEnum.FLAG_NONE);
             DocsEnum d2 = TestUtil.Docs(Random(), r, "f", new BytesRef("j"), null, null, DocsEnum.FLAG_NONE);
-            Assert.AreEqual(0, d1.NextDoc());
-            Assert.AreEqual(0, d2.NextDoc());
+            Assert.Equal(0, d1.NextDoc());
+            Assert.Equal(0, d2.NextDoc());
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermDocsEnum()
         {
             Directory dir = NewDirectory();
@@ -216,9 +214,9 @@ namespace Lucene.Net.Index
             IndexReader r = w.Reader;
             w.Dispose();
             DocsEnum de = MultiFields.GetTermDocsEnum(r, null, "f", new BytesRef("j"));
-            Assert.AreEqual(0, de.NextDoc());
-            Assert.AreEqual(1, de.NextDoc());
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, de.NextDoc());
+            Assert.Equal(0, de.NextDoc());
+            Assert.Equal(1, de.NextDoc());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, de.NextDoc());
             r.Dispose();
             dir.Dispose();
         }

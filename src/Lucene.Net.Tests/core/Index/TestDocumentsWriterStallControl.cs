@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Threading;
-
+using Xunit;
+	
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
-
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements. See the NOTICE file distributed with this
@@ -33,7 +32,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestDocumentsWriterStallControl : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSimpleStall()
         {
             DocumentsWriterStallControl ctrl = new DocumentsWriterStallControl();
@@ -41,8 +40,8 @@ namespace Lucene.Net.Index
             ctrl.UpdateStalled(false);
             ThreadClass[] waitThreads = WaitThreads(AtLeast(1), ctrl);
             Start(waitThreads);
-            Assert.IsFalse(ctrl.HasBlocked());
-            Assert.IsFalse(ctrl.AnyStalledThreads());
+            Assert.False(ctrl.HasBlocked());
+            Assert.False(ctrl.AnyStalledThreads());
             Join(waitThreads);
 
             // now stall threads and wake them up again
@@ -50,14 +49,14 @@ namespace Lucene.Net.Index
             waitThreads = WaitThreads(AtLeast(1), ctrl);
             Start(waitThreads);
             AwaitState(ThreadState.WaitSleepJoin, waitThreads);
-            Assert.IsTrue(ctrl.HasBlocked());
-            Assert.IsTrue(ctrl.AnyStalledThreads());
+            Assert.True(ctrl.HasBlocked());
+            Assert.True(ctrl.AnyStalledThreads());
             ctrl.UpdateStalled(false);
-            Assert.IsFalse(ctrl.AnyStalledThreads());
+            Assert.False(ctrl.AnyStalledThreads());
             Join(waitThreads);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             DocumentsWriterStallControl ctrl = new DocumentsWriterStallControl();
@@ -115,7 +114,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAccquireReleaseRace()
         {
             DocumentsWriterStallControl ctrl = new DocumentsWriterStallControl();
@@ -149,7 +148,7 @@ namespace Lucene.Net.Index
             {
                 if (checkPoint.Get())
                 {
-                    Assert.IsTrue(sync.UpdateJoin.Wait(new TimeSpan(0, 0, 0, 10)), "timed out waiting for update threads - deadlock?");
+                    Assert.True(sync.UpdateJoin.Wait(new TimeSpan(0, 0, 0, 10)), "timed out waiting for update threads - deadlock?");
                     if (exceptions.Count > 0)
                     {
                         foreach (Exception throwable in exceptions)
@@ -157,7 +156,7 @@ namespace Lucene.Net.Index
                             Console.WriteLine(throwable.ToString());
                             Console.Write(throwable.StackTrace);
                         }
-                        Assert.Fail("got exceptions in threads");
+                        Assert.True(false, "got exceptions in threads");
                     }
 
                     if (ctrl.HasBlocked() && ctrl.Healthy)
@@ -169,8 +168,8 @@ namespace Lucene.Net.Index
                     sync.Waiter.Signal();
                     sync.LeftCheckpoint.Wait();
                 }
-                Assert.IsFalse(checkPoint.Get());
-                Assert.AreEqual(0, sync.Waiter.CurrentCount);
+                Assert.False(checkPoint.Get());
+                Assert.Equal(0, sync.Waiter.CurrentCount);
                 if (checkPointProbability >= (float)Random().NextDouble())
                 {
                     sync.Reset(numStallers + numReleasers, numStallers + numReleasers + numWaiters);
@@ -183,7 +182,7 @@ namespace Lucene.Net.Index
                 checkPoint.Set(true);
             }
 
-            Assert.IsTrue(sync.UpdateJoin.Wait(new TimeSpan(0, 0, 0, 10)));
+            Assert.True(sync.UpdateJoin.Wait(new TimeSpan(0, 0, 0, 10)));
             AssertState(numReleasers, numStallers, numWaiters, threads, ctrl);
             checkPoint.Set(false);
             stop.Set(true);
@@ -198,7 +197,7 @@ namespace Lucene.Net.Index
                 {
                     if (threads[i].State == ThreadState.WaitSleepJoin)
                     {
-                        Assert.Fail("waiter is not released - anyThreadsStalled: " + ctrl.AnyStalledThreads());
+                        Assert.True(false, "waiter is not released - anyThreadsStalled: " + ctrl.AnyStalledThreads());
                     }
                 }
             }
@@ -223,7 +222,7 @@ namespace Lucene.Net.Index
                             }
                             else
                             {
-                                Assert.Fail("control claims no stalled threads but waiter seems to be blocked ");
+                                Assert.True(false, "control claims no stalled threads but waiter seems to be blocked ");
                             }
                         }
                     }
@@ -265,7 +264,7 @@ namespace Lucene.Net.Index
                         {
                             try
                             {
-                                Assert.IsTrue(Sync.await());
+                                Assert.True(Sync.await());
                             }
                             catch (ThreadInterruptedException e)
                             {
@@ -320,7 +319,7 @@ namespace Lucene.Net.Index
                             Sync.UpdateJoin.Signal();
                             try
                             {
-                                Assert.IsTrue(Sync.await());
+                                Assert.True(Sync.await());
                             }
                             catch (ThreadInterruptedException e)
                             {

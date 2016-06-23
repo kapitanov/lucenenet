@@ -1,7 +1,5 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -18,7 +16,7 @@ namespace Lucene.Net.Search
          * See the License for the specific language governing permissions and
          * limitations under the License.
          */
-
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
@@ -60,14 +58,14 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullCollectors()
         {
             // Tests that the collector rejects all null collectors.
             try
             {
                 MultiCollector.Wrap(null, null);
-                Assert.Fail("only null collectors should not be supported");
+                Assert.True(false, "only null collectors should not be supported");
             }
             catch (System.ArgumentException e)
             {
@@ -77,23 +75,23 @@ namespace Lucene.Net.Search
             // Tests that the collector handles some null collectors well. If it
             // doesn't, an NPE would be thrown.
             Collector c = MultiCollector.Wrap(new DummyCollector(), null, new DummyCollector());
-            Assert.IsTrue(c is MultiCollector);
-            Assert.IsTrue(c.AcceptsDocsOutOfOrder());
+            Assert.True(c is MultiCollector);
+            Assert.True(c.AcceptsDocsOutOfOrder());
             c.Collect(1);
             c.NextReader = null;
             c.Scorer = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSingleCollector()
         {
             // Tests that if a single Collector is input, it is returned (and not MultiCollector).
             DummyCollector dc = new DummyCollector();
-            Assert.AreSame(dc, MultiCollector.Wrap(dc));
-            Assert.AreSame(dc, MultiCollector.Wrap(dc, null));
+            Assert.Same(dc, MultiCollector.Wrap(dc));
+            Assert.Same(dc, MultiCollector.Wrap(dc, null));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCollector()
         {
             // Tests that the collector delegates calls to input collectors properly.
@@ -102,17 +100,17 @@ namespace Lucene.Net.Search
             // doesn't, an NPE would be thrown.
             DummyCollector[] dcs = new DummyCollector[] { new DummyCollector(), new DummyCollector() };
             Collector c = MultiCollector.Wrap(dcs);
-            Assert.IsTrue(c.AcceptsDocsOutOfOrder());
+            Assert.True(c.AcceptsDocsOutOfOrder());
             c.Collect(1);
             c.NextReader = null;
             c.Scorer = null;
 
             foreach (DummyCollector dc in dcs)
             {
-                Assert.IsTrue(dc.AcceptsDocsOutOfOrderCalled);
-                Assert.IsTrue(dc.CollectCalled);
-                Assert.IsTrue(dc.SetNextReaderCalled);
-                Assert.IsTrue(dc.SetScorerCalled);
+                Assert.True(dc.AcceptsDocsOutOfOrderCalled);
+                Assert.True(dc.CollectCalled);
+                Assert.True(dc.SetNextReaderCalled);
+                Assert.True(dc.SetScorerCalled);
             }
         }
     }

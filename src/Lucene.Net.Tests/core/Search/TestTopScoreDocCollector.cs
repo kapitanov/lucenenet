@@ -1,6 +1,6 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -26,10 +26,9 @@ namespace Lucene.Net.Search
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestTopScoreDocCollector : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestOutOfOrderCollection()
         {
             Directory dir = NewDirectory();
@@ -54,15 +53,15 @@ namespace Lucene.Net.Search
             for (int i = 0; i < inOrder.Length; i++)
             {
                 TopDocsCollector<ScoreDoc> tdc = TopScoreDocCollector.Create(3, inOrder[i]);
-                Assert.AreEqual("Lucene.Net.Search.TopScoreDocCollector+" + actualTSDCClass[i], tdc.GetType().FullName);
+                Assert.Equal("Lucene.Net.Search.TopScoreDocCollector+" + actualTSDCClass[i], tdc.GetType().FullName);
 
                 searcher.Search(new MatchAllDocsQuery(), tdc);
 
                 ScoreDoc[] sd = tdc.TopDocs().ScoreDocs;
-                Assert.AreEqual(3, sd.Length);
+                Assert.Equal(3, sd.Length);
                 for (int j = 0; j < sd.Length; j++)
                 {
-                    Assert.AreEqual(j, sd[j].Doc, "expected doc Id " + j + " found " + sd[j].Doc);
+                    Assert.Equal(j, sd[j].Doc); //, "expected doc Id " + j + " found " + sd[j].Doc);
                 }
             }
             writer.Dispose();

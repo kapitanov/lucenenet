@@ -1,5 +1,6 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -7,7 +8,7 @@ namespace Lucene.Net.Index
 
     using TimeoutSuite = com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;*/
 
-    using NUnit.Framework;
+    
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using BinaryDocValuesField = BinaryDocValuesField;
     using ByteArrayDataInput = Lucene.Net.Store.ByteArrayDataInput;
@@ -36,13 +37,13 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
 
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BBinaryDocValues : LuceneTestCase
     {
         // indexes Integer.MAX_VALUE docs with a fixed binary field
-        [Test]
-        public virtual void TestFixedBinary([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestFixedBinary(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BFixedBinary"));
             if (dir is MockDirectoryWrapper)
@@ -97,7 +98,7 @@ namespace Lucene.Net.Index
                     bytes[2] = (byte)(expectedValue >> 8);
                     bytes[3] = (byte)expectedValue;
                     dv.Get(i, scratch);
-                    Assert.AreEqual(data, scratch);
+                    Assert.Equal(data, scratch);
                     expectedValue++;
                 }
             }
@@ -107,8 +108,9 @@ namespace Lucene.Net.Index
         }
 
         // indexes Integer.MAX_VALUE docs with a variable binary field
-        [Test]
-        public virtual void TestVariableBinary([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestVariableBinary(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BVariableBinary"));
             if (dir is MockDirectoryWrapper)
@@ -162,8 +164,8 @@ namespace Lucene.Net.Index
                 {
                     dv.Get(i, scratch);
                     input.Reset((byte[])(Array)scratch.Bytes, scratch.Offset, scratch.Length);
-                    Assert.AreEqual(expectedValue % 65535, input.ReadVInt());
-                    Assert.IsTrue(input.Eof());
+                    Assert.Equal(expectedValue % 65535, input.ReadVInt());
+                    Assert.True(input.Eof());
                     expectedValue++;
                 }
             }

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene3x
 {
@@ -39,7 +39,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             }
         }
 
-        [Test]
+        [Fact]
         public override void TestWriteReadMerge()
         {
             AssumeFalse("impersonation isnt good enough", true);

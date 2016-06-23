@@ -280,7 +280,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(indexWriter, taxoWriter);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDifferentNumResults()
         {
             // test the collector w/ FacetRequests and different numResults
@@ -293,22 +293,22 @@ namespace Lucene.Net.Facet.Taxonomy
             searcher.Search(q, sfc);
             Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
             FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
-            Assert.AreEqual(-1, (int)result.Value);
+            Assert.Equal(-1, (int)result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(termExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(termExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
             }
             result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
-            Assert.AreEqual(termExpectedCounts[CP_B], result.Value);
+            Assert.Equal(termExpectedCounts[CP_B], result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(termExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(termExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
             }
 
             IOUtils.Close(indexReader, taxoReader);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllCounts()
         {
             DirectoryReader indexReader = DirectoryReader.Open(indexDir);
@@ -321,21 +321,21 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
 
             FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
-            Assert.AreEqual(-1, (int)result.Value);
+            Assert.Equal(-1, (int)result.Value);
             int prevValue = int.MaxValue;
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
                 Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
                 prevValue = (int)labelValue.value;
             }
 
             result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
-            Assert.AreEqual(allExpectedCounts[CP_B], result.Value);
+            Assert.Equal(allExpectedCounts[CP_B], result.Value);
             prevValue = int.MaxValue;
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
                 Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
                 prevValue = (int)labelValue.value;
             }
@@ -343,7 +343,7 @@ namespace Lucene.Net.Facet.Taxonomy
             IOUtils.Close(indexReader, taxoReader);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBigNumResults()
         {
             DirectoryReader indexReader = DirectoryReader.Open(indexDir);
@@ -356,22 +356,22 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
 
             FacetResult result = facets.GetTopChildren(int.MaxValue, CP_A);
-            Assert.AreEqual(-1, (int)result.Value);
+            Assert.Equal(-1, (int)result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
             }
             result = facets.GetTopChildren(int.MaxValue, CP_B);
-            Assert.AreEqual(allExpectedCounts[CP_B], result.Value);
+            Assert.Equal(allExpectedCounts[CP_B], result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
             }
 
             IOUtils.Close(indexReader, taxoReader);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoParents()
         {
             DirectoryReader indexReader = DirectoryReader.Open(indexDir);
@@ -384,16 +384,16 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
 
             FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_C, CP_C);
-            Assert.AreEqual(allExpectedCounts[CP_C], result.Value);
+            Assert.Equal(allExpectedCounts[CP_C], result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_C + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_C + "/" + labelValue.label], labelValue.value);
             }
             result = facets.GetTopChildren(NUM_CHILDREN_CP_D, CP_D);
-            Assert.AreEqual(allExpectedCounts[CP_C], result.Value);
+            Assert.Equal(allExpectedCounts[CP_C], result.Value);
             foreach (LabelAndValue labelValue in result.LabelValues)
             {
-                Assert.AreEqual(allExpectedCounts[CP_D + "/" + labelValue.label], labelValue.value);
+                Assert.Equal(allExpectedCounts[CP_D + "/" + labelValue.label], labelValue.value);
             }
 
             IOUtils.Close(indexReader, taxoReader);

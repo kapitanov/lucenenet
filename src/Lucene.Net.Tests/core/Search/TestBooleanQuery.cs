@@ -4,7 +4,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -41,10 +41,9 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestBooleanQuery : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEquality()
         {
             BooleanQuery bq1 = new BooleanQuery();
@@ -63,26 +62,18 @@ namespace Lucene.Net.Search
             nested2.Add(new TermQuery(new Term("field", "nestedvalue2")), BooleanClause.Occur.SHOULD);
             bq2.Add(nested2, BooleanClause.Occur.SHOULD);
 
-            Assert.IsTrue(bq1.Equals(bq2));
-            //Assert.AreEqual(bq1, bq2);
+            Assert.True(bq1.Equals(bq2));
+            //Assert.Equal(bq1, bq2);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestException()
         {
-            try
-            {
-                BooleanQuery.MaxClauseCount = 0;
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // okay
-            }
+            Assert.Throws<System.ArgumentException>(() => BooleanQuery.MaxClauseCount = 0);
         }
 
         // LUCENE-1630
-        [Test]
+        [Fact]
         public virtual void TestNullOrSubScorer()
         {
             Directory dir = NewDirectory();
@@ -106,7 +97,7 @@ namespace Lucene.Net.Search
             subQuery.Boost = 0;
             q.Add(subQuery, BooleanClause.Occur.SHOULD);
             float score2 = s.Search(q, 10).MaxScore;
-            Assert.AreEqual(score * .5F, score2, 1e-6);
+            Assert.Equal(score * .5F, score2); //, 1e-6);
 
             // LUCENE-2617: make sure that a clause not in the index still contributes to the score via coord factor
             BooleanQuery qq = (BooleanQuery)q.Clone();
@@ -116,19 +107,19 @@ namespace Lucene.Net.Search
             phrase.Boost = 0;
             qq.Add(phrase, BooleanClause.Occur.SHOULD);
             score2 = s.Search(qq, 10).MaxScore;
-            Assert.AreEqual(score * (1 / 3F), score2, 1e-6);
+            Assert.Equal(score * (1 / 3F), score2); //, 1e-6);
 
             // now test BooleanScorer2
             subQuery = new TermQuery(new Term("field", "b"));
             subQuery.Boost = 0;
             q.Add(subQuery, BooleanClause.Occur.MUST);
             score2 = s.Search(q, 10).MaxScore;
-            Assert.AreEqual(score * (2 / 3F), score2, 1e-6);
+            Assert.Equal(score * (2 / 3F), score2); //, 1e-6);
 
             // PhraseQuery w/ no terms added returns a null scorer
             PhraseQuery pq = new PhraseQuery();
             q.Add(pq, BooleanClause.Occur.SHOULD);
-            Assert.AreEqual(1, s.Search(q, 10).TotalHits);
+            Assert.Equal(1, s.Search(q, 10).TotalHits);
 
             // A required clause which returns null scorer should return null scorer to
             // IndexSearcher.
@@ -136,12 +127,12 @@ namespace Lucene.Net.Search
             pq = new PhraseQuery();
             q.Add(new TermQuery(new Term("field", "a")), BooleanClause.Occur.SHOULD);
             q.Add(pq, BooleanClause.Occur.MUST);
-            Assert.AreEqual(0, s.Search(q, 10).TotalHits);
+            Assert.Equal(0, s.Search(q, 10).TotalHits);
 
             DisjunctionMaxQuery dmq = new DisjunctionMaxQuery(1.0f);
             dmq.Add(new TermQuery(new Term("field", "a")));
             dmq.Add(pq);
-            Assert.AreEqual(1, s.Search(dmq, 10).TotalHits);
+            Assert.Equal(1, s.Search(dmq, 10).TotalHits);
 
             r.Dispose();
             w.Dispose();
@@ -149,7 +140,7 @@ namespace Lucene.Net.Search
         }
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestDeMorgan()
         {
             Directory dir1 = NewDirectory();
@@ -176,7 +167,7 @@ namespace Lucene.Net.Search
 
             MultiReader multireader = new MultiReader(reader1, reader2);
             IndexSearcher searcher = NewSearcher(multireader);
-            Assert.AreEqual(0, searcher.Search(query, 10).TotalHits);
+            Assert.Equal(0, searcher.Search(query, 10).TotalHits);
 
             TaskScheduler es = Executors.newCachedThreadPool(new NamedThreadFactory("NRT search threads"));
             searcher = new IndexSearcher(multireader, es);
@@ -184,7 +175,7 @@ namespace Lucene.Net.Search
             {
                 Console.WriteLine("rewritten form: " + searcher.Rewrite(query));
             }
-            Assert.AreEqual(0, searcher.Search(query, 10).TotalHits);
+            Assert.Equal(0, searcher.Search(query, 10).TotalHits);
             es.shutdown();
             es.awaitTermination(new TimeSpan(0, 0, 0, 1));
 
@@ -196,7 +187,7 @@ namespace Lucene.Net.Search
         }*/
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestBS2DisjunctionNextVsAdvance()
         {
             Directory d = NewDirectory();
@@ -308,14 +299,14 @@ namespace Lucene.Net.Search
 
                         if (nextUpto == hits.Count)
                         {
-                            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, nextDoc);
+                            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, nextDoc);
                         }
                         else
                         {
                             ScoreDoc hit = hits[nextUpto];
-                            Assert.AreEqual(hit.Doc, nextDoc);
+                            Assert.Equal(hit.Doc, nextDoc);
                             // Test for precise float equality:
-                            Assert.IsTrue(hit.Score == scorer.Score(), "doc " + hit.Doc + " has wrong score: expected=" + hit.Score + " actual=" + scorer.Score());
+                            Assert.True(hit.Score == scorer.Score(), "doc " + hit.Doc + " has wrong score: expected=" + hit.Score + " actual=" + scorer.Score());
                         }
                         upto = nextUpto;
                     }
@@ -327,7 +318,7 @@ namespace Lucene.Net.Search
         }*/
 
         // LUCENE-4477 / LUCENE-4401:
-        [Test]
+        [Fact]
         public virtual void TestBooleanSpanQuery()
         {
             bool failed = false;
@@ -359,13 +350,13 @@ namespace Lucene.Net.Search
                 Console.WriteLine(scoreDoc.Doc);
             }
             indexReader.Dispose();
-            Assert.AreEqual(failed, false, "Bug in boolean query composed of span queries");
-            Assert.AreEqual(hits, 1, "Bug in boolean query composed of span queries");
+            Assert.False(failed, "Bug in boolean query composed of span queries");
+            Assert.Equal(1, hits); //, "Bug in boolean query composed of span queries");
             directory.Dispose();
         }
 
         // LUCENE-5487
-        [Test]
+        [Fact]
         public virtual void TestInOrderWithMinShouldMatch()
         {
             Directory dir = NewDirectory();
@@ -398,7 +389,7 @@ namespace Lucene.Net.Search
 
             protected override void Search(IList<AtomicReaderContext> leaves, Weight weight, Collector collector)
             {
-                Assert.AreEqual(-1, collector.GetType().Name.IndexOf("OutOfOrder"));
+                Assert.Equal(-1, collector.GetType().Name.IndexOf("OutOfOrder"));
                 base.Search(leaves, weight, collector);
             }
         }

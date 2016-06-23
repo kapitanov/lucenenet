@@ -1,14 +1,13 @@
-using Lucene.Net.Analysis.Tokenattributes;
 using System;
 using System.Diagnostics;
+using System.IO;
+using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-    using System.IO;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -41,7 +40,6 @@ namespace Lucene.Net.Index
     using TextField = TextField;
     using TokenStream = Lucene.Net.Analysis.TokenStream;
 
-    [TestFixture]
     public class TestLongPostings : LuceneTestCase
     {
         // Produces a realistic unicode random string that
@@ -97,7 +95,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongPostings_Mem()
         {
             // Don't use TestUtil.getTempDir so that we own the
@@ -164,7 +162,7 @@ namespace Lucene.Net.Index
               TermEnum termEnum = r.Terms();
               while(termEnum.Next()) {
                 System.out.println("  term=" + termEnum.Term() + " len=" + termEnum.Term().Text().Length());
-                Assert.IsTrue(termEnum.DocFreq() > 0);
+                Assert.True(termEnum.DocFreq() > 0);
                 System.out.println("    s1?=" + (termEnum.Term().Text().equals(s1)) + " s1len=" + s1.Length());
                 System.out.println("    s2?=" + (termEnum.Term().Text().equals(s2)) + " s2len=" + s2.Length());
                 final String s = termEnum.Term().Text();
@@ -175,9 +173,9 @@ namespace Lucene.Net.Index
             }
             */
 
-            Assert.AreEqual(NUM_DOCS, r.NumDocs);
-            Assert.IsTrue(r.DocFreq(new Term("field", s1)) > 0);
-            Assert.IsTrue(r.DocFreq(new Term("field", s2)) > 0);
+            Assert.Equal(NUM_DOCS, r.NumDocs);
+            Assert.True(r.DocFreq(new Term("field", s1)) > 0);
+            Assert.True(r.DocFreq(new Term("field", s2)) > 0);
 
             int num = AtLeast(1000);
             for (int iter = 0; iter < num; iter++)
@@ -235,7 +233,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine("  got docID=" + docID);
                         }
-                        Assert.AreEqual(expected, docID);
+                        Assert.Equal(expected, docID);
                         if (docID == DocIdSetIterator.NO_MORE_DOCS)
                         {
                             break;
@@ -244,10 +242,10 @@ namespace Lucene.Net.Index
                         if (Random().Next(6) == 3)
                         {
                             int freq = postings.Freq();
-                            Assert.IsTrue(freq >= 1 && freq <= 4);
+                            Assert.True(freq >= 1 && freq <= 4);
                             for (int pos = 0; pos < freq; pos++)
                             {
-                                Assert.AreEqual(pos, postings.NextPosition());
+                                Assert.Equal(pos, postings.NextPosition());
                                 if (Random().NextBoolean())
                                 {
                                     var dummy = postings.Payload;
@@ -298,7 +296,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine("  got docID=" + docID);
                         }
-                        Assert.AreEqual(expected, docID);
+                        Assert.Equal(expected, docID);
                         if (docID == DocIdSetIterator.NO_MORE_DOCS)
                         {
                             break;
@@ -307,10 +305,10 @@ namespace Lucene.Net.Index
                         if (Random().Next(6) == 3)
                         {
                             int freq = postings.Freq();
-                            Assert.IsTrue(freq >= 1 && freq <= 4);
+                            Assert.True(freq >= 1 && freq <= 4);
                             for (int pos = 0; pos < freq; pos++)
                             {
-                                Assert.AreEqual(pos, postings.NextPosition());
+                                Assert.Equal(pos, postings.NextPosition());
                                 if (Random().NextBoolean())
                                 {
                                     var dummy = postings.Payload;
@@ -329,7 +327,7 @@ namespace Lucene.Net.Index
         }
 
         // a weaker form of testLongPostings, that doesnt check positions
-        [Test]
+        [Fact]
         public virtual void TestLongPostingsNoPositions()
         {
             DoTestLongPostingsNoPositions(FieldInfo.IndexOptions.DOCS_ONLY);
@@ -411,7 +409,7 @@ namespace Lucene.Net.Index
               TermEnum termEnum = r.Terms();
               while(termEnum.Next()) {
                 System.out.println("  term=" + termEnum.Term() + " len=" + termEnum.Term().Text().Length());
-                Assert.IsTrue(termEnum.DocFreq() > 0);
+                Assert.True(termEnum.DocFreq() > 0);
                 System.out.println("    s1?=" + (termEnum.Term().Text().equals(s1)) + " s1len=" + s1.Length());
                 System.out.println("    s2?=" + (termEnum.Term().Text().equals(s2)) + " s2len=" + s2.Length());
                 final String s = termEnum.Term().Text();
@@ -422,9 +420,9 @@ namespace Lucene.Net.Index
             }
             */
 
-            Assert.AreEqual(NUM_DOCS, r.NumDocs);
-            Assert.IsTrue(r.DocFreq(new Term("field", s1)) > 0);
-            Assert.IsTrue(r.DocFreq(new Term("field", s2)) > 0);
+            Assert.Equal(NUM_DOCS, r.NumDocs);
+            Assert.True(r.DocFreq(new Term("field", s1)) > 0);
+            Assert.True(r.DocFreq(new Term("field", s2)) > 0);
 
             int num = AtLeast(1000);
             for (int iter = 0; iter < num; iter++)
@@ -495,7 +493,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine("  got docID=" + docID);
                         }
-                        Assert.AreEqual(expected, docID);
+                        Assert.Equal(expected, docID);
                         if (docID == DocIdSetIterator.NO_MORE_DOCS)
                         {
                             break;
@@ -504,7 +502,7 @@ namespace Lucene.Net.Index
                         if (Random().Next(6) == 3 && postings != null)
                         {
                             int freq = postings.Freq();
-                            Assert.IsTrue(freq >= 1 && freq <= 4);
+                            Assert.True(freq >= 1 && freq <= 4);
                         }
                     }
                     else
@@ -546,7 +544,7 @@ namespace Lucene.Net.Index
                         {
                             Console.WriteLine("  got docID=" + docID);
                         }
-                        Assert.AreEqual(expected, docID);
+                        Assert.Equal(expected, docID);
                         if (docID == DocIdSetIterator.NO_MORE_DOCS)
                         {
                             break;
@@ -555,7 +553,7 @@ namespace Lucene.Net.Index
                         if (Random().Next(6) == 3 && postings != null)
                         {
                             int freq = postings.Freq();
-                            Assert.IsTrue(freq >= 1 && freq <= 4, "got invalid freq=" + freq);
+                            Assert.True(freq >= 1 && freq <= 4, "got invalid freq=" + freq);
                         }
                     }
                 }

@@ -1,11 +1,10 @@
 using Lucene.Net.Support;
+using Lucene.Net.Util;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Util;
-    using NUnit.Framework;
-
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements.  See the NOTICE file distributed with
@@ -28,18 +27,17 @@ namespace Lucene.Net.Index
     //using MergedIterator = Lucene.Net.Util.MergedIterator;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestPrefixCodedTerms : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEmpty()
         {
             PrefixCodedTerms.Builder b = new PrefixCodedTerms.Builder();
             PrefixCodedTerms pb = b.Finish();
-            Assert.IsFalse(pb.GetEnumerator().MoveNext());
+            Assert.False(pb.GetEnumerator().MoveNext());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOne()
         {
             Term term = new Term("foo", "bogus");
@@ -47,11 +45,11 @@ namespace Lucene.Net.Index
             b.Add(term);
             PrefixCodedTerms pb = b.Finish();
             IEnumerator<Term> iterator = pb.GetEnumerator();
-            Assert.IsTrue(iterator.MoveNext());
-            Assert.AreEqual(term, iterator.Current);
+            Assert.True(iterator.MoveNext());
+            Assert.Equal(term, iterator.Current);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             SortedSet<Term> terms = new SortedSet<Term>();
@@ -72,13 +70,13 @@ namespace Lucene.Net.Index
             IEnumerator<Term> expected = terms.GetEnumerator();
             foreach (Term t in pb)
             {
-                Assert.IsTrue(expected.MoveNext());
-                Assert.AreEqual(expected.Current, t);
+                Assert.True(expected.MoveNext());
+                Assert.Equal(expected.Current, t);
             }
-            Assert.IsFalse(expected.MoveNext());
+            Assert.False(expected.MoveNext());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMergeOne()
         {
             Term t1 = new Term("foo", "a");
@@ -92,13 +90,13 @@ namespace Lucene.Net.Index
             PrefixCodedTerms pb2 = b2.Finish();
 
             IEnumerator<Term> merged = new MergedIterator<Term>(pb1.GetEnumerator(), pb2.GetEnumerator());
-            Assert.IsTrue(merged.MoveNext());
-            Assert.AreEqual(t1, merged.Current);
-            Assert.IsTrue(merged.MoveNext());
-            Assert.AreEqual(t2, merged.Current);
+            Assert.True(merged.MoveNext());
+            Assert.Equal(t1, merged.Current);
+            Assert.True(merged.MoveNext());
+            Assert.Equal(t2, merged.Current);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMergeRandom()
         {
             PrefixCodedTerms[] pb = new PrefixCodedTerms[TestUtil.NextInt(Random(), 2, 10)];
@@ -133,10 +131,10 @@ namespace Lucene.Net.Index
             IEnumerator<Term> actual = new MergedIterator<Term>(subs.ToArray());
             while (actual.MoveNext())
             {
-                Assert.IsTrue(expected.MoveNext());
-                Assert.AreEqual(expected.Current, actual.Current);
+                Assert.True(expected.MoveNext());
+                Assert.Equal(expected.Current, actual.Current);
             }
-            Assert.IsFalse(expected.MoveNext());
+            Assert.False(expected.MoveNext());
         }
     }
 }

@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene3x
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
@@ -122,7 +123,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             SampleTerms = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeekEnum()
         {
             int indexPosition = 3;
@@ -130,11 +131,11 @@ namespace Lucene.Net.Codecs.Lucene3x
             Term term = FindTermThatWouldBeAtIndex(clone, indexPosition);
             SegmentTermEnum enumerator = clone;
             Index.SeekEnum(enumerator, indexPosition);
-            Assert.AreEqual(term, enumerator.Term());
+            Assert.Equal(term, enumerator.Term());
             clone.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCompareTo()
         {
             Term term = new Term("field" + Random().Next(NUMBER_OF_FIELDS), Text);
@@ -142,11 +143,11 @@ namespace Lucene.Net.Codecs.Lucene3x
             {
                 Term t = Index.GetTerm(i);
                 int compareTo = term.CompareTo(t);
-                Assert.AreEqual(compareTo, Index.CompareTo(term, i));
+                Assert.Equal(compareTo, Index.CompareTo(term, i));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomSearchPerformance()
         {
             IndexSearcher searcher = new IndexSearcher(Reader);
@@ -154,7 +155,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             {
                 TermQuery query = new TermQuery(t);
                 TopDocs topDocs = searcher.Search(query, 10);
-                Assert.IsTrue(topDocs.TotalHits > 0);
+                Assert.True(topDocs.TotalHits > 0);
             }
         }
 
@@ -165,7 +166,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             foreach (string field in fields)
             {
                 Terms terms = fields.Terms(field);
-                Assert.IsNotNull(terms);
+                Assert.NotNull(terms);
                 TermsEnum termsEnum = terms.Iterator(null);
                 while (termsEnum.Next() != null)
                 {

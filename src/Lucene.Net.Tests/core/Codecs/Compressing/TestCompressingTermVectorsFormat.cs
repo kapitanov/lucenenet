@@ -1,8 +1,9 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Compressing
 {
-    using NUnit.Framework;
+    
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BaseTermVectorsFormatTestCase = Lucene.Net.Index.BaseTermVectorsFormatTestCase;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -46,7 +47,7 @@ namespace Lucene.Net.Codecs.Compressing
         }
 
         // https://issues.apache.org/jira/browse/LUCENE-5156
-        [Test]
+        [Fact]
         public virtual void TestNoOrds()
         {
             Directory dir = NewDirectory();
@@ -58,28 +59,13 @@ namespace Lucene.Net.Codecs.Compressing
             iw.AddDocument(doc);
             AtomicReader ir = GetOnlySegmentReader(iw.Reader);
             Terms terms = ir.GetTermVector(0, "foo");
-            Assert.IsNotNull(terms);
+            Assert.NotNull(terms);
             TermsEnum termsEnum = terms.Iterator(null);
-            Assert.AreEqual(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("this")));
-            try
-            {
-                termsEnum.Ord();
-                Assert.Fail();
-            }
-            catch (System.NotSupportedException expected)
-            {
-                // expected exception
-            }
+            Assert.Equal(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef("this")));
 
-            try
-            {
-                termsEnum.SeekExact(0);
-                Assert.Fail();
-            }
-            catch (System.NotSupportedException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<System.NotSupportedException>(() => termsEnum.Ord());
+            Assert.Throws<System.NotSupportedException>(() => termsEnum.SeekExact(0));
+
             ir.Dispose();
             iw.Dispose();
             dir.Dispose();

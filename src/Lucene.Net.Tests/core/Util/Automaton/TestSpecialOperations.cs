@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -22,13 +22,12 @@ namespace Lucene.Net.Util.Automaton
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestSpecialOperations : LuceneTestCase
     {
         /// <summary>
         /// tests against the original brics implementation.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestIsFinite()
         {
             int num = AtLeast(200);
@@ -36,26 +35,26 @@ namespace Lucene.Net.Util.Automaton
             {
                 Automaton a = AutomatonTestUtil.RandomAutomaton(Random());
                 Automaton b = (Automaton)a.Clone();
-                Assert.AreEqual(AutomatonTestUtil.IsFiniteSlow(a), SpecialOperations.IsFinite(b));
+                Assert.Equal(AutomatonTestUtil.IsFiniteSlow(a), SpecialOperations.IsFinite(b));
             }
         }
 
         /// <summary>
         /// Basic test for getFiniteStrings
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestFiniteStrings()
         {
             Automaton a = BasicOperations.Union(BasicAutomata.MakeString("dog"), BasicAutomata.MakeString("duck"));
             MinimizationOperations.Minimize(a);
             ISet<IntsRef> strings = SpecialOperations.GetFiniteStrings(a, -1);
-            Assert.AreEqual(2, strings.Count);
+            Assert.Equal(2, strings.Count);
             IntsRef dog = new IntsRef();
             Util.ToIntsRef(new BytesRef("dog"), dog);
-            Assert.IsTrue(strings.Contains(dog));
+            Assert.True(strings.Contains(dog));
             IntsRef duck = new IntsRef();
             Util.ToIntsRef(new BytesRef("duck"), duck);
-            Assert.IsTrue(strings.Contains(duck));
+            Assert.True(strings.Contains(duck));
         }
     }
 }

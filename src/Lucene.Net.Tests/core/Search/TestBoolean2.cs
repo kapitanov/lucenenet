@@ -4,7 +4,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
@@ -43,7 +43,6 @@ namespace Lucene.Net.Search
     /// Test BooleanQuery2 against BooleanQuery by overriding the standard query parser.
     /// this also tests the scoring order of BooleanQuery.
     /// </summary>
-    [TestFixture]
     public class TestBoolean2 : LuceneTestCase
     {
         private static IndexSearcher Searcher;
@@ -143,12 +142,12 @@ namespace Lucene.Net.Search
             Searcher.Search(query, null, collector);
             ScoreDoc[] hits2 = collector.TopDocs().ScoreDocs;
 
-            Assert.AreEqual(MulFactor * collector.TotalHits, BigSearcher.Search(query, 1).TotalHits);
+            Assert.Equal(MulFactor * collector.TotalHits, BigSearcher.Search(query, 1).TotalHits);
 
             CheckHits.CheckHitsQuery(query, hits1, hits2, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries01()
         {
             BooleanQuery query = new BooleanQuery();
@@ -158,7 +157,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries02()
         {
             BooleanQuery query = new BooleanQuery();
@@ -168,7 +167,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries03()
         {
             BooleanQuery query = new BooleanQuery();
@@ -178,7 +177,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries04()
         {
             BooleanQuery query = new BooleanQuery();
@@ -188,7 +187,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries05()
         {
             BooleanQuery query = new BooleanQuery();
@@ -198,7 +197,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries06()
         {
             BooleanQuery query = new BooleanQuery();
@@ -209,7 +208,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries07()
         {
             BooleanQuery query = new BooleanQuery();
@@ -220,7 +219,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries08()
         {
             BooleanQuery query = new BooleanQuery();
@@ -231,7 +230,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries09()
         {
             BooleanQuery query = new BooleanQuery();
@@ -243,7 +242,7 @@ namespace Lucene.Net.Search
             QueriesTest(query, expDocNrs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries10()
         {
             BooleanQuery query = new BooleanQuery();
@@ -280,8 +279,8 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Ignore]
-        [Test]
+        [Ignore("Ignored test")]
+        [Fact]
         public virtual void TestRandomQueries()
         {
             string[] vals = new string[] { "w1", "w2", "w3", "w4", "w5", "xx", "yy", "zzz" };
@@ -330,7 +329,7 @@ namespace Lucene.Net.Search
                     q3.Add(q1, BooleanClause.Occur.SHOULD);
                     q3.Add(new PrefixQuery(new Term("field2", "b")), BooleanClause.Occur.SHOULD);
                     TopDocs hits4 = BigSearcher.Search(q3, 1);
-                    Assert.AreEqual(MulFactor * collector.TotalHits + NUM_EXTRA_DOCS / 2, hits4.TotalHits);
+                    Assert.Equal(MulFactor * collector.TotalHits + NUM_EXTRA_DOCS / 2, hits4.TotalHits);
                 }
             }
             catch (Exception)

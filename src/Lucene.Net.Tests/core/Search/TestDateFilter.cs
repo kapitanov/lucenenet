@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using DateTools = DateTools;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -76,28 +76,28 @@ namespace Lucene.Net.Search
 
             // ensure that queries return expected results without DateFilter first
             result = searcher.Search(query1, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query2, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, result.Length);
+            Assert.Equal(1, result.Length);
 
             // run queries with DateFilter
             result = searcher.Search(query1, df1, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query1, df2, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query2, df1, 1000).ScoreDocs;
-            Assert.AreEqual(1, result.Length);
+            Assert.Equal(1, result.Length);
 
             result = searcher.Search(query2, df2, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
             reader.Dispose();
             indexStore.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void Test()
         {
             // noop, required for the before and after tests to run
@@ -140,23 +140,23 @@ namespace Lucene.Net.Search
 
             // ensure that queries return expected results without DateFilter first
             result = searcher.Search(query1, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query2, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, result.Length);
+            Assert.Equal(1, result.Length);
 
             // run queries with DateFilter
             result = searcher.Search(query1, df1, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query1, df2, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             result = searcher.Search(query2, df1, 1000).ScoreDocs;
-            Assert.AreEqual(1, result.Length);
+            Assert.Equal(1, result.Length);
 
             result = searcher.Search(query2, df2, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
             reader.Dispose();
             indexStore.Dispose();
         }

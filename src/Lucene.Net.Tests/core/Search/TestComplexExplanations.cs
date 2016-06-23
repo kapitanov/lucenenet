@@ -1,8 +1,9 @@
-using NUnit.Framework;
+
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Search.Spans;
+    using Xunit;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
 
@@ -30,25 +31,21 @@ namespace Lucene.Net.Search
     /// on the assumption that if the explanations work out right for them,
     /// they should work for anything.
     /// </summary>
-    [TestFixture]
     public class TestComplexExplanations : TestExplanations
     {
         /// <summary>
         /// Override the Similarity used in our searcher with one that plays
         /// nice with boosts of 0.0
         /// </summary>
-        [SetUp]
-        public override void SetUp()
+        public TestComplexExplanations(TestExplanationsFixture fixture) : base(fixture)
         {
-            base.SetUp();
-            Searcher.Similarity = CreateQnorm1Similarity();
+            _fixture.Searcher.Similarity = CreateQnorm1Similarity();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
-            Searcher.Similarity = IndexSearcher.DefaultSimilarity;
-            base.TearDown();
+            _fixture.Searcher.Similarity = IndexSearcher.DefaultSimilarity;
+            base.Dispose();
         }
 
         // must be static for weight serialization tests
@@ -69,20 +66,22 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void Test1()
         {
+            var field = TestExplanationsFixture.FIELD;
+
             BooleanQuery q = new BooleanQuery();
 
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 1;
-            phraseQuery.Add(new Term(FIELD, "w1"));
-            phraseQuery.Add(new Term(FIELD, "w2"));
+            phraseQuery.Add(new Term(field, "w1"));
+            phraseQuery.Add(new Term(field, "w2"));
             q.Add(phraseQuery, Occur.MUST);
             q.Add(Snear(St("w2"), Sor("w5", "zz"), 4, true), Occur.SHOULD);
             q.Add(Snear(Sf("w3", 2), St("w2"), St("w3"), 5, true), Occur.SHOULD);
 
-            Query t = new FilteredQuery(new TermQuery(new Term(FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
+            Query t = new FilteredQuery(new TermQuery(new Term(field, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
             t.Boost = 1000;
             q.Add(t, Occur.SHOULD);
 
@@ -92,25 +91,25 @@ namespace Lucene.Net.Search
 
             DisjunctionMaxQuery dm = new DisjunctionMaxQuery(0.2f);
             dm.Add(Snear(St("w2"), Sor("w5", "zz"), 4, true));
-            dm.Add(new TermQuery(new Term(FIELD, "QQ")));
+            dm.Add(new TermQuery(new Term(field, "QQ")));
 
             BooleanQuery xxYYZZ = new BooleanQuery();
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "xx")), Occur.SHOULD);
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "yy")), Occur.SHOULD);
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "zz")), Occur.MUST_NOT);
+            xxYYZZ.Add(new TermQuery(new Term(field, "xx")), Occur.SHOULD);
+            xxYYZZ.Add(new TermQuery(new Term(field, "yy")), Occur.SHOULD);
+            xxYYZZ.Add(new TermQuery(new Term(field, "zz")), Occur.MUST_NOT);
 
             dm.Add(xxYYZZ);
 
             BooleanQuery xxW1 = new BooleanQuery();
-            xxW1.Add(new TermQuery(new Term(FIELD, "xx")), Occur.MUST_NOT);
-            xxW1.Add(new TermQuery(new Term(FIELD, "w1")), Occur.MUST_NOT);
+            xxW1.Add(new TermQuery(new Term(field, "xx")), Occur.MUST_NOT);
+            xxW1.Add(new TermQuery(new Term(field, "w1")), Occur.MUST_NOT);
 
             dm.Add(xxW1);
 
             DisjunctionMaxQuery dm2 = new DisjunctionMaxQuery(0.5f);
-            dm2.Add(new TermQuery(new Term(FIELD, "w1")));
-            dm2.Add(new TermQuery(new Term(FIELD, "w2")));
-            dm2.Add(new TermQuery(new Term(FIELD, "w3")));
+            dm2.Add(new TermQuery(new Term(field, "w1")));
+            dm2.Add(new TermQuery(new Term(field, "w2")));
+            dm2.Add(new TermQuery(new Term(field, "w3")));
             dm.Add(dm2);
 
             q.Add(dm, Occur.SHOULD);
@@ -126,20 +125,22 @@ namespace Lucene.Net.Search
             Qtest(q, new int[] { 0, 1, 2 });
         }
 
-        [Test]
+        [Fact]
         public virtual void Test2()
         {
+            var field = TestExplanationsFixture.FIELD;
+
             BooleanQuery q = new BooleanQuery();
 
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 1;
-            phraseQuery.Add(new Term(FIELD, "w1"));
-            phraseQuery.Add(new Term(FIELD, "w2"));
+            phraseQuery.Add(new Term(field, "w1"));
+            phraseQuery.Add(new Term(field, "w2"));
             q.Add(phraseQuery, Occur.MUST);
             q.Add(Snear(St("w2"), Sor("w5", "zz"), 4, true), Occur.SHOULD);
             q.Add(Snear(Sf("w3", 2), St("w2"), St("w3"), 5, true), Occur.SHOULD);
 
-            Query t = new FilteredQuery(new TermQuery(new Term(FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
+            Query t = new FilteredQuery(new TermQuery(new Term(field, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
             t.Boost = 1000;
             q.Add(t, Occur.SHOULD);
 
@@ -149,25 +150,25 @@ namespace Lucene.Net.Search
 
             DisjunctionMaxQuery dm = new DisjunctionMaxQuery(0.2f);
             dm.Add(Snear(St("w2"), Sor("w5", "zz"), 4, true));
-            dm.Add(new TermQuery(new Term(FIELD, "QQ")));
+            dm.Add(new TermQuery(new Term(field, "QQ")));
 
             BooleanQuery xxYYZZ = new BooleanQuery();
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "xx")), Occur.SHOULD);
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "yy")), Occur.SHOULD);
-            xxYYZZ.Add(new TermQuery(new Term(FIELD, "zz")), Occur.MUST_NOT);
+            xxYYZZ.Add(new TermQuery(new Term(field, "xx")), Occur.SHOULD);
+            xxYYZZ.Add(new TermQuery(new Term(field, "yy")), Occur.SHOULD);
+            xxYYZZ.Add(new TermQuery(new Term(field, "zz")), Occur.MUST_NOT);
 
             dm.Add(xxYYZZ);
 
             BooleanQuery xxW1 = new BooleanQuery();
-            xxW1.Add(new TermQuery(new Term(FIELD, "xx")), Occur.MUST_NOT);
-            xxW1.Add(new TermQuery(new Term(FIELD, "w1")), Occur.MUST_NOT);
+            xxW1.Add(new TermQuery(new Term(field, "xx")), Occur.MUST_NOT);
+            xxW1.Add(new TermQuery(new Term(field, "w1")), Occur.MUST_NOT);
 
             dm.Add(xxW1);
 
             DisjunctionMaxQuery dm2 = new DisjunctionMaxQuery(0.5f);
-            dm2.Add(new TermQuery(new Term(FIELD, "w1")));
-            dm2.Add(new TermQuery(new Term(FIELD, "w2")));
-            dm2.Add(new TermQuery(new Term(FIELD, "w3")));
+            dm2.Add(new TermQuery(new Term(field, "w1")));
+            dm2.Add(new TermQuery(new Term(field, "w2")));
+            dm2.Add(new TermQuery(new Term(field, "w3")));
             dm.Add(dm2);
 
             q.Add(dm, Occur.SHOULD);
@@ -192,15 +193,15 @@ namespace Lucene.Net.Search
         // complex, and they expose weakness in dealing with queries that match
         // with scores of 0 wrapped in other queries
 
-        [Test]
+        [Fact]
         public virtual void TestT3()
         {
-            TermQuery query = new TermQuery(new Term(FIELD, "w1"));
+            TermQuery query = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1"));
             query.Boost = 0;
             Bqtest(query, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMA3()
         {
             Query q = new MatchAllDocsQuery();
@@ -208,15 +209,15 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFQ5()
         {
-            TermQuery query = new TermQuery(new Term(FIELD, "xx"));
+            TermQuery query = new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx"));
             query.Boost = 0;
             Bqtest(new FilteredQuery(query, new ItemizedFilter(new int[] { 1, 3 })), new int[] { 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCSQ4()
         {
             Query q = new ConstantScoreQuery(new ItemizedFilter(new int[] { 3 }));
@@ -224,20 +225,20 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDMQ10()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(FIELD, "yy")), Occur.SHOULD);
-            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w5"));
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), Occur.SHOULD);
+            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5"));
             boostedQuery.Boost = 100;
             query.Add(boostedQuery, Occur.SHOULD);
 
             q.Add(query);
 
-            TermQuery xxBoostedQuery = new TermQuery(new Term(FIELD, "xx"));
+            TermQuery xxBoostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx"));
             xxBoostedQuery.Boost = 0;
 
             q.Add(xxBoostedQuery);
@@ -245,7 +246,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMPQ7()
         {
             MultiPhraseQuery q = new MultiPhraseQuery();
@@ -256,70 +257,70 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBQ12()
         {
             // NOTE: using qtest not bqtest
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(FIELD, "w1")), Occur.SHOULD);
-            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w2"));
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), Occur.SHOULD);
+            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2"));
             boostedQuery.Boost = 0;
             query.Add(boostedQuery, Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBQ13()
         {
             // NOTE: using qtest not bqtest
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(FIELD, "w1")), Occur.SHOULD);
-            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w5"));
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), Occur.SHOULD);
+            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5"));
             boostedQuery.Boost = 0;
             query.Add(boostedQuery, Occur.MUST_NOT);
 
             Qtest(query, new int[] { 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBQ18()
         {
             // NOTE: using qtest not bqtest
             BooleanQuery query = new BooleanQuery();
-            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w1"));
+            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1"));
             boostedQuery.Boost = 0;
             query.Add(boostedQuery, Occur.MUST);
-            query.Add(new TermQuery(new Term(FIELD, "w2")), Occur.SHOULD);
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBQ21()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(FIELD, "w1")), Occur.MUST);
-            query.Add(new TermQuery(new Term(FIELD, "w2")), Occur.SHOULD);
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), Occur.MUST);
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), Occur.SHOULD);
             query.Boost = 0;
 
             Bqtest(query, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBQ22()
         {
             BooleanQuery query = new BooleanQuery();
-            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w1"));
+            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1"));
             boostedQuery.Boost = 0;
             query.Add(boostedQuery, Occur.MUST);
-            query.Add(new TermQuery(new Term(FIELD, "w2")), Occur.SHOULD);
+            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), Occur.SHOULD);
             query.Boost = 0;
 
             Bqtest(query, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestST3()
         {
             SpanQuery q = St("w1");
@@ -327,7 +328,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestST6()
         {
             SpanQuery q = St("xx");
@@ -335,7 +336,7 @@ namespace Lucene.Net.Search
             Qtest(q, new int[] { 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSF3()
         {
             SpanQuery q = Sf(("w1"), 1);
@@ -343,7 +344,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSF7()
         {
             SpanQuery q = Sf(("xx"), 3);
@@ -351,7 +352,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSNot3()
         {
             SpanQuery q = Snot(Sf("w1", 10), St("QQ"));
@@ -359,7 +360,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSNot6()
         {
             SpanQuery q = Snot(Sf("w1", 10), St("xx"));
@@ -367,7 +368,7 @@ namespace Lucene.Net.Search
             Bqtest(q, new int[] { 0, 1, 2, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSNot8()
         {
             // NOTE: using qtest not bqtest
@@ -377,7 +378,7 @@ namespace Lucene.Net.Search
             Qtest(q, new int[] { 0, 1, 3 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSNot9()
         {
             // NOTE: using qtest not bqtest

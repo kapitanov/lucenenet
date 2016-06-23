@@ -5,7 +5,7 @@ using System.Threading;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -39,10 +39,9 @@ namespace Lucene.Net.Search
     using TermsEnum = Lucene.Net.Index.TermsEnum;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestSameScoresWithThreads : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();
@@ -72,7 +71,7 @@ namespace Lucene.Net.Search
             {
                 termCount++;
             }
-            Assert.IsTrue(termCount > 0);
+            Assert.True(termCount > 0);
 
             // Target ~10 terms to search:
             double chance = 10.0 / termCount;
@@ -137,13 +136,13 @@ namespace Lucene.Net.Search
                         {
                             TopDocs actual = s.Search(new TermQuery(new Term("body", ent.Key)), 100);
                             TopDocs expected = ent.Value;
-                            Assert.AreEqual(expected.TotalHits, actual.TotalHits);
-                            Assert.AreEqual(expected.ScoreDocs.Length, actual.ScoreDocs.Length, "query=" + ent.Key.Utf8ToString());
+                            Assert.Equal(expected.TotalHits, actual.TotalHits);
+                            Assert.Equal(expected.ScoreDocs.Length, actual.ScoreDocs.Length, "query=" + ent.Key.Utf8ToString());
                             for (int hit = 0; hit < expected.ScoreDocs.Length; hit++)
                             {
-                                Assert.AreEqual(expected.ScoreDocs[hit].Doc, actual.ScoreDocs[hit].Doc);
+                                Assert.Equal(expected.ScoreDocs[hit].Doc, actual.ScoreDocs[hit].Doc);
                                 // Floats really should be identical:
-                                Assert.IsTrue(expected.ScoreDocs[hit].Score == actual.ScoreDocs[hit].Score);
+                                Assert.True(expected.ScoreDocs[hit].Score == actual.ScoreDocs[hit].Score);
                             }
                         }
                     }

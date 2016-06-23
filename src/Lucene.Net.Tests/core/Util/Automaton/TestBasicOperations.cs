@@ -1,7 +1,7 @@
-using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -22,14 +22,11 @@ namespace Lucene.Net.Util.Automaton
      * limitations under the License.
      */
 
-    using Lucene.Net.Util;
-
-    [TestFixture]
     public class TestBasicOperations : LuceneTestCase
     {
         /// <summary>
         /// Test string union. </summary>
-        [Test]
+        [Fact]
         public virtual void TestStringUnion()
         {
             List<BytesRef> strings = new List<BytesRef>();
@@ -40,8 +37,8 @@ namespace Lucene.Net.Util.Automaton
 
             strings.Sort();
             Automaton union = BasicAutomata.MakeStringUnion(strings);
-            Assert.IsTrue(union.Deterministic);
-            Assert.IsTrue(BasicOperations.SameLanguage(union, NaiveUnion(strings)));
+            Assert.True(union.Deterministic);
+            Assert.True(BasicOperations.SameLanguage(union, NaiveUnion(strings)));
         }
 
         private static Automaton NaiveUnion(IList<BytesRef> strings)
@@ -57,20 +54,20 @@ namespace Lucene.Net.Util.Automaton
 
         /// <summary>
         /// Test optimization to concatenate() </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingletonConcatenate()
         {
             Automaton singleton = BasicAutomata.MakeString("prefix");
             Automaton expandedSingleton = singleton.CloneExpanded();
             Automaton other = BasicAutomata.MakeCharRange('5', '7');
             Automaton concat = BasicOperations.Concatenate(singleton, other);
-            Assert.IsTrue(concat.Deterministic);
-            Assert.IsTrue(BasicOperations.SameLanguage(BasicOperations.Concatenate(expandedSingleton, other), concat));
+            Assert.True(concat.Deterministic);
+            Assert.True(BasicOperations.SameLanguage(BasicOperations.Concatenate(expandedSingleton, other), concat));
         }
 
         /// <summary>
         /// Test optimization to concatenate() to an NFA </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingletonNFAConcatenate()
         {
             Automaton singleton = BasicAutomata.MakeString("prefix");
@@ -78,13 +75,13 @@ namespace Lucene.Net.Util.Automaton
             // an NFA (two transitions for 't' from initial state)
             Automaton nfa = BasicOperations.Union(BasicAutomata.MakeString("this"), BasicAutomata.MakeString("three"));
             Automaton concat = BasicOperations.Concatenate(singleton, nfa);
-            Assert.IsFalse(concat.Deterministic);
-            Assert.IsTrue(BasicOperations.SameLanguage(BasicOperations.Concatenate(expandedSingleton, nfa), concat));
+            Assert.False(concat.Deterministic);
+            Assert.True(BasicOperations.SameLanguage(BasicOperations.Concatenate(expandedSingleton, nfa), concat));
         }
 
         /// <summary>
         /// Test optimization to concatenate() with empty String </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptySingletonConcatenate()
         {
             Automaton singleton = BasicAutomata.MakeString("");
@@ -92,25 +89,25 @@ namespace Lucene.Net.Util.Automaton
             Automaton other = BasicAutomata.MakeCharRange('5', '7');
             Automaton concat1 = BasicOperations.Concatenate(expandedSingleton, other);
             Automaton concat2 = BasicOperations.Concatenate(singleton, other);
-            Assert.IsTrue(concat2.Deterministic);
-            Assert.IsTrue(BasicOperations.SameLanguage(concat1, concat2));
-            Assert.IsTrue(BasicOperations.SameLanguage(other, concat1));
-            Assert.IsTrue(BasicOperations.SameLanguage(other, concat2));
+            Assert.True(concat2.Deterministic);
+            Assert.True(BasicOperations.SameLanguage(concat1, concat2));
+            Assert.True(BasicOperations.SameLanguage(other, concat1));
+            Assert.True(BasicOperations.SameLanguage(other, concat2));
         }
 
         /// <summary>
         /// Test concatenation with empty language returns empty </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyLanguageConcatenate()
         {
             Automaton a = BasicAutomata.MakeString("a");
             Automaton concat = BasicOperations.Concatenate(a, BasicAutomata.MakeEmpty());
-            Assert.IsTrue(BasicOperations.IsEmpty(concat));
+            Assert.True(BasicOperations.IsEmpty(concat));
         }
 
         /// <summary>
         /// Test optimization to concatenate() with empty String to an NFA </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptySingletonNFAConcatenate()
         {
             Automaton singleton = BasicAutomata.MakeString("");
@@ -119,27 +116,27 @@ namespace Lucene.Net.Util.Automaton
             Automaton nfa = BasicOperations.Union(BasicAutomata.MakeString("this"), BasicAutomata.MakeString("three"));
             Automaton concat1 = BasicOperations.Concatenate(expandedSingleton, nfa);
             Automaton concat2 = BasicOperations.Concatenate(singleton, nfa);
-            Assert.IsFalse(concat2.Deterministic);
-            Assert.IsTrue(BasicOperations.SameLanguage(concat1, concat2));
-            Assert.IsTrue(BasicOperations.SameLanguage(nfa, concat1));
-            Assert.IsTrue(BasicOperations.SameLanguage(nfa, concat2));
+            Assert.False(concat2.Deterministic);
+            Assert.True(BasicOperations.SameLanguage(concat1, concat2));
+            Assert.True(BasicOperations.SameLanguage(nfa, concat1));
+            Assert.True(BasicOperations.SameLanguage(nfa, concat2));
         }
 
         /// <summary>
         /// Test singletons work correctly </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingleton()
         {
             Automaton singleton = BasicAutomata.MakeString("foobar");
             Automaton expandedSingleton = singleton.CloneExpanded();
-            Assert.IsTrue(BasicOperations.SameLanguage(singleton, expandedSingleton));
+            Assert.True(BasicOperations.SameLanguage(singleton, expandedSingleton));
 
             singleton = BasicAutomata.MakeString("\ud801\udc1c");
             expandedSingleton = singleton.CloneExpanded();
-            Assert.IsTrue(BasicOperations.SameLanguage(singleton, expandedSingleton));
+            Assert.True(BasicOperations.SameLanguage(singleton, expandedSingleton));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGetRandomAcceptedString()
         {
             int ITER1 = AtLeast(100);
@@ -148,7 +145,7 @@ namespace Lucene.Net.Util.Automaton
             {
                 RegExp re = new RegExp(AutomatonTestUtil.RandomRegexp(Random()), RegExp.NONE);
                 Automaton a = re.ToAutomaton();
-                Assert.IsFalse(BasicOperations.IsEmpty(a));
+                Assert.False(BasicOperations.IsEmpty(a));
 
                 AutomatonTestUtil.RandomAcceptedStrings rx = new AutomatonTestUtil.RandomAcceptedStrings(a);
                 for (int j = 0; j < ITER2; j++)
@@ -158,7 +155,7 @@ namespace Lucene.Net.Util.Automaton
                     {
                         acc = rx.GetRandomAcceptedString(Random());
                         string s = UnicodeUtil.NewString(acc, 0, acc.Length);
-                        Assert.IsTrue(BasicOperations.Run(a, s));
+                        Assert.True(BasicOperations.Run(a, s));
                     }
                     catch (Exception t)
                     {

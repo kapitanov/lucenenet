@@ -6,7 +6,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 {
 	public class TestJavascriptCompiler : Util.LuceneTestCase
 	{
-		[Test]
+		[Fact]
 		public virtual void TestValidCompiles()
 		{
 			IsNotNull(JavascriptCompiler.Compile("100"));
@@ -15,7 +15,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			IsNotNull(JavascriptCompiler.Compile("logn(2, 20+10-5.0)"));
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestValidNamespaces()
 		{
 			IsNotNull(JavascriptCompiler.Compile("object.valid0"));
@@ -23,7 +23,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
         //TODO: change all exceptions to ParseExceptions
-		[Test]
+		[Fact]
 		public virtual void TestInvalidNamespaces()
 		{
 			try
@@ -64,7 +64,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		//expected
-		[Test]
+		[Fact]
 		public virtual void TestInvalidCompiles()
 		{
 			try
@@ -113,7 +113,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			}
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestEmpty()
 		{
 			try
@@ -145,7 +145,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		// expected exception
-		[Test]
+		[Fact]
 		public virtual void TestNull()
 		{
 			try
@@ -159,7 +159,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		// expected exception
-		[Test]
+		[Fact]
 		public virtual void TestWrongArity()
 		{
 			try

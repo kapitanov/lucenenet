@@ -1,9 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -38,7 +37,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestConjunctions : LuceneTestCase
     {
         internal Analyzer Analyzer;
@@ -49,10 +47,8 @@ namespace Lucene.Net.Search
         internal const string F1 = "title";
         internal const string F2 = "body";
 
-        [SetUp]
-        public override void SetUp()
+        public TestConjunctions() : base()
         {
-            base.SetUp();
             Analyzer = new MockAnalyzer(Random());
             Dir = NewDirectory();
             IndexWriterConfig config = NewIndexWriterConfig(TEST_VERSION_CURRENT, Analyzer);
@@ -75,23 +71,22 @@ namespace Lucene.Net.Search
             return doc;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermConjunctionsWithOmitTF()
         {
             BooleanQuery bq = new BooleanQuery();
             bq.Add(new TermQuery(new Term(F1, "nutch")), BooleanClause.Occur.MUST);
             bq.Add(new TermQuery(new Term(F2, "is")), BooleanClause.Occur.MUST);
             TopDocs td = Searcher.Search(bq, 3);
-            Assert.AreEqual(1, td.TotalHits);
-            Assert.AreEqual(3F, td.ScoreDocs[0].Score, 0.001F); // f1:nutch + f2:is + f2:is
+            Assert.Equal(1, td.TotalHits);
+            Assert.Equal(3F, td.ScoreDocs[0].Score); //, 0.001F); // f1:nutch + f2:is + f2:is
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         // Similarity that returns the TF as score

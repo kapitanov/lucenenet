@@ -1,4 +1,4 @@
-using NUnit.Framework;
+
 
 namespace Lucene.Net.Codecs.Compressing
 {
@@ -19,13 +19,10 @@ namespace Lucene.Net.Codecs.Compressing
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestHighCompressionMode : AbstractTestCompressionMode
     {
-        [SetUp]
-        public override void SetUp()
+        public TestHighCompressionMode() : base()
         {
-            base.SetUp();
             Mode = CompressionMode.HIGH_COMPRESSION;
         }
     }

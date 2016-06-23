@@ -1,11 +1,11 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Codec = Lucene.Net.Codecs.Codec;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -40,10 +40,9 @@ namespace Lucene.Net.Index
       against it, and add documents to it.
     */
 
-    [TestFixture]
     public class TestIndexFileDeleter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDeleteLeftoverFiles()
         {
             Directory dir = NewDirectory();
@@ -117,8 +116,8 @@ namespace Lucene.Net.Index
             // Create a bogus cfs file shadowing a non-cfs segment:
 
             // TODO: assert is bogus (relies upon codec-specific filenames)
-            Assert.IsTrue(SlowFileExists(dir, "_3.fdt") || SlowFileExists(dir, "_3.fld"));
-            Assert.IsTrue(!SlowFileExists(dir, "_3.cfs"));
+            Assert.True(SlowFileExists(dir, "_3.fdt") || SlowFileExists(dir, "_3.fld"));
+            Assert.True(!SlowFileExists(dir, "_3.cfs"));
             CopyFile(dir, "_1.cfs", "_3.cfs");
 
             string[] filesPre = dir.ListAll();
@@ -138,7 +137,7 @@ namespace Lucene.Net.Index
 
             if (!Arrays.Equals(files, files2))
             {
-                Assert.Fail("IndexFileDeleter failed to delete unreferenced extra files: should have deleted " + (filesPre.Length - files.Length) + " files but only deleted " + (filesPre.Length - files2.Length) + "; expected files:\n    " + AsString(files) + "\n  actual files:\n    " + AsString(files2) + "\ndiff: " + dif);
+                Assert.True(false, "IndexFileDeleter failed to delete unreferenced extra files: should have deleted " + (filesPre.Length - files.Length) + " files but only deleted " + (filesPre.Length - files2.Length) + "; expected files:\n    " + AsString(files) + "\n  actual files:\n    " + AsString(files2) + "\ndiff: " + dif);
             }
         }
 

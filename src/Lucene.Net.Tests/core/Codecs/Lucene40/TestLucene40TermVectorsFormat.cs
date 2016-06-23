@@ -1,6 +1,6 @@
 namespace Lucene.Net.Codecs.Lucene40
 {
-    using NUnit.Framework;
+    
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more

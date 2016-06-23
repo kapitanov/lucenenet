@@ -1,5 +1,5 @@
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Diagnostics;
 
@@ -31,11 +31,10 @@ namespace Lucene.Net.Util
     //using Ignore = org.junit.Ignore;
 
     //ORIGINAL LINE: @Ignore("You must increase heap to > 2 G to run this") public class Test2BPagedBytes extends LuceneTestCase
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignored")]
     public class Test2BPagedBytes : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("test2BPagedBytes"));
@@ -77,7 +76,7 @@ namespace Lucene.Net.Util
 
                 BytesRef actual = new BytesRef();
                 reader.FillSlice(actual, netBytes, numBytes);
-                Assert.AreEqual(expected, actual);
+                Assert.Equal(expected, actual);
 
                 netBytes += numBytes;
             }

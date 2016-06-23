@@ -1,7 +1,7 @@
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
 
@@ -27,16 +27,13 @@ namespace Lucene.Net.Search
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestEarlyTermination : LuceneTestCase
     {
         internal Directory Dir;
         internal RandomIndexWriter Writer;
 
-        [SetUp]
-        public override void SetUp()
+        public TestEarlyTermination() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             Writer = new RandomIndexWriter(Random(), Dir);
             int numDocs = AtLeast(100);
@@ -53,12 +50,12 @@ namespace Lucene.Net.Search
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            base.Dispose();
             Writer.Dispose();
             Dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEarlyTermination_Mem()
         {
             int iters = AtLeast(5);
@@ -97,7 +94,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.IsFalse(collectionTerminated);
+                Assert.False(collectionTerminated);
                 if (Rarely())
                 {
                     collectionTerminated = true;

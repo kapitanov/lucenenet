@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using BaseDirectory = Lucene.Net.Store.BaseDirectory;
     using BufferedIndexInput = Lucene.Net.Store.BufferedIndexInput;
@@ -73,40 +73,40 @@ namespace Lucene.Net.Index
             TestDoc = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
-            Assert.IsTrue(Dir != null);
-            Assert.IsTrue(FieldInfos != null);
+            Assert.True(Dir != null);
+            Assert.True(FieldInfos != null);
             IndexReader reader = DirectoryReader.Open(Dir);
             Document doc = reader.Document(0);
-            Assert.IsTrue(doc != null);
-            Assert.IsTrue(doc.GetField(DocHelper.TEXT_FIELD_1_KEY) != null);
+            Assert.True(doc != null);
+            Assert.True(doc.GetField(DocHelper.TEXT_FIELD_1_KEY) != null);
 
             Field field = (Field)doc.GetField(DocHelper.TEXT_FIELD_2_KEY);
-            Assert.IsTrue(field != null);
-            Assert.IsTrue(field.FieldType().StoreTermVectors);
+            Assert.True(field != null);
+            Assert.True(field.FieldType().StoreTermVectors);
 
-            Assert.IsFalse(field.FieldType().OmitNorms);
-            Assert.IsTrue(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
+            Assert.False(field.FieldType().OmitNorms);
+            Assert.True(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
 
             field = (Field)doc.GetField(DocHelper.TEXT_FIELD_3_KEY);
-            Assert.IsTrue(field != null);
-            Assert.IsFalse(field.FieldType().StoreTermVectors);
-            Assert.IsTrue(field.FieldType().OmitNorms);
-            Assert.IsTrue(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
+            Assert.True(field != null);
+            Assert.False(field.FieldType().StoreTermVectors);
+            Assert.True(field.FieldType().OmitNorms);
+            Assert.True(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS);
 
             field = (Field)doc.GetField(DocHelper.NO_TF_KEY);
-            Assert.IsTrue(field != null);
-            Assert.IsFalse(field.FieldType().StoreTermVectors);
-            Assert.IsFalse(field.FieldType().OmitNorms);
-            Assert.IsTrue(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_ONLY);
+            Assert.True(field != null);
+            Assert.False(field.FieldType().StoreTermVectors);
+            Assert.False(field.FieldType().OmitNorms);
+            Assert.True(field.FieldType().IndexOptions == FieldInfo.IndexOptions.DOCS_ONLY);
 
             DocumentStoredFieldVisitor visitor = new DocumentStoredFieldVisitor(DocHelper.TEXT_FIELD_3_KEY);
             reader.Document(0, visitor);
             IList<IndexableField> fields = visitor.Document.Fields;
-            Assert.AreEqual(1, fields.Count);
-            Assert.AreEqual(DocHelper.TEXT_FIELD_3_KEY, fields[0].Name());
+            Assert.Equal(1, fields.Count);
+            Assert.Equal(DocHelper.TEXT_FIELD_3_KEY, fields[0].Name());
             reader.Dispose();
         }
 
@@ -219,7 +219,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1262
-        [Test]
+        [Fact]
         public virtual void TestExceptions()
         {
             DirectoryInfo indexDir = CreateTempDir("testfieldswriterexceptions");
@@ -263,7 +263,7 @@ namespace Lucene.Net.Index
                         exc = true;
                     }
                 }
-                Assert.IsTrue(exc);
+                Assert.True(exc);
                 reader.Dispose();
                 dir.Dispose();
             }

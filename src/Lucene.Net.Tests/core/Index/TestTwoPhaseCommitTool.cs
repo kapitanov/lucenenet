@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-    using System.IO;
-
     /*
                  * Licensed to the Apache Software Foundation (ASF) under one or more
                  * contributor license agreements.  See the NOTICE file distributed with
@@ -26,7 +25,6 @@ namespace Lucene.Net.Index
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestTwoPhaseCommitTool : LuceneTestCase
     {
         private class TwoPhaseCommitImpl : TwoPhaseCommit
@@ -54,7 +52,7 @@ namespace Lucene.Net.Index
             public virtual void PrepareCommit(IDictionary<string, string> commitData)
             {
                 this.PrepareCommitData = commitData;
-                Assert.IsFalse(CommitCalled, "commit should not have been called before all prepareCommit were");
+                Assert.False(CommitCalled, "commit should not have been called before all prepareCommit were");
                 if (FailOnPrepare)
                 {
                     throw new IOException("failOnPrepare");
@@ -86,14 +84,12 @@ namespace Lucene.Net.Index
             }
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestTwoPhaseCommitTool() : base()
         {
-            base.SetUp();
             TwoPhaseCommitImpl.CommitCalled = false; // reset count before every test
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPrepareThenCommit()
         {
             // tests that prepareCommit() is called on all objects before commit()
@@ -107,7 +103,7 @@ namespace Lucene.Net.Index
             TwoPhaseCommitTool.Execute(objects);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRollback()
         {
             // tests that rollback is called if failure occurs at any stage
@@ -137,12 +133,12 @@ namespace Lucene.Net.Index
                 // if any failure happened, ensure that rollback was called on all.
                 foreach (TwoPhaseCommitImpl tpc in objects)
                 {
-                    Assert.IsTrue(tpc.RollbackCalled, "rollback was not called while a failure occurred during the 2-phase commit");
+                    Assert.True(tpc.RollbackCalled, "rollback was not called while a failure occurred during the 2-phase commit");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNullTPCs()
         {
             int numObjects = Random().Next(4) + 3; // between [3, 6]

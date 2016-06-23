@@ -1,10 +1,10 @@
 using System;
 using System.Threading;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
@@ -29,11 +29,10 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
 
-    [TestFixture]
     public class TestNRTReaderWithThreads : LuceneTestCase
     {
         internal AtomicInteger Seq = new AtomicInteger(1);
-        [Test]
+        [Fact]
         public virtual void TestIndexing()
         {
             Directory mainDir = NewDirectory();
@@ -63,7 +62,7 @@ namespace Lucene.Net.Index
             for (int x = 0; x < indexThreads.Length; x++)
             {
                 indexThreads[x].Run_Renamed = false;
-                Assert.IsNull(indexThreads[x].Ex, "Exception thrown: " + indexThreads[x].Ex);
+                Assert.Null(indexThreads[x].Ex); //, "Exception thrown: " + indexThreads[x].Ex);
                 addCount += indexThreads[x].AddCount;
                 delCount += indexThreads[x].DelCount;
             }
@@ -73,7 +72,7 @@ namespace Lucene.Net.Index
             }
             for (int x = 0; x < indexThreads.Length; x++)
             {
-                Assert.IsNull(indexThreads[x].Ex, "Exception thrown: " + indexThreads[x].Ex);
+                Assert.Null(indexThreads[x].Ex); //, "Exception thrown: " + indexThreads[x].Ex);
             }
             //System.out.println("addCount:"+addCount);
             //System.out.println("delCount:"+delCount);

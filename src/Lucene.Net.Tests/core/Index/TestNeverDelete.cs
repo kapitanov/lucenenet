@@ -1,5 +1,6 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Lucene.Net.Support;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,7 +8,6 @@ using System.Threading;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Support;
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using Document = Documents.Document;
     using Field = Field;
@@ -37,10 +37,9 @@ namespace Lucene.Net.Index
     // Make sure if you use NoDeletionPolicy that no file
     // referenced by a commit point is ever deleted
 
-    [TestFixture]
     public class TestNeverDelete : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestIndexing()
         {
             DirectoryInfo tmpDir = CreateTempDir("TestNeverDelete");
@@ -80,7 +79,7 @@ namespace Lucene.Net.Index
                 // Make sure no old files were removed
                 foreach (string fileName in allFiles)
                 {
-                    Assert.IsTrue(SlowFileExists(d, fileName), "file " + fileName + " does not exist");
+                    Assert.True(SlowFileExists(d, fileName), "file " + fileName + " does not exist");
                 }
                 DirectoryReader r2 = DirectoryReader.OpenIfChanged(r);
                 if (r2 != null)

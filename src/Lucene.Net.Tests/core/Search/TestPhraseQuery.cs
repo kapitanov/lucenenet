@@ -1,7 +1,7 @@
-using Lucene.Net.Analysis.Tokenattributes;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
@@ -22,13 +22,11 @@ namespace Lucene.Net.Search
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
+    using System.IO;
     using Lucene.Net.Analysis;
-    
     using Lucene.Net.Index;
     using Lucene.Net.Util;
-    using NUnit.Framework;
-    using System.IO;
+    using Xunit;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
     using OpenMode = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
@@ -42,8 +40,6 @@ namespace Lucene.Net.Search
      * -ea -Drt.seed=AFD1E7E84B35D2B1
      * to get leaked thread errors.
      */
-
-    [TestFixture]
     public class TestPhraseQuery : LuceneTestCase
     {
         /// <summary>
@@ -104,7 +100,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Query = new PhraseQuery();
         }
 
@@ -118,50 +114,50 @@ namespace Lucene.Net.Search
             Directory = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNotCloseEnough()
         {
             Query.Slop = 2;
             Query.Add(new Term("field", "one"));
             Query.Add(new Term("field", "five"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length);
+            Assert.Equal(0, hits.Length);
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBarelyCloseEnough()
         {
             Query.Slop = 3;
             Query.Add(new Term("field", "one"));
             Query.Add(new Term("field", "five"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
         /// <summary>
         /// Ensures slop of 0 works for exact matches, but not reversed
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestExact()
         {
             // slop is zero by default
             Query.Add(new Term("field", "four"));
             Query.Add(new Term("field", "five"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "exact match");
+            Assert.Equal(1, hits.Length, "exact match");
             QueryUtils.Check(Random(), Query, Searcher);
 
             Query = new PhraseQuery();
             Query.Add(new Term("field", "two"));
             Query.Add(new Term("field", "one"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "reverse not exact");
+            Assert.Equal(0, hits.Length, "reverse not exact");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSlop1()
         {
             // Ensures slop of 1 works with terms in order.
@@ -169,7 +165,7 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "one"));
             Query.Add(new Term("field", "two"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "in order");
+            Assert.Equal(1, hits.Length, "in order");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // Ensures slop of 1 does not work for phrases out of order;
@@ -179,21 +175,21 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "two"));
             Query.Add(new Term("field", "one"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "reversed, slop not 2 or more");
+            Assert.Equal(0, hits.Length, "reversed, slop not 2 or more");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
         /// <summary>
         /// As long as slop is at least 2, terms can be reversed
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestOrderDoesntMatter()
         {
             Query.Slop = 2; // must be at least two for reverse order match
             Query.Add(new Term("field", "two"));
             Query.Add(new Term("field", "one"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             QueryUtils.Check(Random(), Query, Searcher);
 
             Query = new PhraseQuery();
@@ -201,7 +197,7 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "three"));
             Query.Add(new Term("field", "one"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "not sloppy enough");
+            Assert.Equal(0, hits.Length, "not sloppy enough");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
@@ -209,7 +205,7 @@ namespace Lucene.Net.Search
         /// slop is the total number of positional moves allowed
         /// to line up a phrase
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMulipleTerms()
         {
             Query.Slop = 2;
@@ -217,7 +213,7 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "three"));
             Query.Add(new Term("field", "five"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "two total moves");
+            Assert.Equal(1, hits.Length, "two total moves");
             QueryUtils.Check(Random(), Query, Searcher);
 
             Query = new PhraseQuery();
@@ -226,16 +222,16 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "three"));
             Query.Add(new Term("field", "one"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "slop of 5 not close enough");
+            Assert.Equal(0, hits.Length, "slop of 5 not close enough");
             QueryUtils.Check(Random(), Query, Searcher);
 
             Query.Slop = 6;
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "slop of 6 just right");
+            Assert.Equal(1, hits.Length, "slop of 6 just right");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPhraseQueryWithStopAnalyzer()
         {
             Directory directory = NewDirectory();
@@ -254,14 +250,14 @@ namespace Lucene.Net.Search
             query.Add(new Term("field", "stop"));
             query.Add(new Term("field", "words"));
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
             QueryUtils.Check(Random(), query, searcher);
 
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPhraseQueryInConjunctionScorer()
         {
             Directory directory = NewDirectory();
@@ -285,7 +281,7 @@ namespace Lucene.Net.Search
             phraseQuery.Add(new Term("source", "marketing"));
             phraseQuery.Add(new Term("source", "info"));
             ScoreDoc[] hits = searcher.Search(phraseQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
             QueryUtils.Check(Random(), phraseQuery, searcher);
 
             TermQuery termQuery = new TermQuery(new Term("contents", "foobar"));
@@ -293,7 +289,7 @@ namespace Lucene.Net.Search
             booleanQuery.Add(termQuery, BooleanClause.Occur.MUST);
             booleanQuery.Add(phraseQuery, BooleanClause.Occur.MUST);
             hits = searcher.Search(booleanQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
             QueryUtils.Check(Random(), termQuery, searcher);
 
             reader.Dispose();
@@ -322,28 +318,28 @@ namespace Lucene.Net.Search
             phraseQuery.Add(new Term("contents", "entry"));
 
             hits = searcher.Search(termQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             hits = searcher.Search(phraseQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
 
             booleanQuery = new BooleanQuery();
             booleanQuery.Add(termQuery, BooleanClause.Occur.MUST);
             booleanQuery.Add(phraseQuery, BooleanClause.Occur.MUST);
             hits = searcher.Search(booleanQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
 
             booleanQuery = new BooleanQuery();
             booleanQuery.Add(phraseQuery, BooleanClause.Occur.MUST);
             booleanQuery.Add(termQuery, BooleanClause.Occur.MUST);
             hits = searcher.Search(booleanQuery, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
             QueryUtils.Check(Random(), booleanQuery, searcher);
 
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSlopScoring()
         {
             Directory directory = NewDirectory();
@@ -371,33 +367,33 @@ namespace Lucene.Net.Search
             query.Add(new Term("field", "lastname"));
             query.Slop = int.MaxValue;
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
             // Make sure that those matches where the terms appear closer to
             // each other get a higher score:
-            Assert.AreEqual(0.71, hits[0].Score, 0.01);
-            Assert.AreEqual(0, hits[0].Doc);
-            Assert.AreEqual(0.44, hits[1].Score, 0.01);
-            Assert.AreEqual(1, hits[1].Doc);
-            Assert.AreEqual(0.31, hits[2].Score, 0.01);
-            Assert.AreEqual(2, hits[2].Doc);
+            Assert.Equal(0.71, hits[0].Score, 0.01);
+            Assert.Equal(0, hits[0].Doc);
+            Assert.Equal(0.44, hits[1].Score, 0.01);
+            Assert.Equal(1, hits[1].Doc);
+            Assert.Equal(0.31, hits[2].Score, 0.01);
+            Assert.Equal(2, hits[2].Doc);
             QueryUtils.Check(Random(), query, searcher);
             reader.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToString()
         {
             PhraseQuery q = new PhraseQuery(); // Query "this hi this is a test is"
             q.Add(new Term("field", "hi"), 1);
             q.Add(new Term("field", "test"), 5);
 
-            Assert.AreEqual(q.ToString(), "field:\"? hi ? ? ? test\"");
+            Assert.Equal(q.ToString(), "field:\"? hi ? ? ? test\"");
             q.Add(new Term("field", "hello"), 1);
-            Assert.AreEqual(q.ToString(), "field:\"? hi|hello ? ? ? test\"");
+            Assert.Equal(q.ToString(), "field:\"? hi|hello ? ? ? test\"");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWrappedPhrase()
         {
             Query.Add(new Term("repeated", "first"));
@@ -407,18 +403,18 @@ namespace Lucene.Net.Search
             Query.Slop = 100;
 
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "slop of 100 just right");
+            Assert.Equal(1, hits.Length, "slop of 100 just right");
             QueryUtils.Check(Random(), Query, Searcher);
 
             Query.Slop = 99;
 
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "slop of 99 not enough");
+            Assert.Equal(0, hits.Length, "slop of 99 not enough");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
         // work on two docs like this: "phrase exist notexist exist found"
-        [Test]
+        [Fact]
         public virtual void TestNonExistingPhrase()
         {
             // phrase without repetitions that exists in 2 docs
@@ -428,7 +424,7 @@ namespace Lucene.Net.Search
             Query.Slop = 2; // would be found this way
 
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length, "phrase without repetitions exists in 2 docs");
+            Assert.Equal(2, hits.Length, "phrase without repetitions exists in 2 docs");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // phrase with repetitions that exists in 2 docs
@@ -439,7 +435,7 @@ namespace Lucene.Net.Search
             Query.Slop = 1; // would be found
 
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length, "phrase with repetitions exists in two docs");
+            Assert.Equal(2, hits.Length, "phrase with repetitions exists in two docs");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // phrase I with repetitions that does not exist in any doc
@@ -450,7 +446,7 @@ namespace Lucene.Net.Search
             Query.Slop = 1000; // would not be found no matter how high the slop is
 
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "nonexisting phrase with repetitions does not exist in any doc");
+            Assert.Equal(0, hits.Length, "nonexisting phrase with repetitions does not exist in any doc");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // phrase II with repetitions that does not exist in any doc
@@ -462,7 +458,7 @@ namespace Lucene.Net.Search
             Query.Slop = 1000; // would not be found no matter how high the slop is
 
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "nonexisting phrase with repetitions does not exist in any doc");
+            Assert.Equal(0, hits.Length, "nonexisting phrase with repetitions does not exist in any doc");
             QueryUtils.Check(Random(), Query, Searcher);
         }
 
@@ -475,7 +471,7 @@ namespace Lucene.Net.Search
         /// Also, in this case order in query does not matter.
         /// Also, when an exact match is found, both sloppy scorer and exact scorer scores the same.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestPalyndrome2()
         {
             // search on non palyndrome, find phrase with no slop, using exact phrase scorer
@@ -483,7 +479,7 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "two"));
             Query.Add(new Term("field", "three"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "phrase found with exact phrase scorer");
+            Assert.Equal(1, hits.Length, "phrase found with exact phrase scorer");
             float score0 = hits[0].Score;
             //System.out.println("(exact) field: two three: "+score0);
             QueryUtils.Check(Random(), Query, Searcher);
@@ -491,10 +487,10 @@ namespace Lucene.Net.Search
             // search on non palyndrome, find phrase with slop 2, though no slop required here.
             Query.Slop = 2; // to use sloppy scorer
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             float score1 = hits[0].Score;
             //System.out.println("(sloppy) field: two three: "+score1);
-            Assert.AreEqual(score0, score1, SCORE_COMP_THRESH, "exact scorer and sloppy scorer score the same when slop does not matter");
+            Assert.Equal(score0, score1, SCORE_COMP_THRESH, "exact scorer and sloppy scorer score the same when slop does not matter");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // search ordered in palyndrome, find it twice
@@ -503,13 +499,13 @@ namespace Lucene.Net.Search
             Query.Add(new Term("palindrome", "two"));
             Query.Add(new Term("palindrome", "three"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             //float score2 = hits[0].Score;
             //System.out.println("palindrome: two three: "+score2);
             QueryUtils.Check(Random(), Query, Searcher);
 
             //commented out for sloppy-phrase efficiency (issue 736) - see SloppyPhraseScorer.phraseFreq().
-            //Assert.IsTrue("ordered scores higher in palindrome",score1+SCORE_COMP_THRESH<score2);
+            //Assert.True("ordered scores higher in palindrome",score1+SCORE_COMP_THRESH<score2);
 
             // search reveresed in palyndrome, find it twice
             Query = new PhraseQuery();
@@ -517,14 +513,14 @@ namespace Lucene.Net.Search
             Query.Add(new Term("palindrome", "three"));
             Query.Add(new Term("palindrome", "two"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             //float score3 = hits[0].Score;
             //System.out.println("palindrome: three two: "+score3);
             QueryUtils.Check(Random(), Query, Searcher);
 
             //commented out for sloppy-phrase efficiency (issue 736) - see SloppyPhraseScorer.phraseFreq().
-            //Assert.IsTrue("reversed scores higher in palindrome",score1+SCORE_COMP_THRESH<score3);
-            //Assert.AreEqual("ordered or reversed does not matter",score2, score3, SCORE_COMP_THRESH);
+            //Assert.True("reversed scores higher in palindrome",score1+SCORE_COMP_THRESH<score3);
+            //Assert.Equal("ordered or reversed does not matter",score2, score3, SCORE_COMP_THRESH);
         }
 
         /// <summary>
@@ -536,7 +532,7 @@ namespace Lucene.Net.Search
         /// Also, in this case order in query does not matter.
         /// Also, when an exact match is found, both sloppy scorer and exact scorer scores the same.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestPalyndrome3()
         {
             // search on non palyndrome, find phrase with no slop, using exact phrase scorer
@@ -545,7 +541,7 @@ namespace Lucene.Net.Search
             Query.Add(new Term("field", "two"));
             Query.Add(new Term("field", "three"));
             ScoreDoc[] hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "phrase found with exact phrase scorer");
+            Assert.Equal(1, hits.Length, "phrase found with exact phrase scorer");
             float score0 = hits[0].Score;
             //System.out.println("(exact) field: one two three: "+score0);
             QueryUtils.Check(Random(), Query, Searcher);
@@ -556,10 +552,10 @@ namespace Lucene.Net.Search
             // search on non palyndrome, find phrase with slop 3, though no slop required here.
             Query.Slop = 4; // to use sloppy scorer
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             float score1 = hits[0].Score;
             //System.out.println("(sloppy) field: one two three: "+score1);
-            Assert.AreEqual(score0, score1, SCORE_COMP_THRESH, "exact scorer and sloppy scorer score the same when slop does not matter");
+            Assert.Equal(score0, score1, SCORE_COMP_THRESH, "exact scorer and sloppy scorer score the same when slop does not matter");
             QueryUtils.Check(Random(), Query, Searcher);
 
             // search ordered in palyndrome, find it twice
@@ -573,13 +569,13 @@ namespace Lucene.Net.Search
             // just make sure no exc:
             Searcher.Explain(Query, 0);
 
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             //float score2 = hits[0].Score;
             //System.out.println("palindrome: one two three: "+score2);
             QueryUtils.Check(Random(), Query, Searcher);
 
             //commented out for sloppy-phrase efficiency (issue 736) - see SloppyPhraseScorer.phraseFreq().
-            //Assert.IsTrue("ordered scores higher in palindrome",score1+SCORE_COMP_THRESH<score2);
+            //Assert.True("ordered scores higher in palindrome",score1+SCORE_COMP_THRESH<score2);
 
             // search reveresed in palyndrome, find it twice
             Query = new PhraseQuery();
@@ -588,18 +584,18 @@ namespace Lucene.Net.Search
             Query.Add(new Term("palindrome", "two"));
             Query.Add(new Term("palindrome", "one"));
             hits = Searcher.Search(Query, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "just sloppy enough");
+            Assert.Equal(1, hits.Length, "just sloppy enough");
             //float score3 = hits[0].Score;
             //System.out.println("palindrome: three two one: "+score3);
             QueryUtils.Check(Random(), Query, Searcher);
 
             //commented out for sloppy-phrase efficiency (issue 736) - see SloppyPhraseScorer.phraseFreq().
-            //Assert.IsTrue("reversed scores higher in palindrome",score1+SCORE_COMP_THRESH<score3);
-            //Assert.AreEqual("ordered or reversed does not matter",score2, score3, SCORE_COMP_THRESH);
+            //Assert.True("reversed scores higher in palindrome",score1+SCORE_COMP_THRESH<score3);
+            //Assert.Equal("ordered or reversed does not matter",score2, score3, SCORE_COMP_THRESH);
         }
 
         // LUCENE-1280
-        [Test]
+        [Fact]
         public virtual void TestEmptyPhraseQuery()
         {
             BooleanQuery q2 = new BooleanQuery();
@@ -609,17 +605,17 @@ namespace Lucene.Net.Search
 
         /* test that a single term is rewritten to a term query */
 
-        [Test]
+        [Fact]
         public virtual void TestRewrite()
         {
             PhraseQuery pq = new PhraseQuery();
             pq.Add(new Term("foo", "bar"));
             Query rewritten = pq.Rewrite(Searcher.IndexReader);
-            Assert.IsTrue(rewritten is TermQuery);
+            Assert.True(rewritten is TermQuery);
         }
 
-        [Ignore]
-        [Test]
+        [Ignore("Ignored test")]
+        [Fact]
         public virtual void TestRandomPhrases()
         {
             Directory dir = NewDirectory();
@@ -730,14 +726,14 @@ namespace Lucene.Net.Search
                     }
                 }
 
-                Assert.IsTrue(found, "phrase '" + sb + "' not found; start=" + start);
+                Assert.True(found, "phrase '" + sb + "' not found; start=" + start);
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNegativeSlop()
         {
             PhraseQuery query = new PhraseQuery();
@@ -746,7 +742,7 @@ namespace Lucene.Net.Search
             try
             {
                 query.Slop = -2;
-                Assert.Fail("didn't get expected exception");
+                Assert.True(false, "didn't get expected exception");
             }
             catch (System.ArgumentException expected)
             {

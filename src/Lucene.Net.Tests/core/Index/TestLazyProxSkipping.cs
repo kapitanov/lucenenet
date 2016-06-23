@@ -18,7 +18,7 @@ namespace Lucene.Net.Index
      */
 
     using Lucene.Net.Analysis;
-    using NUnit.Framework;
+    using Xunit;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -35,9 +35,7 @@ namespace Lucene.Net.Index
 
     /// <summary>
     /// Tests lazy skipping on the proximity file.
-    ///
     /// </summary>
-    [TestFixture]
     public class TestLazyProxSkipping : LuceneTestCase
     {
         private IndexSearcher Searcher;
@@ -142,15 +140,15 @@ namespace Lucene.Net.Index
             this.SeeksCounter = 0;
             ScoreDoc[] hits = Search();
             // verify that the right number of docs was found
-            Assert.AreEqual(numHits, hits.Length);
+            Assert.Equal(numHits, hits.Length);
 
             // check if the number of calls of seek() does not exceed the number of hits
-            Assert.IsTrue(this.SeeksCounter > 0);
-            Assert.IsTrue(this.SeeksCounter <= numHits + 1, "seeksCounter=" + this.SeeksCounter + " numHits=" + numHits);
+            Assert.True(this.SeeksCounter > 0);
+            Assert.True(this.SeeksCounter <= numHits + 1, "seeksCounter=" + this.SeeksCounter + " numHits=" + numHits);
             Searcher.IndexReader.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLazySkipping()
         {
             string fieldFormat = TestUtil.GetPostingsFormat(this.Field);
@@ -164,7 +162,7 @@ namespace Lucene.Net.Index
             PerformTest(10);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSeek()
         {
             Directory directory = NewDirectory();
@@ -184,8 +182,8 @@ namespace Lucene.Net.Index
             for (int i = 0; i < 10; i++)
             {
                 tp.NextDoc();
-                Assert.AreEqual(tp.DocID(), i);
-                Assert.AreEqual(tp.NextPosition(), 1);
+                Assert.Equal(tp.DocID(), i);
+                Assert.Equal(tp.NextPosition(), 1);
             }
 
             tp = MultiFields.GetTermPositionsEnum(reader, MultiFields.GetLiveDocs(reader), this.Field, new BytesRef("a"));
@@ -193,8 +191,8 @@ namespace Lucene.Net.Index
             for (int i = 0; i < 10; i++)
             {
                 tp.NextDoc();
-                Assert.AreEqual(tp.DocID(), i);
-                Assert.AreEqual(tp.NextPosition(), 0);
+                Assert.Equal(tp.DocID(), i);
+                Assert.Equal(tp.NextPosition(), 0);
             }
             reader.Dispose();
             directory.Dispose();

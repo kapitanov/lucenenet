@@ -1,8 +1,7 @@
-using Lucene.Net.Index;
-using Lucene.Net.Support;
-using NUnit.Framework;
 using System.Collections.Generic;
 using System.Text;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -27,10 +26,9 @@ namespace Lucene.Net.Util.Automaton
     /// Not thorough, but tries to test determinism correctness
     /// somewhat randomly, by determinizing a huge random lexicon.
     /// </summary>
-    [TestFixture]
     public class TestDeterminizeLexicon : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestLexicon()
         {
             var automata = new List<Automaton>();
@@ -56,16 +54,16 @@ namespace Lucene.Net.Util.Automaton
             var automata = CollectionsHelper.Shuffle(a);
             var lex = BasicOperations.Union(automata);
             lex.Determinize();
-            Assert.IsTrue(SpecialOperations.IsFinite(lex));
+            Assert.True(SpecialOperations.IsFinite(lex));
             foreach (string s in terms)
             {
-                Assert.IsTrue(BasicOperations.Run(lex, s));
+                Assert.True(BasicOperations.Run(lex, s));
             }
             var lexByte = new ByteRunAutomaton(lex);
             foreach (string s in terms)
             {
                 var bytes = s.GetBytes(Encoding.UTF8);
-                Assert.IsTrue(lexByte.Run(bytes, 0, bytes.Length));
+                Assert.True(lexByte.Run(bytes, 0, bytes.Length));
             }
         }
     }

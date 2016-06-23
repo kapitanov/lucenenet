@@ -11,7 +11,7 @@ namespace Lucene.Net.Tests.Queries
         // TODO: this suite desperately needs more tests!
         // ... like ones that actually run the query
 
-        [Test]
+        [Fact]
         public virtual void TestBoostingQueryEquals()
         {
             TermQuery q1 = new TermQuery(new Term("subject:", "java"));

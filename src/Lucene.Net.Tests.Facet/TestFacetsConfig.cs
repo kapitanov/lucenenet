@@ -36,7 +36,7 @@ namespace Lucene.Net.Facet
     public class TestFacetsConfig : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestPathToStringAndBack()
         {
             int iters = AtLeast(1000);
@@ -64,7 +64,7 @@ namespace Lucene.Net.Facet
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddSameDocTwice()
         {
             // LUCENE-5367: this was a problem with the previous code, making sure it
@@ -89,8 +89,8 @@ namespace Lucene.Net.Facet
 
             Facets facets = GetTaxonomyFacetCounts(taxoReader, facetsConfig, fc);
             FacetResult res = facets.GetTopChildren(10, "a");
-            Assert.AreEqual(1, res.LabelValues.Length);
-            Assert.AreEqual(2, res.LabelValues[0].value);
+            Assert.Equal(1, res.LabelValues.Length);
+            Assert.Equal(2, res.LabelValues[0].value);
             IOUtils.Close(indexReader, taxoReader);
 
             IOUtils.Close(indexDir, taxoDir);
@@ -99,7 +99,7 @@ namespace Lucene.Net.Facet
         /// <summary>
         /// LUCENE-5479 
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCustomDefault()
         {
             FacetsConfig config = new FacetsConfigAnonymousInnerClassHelper(this);

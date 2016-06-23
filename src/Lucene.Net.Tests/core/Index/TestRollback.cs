@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -28,11 +28,10 @@ namespace Lucene.Net.Index
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestRollback : LuceneTestCase
     {
         // LUCENE-2536
-        [Test]
+        [Fact]
         public virtual void TestRollbackIntegrityWithBufferFlush()
         {
             Directory dir = NewDirectory();
@@ -59,7 +58,7 @@ namespace Lucene.Net.Index
             w.Rollback();
 
             IndexReader r = DirectoryReader.Open(dir);
-            Assert.AreEqual(5, r.NumDocs, "index should contain same number of docs post rollback");
+            Assert.Equal(5, r.NumDocs); //, "index should contain same number of docs post rollback");
             r.Dispose();
             dir.Dispose();
         }

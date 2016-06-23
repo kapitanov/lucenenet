@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -25,7 +25,6 @@ namespace Lucene.Net.Index
     /// Tests the codec configuration defined by LuceneTestCase randomly
     ///  (typically a mix across different fields).
     /// </summary>
-    [TestFixture]
     public class TestPostingsFormat : BasePostingsFormatTestCase
     {
         protected override Codec Codec
@@ -36,7 +35,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public override void TestMergeStability()
         {
             AssumeTrue("The MockRandom PF randomizes content on the fly, so we can't check it", false);

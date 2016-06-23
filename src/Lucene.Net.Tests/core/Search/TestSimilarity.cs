@@ -2,7 +2,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -38,7 +38,6 @@ namespace Lucene.Net.Search
     ///
     ///
     /// </summary>
-    [TestFixture]
     public class TestSimilarity : LuceneTestCase
     {
         public class SimpleSimilarity : DefaultSimilarity
@@ -79,7 +78,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimilarity_Mem()
         {
             Directory store = NewDirectory();
@@ -146,7 +145,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.AreEqual(1.0f, scorer.Score(), 0);
+                Assert.Equal(1.0f, scorer.Score(), 0);
             }
 
             public override AtomicReaderContext NextReader
@@ -186,7 +185,7 @@ namespace Lucene.Net.Search
             public override void Collect(int doc)
             {
                 //System.out.println("Doc=" + doc + " score=" + score);
-                Assert.AreEqual((float)doc + @base + 1, scorer.Score(), 0);
+                Assert.Equal((float)doc + @base + 1, scorer.Score(), 0);
             }
 
             public override AtomicReaderContext NextReader
@@ -225,7 +224,7 @@ namespace Lucene.Net.Search
             public override void Collect(int doc)
             {
                 //System.out.println("Doc=" + doc + " score=" + score);
-                Assert.AreEqual(1.0f, scorer.Score(), 0);
+                Assert.Equal(1.0f, scorer.Score(), 0);
             }
 
             public override AtomicReaderContext NextReader
@@ -263,7 +262,7 @@ namespace Lucene.Net.Search
             public override void Collect(int doc)
             {
                 //System.out.println("Doc=" + doc + " score=" + score);
-                Assert.AreEqual(2.0f, scorer.Score(), 0);
+                Assert.Equal(2.0f, scorer.Score(), 0);
             }
 
             public override AtomicReaderContext NextReader

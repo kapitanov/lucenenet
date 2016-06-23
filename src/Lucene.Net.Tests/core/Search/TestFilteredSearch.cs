@@ -1,4 +1,3 @@
-using System;
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -15,11 +14,12 @@ using System;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
     using Directory = Lucene.Net.Store.Directory;
@@ -34,12 +34,11 @@ namespace Lucene.Net.Search
     using OpenMode = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestFilteredSearch : LuceneTestCase
     {
         private const string FIELD = "category";
 
-        [Test]
+        [Fact]
         public virtual void TestFilteredSearch_Mem()
         {
             bool enforceSingleSegment = true;
@@ -78,7 +77,7 @@ namespace Lucene.Net.Search
             IndexReader reader = DirectoryReader.Open(directory);
             IndexSearcher indexSearcher = NewSearcher(reader);
             ScoreDoc[] hits = indexSearcher.Search(booleanQuery, filter, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length, "Number of matched documents");
+            Assert.Equal(1, hits.Length); //, "Number of matched documents");
             reader.Dispose();
         }
 
@@ -93,7 +92,7 @@ namespace Lucene.Net.Search
 
             public override DocIdSet GetDocIdSet(AtomicReaderContext context, Bits acceptDocs)
             {
-                Assert.IsNull(acceptDocs, "acceptDocs should be null, as we have an index without deletions");
+                Assert.Null(acceptDocs); //, "acceptDocs should be null, as we have an index without deletions");
                 FixedBitSet set = new FixedBitSet(context.Reader.MaxDoc);
                 int docBase = context.DocBase;
                 int limit = docBase + context.Reader.MaxDoc;

@@ -19,7 +19,6 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
-using NUnit.Framework;
 
 namespace Lucene.Net.Classification
 {
@@ -28,7 +27,7 @@ namespace Lucene.Net.Classification
      */
     public class KNearestNeighborClassifierTest : ClassificationTestBase<BytesRef>
     {
-        [Test]
+        [Fact]
         public void TestBasicUsage()
         {
             // usage with default MLT min docs / term freq
@@ -37,13 +36,13 @@ namespace Lucene.Net.Classification
             CheckCorrectClassification(new KNearestNeighborClassifier(3, 2, 1), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName);
         }
 
-        [Test]
+        [Fact]
         public void TestBasicUsageWithQuery()
         {
             CheckCorrectClassification(new KNearestNeighborClassifier(1), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName, new TermQuery(new Term(textFieldName, "it")));
         }
 
-        [Test]
+        [Fact]
         public void TestPerformance()
         {
             CheckPerformance(new KNearestNeighborClassifier(100), new MockAnalyzer(Random()), categoryFieldName);

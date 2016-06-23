@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.JavaCompatibility;
 using Lucene.Net.Support;
-using NUnit.Framework;
-using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -68,14 +68,14 @@ namespace Lucene.Net.Util
 
         public virtual void AssertSorted(Entry[] original, Entry[] sorted)
         {
-            Assert.AreEqual(original.Length, sorted.Length);
+            Assert.Equal(original.Length, sorted.Length);
             Entry[] stableSorted = original.OrderBy(e => e, new StableEntryComparer()).ToArray();
             for (int i = 0; i < original.Length; ++i)
             {
-                Assert.AreEqual(stableSorted[i].Value, sorted[i].Value);
+                Assert.Equal(stableSorted[i].Value, sorted[i].Value);
                 if (Stable)
                 {
-                    Assert.AreEqual(stableSorted[i].Ord, sorted[i].Ord);
+                    Assert.Equal(stableSorted[i].Ord, sorted[i].Ord);
                 }
             }
         }
@@ -154,55 +154,55 @@ namespace Lucene.Net.Util
             DoTest(strategy, Random().Next(20000));
         }
 
-        [Test]
+        [Fact]
         public void TestEmpty()
         {
             SortTest(new Entry[0]);
         }
 
-        [Test]
+        [Fact]
         public void TestOne()
         {
             DoTest(RandomStrategy, 1);
         }
 
-        [Test]
+        [Fact]
         public void TestTwo()
         {
             DoTest(RandomStrategy, 2);
         }
 
-        [Test]
+        [Fact]
         public void TestRandom()
         {
             DoTest(RandomStrategy);
         }
 
-        [Test]
+        [Fact]
         public void TestRandomLowCardinality()
         {
             DoTest(RandomLowCardinalityStrategy, 2);
         }
 
-        [Test]
+        [Fact]
         public void TestAscending()
         {
             DoTest(AscendingStrategy, 2);
         }
 
-        [Test]
+        [Fact]
         public void TestAscendingSequences()
         {
             DoTest(AscendingSequencesStrategy, 2);
         }
 
-        [Test]
+        [Fact]
         public void TestDescending()
         {
             DoTest(DescendingStrategy, 2);
         }
 
-        [Test]
+        [Fact]
         public void TestStrictlyDescendingStrategy()
         {
             DoTest(StrictlyDescendingStrategy, 2);

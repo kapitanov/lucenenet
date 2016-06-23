@@ -1,8 +1,10 @@
+using Xunit;
+
 namespace Lucene.Net.Codecs.Lucene41
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -32,7 +34,7 @@ namespace Lucene.Net.Codecs.Lucene41
     [TestFixture]
     public class TestForUtil : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEncodeDecode()
         {
             int iterations = RandomInts.NextIntBetween(Random(), 1, 1000);
@@ -87,9 +89,9 @@ namespace Lucene.Net.Codecs.Lucene41
                     }
                     int[] restored = new int[Lucene41.ForUtil.MAX_DATA_SIZE];
                     forUtil.ReadBlock(@in, new byte[Lucene41.ForUtil.MAX_ENCODED_SIZE], restored);
-                    Assert.AreEqual(Arrays.CopyOfRange(values, i * Lucene41PostingsFormat.BLOCK_SIZE, (i + 1) * Lucene41PostingsFormat.BLOCK_SIZE), Arrays.CopyOf(restored, Lucene41PostingsFormat.BLOCK_SIZE));
+                    Assert.Equal(Arrays.CopyOfRange(values, i * Lucene41PostingsFormat.BLOCK_SIZE, (i + 1) * Lucene41PostingsFormat.BLOCK_SIZE), Arrays.CopyOf(restored, Lucene41PostingsFormat.BLOCK_SIZE));
                 }
-                Assert.AreEqual(endPointer, @in.FilePointer);
+                Assert.Equal(endPointer, @in.FilePointer);
                 @in.Dispose();
             }
         }

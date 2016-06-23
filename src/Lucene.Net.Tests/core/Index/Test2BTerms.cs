@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Analysis;
     using Lucene.Net.Analysis.Tokenattributes;
-    
+
     using Lucene.Net.Search;
     using Lucene.Net.Store;
     using Lucene.Net.Support;
@@ -29,7 +30,6 @@ namespace Lucene.Net.Index
          */
 
     using Lucene.Net.Util;
-    using NUnit.Framework;
     using System.Runtime.CompilerServices;
     using Codec = Lucene.Net.Codecs.Codec;
 
@@ -45,8 +45,7 @@ namespace Lucene.Net.Index
     //
     //   java -server -Xmx8g -d64 -cp .:lib/junit-4.10.jar:./build/classes/test:./build/classes/test-framework:./build/classes/java -Dlucene.version=4.0-dev -Dtests.directory=MMapDirectory -DtempDir=build -ea org.junit.runner.JUnitCore Lucene.Net.Index.Test2BTerms
     //
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BTerms : LuceneTestCase
     {
         private const int TOKEN_LEN = 5;
@@ -166,9 +165,9 @@ namespace Lucene.Net.Index
         }
 
         //ORIGINAL LINE: @Ignore("Very slow. Enable manually by removing @Ignore.") public void test2BTerms() throws java.io.IOException
-        [Ignore]
-        [Test]
-        public virtual void Test2BTerms_Mem([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory(Skip = "long running testcase")]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void Test2BTerms_Mem(IConcurrentMergeScheduler scheduler)
         {
             if ("Lucene3x".Equals(Codec.Default.Name))
             {
@@ -250,7 +249,7 @@ namespace Lucene.Net.Index
             Console.WriteLine("TEST: now CheckIndex...");
             CheckIndex.Status status = TestUtil.CheckIndex(dir);
             long tc = status.SegmentInfos[0].TermIndexStatus.TermCount;
-            Assert.IsTrue(tc > int.MaxValue, "count " + tc + " is not > " + int.MaxValue);
+            Assert.True(tc > int.MaxValue, "count " + tc + " is not > " + int.MaxValue);
 
             dir.Dispose();
             Console.WriteLine("TEST: done!");
@@ -310,7 +309,7 @@ namespace Lucene.Net.Index
                     failed = true;
                 }
             }
-            Assert.IsFalse(failed);
+            Assert.False(failed);
         }
     }
 }

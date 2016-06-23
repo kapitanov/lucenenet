@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using System.IO;
 
 namespace Lucene.Net.Index
@@ -31,10 +31,9 @@ namespace Lucene.Net.Index
     /// release its write lock when trying to open an index which does not yet
     /// exist).
     /// </summary>
-    [TestFixture]
     public class TestIndexWriterLockRelease : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestIndexWriterLockRelease_Mem()
         {
             Directory dir = NewFSDirectory(CreateTempDir("testLockRelease"));

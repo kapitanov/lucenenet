@@ -15,7 +15,7 @@ namespace Lucene.Net.Tests.Queries
 {
     public class TermsFilterTest : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestCachability()
         {
             TermsFilter a = TermsFilter(Random().NextBoolean(), new Term("field1", "a"), new Term("field1", "b"));
@@ -28,7 +28,7 @@ namespace Lucene.Net.Tests.Queries
             assertFalse("Must not be cached", cachedFilters.Contains(TermsFilter(Random().NextBoolean(), new Term("field1", "a"), new Term("field1", "a"), new Term("field1", "b"), new Term("field1", "v"))));
         }
 
-        [Test]
+        [Fact]
         public void TestMissingTerms()
         {
             string fieldName = "field1";
@@ -67,7 +67,7 @@ namespace Lucene.Net.Tests.Queries
             rd.Dispose();
         }
         
-        [Test]
+        [Fact]
         public void TestMissingField()
         {
             string fieldName = "field1";
@@ -110,7 +110,7 @@ namespace Lucene.Net.Tests.Queries
             rd2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestFieldNotPresent()
         {
             Directory dir = NewDirectory();
@@ -146,7 +146,7 @@ namespace Lucene.Net.Tests.Queries
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSkipField()
         {
             Directory dir = NewDirectory();
@@ -188,7 +188,7 @@ namespace Lucene.Net.Tests.Queries
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestRandom()
         {
             Directory dir = NewDirectory();
@@ -265,7 +265,7 @@ namespace Lucene.Net.Tests.Queries
             return filter;
         }
 
-        [Test]
+        [Fact]
         public void TestHashCodeAndEquals()
         {
             int num = AtLeast(100);
@@ -294,7 +294,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSingleFieldEquals()
         {
             // Two terms with the same hash code
@@ -304,7 +304,7 @@ namespace Lucene.Net.Tests.Queries
             assertFalse(left.Equals(right));
         }
 
-        [Test]
+        [Fact]
         public void TestNoTerms()
         {
             var emptyTerms = new List<Term>();
@@ -316,7 +316,7 @@ namespace Lucene.Net.Tests.Queries
             Assert.Throws<ArgumentException>(() => new TermsFilter(null, emptyBytesRef));
         }
 
-        [Test]
+        [Fact]
         public void TestToString()
         {
             TermsFilter termsFilter = new TermsFilter(new Term("field1", "a"), new Term("field1", "b"), new Term("field1", "c"));

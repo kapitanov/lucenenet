@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.Diagnostics;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
@@ -37,12 +37,11 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestBooleanScorer : LuceneTestCase
     {
         private const string FIELD = "category";
 
-        [Test]
+        [Fact]
         public virtual void TestMethod()
         {
             Directory directory = NewDirectory();
@@ -69,12 +68,12 @@ namespace Lucene.Net.Search
 
             IndexSearcher indexSearcher = NewSearcher(ir);
             ScoreDoc[] hits = indexSearcher.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length, "Number of matched documents");
+            Assert.Equal(2, hits.Length, "Number of matched documents");
             ir.Dispose();
             directory.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyBucketWithMoreDocs()
         {
             // this test checks the logic of nextDoc() when all sub scorers have docs
@@ -99,8 +98,8 @@ namespace Lucene.Net.Search
             IList<int> hits = new List<int>();
             bs.Score(new CollectorAnonymousInnerClassHelper(this, hits));
 
-            Assert.AreEqual(1, hits.Count, "should have only 1 hit");
-            Assert.AreEqual(3000, (int)hits[0], "hit should have been docID=3000");
+            Assert.Equal(1, hits.Count, "should have only 1 hit");
+            Assert.Equal(3000, (int)hits[0], "hit should have been docID=3000");
             ir.Dispose();
             directory.Dispose();
         }
@@ -162,7 +161,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMoreThan32ProhibitedClauses()
         {
             Directory d = NewDirectory();
@@ -188,7 +187,7 @@ namespace Lucene.Net.Search
             int[] count = new int[1];
             s.Search(q, new CollectorAnonymousInnerClassHelper2(this, doc, count));
 
-            Assert.AreEqual(1, count[0]);
+            Assert.Equal(1, count[0]);
 
             r.Dispose();
             d.Dispose();
@@ -214,7 +213,7 @@ namespace Lucene.Net.Search
                 {
                     // Make sure we got BooleanScorer:
                     Type clazz = value.GetType();
-                    Assert.AreEqual(typeof(FakeScorer).Name, clazz.Name, "Scorer is implemented by wrong class");
+                    Assert.Equal(typeof(FakeScorer).Name, clazz.Name, "Scorer is implemented by wrong class");
                 }
             }
 
@@ -317,7 +316,7 @@ namespace Lucene.Net.Search
         /// Make sure BooleanScorer can embed another
         ///  BooleanScorer.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmbeddedBooleanScorer()
         {
             Directory dir = NewDirectory();
@@ -337,7 +336,7 @@ namespace Lucene.Net.Search
             q2.Add(q1, BooleanClause.Occur.SHOULD);
             q2.Add(new CrazyMustUseBulkScorerQuery(), BooleanClause.Occur.SHOULD);
 
-            Assert.AreEqual(1, s.Search(q2, 10).TotalHits);
+            Assert.Equal(1, s.Search(q2, 10).TotalHits);
             r.Dispose();
             dir.Dispose();
         }

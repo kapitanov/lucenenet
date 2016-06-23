@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Analysis.Tokenattributes
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
     using Attribute = Lucene.Net.Util.Attribute;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
@@ -30,7 +31,7 @@ namespace Lucene.Net.Analysis.Tokenattributes
     public class TestSimpleAttributeImpl : LuceneTestCase
     {
         // this checks using reflection API if the defaults are correct
-        [Test]
+        [Fact]
         public virtual void TestAttributes()
         {
             TestUtil.AssertAttributeReflection(new PositionIncrementAttribute(), CollectionsHelper.SingletonMap(typeof(IPositionIncrementAttribute).Name + "#positionIncrement", (object)1));
@@ -49,8 +50,8 @@ namespace Lucene.Net.Analysis.Tokenattributes
         public static Attribute AssertCloneIsEqual(Attribute att)
         {
             Attribute clone = (Attribute)att.Clone();
-            Assert.AreEqual(att, clone, "Clone must be equal");
-            Assert.AreEqual(att.GetHashCode(), clone.GetHashCode(), "Clone's hashcode must be equal");
+            Assert.Equal(att, clone); //, "Clone must be equal");
+            Assert.Equal(att.GetHashCode(), clone.GetHashCode()); //, "Clone's hashcode must be equal");
             return clone;
         }
 
@@ -58,8 +59,8 @@ namespace Lucene.Net.Analysis.Tokenattributes
         {
             Attribute copy = (Attribute)System.Activator.CreateInstance(att.GetType());
             att.CopyTo(copy);
-            Assert.AreEqual(att, copy, "Copied instance must be equal");
-            Assert.AreEqual(att.GetHashCode(), copy.GetHashCode(), "Copied instance's hashcode must be equal");
+            Assert.Equal(att, copy); //, "Copied instance must be equal");
+            Assert.Equal(att.GetHashCode(), copy.GetHashCode()); //, "Copied instance's hashcode must be equal");
             return copy;
         }
     }

@@ -1,6 +1,6 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -25,7 +25,6 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestPositiveScoresOnlyCollector : LuceneTestCase
     {
         private sealed class SimpleScorer : Scorer
@@ -72,7 +71,7 @@ namespace Lucene.Net.Search
         // The scores must have positive as well as negative values
         private static readonly float[] Scores = new float[] { 0.7767749f, -1.7839992f, 8.9925785f, 7.9608946f, -0.07948637f, 2.6356435f, 7.4950366f, 7.1490803f, -8.108544f, 4.961808f, 2.2423935f, -7.285586f, 4.6699767f };
 
-        [Test]
+        [Fact]
         public virtual void TestNegativeScores()
         {
             // The Top*Collectors previously filtered out documents with <= scores. this
@@ -106,10 +105,10 @@ namespace Lucene.Net.Search
             }
             TopDocs td = tdc.TopDocs();
             ScoreDoc[] sd = td.ScoreDocs;
-            Assert.AreEqual(numPositiveScores, td.TotalHits);
+            Assert.Equal(numPositiveScores, td.TotalHits);
             for (int i = 0; i < sd.Length; i++)
             {
-                Assert.IsTrue(sd[i].Score > 0, "only positive scores should return: " + sd[i].Score);
+                Assert.True(sd[i].Score > 0, "only positive scores should return: " + sd[i].Score);
             }
             ir.Dispose();
             directory.Dispose();

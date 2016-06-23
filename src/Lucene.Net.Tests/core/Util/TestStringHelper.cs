@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -19,17 +19,16 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestStringHelper : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestMurmurHash3()
         {
             // Hashes computed using murmur3_32 from https://code.google.com/p/pyfasthash
-            Assert.AreEqual(0xf6a5c420, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("foo"), 0));
-            Assert.AreEqual(0xcd018ef6, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("foo"), 16));
-            Assert.AreEqual(0x111e7435, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("You want weapons? We're in a library! Books! The best weapons in the world!"), 0));
-            Assert.AreEqual(0x2c628cd0, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("You want weapons? We're in a library! Books! The best weapons in the world!"), 3476));
+            Assert.Equal(0xf6a5c420, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("foo"), 0));
+            Assert.Equal(0xcd018ef6, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("foo"), 16));
+            Assert.Equal((uint)0x111e7435, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("You want weapons? We're in a library! Books! The best weapons in the world!"), 0));
+            Assert.Equal((uint)0x2c628cd0, (uint)StringHelper.Murmurhash3_x86_32(new BytesRef("You want weapons? We're in a library! Books! The best weapons in the world!"), 3476));
         }
     }
 }

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -33,11 +32,10 @@ namespace Lucene.Net.Facet.Taxonomy
     using IndexWriterConfig = Lucene.Net.Index.IndexWriterConfig;
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
-    [TestFixture]
     public class TestCachedOrdinalsReader : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestWithThreads()
         {
             // LUCENE-5303: OrdinalsCache used the ThreadLocal BinaryDV instead of reader.getCoreCacheKey().
@@ -74,7 +72,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 }
                 else
                 {
-                    Assert.AreEqual(ramBytesUsed, ordsReader.RamBytesUsed());
+                    Assert.Equal(ramBytesUsed, ordsReader.RamBytesUsed());
                 }
             }
 

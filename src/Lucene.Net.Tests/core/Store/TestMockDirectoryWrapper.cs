@@ -1,10 +1,11 @@
-using NUnit.Framework;
+
 using System;
 using System.IO;
 
 namespace Lucene.Net.Store
 {
-    /*
+    using Support;
+    using Xunit;    /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
      * this work for additional information regarding copyright ownership.
@@ -25,10 +26,9 @@ namespace Lucene.Net.Store
     using IndexWriterConfig = Lucene.Net.Index.IndexWriterConfig;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestMockDirectoryWrapper : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestFailIfIndexWriterNotClosed()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -36,17 +36,17 @@ namespace Lucene.Net.Store
             try
             {
                 dir.Dispose();
-                Assert.Fail();
+                Assert.True(false);
             }
             catch (Exception expected)
             {
-                Assert.IsTrue(expected.Message.Contains("there are still open locks"));
+                Assert.True(expected.Message.Contains("there are still open locks"));
             }
             iw.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFailIfIndexWriterNotClosedChangeLockFactory()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -55,17 +55,18 @@ namespace Lucene.Net.Store
             try
             {
                 dir.Dispose();
-                Assert.Fail();
+                Assert.True(false);
             }
             catch (Exception expected)
             {
-                Assert.IsTrue(expected.Message.Contains("there are still open locks"));
+                Assert.True(expected.Message.Contains("there are still open locks"));
             }
             iw.Dispose();
             dir.Dispose();
         }
 
-        [Test, Repeat(100)]
+        [Theory]
+        [Repeat(100)]
         public void TestDiskFull()
         {
             // test writeBytes
@@ -80,7 +81,7 @@ namespace Lucene.Net.Store
             try
             {
                 @out.WriteBytes(bytes, bytes.Length);
-                Assert.Fail("should have failed on disk full");
+                Assert.True(false, "should have failed on disk full");
             }
             catch (IOException e)
             {
@@ -100,7 +101,7 @@ namespace Lucene.Net.Store
             try
             {
                 @out.CopyBytes(new ByteArrayDataInput((byte[])(Array)bytes), bytes.Length);
-                Assert.Fail("should have failed on disk full");
+                Assert.True(false, "should have failed on disk full");
             }
             catch (IOException e)
             {

@@ -1,13 +1,11 @@
-using Lucene.Net.Attributes;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using Lucene.Net.Util;
-using NUnit.Framework;
 using System;
 using System.IO;
 
 namespace Lucene.Net.Store
 {
+    using Xunit;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
@@ -30,10 +28,9 @@ namespace Lucene.Net.Store
 
     using Throttling = Lucene.Net.Store.MockDirectoryWrapper.Throttling_e;
 
-    [TestFixture]
     public class TestDirectory : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDetectClose()
         {
             DirectoryInfo tempDir = new System.IO.DirectoryInfo("TestDetectClose");// LUCENENET TODO LuceneTestCase.TestClass.SimpleName
@@ -45,7 +42,7 @@ namespace Lucene.Net.Store
                 try
                 {
                     dir.CreateOutput("test", NewIOContext(Random()));
-                    Assert.Fail("did not hit expected exception");
+                    Assert.True(false, "did not hit expected exception");
                 }
                 catch (AlreadyClosedException ace)
                 {
@@ -55,7 +52,9 @@ namespace Lucene.Net.Store
 
         // test is occasionally very slow, i dont know why
         // try this seed: 7D7E036AD12927F5:93333EF9E6DE44DE
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestThreadSafety()
         {
             BaseDirectoryWrapper dir = NewDirectory();
@@ -101,7 +100,7 @@ namespace Lucene.Net.Store
                     try
                     {
                         using (IndexOutput output = outerBDWrapper.CreateOutput(fileName, NewIOContext(Random()))) { }
-                        Assert.IsTrue(SlowFileExists(outerBDWrapper, fileName));
+                        Assert.True(SlowFileExists(outerBDWrapper, fileName));
                     }
                     catch (IOException e)
                     {
@@ -161,7 +160,8 @@ namespace Lucene.Net.Store
 
         // Test that different instances of FSDirectory can coexist on the same
         // path, can read, write, and lock files.
-        [Test, Timeout(int.MaxValue)]
+        //[Test, Timeout(int.MaxValue)]
+        [Fact]
         public virtual void TestDirectInstantiation()
         {
             DirectoryInfo path = CreateTempDir("testDirectInstantiation");
@@ -189,8 +189,8 @@ namespace Lucene.Net.Store
                 {
                     FSDirectory d2 = dirs[j];
                     d2.EnsureOpen();
-                    Assert.IsTrue(SlowFileExists(d2, fname));
-                    Assert.AreEqual(1 + largeBuffer.Length, d2.FileLength(fname));
+                    Assert.True(SlowFileExists(d2, fname));
+                    Assert.Equal(1 + largeBuffer.Length, d2.FileLength(fname));
 
                     // don't do read tests if unmapping is not supported!
                     if (d2 is MMapDirectory && !((MMapDirectory)d2).UseUnmap)
@@ -199,16 +199,16 @@ namespace Lucene.Net.Store
                     }
 
                     IndexInput input = d2.OpenInput(fname, NewIOContext(Random()));
-                    Assert.AreEqual((byte)i, input.ReadByte());
+                    Assert.Equal((byte)i, input.ReadByte());
                     // read array with buffering enabled
                     Arrays.Fill(largeReadBuffer, (byte)0);
                     input.ReadBytes(largeReadBuffer, 0, largeReadBuffer.Length, true);
-                    Assert.AreEqual(largeBuffer, largeReadBuffer);
+                    Assert.Equal(largeBuffer, largeReadBuffer);
                     // read again without using buffer
                     input.Seek(1L);
                     Arrays.Fill(largeReadBuffer, (byte)0);
                     input.ReadBytes(largeReadBuffer, 0, largeReadBuffer.Length, false);
-                    Assert.AreEqual(largeBuffer, largeReadBuffer);
+                    Assert.Equal(largeBuffer, largeReadBuffer);
                     input.Dispose();
                 }
 
@@ -218,11 +218,11 @@ namespace Lucene.Net.Store
                 for (int j = 0; j < dirs.Length; j++)
                 {
                     FSDirectory d2 = dirs[j];
-                    Assert.IsFalse(SlowFileExists(d2, fname));
+                    Assert.False(SlowFileExists(d2, fname));
                 }
 
                 Lock @lock = dir.MakeLock(lockname);
-                Assert.IsTrue(@lock.Obtain());
+                Assert.True(@lock.Obtain());
 
                 for (int j = 0; j < dirs.Length; j++)
                 {
@@ -230,7 +230,7 @@ namespace Lucene.Net.Store
                     Lock lock2 = d2.MakeLock(lockname);
                     try
                     {
-                        Assert.IsFalse(lock2.Obtain(1));
+                        Assert.False(lock2.Obtain(1));
                     }
                     catch (LockObtainFailedException e)
                     {
@@ -242,7 +242,7 @@ namespace Lucene.Net.Store
 
                 // now lock with different dir
                 @lock = dirs[(i + 1) % dirs.Length].MakeLock(lockname);
-                Assert.IsTrue(@lock.Obtain());
+                Assert.True(@lock.Obtain());
                 @lock.Dispose();
             }
 
@@ -251,21 +251,21 @@ namespace Lucene.Net.Store
                 FSDirectory dir = dirs[i];
                 dir.EnsureOpen();
                 dir.Dispose();
-                Assert.IsFalse(dir.IsOpen);
+                Assert.False(dir.IsOpen);
             }
         }
 
         // LUCENE-1464
-        [Test]
+        [Fact]
         public virtual void TestDontCreate()
         {
             var parentFolder = CreateTempDir(this.GetType().Name.ToLowerInvariant());
             var path = new DirectoryInfo(Path.Combine(parentFolder.FullName, "doesnotexist"));
             try
             {
-                Assert.IsTrue(!path.Exists);
+                Assert.True(!path.Exists);
                 Directory dir = new SimpleFSDirectory(path, null);
-                Assert.IsTrue(!path.Exists);
+                Assert.True(!path.Exists);
                 dir.Dispose();
             }
             finally
@@ -275,14 +275,14 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-1468
-        [Test]
+        [Fact]
         public virtual void TestRAMDirectoryFilter()
         {
             CheckDirectoryFilter(new RAMDirectory());
         }
 
         // LUCENE-1468
-        [Test]
+        [Fact]
         public virtual void TestFSDirectoryFilter()
         {
             CheckDirectoryFilter(NewFSDirectory(CreateTempDir("test")));
@@ -295,8 +295,8 @@ namespace Lucene.Net.Store
             try
             {
                 dir.CreateOutput(name, NewIOContext(Random())).Dispose();
-                Assert.IsTrue(SlowFileExists(dir, name));
-                Assert.IsTrue(Arrays.AsList(dir.ListAll()).Contains(name));
+                Assert.True(SlowFileExists(dir, name));
+                Assert.True(Arrays.AsList(dir.ListAll()).Contains(name));
             }
             finally
             {
@@ -305,7 +305,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-1468
-        [Test]
+        [Fact]
         public virtual void TestCopySubdir()
         {
             //File path = CreateTempDir("testsubdir");
@@ -317,7 +317,7 @@ namespace Lucene.Net.Store
                 //(new File(path, "subdir")).mkdirs();
                 System.IO.Directory.CreateDirectory(new DirectoryInfo(Path.Combine(path.FullName, "subdir")).FullName);
                 Directory fsDir = new SimpleFSDirectory(path, null);
-                Assert.AreEqual(0, (new RAMDirectory(fsDir, NewIOContext(Random()))).ListAll().Length);
+                Assert.Equal(0, (new RAMDirectory(fsDir, NewIOContext(Random()))).ListAll().Length);
             }
             finally
             {
@@ -326,7 +326,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-1468
-        [Test]
+        [Fact]
         public virtual void TestNotDirectory()
         {
             //File path = CreateTempDir("testnotdir");
@@ -336,11 +336,11 @@ namespace Lucene.Net.Store
             {
                 IndexOutput @out = fsDir.CreateOutput("afile", NewIOContext(Random()));
                 @out.Dispose();
-                Assert.IsTrue(SlowFileExists(fsDir, "afile"));
+                Assert.True(SlowFileExists(fsDir, "afile"));
                 try
                 {
                     var d = new SimpleFSDirectory(new DirectoryInfo(Path.Combine(path.FullName, "afile")), null);
-                    Assert.Fail("did not hit expected exception");
+                    Assert.True(false, "did not hit expected exception");
                 }
                 catch (NoSuchDirectoryException nsde)
                 {
@@ -354,7 +354,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFsyncDoesntCreateNewFiles()
         {
             var path = CreateTempDir("nocreate");
@@ -375,17 +375,17 @@ namespace Lucene.Net.Store
                 }
                 catch (Exception e)
                 {
-                    Assert.Fail("Deletion of new Directory should never fail.\nException thrown: {0}", e);
+                    Assert.True(false, string.Format("Deletion of new Directory should never fail.\nException thrown: {0}", e));
                 }
 
                 // directory is empty
-                Assert.AreEqual(0, fsdir.ListAll().Length);
+                Assert.Equal(0, fsdir.ListAll().Length);
 
                 // fsync it
                 try
                 {
                     fsdir.Sync(Collections.Singleton("afile"));
-                    Assert.Fail("didn't get expected exception, instead fsync created new files: " +
+                    Assert.True(false, "didn't get expected exception, instead fsync created new files: " +
                                 Arrays.AsList(fsdir.ListAll()));
                 }
                 catch (FileNotFoundException)
@@ -394,7 +394,7 @@ namespace Lucene.Net.Store
                 }
 
                 // directory is still empty
-                Assert.AreEqual(0, fsdir.ListAll().Length);
+                Assert.Equal(0, fsdir.ListAll().Length);
             }
         }
     }

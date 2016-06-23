@@ -1,9 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
+    
     using CodecUtil = Lucene.Net.Codecs.CodecUtil;
     using CompoundFileDirectory = Lucene.Net.Store.CompoundFileDirectory;
     using Directory = Lucene.Net.Store.Directory;
@@ -41,7 +42,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestAllFilesHaveCodecHeader : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();
@@ -99,7 +100,7 @@ namespace Lucene.Net.Index
                 {
                     @in = dir.OpenInput(file, NewIOContext(Random()));
                     int val = @in.ReadInt();
-                    Assert.AreEqual(CodecUtil.CODEC_MAGIC, val, file + " has no codec header, instead found: " + val);
+                    Assert.Equal(CodecUtil.CODEC_MAGIC, val); //, file + " has no codec header, instead found: " + val);
                     success = true;
                 }
                 finally

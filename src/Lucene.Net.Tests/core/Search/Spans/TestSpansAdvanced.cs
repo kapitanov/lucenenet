@@ -1,10 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search.Spans
 {
     using Lucene.Net.Search;
-    using NUnit.Framework;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -61,7 +61,7 @@ namespace Lucene.Net.Search.Spans
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             // create test index
             MDirectory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), MDirectory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET)).SetMergePolicy(NewLogMergePolicy()).SetSimilarity(new DefaultSimilarity()));
@@ -81,7 +81,7 @@ namespace Lucene.Net.Search.Spans
             Reader.Dispose();
             MDirectory.Dispose();
             MDirectory = null;
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Lucene.Net.Search.Spans
         /// <summary>
         /// Tests two span queries.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestBooleanQueryWithSpanQueries()
         {
             DoTestBooleanQueryWithSpanQueries(Searcher, 0.3884282f);
@@ -147,7 +147,7 @@ namespace Lucene.Net.Search.Spans
             */
 
             // did we get the hits we expected
-            Assert.AreEqual(expectedIds.Length, topdocs.TotalHits);
+            Assert.Equal(expectedIds.Length, topdocs.TotalHits);
             for (int i = 0; i < topdocs.TotalHits; i++)
             {
                 // System.out.println(i + " exp: " + expectedIds[i]);
@@ -156,15 +156,15 @@ namespace Lucene.Net.Search.Spans
                 int id = topdocs.ScoreDocs[i].Doc;
                 float score = topdocs.ScoreDocs[i].Score;
                 Document doc = s.Doc(id);
-                Assert.AreEqual(expectedIds[i], doc.Get(FIELD_ID));
+                Assert.Equal(expectedIds[i], doc.Get(FIELD_ID));
                 bool scoreEq = Math.Abs(expectedScores[i] - score) < tolerance;
                 if (!scoreEq)
                 {
                     Console.WriteLine(i + " warning, expected score: " + expectedScores[i] + ", actual " + score);
                     Console.WriteLine(s.Explain(query, id));
                 }
-                Assert.AreEqual(expectedScores[i], score, tolerance);
-                Assert.AreEqual(s.Explain(query, id).Value, score, tolerance);
+                Assert.Equal(expectedScores[i], score, tolerance);
+                Assert.Equal(s.Explain(query, id).Value, score, tolerance);
             }
         }
     }

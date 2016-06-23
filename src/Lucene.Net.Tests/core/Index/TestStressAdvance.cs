@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Lucene.Net.Store;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    
-    using Lucene.Net.Store;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -25,13 +24,11 @@ namespace Lucene.Net.Index
          */
 
     using Lucene.Net.Util;
-    using NUnit.Framework;
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
 
-    [TestFixture]
     public class TestStressAdvance : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestStressAdvance_Mem()
         {
             for (int iter = 0; iter < 3; iter++)
@@ -100,11 +97,11 @@ namespace Lucene.Net.Index
                     {
                         Console.WriteLine("\nTEST: iter=" + iter + " iter2=" + iter2);
                     }
-                    Assert.AreEqual(TermsEnum.SeekStatus.FOUND, te.SeekCeil(new BytesRef("a")));
+                    Assert.Equal(TermsEnum.SeekStatus.FOUND, te.SeekCeil(new BytesRef("a")));
                     de = TestUtil.Docs(Random(), te, null, de, DocsEnum.FLAG_NONE);
                     TestOne(de, aDocIDs);
 
-                    Assert.AreEqual(TermsEnum.SeekStatus.FOUND, te.SeekCeil(new BytesRef("b")));
+                    Assert.Equal(TermsEnum.SeekStatus.FOUND, te.SeekCeil(new BytesRef("b")));
                     de = TestUtil.Docs(Random(), te, null, de, DocsEnum.FLAG_NONE);
                     TestOne(de, bDocIDs);
                 }
@@ -156,7 +153,7 @@ namespace Lucene.Net.Index
                     {
                         Console.WriteLine("  expect docID=" + DocIdSetIterator.NO_MORE_DOCS + " actual=" + docID);
                     }
-                    Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, docID);
+                    Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, docID);
                 }
                 else
                 {
@@ -164,8 +161,8 @@ namespace Lucene.Net.Index
                     {
                         Console.WriteLine("  expect docID=" + expected[upto] + " actual=" + docID);
                     }
-                    Assert.IsTrue(docID != DocIdSetIterator.NO_MORE_DOCS);
-                    Assert.AreEqual((int)expected[upto], docID);
+                    Assert.True(docID != DocIdSetIterator.NO_MORE_DOCS);
+                    Assert.Equal((int)expected[upto], docID);
                 }
             }
         }

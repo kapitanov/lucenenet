@@ -1,11 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Search;
-    using NUnit.Framework;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -33,13 +33,12 @@ namespace Lucene.Net.Index
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
     using ReaderClosedListener = Lucene.Net.Index.IndexReader.ReaderClosedListener;
 
-    [TestFixture]
     public class TestParallelCompositeReader : LuceneTestCase
     {
         private IndexSearcher Parallel_Renamed, Single_Renamed;
         private Directory Dir, Dir1, Dir2;
 
-        [Test]
+        [Fact]
         public virtual void TestQueries()
         {
             Single_Renamed = Single(Random(), false);
@@ -59,7 +58,7 @@ namespace Lucene.Net.Index
             Dir2 = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueriesCompositeComposite()
         {
             Single_Renamed = Single(Random(), true);
@@ -96,7 +95,7 @@ namespace Lucene.Net.Index
             QueryTest(bq1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRefCounts1()
         {
             Directory dir1 = GetDir1(Random());
@@ -106,18 +105,18 @@ namespace Lucene.Net.Index
             ParallelCompositeReader pr = new ParallelCompositeReader(ir1 = DirectoryReader.Open(dir1), ir2 = DirectoryReader.Open(dir2));
             IndexReader psub1 = pr.GetSequentialSubReaders()[0];
             // check RefCounts
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
-            Assert.AreEqual(1, psub1.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
+            Assert.Equal(1, psub1.RefCount);
             pr.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
-            Assert.AreEqual(0, psub1.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
+            Assert.Equal(0, psub1.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRefCounts2()
         {
             Directory dir1 = GetDir1(Random());
@@ -129,24 +128,24 @@ namespace Lucene.Net.Index
             ParallelCompositeReader pr = new ParallelCompositeReader(false, ir1, ir2);
             IndexReader psub1 = pr.GetSequentialSubReaders()[0];
             // check RefCounts
-            Assert.AreEqual(2, ir1.RefCount);
-            Assert.AreEqual(2, ir2.RefCount);
-            Assert.AreEqual(1, psub1.RefCount, "refCount must be 1, as the synthetic reader was created by ParallelCompositeReader");
+            Assert.Equal(2, ir1.RefCount);
+            Assert.Equal(2, ir2.RefCount);
+            Assert.Equal(1, psub1.RefCount); //, "refCount must be 1, as the synthetic reader was created by ParallelCompositeReader");
             pr.Dispose();
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
-            Assert.AreEqual(0, psub1.RefCount, "refcount must be 0 because parent was closed");
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
+            Assert.Equal(0, psub1.RefCount); //, "refcount must be 0 because parent was closed");
             ir1.Dispose();
             ir2.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
-            Assert.AreEqual(0, psub1.RefCount, "refcount should not change anymore");
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
+            Assert.Equal(0, psub1.RefCount); //, "refcount should not change anymore");
             dir1.Dispose();
             dir2.Dispose();
         }
 
         // closeSubreaders=false
-        [Test]
+        [Fact]
         public virtual void TestReaderClosedListener1()
         {
             Directory dir1 = GetDir1(Random());
@@ -157,7 +156,7 @@ namespace Lucene.Net.Index
 
             int[] listenerClosedCount = new int[1];
 
-            Assert.AreEqual(3, pr.Leaves.Count);
+            Assert.Equal(3, pr.Leaves.Count);
 
             foreach (AtomicReaderContext cxt in pr.Leaves)
             {
@@ -165,7 +164,7 @@ namespace Lucene.Net.Index
             }
             pr.Dispose();
             ir1.Dispose();
-            Assert.AreEqual(3, listenerClosedCount[0]);
+            Assert.Equal(3, listenerClosedCount[0]);
             dir1.Dispose();
         }
 
@@ -188,7 +187,7 @@ namespace Lucene.Net.Index
         }
 
         // closeSubreaders=true
-        [Test]
+        [Fact]
         public virtual void TestReaderClosedListener2()
         {
             Directory dir1 = GetDir1(Random());
@@ -199,14 +198,14 @@ namespace Lucene.Net.Index
 
             int[] listenerClosedCount = new int[1];
 
-            Assert.AreEqual(3, pr.Leaves.Count);
+            Assert.Equal(3, pr.Leaves.Count);
 
             foreach (AtomicReaderContext cxt in pr.Leaves)
             {
                 cxt.Reader.AddReaderClosedListener(new ReaderClosedListenerAnonymousInnerClassHelper2(this, listenerClosedCount));
             }
             pr.Dispose();
-            Assert.AreEqual(3, listenerClosedCount[0]);
+            Assert.Equal(3, listenerClosedCount[0]);
             dir1.Dispose();
         }
 
@@ -228,26 +227,26 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloseInnerReader()
         {
             Directory dir1 = GetDir1(Random());
             CompositeReader ir1 = DirectoryReader.Open(dir1);
-            Assert.AreEqual(1, ir1.GetSequentialSubReaders()[0].RefCount);
+            Assert.Equal(1, ir1.GetSequentialSubReaders()[0].RefCount);
 
             // with overlapping
             ParallelCompositeReader pr = new ParallelCompositeReader(true, new CompositeReader[] { ir1 }, new CompositeReader[] { ir1 });
 
             IndexReader psub = pr.GetSequentialSubReaders()[0];
-            Assert.AreEqual(1, psub.RefCount);
+            Assert.Equal(1, psub.RefCount);
 
             ir1.Dispose();
 
-            Assert.AreEqual(1, psub.RefCount, "refCount of synthetic subreader should be unchanged");
+            Assert.Equal(1, psub.RefCount); //, "refCount of synthetic subreader should be unchanged");
             try
             {
                 psub.Document(0);
-                Assert.Fail("Subreader should be already closed because inner reader was closed!");
+                Assert.True(false, "Subreader should be already closed because inner reader was closed!");
             }
             catch (AlreadyClosedException e)
             {
@@ -257,7 +256,7 @@ namespace Lucene.Net.Index
             try
             {
                 pr.Document(0);
-                Assert.Fail("ParallelCompositeReader should be already closed because inner reader was closed!");
+                Assert.True(false, "ParallelCompositeReader should be already closed because inner reader was closed!");
             }
             catch (AlreadyClosedException e)
             {
@@ -266,11 +265,11 @@ namespace Lucene.Net.Index
 
             // noop:
             pr.Dispose();
-            Assert.AreEqual(0, psub.RefCount);
+            Assert.Equal(0, psub.RefCount);
             dir1.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIncompatibleIndexes1()
         {
             // two documents:
@@ -289,7 +288,7 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(ir1, ir2);
-                Assert.Fail("didn't get expected exception: indexes don't have same number of documents");
+                Assert.True(false, "didn't get expected exception: indexes don't have same number of documents");
             }
             catch (System.ArgumentException e)
             {
@@ -298,23 +297,23 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(Random().NextBoolean(), ir1, ir2);
-                Assert.Fail("didn't get expected exception: indexes don't have same number of documents");
+                Assert.True(false, "didn't get expected exception: indexes don't have same number of documents");
             }
             catch (System.ArgumentException e)
             {
                 // expected exception
             }
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             ir1.Dispose();
             ir2.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIncompatibleIndexes2()
         {
             Directory dir1 = GetDir1(Random());
@@ -325,7 +324,7 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(readers);
-                Assert.Fail("didn't get expected exception: indexes don't have same subreader structure");
+                Assert.True(false, "didn't get expected exception: indexes don't have same subreader structure");
             }
             catch (System.ArgumentException e)
             {
@@ -334,23 +333,23 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(Random().NextBoolean(), readers, readers);
-                Assert.Fail("didn't get expected exception: indexes don't have same subreader structure");
+                Assert.True(false, "didn't get expected exception: indexes don't have same subreader structure");
             }
             catch (System.ArgumentException e)
             {
                 // expected exception
             }
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             ir1.Dispose();
             ir2.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIncompatibleIndexes3()
         {
             Directory dir1 = GetDir1(Random());
@@ -361,7 +360,7 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(readers);
-                Assert.Fail("didn't get expected exception: indexes don't have same subreader structure");
+                Assert.True(false, "didn't get expected exception: indexes don't have same subreader structure");
             }
             catch (System.ArgumentException e)
             {
@@ -370,23 +369,23 @@ namespace Lucene.Net.Index
             try
             {
                 new ParallelCompositeReader(Random().NextBoolean(), readers, readers);
-                Assert.Fail("didn't get expected exception: indexes don't have same subreader structure");
+                Assert.True(false, "didn't get expected exception: indexes don't have same subreader structure");
             }
             catch (System.ArgumentException e)
             {
                 // expected exception
             }
-            Assert.AreEqual(1, ir1.RefCount);
-            Assert.AreEqual(1, ir2.RefCount);
+            Assert.Equal(1, ir1.RefCount);
+            Assert.Equal(1, ir2.RefCount);
             ir1.Dispose();
             ir2.Dispose();
-            Assert.AreEqual(0, ir1.RefCount);
-            Assert.AreEqual(0, ir2.RefCount);
+            Assert.Equal(0, ir1.RefCount);
+            Assert.Equal(0, ir2.RefCount);
             dir1.Dispose();
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIgnoreStoredFields()
         {
             Directory dir1 = GetDir1(Random());
@@ -396,51 +395,51 @@ namespace Lucene.Net.Index
 
             // with overlapping
             ParallelCompositeReader pr = new ParallelCompositeReader(false, new CompositeReader[] { ir1, ir2 }, new CompositeReader[] { ir1 });
-            Assert.AreEqual("v1", pr.Document(0).Get("f1"));
-            Assert.AreEqual("v1", pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Equal("v1", pr.Document(0).Get("f1"));
+            Assert.Equal("v1", pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
             AtomicReader slow = SlowCompositeReaderWrapper.Wrap(pr);
-            Assert.IsNotNull(slow.Terms("f1"));
-            Assert.IsNotNull(slow.Terms("f2"));
-            Assert.IsNotNull(slow.Terms("f3"));
-            Assert.IsNotNull(slow.Terms("f4"));
+            Assert.NotNull(slow.Terms("f1"));
+            Assert.NotNull(slow.Terms("f2"));
+            Assert.NotNull(slow.Terms("f3"));
+            Assert.NotNull(slow.Terms("f4"));
             pr.Dispose();
 
             // no stored fields at all
             pr = new ParallelCompositeReader(false, new CompositeReader[] { ir2 }, new CompositeReader[0]);
-            Assert.IsNull(pr.Document(0).Get("f1"));
-            Assert.IsNull(pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Null(pr.Document(0).Get("f1"));
+            Assert.Null(pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
             slow = SlowCompositeReaderWrapper.Wrap(pr);
-            Assert.IsNull(slow.Terms("f1"));
-            Assert.IsNull(slow.Terms("f2"));
-            Assert.IsNotNull(slow.Terms("f3"));
-            Assert.IsNotNull(slow.Terms("f4"));
+            Assert.Null(slow.Terms("f1"));
+            Assert.Null(slow.Terms("f2"));
+            Assert.NotNull(slow.Terms("f3"));
+            Assert.NotNull(slow.Terms("f4"));
             pr.Dispose();
 
             // without overlapping
             pr = new ParallelCompositeReader(true, new CompositeReader[] { ir2 }, new CompositeReader[] { ir1 });
-            Assert.AreEqual("v1", pr.Document(0).Get("f1"));
-            Assert.AreEqual("v1", pr.Document(0).Get("f2"));
-            Assert.IsNull(pr.Document(0).Get("f3"));
-            Assert.IsNull(pr.Document(0).Get("f4"));
+            Assert.Equal("v1", pr.Document(0).Get("f1"));
+            Assert.Equal("v1", pr.Document(0).Get("f2"));
+            Assert.Null(pr.Document(0).Get("f3"));
+            Assert.Null(pr.Document(0).Get("f4"));
             // check that fields are there
             slow = SlowCompositeReaderWrapper.Wrap(pr);
-            Assert.IsNull(slow.Terms("f1"));
-            Assert.IsNull(slow.Terms("f2"));
-            Assert.IsNotNull(slow.Terms("f3"));
-            Assert.IsNotNull(slow.Terms("f4"));
+            Assert.Null(slow.Terms("f1"));
+            Assert.Null(slow.Terms("f2"));
+            Assert.NotNull(slow.Terms("f3"));
+            Assert.NotNull(slow.Terms("f4"));
             pr.Dispose();
 
             // no main readers
             try
             {
                 new ParallelCompositeReader(true, new CompositeReader[0], new CompositeReader[] { ir1 });
-                Assert.Fail("didn't get expected exception: need a non-empty main-reader array");
+                Assert.True(false, "didn't get expected exception: need a non-empty main-reader array");
             }
             catch (System.ArgumentException iae)
             {
@@ -451,7 +450,7 @@ namespace Lucene.Net.Index
             dir2.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToString()
         {
             Directory dir1 = GetDir1(Random());
@@ -459,13 +458,13 @@ namespace Lucene.Net.Index
             ParallelCompositeReader pr = new ParallelCompositeReader(new CompositeReader[] { ir1 });
 
             string s = pr.ToString();
-            Assert.IsTrue(s.StartsWith("ParallelCompositeReader(ParallelAtomicReader("), "toString incorrect: " + s);
+            Assert.True(s.StartsWith("ParallelCompositeReader(ParallelAtomicReader("), "toString incorrect: " + s);
 
             pr.Dispose();
             dir1.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToStringCompositeComposite()
         {
             Directory dir1 = GetDir1(Random());
@@ -474,7 +473,7 @@ namespace Lucene.Net.Index
 
             string s = pr.ToString();
 
-            Assert.IsTrue(s.StartsWith("ParallelCompositeReader(ParallelCompositeReaderAnonymousInnerClassHelper(ParallelAtomicReader("), "toString incorrect: " + s);
+            Assert.True(s.StartsWith("ParallelCompositeReader(ParallelCompositeReaderAnonymousInnerClassHelper(ParallelAtomicReader("), "toString incorrect: " + s);
 
             pr.Dispose();
             dir1.Dispose();
@@ -484,16 +483,16 @@ namespace Lucene.Net.Index
         {
             ScoreDoc[] parallelHits = Parallel_Renamed.Search(query, null, 1000).ScoreDocs;
             ScoreDoc[] singleHits = Single_Renamed.Search(query, null, 1000).ScoreDocs;
-            Assert.AreEqual(parallelHits.Length, singleHits.Length);
+            Assert.Equal(parallelHits.Length, singleHits.Length);
             for (int i = 0; i < parallelHits.Length; i++)
             {
-                Assert.AreEqual(parallelHits[i].Score, singleHits[i].Score, 0.001f);
+                Assert.Equal(parallelHits[i].Score, singleHits[i].Score); //, 0.001f);
                 Document docParallel = Parallel_Renamed.Doc(parallelHits[i].Doc);
                 Document docSingle = Single_Renamed.Doc(singleHits[i].Doc);
-                Assert.AreEqual(docParallel.Get("f1"), docSingle.Get("f1"));
-                Assert.AreEqual(docParallel.Get("f2"), docSingle.Get("f2"));
-                Assert.AreEqual(docParallel.Get("f3"), docSingle.Get("f3"));
-                Assert.AreEqual(docParallel.Get("f4"), docSingle.Get("f4"));
+                Assert.Equal(docParallel.Get("f1"), docSingle.Get("f1"));
+                Assert.Equal(docParallel.Get("f2"), docSingle.Get("f2"));
+                Assert.Equal(docParallel.Get("f3"), docSingle.Get("f3"));
+                Assert.Equal(docParallel.Get("f4"), docSingle.Get("f4"));
             }
         }
 
@@ -550,15 +549,15 @@ namespace Lucene.Net.Index
             {
                 rd1 = new MultiReader(DirectoryReader.Open(Dir1), DirectoryReader.Open(Dir1));
                 rd2 = new MultiReader(DirectoryReader.Open(Dir2), DirectoryReader.Open(Dir2));
-                Assert.AreEqual(2, rd1.Context.Children.Count);
-                Assert.AreEqual(2, rd2.Context.Children.Count);
+                Assert.Equal(2, rd1.Context.Children.Count);
+                Assert.Equal(2, rd2.Context.Children.Count);
             }
             else
             {
                 rd1 = DirectoryReader.Open(Dir1);
                 rd2 = DirectoryReader.Open(Dir2);
-                Assert.AreEqual(3, rd1.Context.Children.Count);
-                Assert.AreEqual(3, rd2.Context.Children.Count);
+                Assert.Equal(3, rd1.Context.Children.Count);
+                Assert.Equal(3, rd2.Context.Children.Count);
             }
             ParallelCompositeReader pr = new ParallelCompositeReader(rd1, rd2);
             return NewSearcher(pr);

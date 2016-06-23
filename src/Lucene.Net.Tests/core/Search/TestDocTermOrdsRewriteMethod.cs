@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    
     using AutomatonTestUtil = Lucene.Net.Util.Automaton.AutomatonTestUtil;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -43,7 +44,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Tests the DocTermOrdsRewriteMethod
     /// </summary>
-    [TestFixture]
     public class TestDocTermOrdsRewriteMethod : LuceneTestCase
     {
         protected internal IndexSearcher Searcher1;
@@ -52,10 +52,8 @@ namespace Lucene.Net.Search
         private Directory Dir;
         protected internal string FieldName;
 
-        [SetUp]
-        public override void SetUp()
+        public TestDocTermOrdsRewriteMethod() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             FieldName = Random().NextBoolean() ? "field" : ""; // sometimes use an empty string as field name
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
@@ -103,17 +101,16 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         /// <summary>
         /// test a bunch of random regular expressions </summary>
-        [Test]
+        [Fact]
         public virtual void TestRegexps()
         {
             int num = AtLeast(1000);
@@ -144,20 +141,20 @@ namespace Lucene.Net.Search
             CheckHits.CheckEqual(inverted, invertedDocs.ScoreDocs, docValuesDocs.ScoreDocs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             RegexpQuery a1 = new RegexpQuery(new Term(FieldName, "[aA]"), RegExp.NONE);
             RegexpQuery a2 = new RegexpQuery(new Term(FieldName, "[aA]"), RegExp.NONE);
             RegexpQuery b = new RegexpQuery(new Term(FieldName, "[bB]"), RegExp.NONE);
-            Assert.AreEqual(a1, a2);
-            Assert.IsFalse(a1.Equals(b));
+            Assert.Equal(a1, a2);
+            Assert.False(a1.Equals(b));
 
             a1.SetRewriteMethod(new DocTermOrdsRewriteMethod());
             a2.SetRewriteMethod(new DocTermOrdsRewriteMethod());
             b.SetRewriteMethod(new DocTermOrdsRewriteMethod());
-            Assert.AreEqual(a1, a2);
-            Assert.IsFalse(a1.Equals(b));
+            Assert.Equal(a1, a2);
+            Assert.False(a1.Equals(b));
             QueryUtils.Check(a1);
         }
     }

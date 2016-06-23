@@ -19,7 +19,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Analyzer = Lucene.Net.Analysis.Analyzer;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
@@ -43,11 +43,11 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Analyzer = new MockAnalyzer(Random());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQuery()
         {
             Directory dir = NewDirectory();
@@ -61,10 +61,10 @@ namespace Lucene.Net.Search
             ScoreDoc[] hits;
 
             hits = @is.Search(new MatchAllDocsQuery(), null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
-            Assert.AreEqual("one", @is.Doc(hits[0].Doc).Get("key"));
-            Assert.AreEqual("two", @is.Doc(hits[1].Doc).Get("key"));
-            Assert.AreEqual("three four", @is.Doc(hits[2].Doc).Get("key"));
+            Assert.Equal(3, hits.Length);
+            Assert.Equal("one", @is.Doc(hits[0].Doc).Get("key"));
+            Assert.Equal("two", @is.Doc(hits[1].Doc).Get("key"));
+            Assert.Equal("three four", @is.Doc(hits[2].Doc).Get("key"));
 
             // some artificial queries to trigger the use of skipTo():
 
@@ -72,13 +72,13 @@ namespace Lucene.Net.Search
             bq.Add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
             bq.Add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
             hits = @is.Search(bq, null, 1000).ScoreDocs;
-            Assert.AreEqual(3, hits.Length);
+            Assert.Equal(3, hits.Length);
 
             bq = new BooleanQuery();
             bq.Add(new MatchAllDocsQuery(), BooleanClause.Occur.MUST);
             bq.Add(new TermQuery(new Term("key", "three")), BooleanClause.Occur.MUST);
             hits = @is.Search(bq, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits.Length);
+            Assert.Equal(1, hits.Length);
 
             iw.DeleteDocuments(new Term("key", "one"));
             ir.Dispose();
@@ -86,21 +86,21 @@ namespace Lucene.Net.Search
             @is = NewSearcher(ir);
 
             hits = @is.Search(new MatchAllDocsQuery(), null, 1000).ScoreDocs;
-            Assert.AreEqual(2, hits.Length);
+            Assert.Equal(2, hits.Length);
 
             iw.Dispose();
             ir.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             Query q1 = new MatchAllDocsQuery();
             Query q2 = new MatchAllDocsQuery();
-            Assert.IsTrue(q1.Equals(q2));
+            Assert.True(q1.Equals(q2));
             q1.Boost = 1.5f;
-            Assert.IsFalse(q1.Equals(q2));
+            Assert.False(q1.Equals(q2));
         }
 
         private void AddDoc(string text, IndexWriter iw, float boost)

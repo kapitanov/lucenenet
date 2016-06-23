@@ -1,6 +1,6 @@
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -21,10 +21,9 @@ namespace Lucene.Net.Util
      * the License.
      */
 
-    [TestFixture]
     public class TestByteBlockPool : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestReadAndWrite()
         {
             Counter bytesUsed = Util.Counter.NewCounter();
@@ -51,17 +50,17 @@ namespace Lucene.Net.Util
                     @ref.Grow(expected.Length);
                     @ref.Length = expected.Length;
                     pool.ReadBytes(position, @ref.Bytes, @ref.Offset, @ref.Length);
-                    Assert.AreEqual(expected, @ref);
+                    Assert.Equal(expected, @ref);
                     position += @ref.Length;
                 }
                 pool.Reset(Random().NextBoolean(), reuseFirst);
                 if (reuseFirst)
                 {
-                    Assert.AreEqual(ByteBlockPool.BYTE_BLOCK_SIZE, bytesUsed.Get());
+                    Assert.Equal(ByteBlockPool.BYTE_BLOCK_SIZE, bytesUsed.Get());
                 }
                 else
                 {
-                    Assert.AreEqual(0, bytesUsed.Get());
+                    Assert.Equal(0, bytesUsed.Get());
                     pool.NextBuffer(); // prepare for next iter
                 }
             }

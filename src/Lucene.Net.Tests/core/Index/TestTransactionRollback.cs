@@ -2,11 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Support;
-    using NUnit.Framework;
     using Bits = Lucene.Net.Util.Bits;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -77,7 +77,7 @@ namespace Lucene.Net.Index
             w.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRepeatedRollBacks()
         {
             int expectedLastRecordId = 100;
@@ -107,13 +107,13 @@ namespace Lucene.Net.Index
                     if (sval != null)
                     {
                         int val = Convert.ToInt32(sval);
-                        Assert.IsTrue(expecteds.SafeGet(val), "Did not expect document #" + val);
+                        Assert.True(expecteds.SafeGet(val), "Did not expect document #" + val);
                         expecteds.SafeSet(val, false);
                     }
                 }
             }
             r.Dispose();
-            Assert.AreEqual(0, expecteds.Cardinality(), "Should have 0 docs remaining ");
+            Assert.Equal(0, expecteds.Cardinality(), "Should have 0 docs remaining ");
         }
 
         /*
@@ -135,7 +135,7 @@ namespace Lucene.Net.Index
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
 
             //Build index, of records 1 to 100, committing after each batch of 10
@@ -164,7 +164,7 @@ namespace Lucene.Net.Index
         public override void TearDown()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         // Rolls back to previous commit point
@@ -237,7 +237,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRollbackDeletionPolicy()
         {
             for (int i = 0; i < 2; i++)
@@ -246,7 +246,7 @@ namespace Lucene.Net.Index
                 // should not work:
                 (new IndexWriter(Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetIndexDeletionPolicy(new DeleteLastCommitPolicy<IndexCommit>(this)))).Dispose();
                 IndexReader r = DirectoryReader.Open(Dir);
-                Assert.AreEqual(100, r.NumDocs);
+                Assert.Equal(100, r.NumDocs);
                 r.Dispose();
             }
         }

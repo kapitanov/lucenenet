@@ -1,6 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
-using System.IO;
+using Xunit;
 using System.Text;
 
 namespace Lucene.Net.Store
@@ -33,16 +32,9 @@ namespace Lucene.Net.Store
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestWindowsMMap : LuceneTestCase
     {
         private const string Alphabet = "abcdefghijklmnopqrstuvwzyz";
-
-        [SetUp]
-        public override void SetUp()
-        {
-            base.SetUp();
-        }
 
         private string RandomToken()
         {
@@ -68,7 +60,7 @@ namespace Lucene.Net.Store
             return fb.ToString();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMmapIndex()
         {
             // sometimes the directory is not cleaned by rmDir, because on Windows it

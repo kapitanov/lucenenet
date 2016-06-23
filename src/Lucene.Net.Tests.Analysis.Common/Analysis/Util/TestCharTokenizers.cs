@@ -38,7 +38,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
          * test to read surrogate pairs without loosing the pairing 
          * if the surrogate pair is at the border of the internal IO buffer
          */
-        [Test]
+        [Fact]
         public virtual void TestReadSupplementaryChars()
         {
             var builder = new StringBuilder();
@@ -65,7 +65,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
        * next char to be filled in is a supplementary codepoint (using 2 chars) an
        * index out of bound exception is triggered.
        */
-        [Test]
+        [Fact]
         public virtual void TestExtendCharBuffer()
         {
             for (var i = 0; i < 40; i++)
@@ -84,7 +84,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /*
          * tests the max word length of 255 - tokenizer will split at the 255 char no matter what happens
          */
-        [Test]
+        [Fact]
         public virtual void TestMaxWordLength()
         {
             var builder = new StringBuilder();
@@ -100,7 +100,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         /*
          * tests the max word length of 255 with a surrogate pair at position 255
          */
-        [Test]
+        [Fact]
         public virtual void TestMaxWordLengthWithSupplementary()
         {
             var builder = new StringBuilder();
@@ -115,7 +115,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         }
 
         // LUCENE-3642: normalize SMP->BMP and check that offsets are correct
-        [Test]
+        [Fact]
         public virtual void TestCrossPlaneNormalization()
         {
             var analyzer = new AnalyzerAnonymousInnerClassHelper();
@@ -178,7 +178,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         }
 
         // LUCENE-3642: normalize BMP->SMP and check that offsets are correct
-        [Test]
+        [Fact]
         public virtual void TestCrossPlaneNormalization2()
         {
             var analyzer = new AnalyzerAnonymousInnerClassHelper2();

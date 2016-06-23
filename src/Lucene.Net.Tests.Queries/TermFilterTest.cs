@@ -13,7 +13,7 @@ namespace Lucene.Net.Tests.Queries
 {
     public class TermFilterTest : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestCachability()
         {
             TermFilter a = TermFilter(@"field1", @"a");
@@ -24,7 +24,7 @@ namespace Lucene.Net.Tests.Queries
             assertFalse(@"Must not be cached", cachedFilters.Contains(TermFilter(@"field2", @"a")));
         }
 
-        [Test]
+        [Fact]
         public void TestMissingTermAndField()
         {
             string fieldName = @"field1";
@@ -50,7 +50,7 @@ namespace Lucene.Net.Tests.Queries
             rd.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestRandom()
         {
             Directory dir = NewDirectory();
@@ -90,7 +90,7 @@ namespace Lucene.Net.Tests.Queries
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestHashCodeAndEquals()
         {
             int num = AtLeast(100);
@@ -137,7 +137,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         public void TestNoTerms()
         {
             try
@@ -159,7 +159,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         public void TestToString()
         {
             var termsFilter = new TermFilter(new Term("field1", "a"));

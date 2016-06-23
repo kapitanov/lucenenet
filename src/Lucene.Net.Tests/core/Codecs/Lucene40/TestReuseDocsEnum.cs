@@ -5,7 +5,7 @@ namespace Lucene.Net.Codecs.Lucene40
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
@@ -52,7 +52,7 @@ namespace Lucene.Net.Codecs.Lucene40
             OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReuseDocsEnumNoReuse()
         {
             Directory dir = NewDirectory();
@@ -76,13 +76,13 @@ namespace Lucene.Net.Codecs.Lucene40
                     enums[docs] = true;
                 }
 
-                Assert.AreEqual(terms.Size(), enums.Count);
+                Assert.Equal(terms.Size(), enums.Count);
             }
             IOUtils.Close(writer, open, dir);
         }
 
         // tests for reuse only if bits are the same either null or the same instance
-        [Test]
+        [Fact]
         public virtual void TestReuseDocsEnumSameBitsOrNull()
         {
             Directory dir = NewDirectory();
@@ -106,7 +106,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     enums[docs] = true;
                 }
 
-                Assert.AreEqual(1, enums.Count);
+                Assert.Equal(1, enums.Count);
                 enums.Clear();
                 iterator = terms.Iterator(null);
                 docs = null;
@@ -115,7 +115,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     docs = iterator.Docs(new MatchNoBits(open.MaxDoc), docs, Random().NextBoolean() ? DocsEnum.FLAG_FREQS : DocsEnum.FLAG_NONE);
                     enums[docs] = true;
                 }
-                Assert.AreEqual(terms.Size(), enums.Count);
+                Assert.Equal(terms.Size(), enums.Count);
 
                 enums.Clear();
                 iterator = terms.Iterator(null);
@@ -125,13 +125,13 @@ namespace Lucene.Net.Codecs.Lucene40
                     docs = iterator.Docs(null, docs, Random().NextBoolean() ? DocsEnum.FLAG_FREQS : DocsEnum.FLAG_NONE);
                     enums[docs] = true;
                 }
-                Assert.AreEqual(1, enums.Count);
+                Assert.Equal(1, enums.Count);
             }
             IOUtils.Close(writer, open, dir);
         }
 
         // make sure we never reuse from another reader even if it is the same field & codec etc
-        [Test]
+        [Fact]
         public virtual void TestReuseDocsEnumDifferentReader()
         {
             Directory dir = NewDirectory();
@@ -163,7 +163,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     docs = iterator.Docs(null, RandomDocsEnum("body", term, leaves2, bits), Random().NextBoolean() ? DocsEnum.FLAG_FREQS : DocsEnum.FLAG_NONE);
                     enums[docs] = true;
                 }
-                Assert.AreEqual(terms.Size(), enums.Count);
+                Assert.Equal(terms.Size(), enums.Count);
 
                 iterator = terms.Iterator(null);
                 enums.Clear();
@@ -173,7 +173,7 @@ namespace Lucene.Net.Codecs.Lucene40
                     docs = iterator.Docs(bits, RandomDocsEnum("body", term, leaves2, bits), Random().NextBoolean() ? DocsEnum.FLAG_FREQS : DocsEnum.FLAG_NONE);
                     enums[docs] = true;
                 }
-                Assert.AreEqual(terms.Size(), enums.Count);
+                Assert.Equal(terms.Size(), enums.Count);
             }
             IOUtils.Close(writer, firstReader, secondReader, dir);
         }

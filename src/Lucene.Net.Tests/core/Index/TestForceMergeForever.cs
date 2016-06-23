@@ -1,9 +1,9 @@
 using System;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using LineFileDocs = Lucene.Net.Util.LineFileDocs;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
@@ -57,7 +57,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory d = NewDirectory();
@@ -99,7 +99,7 @@ namespace Lucene.Net.Index
             w.ForceMerge(1);
             doStop.Set(true);
             t.Join();
-            Assert.IsTrue(w.MergeCount.Get() <= 1, "merge count is " + w.MergeCount.Get());
+            Assert.True(w.MergeCount.Get() <= 1, "merge count is " + w.MergeCount.Get());
             w.Dispose();
             d.Dispose();
             docs.Dispose();

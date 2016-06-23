@@ -56,7 +56,7 @@ namespace Lucene.Net.Facet
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDefault()
         {
             Directory indexDir = NewDirectory();
@@ -89,7 +89,7 @@ namespace Lucene.Net.Facet
             IOUtils.Close(tr, ir, iw, tw, indexDir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustom()
         {
             Directory indexDir = NewDirectory();
@@ -128,7 +128,7 @@ namespace Lucene.Net.Facet
             IOUtils.Close(tr, ir, iw, tw, indexDir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTwoCustomsSameField()
         {
             Directory indexDir = NewDirectory();
@@ -181,10 +181,10 @@ namespace Lucene.Net.Facet
                     return; // not all segments must have this DocValues
                 }
             }
-            Fail("no ordinals found for " + field);
+            True(false, "no ordinals found for " + field);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDifferentFieldsAndText()
         {
             Directory indexDir = NewDirectory();
@@ -225,7 +225,7 @@ namespace Lucene.Net.Facet
             IOUtils.Close(tr, ir, iw, tw, indexDir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeSameSomeDifferent()
         {
             Directory indexDir = NewDirectory();
@@ -272,10 +272,10 @@ namespace Lucene.Net.Facet
         
         private void AssertCorrectResults(Facets facets)
         {
-            Assert.AreEqual(5, facets.GetSpecificValue("Band"));
-            Assert.AreEqual("dim=Band path=[] value=5 childCount=2\n  Rock & Pop (4)\n  Punk (1)\n", facets.GetTopChildren(10, "Band").ToString());
-            Assert.AreEqual("dim=Band path=[Rock & Pop] value=4 childCount=4\n  The Beatles (1)\n  U2 (1)\n  REM (1)\n  Dave Matthews Band (1)\n", facets.GetTopChildren(10, "Band", "Rock & Pop").ToString());
-            Assert.AreEqual("dim=Author path=[] value=3 childCount=3\n  Mark Twain (1)\n  Stephen King (1)\n  Kurt Vonnegut (1)\n", facets.GetTopChildren(10, "Author").ToString());
+            Assert.Equal(5, facets.GetSpecificValue("Band"));
+            Assert.Equal("dim=Band path=[] value=5 childCount=2\n  Rock & Pop (4)\n  Punk (1)\n", facets.GetTopChildren(10, "Band").ToString());
+            Assert.Equal("dim=Band path=[Rock & Pop] value=4 childCount=4\n  The Beatles (1)\n  U2 (1)\n  REM (1)\n  Dave Matthews Band (1)\n", facets.GetTopChildren(10, "Band", "Rock & Pop").ToString());
+            Assert.Equal("dim=Author path=[] value=3 childCount=3\n  Mark Twain (1)\n  Stephen King (1)\n  Kurt Vonnegut (1)\n", facets.GetTopChildren(10, "Author").ToString());
         }
 
         

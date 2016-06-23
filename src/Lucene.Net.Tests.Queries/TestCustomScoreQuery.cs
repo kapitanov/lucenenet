@@ -17,14 +17,14 @@ namespace Lucene.Net.Tests.Queries
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             CreateIndex(true);
         }
 
         /// <summary>
         /// Test that CustomScoreQuery of Type.BYTE returns the expected scores.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCustomScoreByte()
         {
             // INT field values are small enough to be parsed as byte
@@ -35,7 +35,7 @@ namespace Lucene.Net.Tests.Queries
         /// <summary>
         /// Test that CustomScoreQuery of Type.SHORT returns the expected scores.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCustomScoreShort()
         {
             // INT field values are small enough to be parsed as short
@@ -46,7 +46,7 @@ namespace Lucene.Net.Tests.Queries
         /// <summary>
         /// Test that CustomScoreQuery of Type.INT returns the expected scores.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCustomScoreInt()
         {
             DoTestCustomScore(INT_VALUESOURCE, 1.0);
@@ -56,7 +56,7 @@ namespace Lucene.Net.Tests.Queries
         /// <summary>
         /// Test that CustomScoreQuery of Type.FLOAT returns the expected scores.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCustomScoreFloat()
         {
             // INT field can be parsed as float
@@ -215,7 +215,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
         
-        [Test]
+        [Fact]
         public virtual void TestCustomExternalQuery()
         {
             BooleanQuery q1 = new BooleanQuery();
@@ -239,7 +239,7 @@ namespace Lucene.Net.Tests.Queries
             r.Dispose();
         }
        
-        [Test] 
+        [Fact] 
         public virtual void TestRewrite()
         {
             IndexReader r = DirectoryReader.Open(dir);

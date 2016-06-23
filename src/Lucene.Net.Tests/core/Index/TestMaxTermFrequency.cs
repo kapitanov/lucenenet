@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Documents;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Support;
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -38,7 +38,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Tests the maxTermFrequency statistic in FieldInvertState
     /// </summary>
-    [TestFixture]
     public class TestMaxTermFrequency : LuceneTestCase
     {
         internal Directory Dir;
@@ -46,10 +45,8 @@ namespace Lucene.Net.Index
         /* expected maxTermFrequency values for our documents */
         internal List<int?> Expected = new List<int?>();
 
-        [SetUp]
-        public override void SetUp()
+        public TestMaxTermFrequency() : base()
         {
-            base.SetUp();
             Dir = NewDirectory();
             IndexWriterConfig config = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true)).SetMergePolicy(NewLogMergePolicy());
             config.SetSimilarity(new TestSimilarity(this));
@@ -66,21 +63,20 @@ namespace Lucene.Net.Index
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             NumericDocValues fooNorms = MultiDocValues.GetNormValues(Reader, "foo");
             for (int i = 0; i < Reader.MaxDoc; i++)
             {
-                Assert.AreEqual((int)Expected[i], fooNorms.Get(i) & 0xff);
+                Assert.Equal((int)Expected[i], fooNorms.Get(i) & 0xff);
             }
         }
 

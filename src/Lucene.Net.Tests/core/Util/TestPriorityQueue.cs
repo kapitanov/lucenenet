@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using Lucene.Net.JavaCompatibility;
-using NUnit.Framework;
+
 using System;
-using NUnit.Framework.Constraints;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -23,7 +23,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestPriorityQueue : LuceneTestCase
     {
         private static readonly int MAX_PQ_SIZE = ArrayUtil.MAX_ARRAY_LENGTH - 1;
@@ -93,8 +92,8 @@ namespace Lucene.Net.Util
         {
             public int Compare(int? a, int? b)
             {
-                Assert.IsNotNull(a);
-                Assert.IsNotNull(b);
+                Assert.NotNull(a);
+                Assert.NotNull(b);
                 return (int) (a - b);
             }
         }
@@ -103,14 +102,13 @@ namespace Lucene.Net.Util
         {
             public int Compare(int? a, int? b)
             {
-                Assert.IsNotNull(a);
-                Assert.IsNotNull(b);
+                Assert.NotNull(a);
+                Assert.NotNull(b);
                 return (int) (a - b);
             }
         } 
 
-        [Ignore] // Increase heap size to run this test
-        [Test]
+        [Fact(Skip = "Ignored test")] // Increase heap size to run this test
         public static void TestMaxSizeBounds()
         {
             // Minimum size is 0
@@ -127,49 +125,35 @@ namespace Lucene.Net.Util
             
             // Cannot construct a negative size heap
             maxSize = -3;
-            try
-            {
-                pq = new IntegerQueue(maxSize);
-                // Should had thrown an exception
-                Assert.Fail();
-            }
-            catch (ArgumentException)
-            {
-            }
+            Assert.Throws<ArgumentException>(() => pq = new IntegerQueue(maxSize));
 
             maxSize = MAX_PQ_SIZE;
-            try
-            {
-                pq = new IntegerQueue(maxSize);
-            }
-            catch (ArgumentException)
-            {
-            }
+            Assert.Throws<ArgumentException>(() => pq = new IntegerQueue(maxSize));
         }
 
-        [Test]
+        [Fact]
         public static void TestPrepopulation()
         {
             int maxSize = 10;
             // Populates the internal array
             PriorityQueue<int?> pq = new IntegerQueueWithSentinel(maxSize, true);
-            Assert.AreEqual(pq.Top(), int.MaxValue);
-            Assert.AreEqual(pq.Size(), 10);
+            Assert.Equal(pq.Top(), int.MaxValue);
+            Assert.Equal(pq.Size(), 10);
 
             // Does not populate it
             pq = new IntegerQueue(maxSize, false);
-            Assert.AreEqual(pq.Top(), default(int?));
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Top(), default(int?));
+            Assert.Equal(pq.Size(), 0);
         }
 
         private static void AddAndTest<T>(PriorityQueue<T> pq, T element, T expectedTop, int expectedSize)
         {
             pq.Add(element);
-            Assert.AreEqual(pq.Top(), expectedTop);
-            Assert.AreEqual(pq.Size(), expectedSize);
+            Assert.Equal(pq.Top(), expectedTop);
+            Assert.Equal(pq.Size(), expectedSize);
         }
 
-        [Test]
+        [Fact]
         public static void TestAdd()
         {
             int maxSize = 10;
@@ -199,7 +183,7 @@ namespace Lucene.Net.Util
             AddAndTest(pq, -111111, -111111, 5);
         }
 
-        [Test]
+        [Fact]
         public static void TestDuplicates()
         {
             // Tests that the queue doesn't absorb elements with duplicate keys
@@ -208,19 +192,19 @@ namespace Lucene.Net.Util
 
             pq.Add(3);
             pq.Add(3);
-            Assert.AreEqual(pq.Size(), 2);
+            Assert.Equal(pq.Size(), 2);
 
             pq.Add(3);
-            Assert.AreEqual(pq.Size(), 3);
+            Assert.Equal(pq.Size(), 3);
 
             pq.Add(17);
             pq.Add(17);
             pq.Add(17);
             pq.Add(17);
-            Assert.AreEqual(pq.Size(), 7);
+            Assert.Equal(pq.Size(), 7);
         }
 
-        [Test]
+        [Fact]
         public static void TestPop()
         {
             int maxSize = 10;
@@ -229,7 +213,7 @@ namespace Lucene.Net.Util
             // Add one element and pop it
             pq.Add(7);
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Size(), 0);
             
             // Add a bunch of elements, pop them all
             pq.Add(1);
@@ -241,7 +225,7 @@ namespace Lucene.Net.Util
             pq.Add(1000);
             pq.Add(-3);
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 7);
+            Assert.Equal(pq.Size(), 7);
             pq.Pop();
             pq.Pop();
             pq.Pop();
@@ -249,25 +233,25 @@ namespace Lucene.Net.Util
             pq.Pop();
             pq.Pop();
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Size(), 0);
 
             // Interleaved adds and pops
             pq.Add(1);
             pq.Add(20);
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 1);
+            Assert.Equal(pq.Size(), 1);
             pq.Add(1);
             pq.Add(15);
             pq.Add(4);
             pq.Pop();
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 2);
+            Assert.Equal(pq.Size(), 2);
             pq.Add(12);
             pq.Add(1000);
             pq.Add(-3);
             pq.Pop();
             pq.Pop();
-            Assert.AreEqual(pq.Size(), 3);
+            Assert.Equal(pq.Size(), 3);
 
             // Pop an empty PQ
             pq.Pop();
@@ -278,7 +262,7 @@ namespace Lucene.Net.Util
             pq.Pop();
         }
 
-        [Test]
+        [Fact]
         public static void TestUpdateTop()
         {
             // Mostly to reflect the usage of UpdateTop
@@ -294,20 +278,20 @@ namespace Lucene.Net.Util
             pq.Add(new MyType(1000));
             pq.Add(new MyType(-300));
 
-            Assert.AreEqual(pq.Top().Field, -300);
+            Assert.Equal(pq.Top().Field, -300);
             MyType topElement = pq.Top();
             topElement.Field = 25;  // Now this should no longer be at the top of the queue
             pq.UpdateTop();         // Hence we need to update the top queue
-            Assert.AreEqual(pq.Top().Field, 1);
+            Assert.Equal(pq.Top().Field, 1);
 
             // The less eficient way to do this is the following
             topElement = pq.Pop();
             topElement.Field = 678;
             pq.Add(topElement);
-            Assert.AreEqual(pq.Top().Field, 1);
+            Assert.Equal(pq.Top().Field, 1);
         }
 
-        [Test]
+        [Fact]
         public static void TestOverflow()
         {
             // Tests adding elements to full queues
@@ -317,14 +301,7 @@ namespace Lucene.Net.Util
             int maxSize = 10;
             PriorityQueue<int?> pq = new IntegerQueueWithSentinel(maxSize, true);
 
-            try
-            {
-                pq.Add(3);
-                Assert.Fail();
-            }
-            catch (IndexOutOfRangeException)
-            {
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => pq.Add(3));
 
             // Populate manually
             maxSize = 5;
@@ -344,7 +321,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public static void TestResize()
         {
             // Initialize a resizable queue
@@ -353,32 +330,32 @@ namespace Lucene.Net.Util
             pq.Add(-2);
             pq.Add(1);
             pq.Add(-10);
-            Assert.AreEqual(pq.Size(), 4);
+            Assert.Equal(pq.Size(), 4);
 
             pq.Add(7);
             pq.Add(5);
             pq.Add(10);
             pq.Add(1);
-            Assert.AreEqual(pq.Size(), 8);
+            Assert.Equal(pq.Size(), 8);
 
             pq.Add(10);
             pq.Add(1);
             pq.Add(5);
-            Assert.AreEqual(pq.Size(), 11);
+            Assert.Equal(pq.Size(), 11);
 
             pq.Add(12);
             pq.Add(13);
             pq.Add(14);
             pq.Add(15);
             pq.Add(16);
-            Assert.AreEqual(pq.Size(), 16);
+            Assert.Equal(pq.Size(), 16);
 
             pq.Add(-17);
             pq.Add(-18);
-            Assert.AreEqual(pq.Size(), 18);
+            Assert.Equal(pq.Size(), 18);
         }
 
-        [Test]
+        [Fact]
         public static void TestIntegrityAfterResize()
         {
             // Tests that after a resize, the queue keeps working fine
@@ -392,40 +369,40 @@ namespace Lucene.Net.Util
             pq.Add(1);
             pq.Add(-10);
             pq.Add(-100);
-            Assert.AreEqual(pq.Top(), -100);
+            Assert.Equal(pq.Top(), -100);
 
             pq.Add(-1000);
-            Assert.AreEqual(pq.Top(), -1000);
+            Assert.Equal(pq.Top(), -1000);
 
             pq.Pop();
             pq.Pop();
             pq.Pop();
-            Assert.AreEqual(pq.Top(), -2);
+            Assert.Equal(pq.Top(), -2);
 
             pq.Add(0);
-            Assert.AreEqual(pq.Top(), -2);
+            Assert.Equal(pq.Top(), -2);
 
             for(int i = 0; i < 100; i++)
             {
                 pq.Add(5);
             }
             
-            Assert.AreEqual(pq.Top(), -2);
+            Assert.Equal(pq.Top(), -2);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestClear()
         {
             PriorityQueue<int?> pq = new IntegerQueue(3);
             pq.Add(2);
             pq.Add(3);
             pq.Add(1);
-            Assert.AreEqual(3, pq.Size());
+            Assert.Equal(3, pq.Size());
             pq.Clear();
-            Assert.AreEqual(0, pq.Size());
+            Assert.Equal(0, pq.Size());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInsertWithOverflowDoesNotOverflow()
         {
             // Tests that InsertWithOverflow does not cause overflow
@@ -437,11 +414,11 @@ namespace Lucene.Net.Util
             pq.InsertWithOverflow(5);
             pq.InsertWithOverflow(7);
             pq.InsertWithOverflow(1);
-            Assert.AreEqual(3, pq.Size());
-            Assert.AreEqual((int?)3, pq.Top());
+            Assert.Equal(3, pq.Size());
+            Assert.Equal((int?)3, pq.Top());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInsertWithOverflowDiscardsRight()
         {
             // Tests that InsertWithOverflow discards the correct value,
@@ -456,21 +433,21 @@ namespace Lucene.Net.Util
             int? i5 = 7;
             int? i6 = 1;
 
-            Assert.IsNull(pq.InsertWithOverflow(i1));
-            Assert.IsNull(pq.InsertWithOverflow(i2));
-            Assert.IsNull(pq.InsertWithOverflow(i3));
-            Assert.IsNull(pq.InsertWithOverflow(i4));
-            Assert.IsTrue(pq.InsertWithOverflow(i5) == i3); // i3 should have been dropped
-            Assert.IsTrue(pq.InsertWithOverflow(i6) == i6); // i6 should not have been inserted
-            Assert.AreEqual(size, pq.Size());
-            Assert.AreEqual((int?)2, pq.Top());
+            Assert.Null(pq.InsertWithOverflow(i1));
+            Assert.Null(pq.InsertWithOverflow(i2));
+            Assert.Null(pq.InsertWithOverflow(i3));
+            Assert.Null(pq.InsertWithOverflow(i4));
+            Assert.True(pq.InsertWithOverflow(i5) == i3); // i3 should have been dropped
+            Assert.True(pq.InsertWithOverflow(i6) == i6); // i6 should not have been inserted
+            Assert.Equal(size, pq.Size());
+            Assert.Equal((int?)2, pq.Top());
 
             pq.Pop();
-            Assert.AreEqual((int?)3, pq.Top());
+            Assert.Equal((int?)3, pq.Top());
             pq.Pop();
-            Assert.AreEqual((int?)5, pq.Top());
+            Assert.Equal((int?)5, pq.Top());
             pq.Pop();
-            Assert.AreEqual((int?)7, pq.Top());
+            Assert.Equal((int?)7, pq.Top());
         }
 
         private static void AddElements<T>(PriorityQueue<T> pq, T[] elements)
@@ -499,7 +476,7 @@ namespace Lucene.Net.Util
 
             for (int i = 0; i < size; i++)
             {
-                Assert.AreEqual(pq.Pop(), elements[i]);
+                Assert.Equal(pq.Pop(), elements[i]);
             }
         }
 
@@ -511,7 +488,7 @@ namespace Lucene.Net.Util
             for (int i = 1; i < size; i++)
             {
                 T next = pq.Pop();
-                Assert.IsTrue(pq.LessThan(last, next));
+                Assert.True(pq.LessThan(last, next));
                 last = next;
             }
         }
@@ -543,7 +520,7 @@ namespace Lucene.Net.Util
             System.Console.WriteLine("Average time per pop: {0} ticks", total.Ticks / size);
         }
 
-        [Test]
+        [Fact]
         public static void TestPersistence()
         {
             // Tests that a big number of elements are added and popped (in the correct order)
@@ -565,7 +542,8 @@ namespace Lucene.Net.Util
             PopAndTestElements(pq, elements);
         }
 
-        [Test, Timeout(0)]
+        //[Test, Timeout(0)]
+        [Fact]
         public static void TestStress()
         {
             int atLeast = 1000000;
@@ -592,7 +570,7 @@ namespace Lucene.Net.Util
 
             PopAndTestElements(pq);
 
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Size(), 0);
 
             // We fill it again
             for (int i = 0; 2 * i < maxSize; i++)
@@ -600,9 +578,9 @@ namespace Lucene.Net.Util
                 pq.Add(Random().Next());
             }
 
-            Assert.AreEqual(pq.Size(), (maxSize + 1) / 2);
+            Assert.Equal(pq.Size(), (maxSize + 1) / 2);
             pq.Clear();
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Size(), 0);
 
             // One last time
             for (int i = 0; 2 * i < maxSize; i++)
@@ -611,15 +589,16 @@ namespace Lucene.Net.Util
             }
 
             PopAndTestElements(pq);
-            Assert.AreEqual(pq.Size(), 0);
+            Assert.Equal(pq.Size(), 0);
         }
 
-        [Test, Explicit]
+        [Fact]
+        [Trait("Category", "Explicit")]
         public static void Benchmarks()
         {
             if (!VERBOSE)
             {
-                Assert.Fail("Turn VERBOSE on or otherwise you won't see the results.");
+                Assert.True(false, "Turn VERBOSE on or otherwise you won't see the results.");
             }
                
             int maxSize = AtLeast(100000);

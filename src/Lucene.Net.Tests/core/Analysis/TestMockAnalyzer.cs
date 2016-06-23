@@ -1,5 +1,4 @@
 using System;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 
@@ -7,8 +6,9 @@ namespace Lucene.Net.Analysis
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
+
     using System.IO;
+    using Xunit;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using Automaton = Lucene.Net.Util.Automaton.Automaton;
     using AutomatonTestUtil = Lucene.Net.Util.Automaton.AutomatonTestUtil;
@@ -51,7 +51,7 @@ namespace Lucene.Net.Analysis
     {
         /// <summary>
         /// Test a configuration that behaves a lot like WhitespaceAnalyzer </summary>
-        [Test]
+        [Fact]
         public virtual void TestWhitespace()
         {
             Analyzer a = new MockAnalyzer(Random());
@@ -62,7 +62,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration that behaves a lot like SimpleAnalyzer </summary>
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
@@ -73,7 +73,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration that behaves a lot like KeywordAnalyzer </summary>
-        [Test]
+        [Fact]
         public virtual void TestKeyword()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false);
@@ -88,7 +88,7 @@ namespace Lucene.Net.Analysis
         // Test some regular expressions as tokenization patterns
         /// <summary>
         /// Test a configuration where each character is a term </summary>
-        [Test]
+        [Fact]
         public virtual void TestSingleChar()
         {
             var single = new CharacterRunAutomaton((new RegExp(".")).ToAutomaton());
@@ -99,7 +99,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration where two characters makes a term </summary>
-        [Test]
+        [Fact]
         public virtual void TestTwoChars()
         {
             CharacterRunAutomaton single = new CharacterRunAutomaton((new RegExp("..")).ToAutomaton());
@@ -112,7 +112,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration where three characters makes a term </summary>
-        [Test]
+        [Fact]
         public virtual void TestThreeChars()
         {
             CharacterRunAutomaton single = new CharacterRunAutomaton((new RegExp("...")).ToAutomaton());
@@ -125,7 +125,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration where word starts with one uppercase </summary>
-        [Test]
+        [Fact]
         public virtual void TestUppercase()
         {
             CharacterRunAutomaton single = new CharacterRunAutomaton((new RegExp("[A-Z][a-z]*")).ToAutomaton());
@@ -137,7 +137,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration that behaves a lot like StopAnalyzer </summary>
-        [Test]
+        [Fact]
         public virtual void TestStop()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET);
@@ -146,7 +146,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration that behaves a lot like KeepWordFilter </summary>
-        [Test]
+        [Fact]
         public virtual void TestKeep()
         {
             CharacterRunAutomaton keepWords = new CharacterRunAutomaton(BasicOperations.Complement(Automaton.Union(Arrays.AsList(BasicAutomata.MakeString("foo"), BasicAutomata.MakeString("bar")))));
@@ -156,7 +156,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test a configuration that behaves a lot like LengthFilter </summary>
-        [Test]
+        [Fact]
         public virtual void TestLength()
         {
             CharacterRunAutomaton length5 = new CharacterRunAutomaton((new RegExp(".{5,}")).ToAutomaton());
@@ -166,7 +166,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// Test MockTokenizer encountering a too long token </summary>
-        [Test]
+        [Fact]
         public virtual void TestTooLongToken()
         {
             Analyzer whitespace = new AnalyzerAnonymousInnerClassHelper(this);
@@ -190,7 +190,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLUCENE_3042()
         {
             string testString = "t";
@@ -221,7 +221,7 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// blast some random strings through the analyzer </summary>
-        [Test]
+        [Fact]
         public virtual void TestRandomStrings()
         {
             CheckRandomData(Random(), new MockAnalyzer(Random()), AtLeast(1000));
@@ -229,7 +229,9 @@ namespace Lucene.Net.Analysis
 
         /// <summary>
         /// blast some random strings through differently configured tokenizers </summary>
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestRandomRegexps()
         {
             int iters = AtLeast(30);
@@ -267,7 +269,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestForwardOffsets()
         {
             int num = AtLeast(10000);
@@ -299,7 +301,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWrapReader()
         {
             // LUCENE-5153: test that wrapping an analyzer's reader is allowed
@@ -340,7 +342,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestChangeGaps()
         {
             // LUCENE-5324: check that it is possible to change the wrapper's gaps
@@ -365,16 +367,16 @@ namespace Lucene.Net.Analysis
             Fields fields = reader.GetTermVectors(0);
             Terms terms = fields.Terms("f");
             TermsEnum te = terms.Iterator(null);
-            Assert.AreEqual(new BytesRef("a"), te.Next());
+            Assert.Equal(new BytesRef("a"), te.Next());
             DocsAndPositionsEnum dpe = te.DocsAndPositions(null, null);
-            Assert.AreEqual(0, dpe.NextDoc());
-            Assert.AreEqual(2, dpe.Freq());
-            Assert.AreEqual(0, dpe.NextPosition());
-            Assert.AreEqual(0, dpe.StartOffset());
+            Assert.Equal(0, dpe.NextDoc());
+            Assert.Equal(2, dpe.Freq());
+            Assert.Equal(0, dpe.NextPosition());
+            Assert.Equal(0, dpe.StartOffset());
             int endOffset = dpe.EndOffset();
-            Assert.AreEqual(1 + positionGap, dpe.NextPosition());
-            Assert.AreEqual(1 + endOffset + offsetGap, dpe.EndOffset());
-            Assert.AreEqual(null, te.Next());
+            Assert.Equal(1 + positionGap, dpe.NextPosition());
+            Assert.Equal(1 + endOffset + offsetGap, dpe.EndOffset());
+            Assert.Equal(null, te.Next());
             reader.Dispose();
             writer.Dispose();
             writer.w.Directory.Dispose();

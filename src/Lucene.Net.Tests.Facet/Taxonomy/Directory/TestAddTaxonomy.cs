@@ -5,7 +5,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
@@ -142,7 +141,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                         FacetLabel cp = srcTR.GetPath(j);
                         int destOrdinal = destTr.GetOrdinal(cp);
                         Assert.True(destOrdinal > 0, cp + " not found in destination");
-                        Assert.AreEqual(destOrdinal, map[j]);
+                        Assert.Equal(destOrdinal, map[j]);
                     }
                 }
                 finally
@@ -156,7 +155,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddEmpty()
         {
             Directory dest = NewDirectory();
@@ -177,7 +176,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             IOUtils.Close(dest, src);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddToEmpty()
         {
             Directory dest = NewDirectory();
@@ -199,7 +198,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
         }
 
         // A more comprehensive and big random test.
-        [Test]
+        [Fact]
         public virtual void TestBig()
         {
             Dotest(200, 10000);
@@ -208,7 +207,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
         }
 
         // a reasonable random test
-        [Test]
+        [Fact]
         public virtual void TestMedium()
         {
             Random random = Random();
@@ -219,7 +218,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             Directory dest = NewDirectory();
@@ -244,7 +243,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             IOUtils.Close(dest, src);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConcurrency()
         {
             // tests that addTaxonomy and addCategory work in parallel
@@ -275,7 +274,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
             var dtr = new DirectoryTaxonomyReader(dest);
             // +2 to account for the root category + "a"
-            Assert.AreEqual(numCategories + 2, dtr.Size);
+            Assert.Equal(numCategories + 2, dtr.Size);
             var categories = new HashSet<FacetLabel>();
             for (int i = 1; i < dtr.Size; i++)
             {

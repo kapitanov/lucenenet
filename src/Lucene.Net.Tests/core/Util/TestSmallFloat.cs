@@ -1,5 +1,5 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -19,7 +19,6 @@ namespace Lucene.Net.Util
     /// limitations under the License.
     /// </summary>
 
-    [TestFixture]
     public class TestSmallFloat : LuceneTestCase
     {
         // original lucene byteToFloat
@@ -100,7 +99,7 @@ namespace Lucene.Net.Util
             return (sbyte)((exponent << 3) | mantissa); // pack into a byte
         }
 
-        [Test]
+        [Fact]
         public virtual void TestByteToFloat()
         {
             for (int i = 0; i < 256; i++)
@@ -108,33 +107,33 @@ namespace Lucene.Net.Util
                 float f1 = Orig_byteToFloat((sbyte)i);
                 float f2 = SmallFloat.ByteToFloat((sbyte)i, 3, 15);
                 float f3 = SmallFloat.Byte315ToFloat((sbyte)i);
-                Assert.AreEqual(f1, f2, 0.0);
-                Assert.AreEqual(f2, f3, 0.0);
+                Assert.Equal(f1, f2, 0.0);
+                Assert.Equal(f2, f3, 0.0);
 
                 float f4 = SmallFloat.ByteToFloat((sbyte)i, 5, 2);
                 float f5 = SmallFloat.Byte52ToFloat((sbyte)i);
-                Assert.AreEqual(f4, f5, 0.0);
+                Assert.Equal(f4, f5, 0.0);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFloatToByte()
         {
-            Assert.AreEqual(0, Orig_floatToByte_v13(5.8123817E-10f)); // verify the old bug (see LUCENE-2937)
-            Assert.AreEqual(1, Orig_floatToByte(5.8123817E-10f)); // verify it's fixed in this test code
-            Assert.AreEqual(1, SmallFloat.FloatToByte315(5.8123817E-10f)); // verify it's fixed
+            Assert.Equal(0, Orig_floatToByte_v13(5.8123817E-10f)); // verify the old bug (see LUCENE-2937)
+            Assert.Equal(1, Orig_floatToByte(5.8123817E-10f)); // verify it's fixed in this test code
+            Assert.Equal(1, SmallFloat.FloatToByte315(5.8123817E-10f)); // verify it's fixed
 
             // test some constants
-            Assert.AreEqual(0, SmallFloat.FloatToByte315(0));
+            Assert.Equal(0, SmallFloat.FloatToByte315(0));
             //Java's Float.MIN_VALUE equals C#'s float.Epsilon
-            Assert.AreEqual(1, SmallFloat.FloatToByte315(float.Epsilon)); // underflow rounds up to smallest positive
-            Assert.AreEqual(255, SmallFloat.FloatToByte315(float.MaxValue) & 0xff); // overflow rounds down to largest positive
-            Assert.AreEqual(255, SmallFloat.FloatToByte315(float.PositiveInfinity) & 0xff);
+            Assert.Equal(1, SmallFloat.FloatToByte315(float.Epsilon)); // underflow rounds up to smallest positive
+            Assert.Equal(255, SmallFloat.FloatToByte315(float.MaxValue) & 0xff); // overflow rounds down to largest positive
+            Assert.Equal(255, SmallFloat.FloatToByte315(float.PositiveInfinity) & 0xff);
 
             // all negatives map to 0
-            Assert.AreEqual(0, SmallFloat.FloatToByte315(-float.Epsilon));
-            Assert.AreEqual(0, SmallFloat.FloatToByte315(-float.MaxValue));
-            Assert.AreEqual(0, SmallFloat.FloatToByte315(float.NegativeInfinity));
+            Assert.Equal(0, SmallFloat.FloatToByte315(-float.Epsilon));
+            Assert.Equal(0, SmallFloat.FloatToByte315(-float.MaxValue));
+            Assert.Equal(0, SmallFloat.FloatToByte315(float.NegativeInfinity));
 
             // up iterations for more exhaustive test after changing something
             int num = AtLeast(100000);
@@ -148,12 +147,12 @@ namespace Lucene.Net.Util
                 sbyte b1 = Orig_floatToByte(f);
                 sbyte b2 = SmallFloat.FloatToByte(f, 3, 15);
                 sbyte b3 = SmallFloat.FloatToByte315(f);
-                Assert.AreEqual(b1, b2);
-                Assert.AreEqual(b2, b3);
+                Assert.Equal(b1, b2);
+                Assert.Equal(b2, b3);
 
                 sbyte b4 = SmallFloat.FloatToByte(f, 5, 2);
                 sbyte b5 = SmallFloat.FloatToByte52(f);
-                Assert.AreEqual(b4, b5);
+                Assert.Equal(b4, b5);
             }
         }
     }

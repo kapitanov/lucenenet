@@ -30,7 +30,7 @@ namespace Lucene.Net.Tests.Expressions
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             dir = NewDirectory();
             var iw = new RandomIndexWriter(Random(), dir);
             int numDocs = TestUtil.NextInt(Random(), 2049, 4000);
@@ -64,10 +64,10 @@ namespace Lucene.Net.Tests.Expressions
         {
             reader.Dispose();
             dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestQueries()
         {
             int n = AtLeast(4);

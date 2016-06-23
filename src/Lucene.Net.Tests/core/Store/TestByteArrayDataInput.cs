@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Store
 {
@@ -21,19 +21,18 @@ namespace Lucene.Net.Store
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestByteArrayDataInput : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             byte[] bytes = new byte[] { 1, 65 };
             ByteArrayDataInput @in = new ByteArrayDataInput(bytes);
-            Assert.AreEqual("A", @in.ReadString());
+            Assert.Equal("A", @in.ReadString());
 
             bytes = new byte[] { 1, 1, 65 };
             @in.Reset(bytes, 1, 2);
-            Assert.AreEqual("A", @in.ReadString());
+            Assert.Equal("A", @in.ReadString());
         }
     }
 }

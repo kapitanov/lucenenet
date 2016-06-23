@@ -23,7 +23,7 @@ namespace Lucene.Net.Tests.Queries.Function
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             dir = NewDirectory();
             IndexWriterConfig iwConfig = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             iwConfig.SetMergePolicy(NewLogMergePolicy());
@@ -40,7 +40,7 @@ namespace Lucene.Net.Tests.Queries.Function
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            base.Dispose();
             @is = null;
             ir.Dispose();
             ir = null;
@@ -48,7 +48,7 @@ namespace Lucene.Net.Tests.Queries.Function
             dir = null;
         }
         
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Query q = new MatchAllDocsQuery();

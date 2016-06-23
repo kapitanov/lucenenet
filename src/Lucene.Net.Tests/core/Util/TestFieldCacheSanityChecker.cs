@@ -1,7 +1,7 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Search;
-using NUnit.Framework;
 using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -34,7 +34,6 @@ namespace Lucene.Net.Util
     using MultiReader = Lucene.Net.Index.MultiReader;
     using SlowCompositeReaderWrapper = Lucene.Net.Index.SlowCompositeReaderWrapper;
 
-    [TestFixture]
     public class TestFieldCacheSanityChecker : LuceneTestCase
     {
         protected internal AtomicReader ReaderA;
@@ -47,7 +46,7 @@ namespace Lucene.Net.Util
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             DirA = NewDirectory();
             DirB = NewDirectory();
 
@@ -98,10 +97,10 @@ namespace Lucene.Net.Util
             ReaderX.Dispose();
             DirA.Dispose();
             DirB.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSanity()
         {
             IFieldCache cache = FieldCache.DEFAULT;
@@ -124,11 +123,11 @@ namespace Lucene.Net.Util
                 DumpArray(TestClass.Name + "#" + TestName + " INSANITY", insanity, Console.Error);
             }
 
-            Assert.AreEqual(0, insanity.Length, "shouldn't be any cache insanity");
+            Assert.Equal(0, insanity.Length, "shouldn't be any cache insanity");
             cache.PurgeAllCaches();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInsanity1()
         {
             IFieldCache cache = FieldCache.DEFAULT;
@@ -142,15 +141,15 @@ namespace Lucene.Net.Util
 
             Insanity[] insanity = FieldCacheSanityChecker.CheckSanity(cache.CacheEntries);
 
-            Assert.AreEqual(1, insanity.Length, "wrong number of cache errors");
-            Assert.AreEqual(InsanityType.VALUEMISMATCH, insanity[0].Type, "wrong type of cache error");
-            Assert.AreEqual(2, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
+            Assert.Equal(1, insanity.Length, "wrong number of cache errors");
+            Assert.Equal(InsanityType.VALUEMISMATCH, insanity[0].Type, "wrong type of cache error");
+            Assert.Equal(2, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
 
             // we expect bad things, don't let tearDown complain about them
             cache.PurgeAllCaches();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInsanity2()
         {
             IFieldCache cache = FieldCache.DEFAULT;
@@ -166,9 +165,9 @@ namespace Lucene.Net.Util
 
             Insanity[] insanity = FieldCacheSanityChecker.CheckSanity(cache.CacheEntries);
 
-            Assert.AreEqual(1, insanity.Length, "wrong number of cache errors");
-            Assert.AreEqual(InsanityType.SUBREADER, insanity[0].Type, "wrong type of cache error");
-            Assert.AreEqual(3, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
+            Assert.Equal(1, insanity.Length, "wrong number of cache errors");
+            Assert.Equal(InsanityType.SUBREADER, insanity[0].Type, "wrong type of cache error");
+            Assert.Equal(3, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
 
             // we expect bad things, don't let tearDown complain about them
             cache.PurgeAllCaches();

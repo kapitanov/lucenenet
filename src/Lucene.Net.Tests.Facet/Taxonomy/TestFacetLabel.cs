@@ -1,6 +1,6 @@
 ﻿using System;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -8,7 +8,6 @@ namespace Lucene.Net.Facet.Taxonomy
     using SortedSetDocValuesFacetField = Lucene.Net.Facet.SortedSet.SortedSetDocValuesFacetField;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using TestUtil = Lucene.Net.Util.TestUtil;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -25,30 +24,29 @@ namespace Lucene.Net.Facet.Taxonomy
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    [TestFixture]
     public class TestFacetLabel : FacetTestCase
     {
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
-            Assert.AreEqual(0, (new FacetLabel()).Length);
-            Assert.AreEqual(1, (new FacetLabel("hello")).Length);
-            Assert.AreEqual(2, (new FacetLabel("hello", "world")).Length);
+            Assert.Equal(0, (new FacetLabel()).Length);
+            Assert.Equal(1, (new FacetLabel("hello")).Length);
+            Assert.Equal(2, (new FacetLabel("hello", "world")).Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToString()
         {
             // When the category is empty, we expect an empty string
-            Assert.AreEqual("FacetLabel: []", (new FacetLabel()).ToString());
+            Assert.Equal("FacetLabel: []", (new FacetLabel()).ToString());
             // one category
-            Assert.AreEqual("FacetLabel: [hello]", (new FacetLabel("hello")).ToString());
+            Assert.Equal("FacetLabel: [hello]", (new FacetLabel("hello")).ToString());
             // more than one category
-            Assert.AreEqual("FacetLabel: [hello, world]", (new FacetLabel("hello", "world")).ToString());
+            Assert.Equal("FacetLabel: [hello, world]", (new FacetLabel("hello", "world")).ToString());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGetComponent()
         {
             string[] components = new string[AtLeast(10)];
@@ -59,11 +57,11 @@ namespace Lucene.Net.Facet.Taxonomy
             FacetLabel cp = new FacetLabel(components);
             for (int i = 0; i < components.Length; i++)
             {
-                Assert.AreEqual(i, Convert.ToInt32(cp.Components[i]));
+                Assert.Equal(i, Convert.ToInt32(cp.Components[i]));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDefaultConstructor()
         {
             // test that the default constructor (no parameters) currently
@@ -71,79 +69,79 @@ namespace Lucene.Net.Facet.Taxonomy
             // If we change this default later, we also need to change this
             // test.
             FacetLabel p = new FacetLabel();
-            Assert.AreEqual(0, p.Length);
-            Assert.AreEqual("FacetLabel: []", p.ToString());
+            Assert.Equal(0, p.Length);
+            Assert.Equal("FacetLabel: []", p.ToString());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSubPath()
         {
             FacetLabel p = new FacetLabel("hi", "there", "man");
-            Assert.AreEqual(p.Length, 3);
+            Assert.Equal(p.Length, 3);
 
             FacetLabel p1 = p.Subpath(2);
-            Assert.AreEqual(2, p1.Length);
-            Assert.AreEqual("FacetLabel: [hi, there]", p1.ToString());
+            Assert.Equal(2, p1.Length);
+            Assert.Equal("FacetLabel: [hi, there]", p1.ToString());
 
             p1 = p.Subpath(1);
-            Assert.AreEqual(1, p1.Length);
-            Assert.AreEqual("FacetLabel: [hi]", p1.ToString());
+            Assert.Equal(1, p1.Length);
+            Assert.Equal("FacetLabel: [hi]", p1.ToString());
 
             p1 = p.Subpath(0);
-            Assert.AreEqual(0, p1.Length);
-            Assert.AreEqual("FacetLabel: []", p1.ToString());
+            Assert.Equal(0, p1.Length);
+            Assert.Equal("FacetLabel: []", p1.ToString());
 
             // with all the following lengths, the prefix should be the whole path 
             int[] lengths = new int[] { 3, -1, 4 };
             for (int i = 0; i < lengths.Length; i++)
             {
                 p1 = p.Subpath(lengths[i]);
-                Assert.AreEqual(3, p1.Length);
-                Assert.AreEqual("FacetLabel: [hi, there, man]", p1.ToString());
-                Assert.AreEqual(p, p1);
+                Assert.Equal(3, p1.Length);
+                Assert.Equal("FacetLabel: [hi, there, man]", p1.ToString());
+                Assert.Equal(p, p1);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
-            Assert.AreEqual(new FacetLabel(), new FacetLabel());
+            Assert.Equal(new FacetLabel(), new FacetLabel());
             Assert.False((new FacetLabel()).Equals(new FacetLabel("hi")));
             Assert.False((new FacetLabel()).Equals(Convert.ToInt32(3)));
-            Assert.AreEqual(new FacetLabel("hello", "world"), new FacetLabel("hello", "world"));
+            Assert.Equal(new FacetLabel("hello", "world"), new FacetLabel("hello", "world"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHashCode()
         {
-            Assert.AreEqual((new FacetLabel()).GetHashCode(), (new FacetLabel()).GetHashCode());
+            Assert.Equal((new FacetLabel()).GetHashCode(), (new FacetLabel()).GetHashCode());
             Assert.False((new FacetLabel()).GetHashCode() == (new FacetLabel("hi")).GetHashCode());
-            Assert.AreEqual((new FacetLabel("hello", "world")).GetHashCode(), (new FacetLabel("hello", "world")).GetHashCode());
+            Assert.Equal((new FacetLabel("hello", "world")).GetHashCode(), (new FacetLabel("hello", "world")).GetHashCode());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongHashCode()
         {
-            Assert.AreEqual((new FacetLabel()).LongHashCode(), (new FacetLabel()).LongHashCode());
+            Assert.Equal((new FacetLabel()).LongHashCode(), (new FacetLabel()).LongHashCode());
             Assert.False((new FacetLabel()).LongHashCode() == (new FacetLabel("hi")).LongHashCode());
-            Assert.AreEqual((new FacetLabel("hello", "world")).LongHashCode(), (new FacetLabel("hello", "world")).LongHashCode());
+            Assert.Equal((new FacetLabel("hello", "world")).LongHashCode(), (new FacetLabel("hello", "world")).LongHashCode());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestArrayConstructor()
         {
             FacetLabel p = new FacetLabel("hello", "world", "yo");
-            Assert.AreEqual(3, p.Length);
-            Assert.AreEqual("FacetLabel: [hello, world, yo]", p.ToString());
+            Assert.Equal(3, p.Length);
+            Assert.Equal("FacetLabel: [hello, world, yo]", p.ToString());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCompareTo()
         {
             FacetLabel p = new FacetLabel("a", "b", "c", "d");
             FacetLabel pother = new FacetLabel("a", "b", "c", "d");
-            Assert.AreEqual(0, pother.CompareTo(p));
-            Assert.AreEqual(0, p.CompareTo(pother));
+            Assert.Equal(0, pother.CompareTo(p));
+            Assert.Equal(0, p.CompareTo(pother));
             pother = new FacetLabel();
             Assert.True(pother.CompareTo(p) < 0);
             Assert.True(p.CompareTo(pother) > 0);
@@ -158,7 +156,7 @@ namespace Lucene.Net.Facet.Taxonomy
             Assert.True(p.CompareTo(pother) < 0);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEmptyNullComponents()
         {
             // LUCENE-4724: CategoryPath should not allow empty or null components
@@ -177,7 +175,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 try
                 {
                     Assert.NotNull(new FacetLabel(components));
-                    Fail("empty or null components should not be allowed: " + Arrays.ToString(components));
+                    True(false, "empty or null components should not be allowed: " + Arrays.ToString(components));
                 }
                 catch (System.ArgumentException)
                 {
@@ -186,7 +184,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 try
                 {
                     new FacetField("dim", components);
-                    Fail("empty or null components should not be allowed: " + Arrays.ToString(components));
+                    True(false, "empty or null components should not be allowed: " + Arrays.ToString(components));
                 }
                 catch (System.ArgumentException)
                 {
@@ -195,7 +193,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 try
                 {
                     new AssociationFacetField(new BytesRef(), "dim", components);
-                    Fail("empty or null components should not be allowed: " + Arrays.ToString(components));
+                    True(false, "empty or null components should not be allowed: " + Arrays.ToString(components));
                 }
                 catch (System.ArgumentException)
                 {
@@ -204,7 +202,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 try
                 {
                     new IntAssociationFacetField(17, "dim", components);
-                    Fail("empty or null components should not be allowed: " + Arrays.ToString(components));
+                    True(false, "empty or null components should not be allowed: " + Arrays.ToString(components));
                 }
                 catch (System.ArgumentException)
                 {
@@ -213,7 +211,7 @@ namespace Lucene.Net.Facet.Taxonomy
                 try
                 {
                     new FloatAssociationFacetField(17.0f, "dim", components);
-                    Fail("empty or null components should not be allowed: " + Arrays.ToString(components));
+                    True(false, "empty or null components should not be allowed: " + Arrays.ToString(components));
                 }
                 catch (System.ArgumentException)
                 {
@@ -223,7 +221,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new FacetField(null, new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -232,7 +230,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new FacetField("", new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -241,7 +239,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new IntAssociationFacetField(17, null, new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -250,7 +248,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new IntAssociationFacetField(17, "", new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -259,7 +257,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new FloatAssociationFacetField(17.0f, null, new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -268,7 +266,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new FloatAssociationFacetField(17.0f, "", new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -277,7 +275,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new AssociationFacetField(new BytesRef(), null, new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -286,7 +284,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new AssociationFacetField(new BytesRef(), "", new string[] { "abc" });
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -295,7 +293,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new SortedSetDocValuesFacetField(null, "abc");
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -304,7 +302,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new SortedSetDocValuesFacetField("", "abc");
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -313,7 +311,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new SortedSetDocValuesFacetField("dim", null);
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -322,7 +320,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 new SortedSetDocValuesFacetField("dim", "");
-                Fail("empty or null components should not be allowed");
+                True(false, "empty or null components should not be allowed");
             }
             catch (System.ArgumentException)
             {
@@ -330,7 +328,7 @@ namespace Lucene.Net.Facet.Taxonomy
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongPath()
         {
             string bigComp = null;
@@ -348,7 +346,7 @@ namespace Lucene.Net.Facet.Taxonomy
             try
             {
                 Assert.NotNull(new FacetLabel("dim", bigComp));
-                Fail("long paths should not be allowed; len=" + bigComp.Length);
+                True(false, "long paths should not be allowed; len=" + bigComp.Length);
             }
             catch (System.ArgumentException)
             {

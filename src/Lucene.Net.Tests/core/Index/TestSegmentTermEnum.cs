@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -39,7 +39,7 @@ namespace Lucene.Net.Index
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
         }
 
@@ -47,10 +47,10 @@ namespace Lucene.Net.Index
         public override void TearDown()
         {
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermEnum()
         {
             IndexWriter writer = null;
@@ -80,7 +80,7 @@ namespace Lucene.Net.Index
             VerifyDocFreq();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPrevTermAtEnd()
         {
             IndexWriter writer = new IndexWriter(Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetCodec(TestUtil.AlwaysPostingsFormat(new Lucene41PostingsFormat())));
@@ -88,9 +88,9 @@ namespace Lucene.Net.Index
             writer.Dispose();
             SegmentReader reader = GetOnlySegmentReader(DirectoryReader.Open(Dir));
             TermsEnum terms = reader.Fields.Terms("content").Iterator(null);
-            Assert.IsNotNull(terms.Next());
-            Assert.AreEqual("aaa", terms.Term().Utf8ToString());
-            Assert.IsNotNull(terms.Next());
+            Assert.NotNull(terms.Next());
+            Assert.Equal("aaa", terms.Term().Utf8ToString());
+            Assert.NotNull(terms.Next());
             long ordB;
             try
             {
@@ -102,11 +102,11 @@ namespace Lucene.Net.Index
                 reader.Dispose();
                 return;
             }
-            Assert.AreEqual("bbb", terms.Term().Utf8ToString());
-            Assert.IsNull(terms.Next());
+            Assert.Equal("bbb", terms.Term().Utf8ToString());
+            Assert.Null(terms.Next());
 
             terms.SeekExact(ordB);
-            Assert.AreEqual("bbb", terms.Term().Utf8ToString());
+            Assert.Equal("bbb", terms.Term().Utf8ToString());
             reader.Dispose();
         }
 
@@ -119,25 +119,25 @@ namespace Lucene.Net.Index
             // go to the first term (aaa)
             termEnum.Next();
             // assert that term is 'aaa'
-            Assert.AreEqual("aaa", termEnum.Term().Utf8ToString());
-            Assert.AreEqual(200, termEnum.DocFreq());
+            Assert.Equal("aaa", termEnum.Term().Utf8ToString());
+            Assert.Equal(200, termEnum.DocFreq());
             // go to the second term (bbb)
             termEnum.Next();
             // assert that term is 'bbb'
-            Assert.AreEqual("bbb", termEnum.Term().Utf8ToString());
-            Assert.AreEqual(100, termEnum.DocFreq());
+            Assert.Equal("bbb", termEnum.Term().Utf8ToString());
+            Assert.Equal(100, termEnum.DocFreq());
 
             // create enumeration of terms after term 'aaa',
             // including 'aaa'
             termEnum.SeekCeil(new BytesRef("aaa"));
             // assert that term is 'aaa'
-            Assert.AreEqual("aaa", termEnum.Term().Utf8ToString());
-            Assert.AreEqual(200, termEnum.DocFreq());
+            Assert.Equal("aaa", termEnum.Term().Utf8ToString());
+            Assert.Equal(200, termEnum.DocFreq());
             // go to term 'bbb'
             termEnum.Next();
             // assert that term is 'bbb'
-            Assert.AreEqual("bbb", termEnum.Term().Utf8ToString());
-            Assert.AreEqual(100, termEnum.DocFreq());
+            Assert.Equal("bbb", termEnum.Term().Utf8ToString());
+            Assert.Equal(100, termEnum.DocFreq());
             reader.Dispose();
         }
 

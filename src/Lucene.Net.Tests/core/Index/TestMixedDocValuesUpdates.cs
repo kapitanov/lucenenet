@@ -1,14 +1,14 @@
 using System;
-using System.Threading;
 using System.Collections.Generic;
+using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
+    using System.IO;
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
-    using System.IO;
     using BinaryDocValuesField = BinaryDocValuesField;
     using Bits = Lucene.Net.Util.Bits;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -21,7 +21,6 @@ namespace Lucene.Net.Index
     using Store = Field.Store;
     using StringField = StringField;
     using TestUtil = Lucene.Net.Util.TestUtil;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -42,7 +41,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestMixedDocValuesUpdates : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestManyReopensAndFields()
         {
             Directory dir = NewDirectory();
@@ -162,11 +161,11 @@ namespace Lucene.Net.Index
 
                 //      System.out.println("[" + Thread.currentThread().getName() + "]: reopen reader: " + reader);
                 DirectoryReader newReader = DirectoryReader.OpenIfChanged(reader);
-                Assert.IsNotNull(newReader);
+                Assert.NotNull(newReader);
                 reader.Dispose();
                 reader = newReader;
                 //      System.out.println("[" + Thread.currentThread().getName() + "]: reopened reader: " + reader);
-                Assert.IsTrue(reader.NumDocs > 0); // we delete at most one document per round
+                Assert.True(reader.NumDocs > 0); // we delete at most one document per round
                 BytesRef scratch = new BytesRef();
                 foreach (AtomicReaderContext context in reader.Leaves)
                 {
@@ -181,13 +180,13 @@ namespace Lucene.Net.Index
                         Bits docsWithField = r.GetDocsWithField(f);
                         if (field < numNDVFields)
                         {
-                            Assert.IsNotNull(ndv);
-                            Assert.IsNull(bdv);
+                            Assert.NotNull(ndv);
+                            Assert.Null(bdv);
                         }
                         else
                         {
-                            Assert.IsNull(ndv);
-                            Assert.IsNotNull(bdv);
+                            Assert.Null(ndv);
+                            Assert.NotNull(bdv);
                         }
                         int maxDoc = r.MaxDoc;
                         for (int doc = 0; doc < maxDoc; doc++)
@@ -197,19 +196,19 @@ namespace Lucene.Net.Index
                                 //              System.out.println("doc=" + (doc + context.DocBase) + " f='" + f + "' vslue=" + getValue(bdv, doc, scratch));
                                 if (fieldHasValue[field])
                                 {
-                                    Assert.IsTrue(docsWithField.Get(doc));
+                                    Assert.True(docsWithField.Get(doc));
                                     if (field < numNDVFields)
                                     {
-                                        Assert.AreEqual(fieldValues[field], ndv.Get(doc), "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
+                                        Assert.Equal(fieldValues[field], ndv.Get(doc)); //, "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
                                     }
                                     else
                                     {
-                                        Assert.AreEqual(fieldValues[field], TestBinaryDocValuesUpdates.GetValue(bdv, doc, scratch), "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
+                                        Assert.Equal(fieldValues[field], TestBinaryDocValuesUpdates.GetValue(bdv, doc, scratch), "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
                                     }
                                 }
                                 else
                                 {
-                                    Assert.IsFalse(docsWithField.Get(doc));
+                                    Assert.False(docsWithField.Get(doc));
                                 }
                             }
                         }
@@ -221,7 +220,7 @@ namespace Lucene.Net.Index
             IOUtils.Close(writer, reader, dir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStressMultiThreading()
         {
             Directory dir = NewDirectory();
@@ -298,7 +297,7 @@ namespace Lucene.Net.Index
                     {
                         if (liveDocs == null || liveDocs.Get(j))
                         {
-                            Assert.AreEqual(docsWithBdv.Get(j), docsWithControl.Get(j));
+                            Assert.Equal(docsWithBdv.Get(j), docsWithControl.Get(j));
                             if (docsWithBdv.Get(j))
                             {
                                 long ctrlValue = control.Get(j);
@@ -306,7 +305,7 @@ namespace Lucene.Net.Index
                                 //              if (ctrlValue != bdvValue) {
                                 //                System.out.println("seg=" + r + ", f=f" + i + ", doc=" + j + ", group=" + r.Document(j).Get("updKey") + ", ctrlValue=" + ctrlValue + ", bdvBytes=" + scratch);
                                 //              }
-                                Assert.AreEqual(ctrlValue, bdvValue);
+                                Assert.Equal(ctrlValue, bdvValue);
                             }
                         }
                     }
@@ -443,7 +442,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestUpdateDifferentDocsInDifferentGens()
         {
             // update same document multiple times across generations
@@ -479,7 +478,7 @@ namespace Lucene.Net.Index
                     NumericDocValues cfndv = r.GetNumericDocValues("cf");
                     for (int j = 0; j < r.MaxDoc; j++)
                     {
-                        Assert.AreEqual(cfndv.Get(j), TestBinaryDocValuesUpdates.GetValue(fbdv, j, scratch) * 2);
+                        Assert.Equal(cfndv.Get(j), TestBinaryDocValuesUpdates.GetValue(fbdv, j, scratch) * 2);
                     }
                 }
                 reader.Dispose();
@@ -488,7 +487,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTonsOfUpdates()
         {
             // LUCENE-5248: make sure that when there are many updates, we don't use too much RAM
@@ -558,7 +557,7 @@ namespace Lucene.Net.Index
                     NumericDocValues cf = r.GetNumericDocValues("cf" + i);
                     for (int j = 0; j < r.MaxDoc; j++)
                     {
-                        Assert.AreEqual(cf.Get(j), TestBinaryDocValuesUpdates.GetValue(f, j, scratch) * 2, "reader=" + r + ", field=f" + i + ", doc=" + j);
+                        Assert.Equal(cf.Get(j), TestBinaryDocValuesUpdates.GetValue(f, j, scratch) * 2, "reader=" + r + ", field=f" + i + ", doc=" + j);
                     }
                 }
             }

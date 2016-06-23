@@ -2,7 +2,7 @@ using System.Text;
 
 namespace Lucene.Net.Analysis
 {
-    using NUnit.Framework;
+    using Xunit;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
     /*
@@ -25,32 +25,32 @@ namespace Lucene.Net.Analysis
     [TestFixture]
     public class TestReusableStringReader : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             ReusableStringReader reader = new ReusableStringReader();
-            Assert.AreEqual(-1, reader.Read());
-            Assert.AreEqual(-1, reader.Read(new char[1], 0, 1));
-            Assert.AreEqual(-1, reader.Read(new char[2], 1, 1));
-            //Assert.AreEqual(-1, reader.Read(CharBuffer.wrap(new char[2])));
+            Assert.Equal(-1, reader.Read());
+            Assert.Equal(-1, reader.Read(new char[1], 0, 1));
+            Assert.Equal(-1, reader.Read(new char[2], 1, 1));
+            //Assert.Equal(-1, reader.Read(CharBuffer.wrap(new char[2])));
 
             reader.Value = "foobar";
             char[] buf = new char[4];
-            Assert.AreEqual(4, reader.Read(buf, 0, 4));
-            Assert.AreEqual("foob", new string(buf));
-            Assert.AreEqual(2, reader.Read(buf, 0, 2));
-            Assert.AreEqual("ar", new string(buf, 0, 2));
-            Assert.AreEqual(-1, reader.Read(buf, 2, 0));
+            Assert.Equal(4, reader.Read(buf, 0, 4));
+            Assert.Equal("foob", new string(buf));
+            Assert.Equal(2, reader.Read(buf, 0, 2));
+            Assert.Equal("ar", new string(buf, 0, 2));
+            Assert.Equal(-1, reader.Read(buf, 2, 0));
             reader.Close();
 
             reader.Value = "foobar";
-            Assert.AreEqual(0, reader.Read(buf, 1, 0));
-            Assert.AreEqual(3, reader.Read(buf, 1, 3));
-            Assert.AreEqual("foo", new string(buf, 1, 3));
-            Assert.AreEqual(2, reader.Read(buf, 2, 2));
-            Assert.AreEqual("ba", new string(buf, 2, 2));
-            Assert.AreEqual('r', (char)reader.Read());
-            Assert.AreEqual(-1, reader.Read(buf, 2, 0));
+            Assert.Equal(0, reader.Read(buf, 1, 0));
+            Assert.Equal(3, reader.Read(buf, 1, 3));
+            Assert.Equal("foo", new string(buf, 1, 3));
+            Assert.Equal(2, reader.Read(buf, 2, 2));
+            Assert.Equal("ba", new string(buf, 2, 2));
+            Assert.Equal('r', (char)reader.Read());
+            Assert.Equal(-1, reader.Read(buf, 2, 0));
             reader.Close();
 
             reader.Value = "foobar";
@@ -61,7 +61,7 @@ namespace Lucene.Net.Analysis
                 sb.Append((char)ch);
             }
             reader.Close();
-            Assert.AreEqual("foobar", sb.ToString());
+            Assert.Equal("foobar", sb.ToString());
         }
     }
 }

@@ -1,9 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
+    
     using BaseDirectoryWrapper = Lucene.Net.Store.BaseDirectoryWrapper;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Document = Documents.Document;
@@ -33,13 +34,13 @@ namespace Lucene.Net.Index
     /*using Ignore = org.junit.Ignore;
     using TimeoutSuite = com.carrotsearch.randomizedtesting.annotations.TimeoutSuite;*/
 
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test2BSortedDocValues : LuceneTestCase
     {
         // indexes Integer.MAX_VALUE docs with a fixed binary field
-        [Test]
-        public virtual void TestFixedSorted([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void TestFixedSorted(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BFixedSorted"));
             if (dir is MockDirectoryWrapper)
@@ -90,7 +91,7 @@ namespace Lucene.Net.Index
                     bytes[0] = (byte)(expectedValue >> 8);
                     bytes[1] = (byte)expectedValue;
                     dv.Get(i, scratch);
-                    Assert.AreEqual(data, scratch);
+                    Assert.Equal(data, scratch);
                     expectedValue++;
                 }
             }
@@ -100,8 +101,9 @@ namespace Lucene.Net.Index
         }
 
         // indexes Integer.MAX_VALUE docs with a fixed binary field
-        [Test]
-        public virtual void Test2BOrds([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void Test2BOrds(IConcurrentMergeScheduler scheduler)
         {
             BaseDirectoryWrapper dir = NewFSDirectory(CreateTempDir("2BOrds"));
             if (dir is MockDirectoryWrapper)
@@ -158,7 +160,7 @@ namespace Lucene.Net.Index
                     bytes[3] = (byte)counter;
                     counter++;
                     dv.Get(i, scratch);
-                    Assert.AreEqual(data, scratch);
+                    Assert.Equal(data, scratch);
                 }
             }
 

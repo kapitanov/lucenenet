@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -44,7 +44,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// LUCENE-3627: this test fails.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestCrashCorruptsIndexing()
         {
             Path = CreateTempDir("testCrashCorruptsIndexing");
@@ -63,7 +63,7 @@ namespace Lucene.Net.Index
         /// prepare for crashing.
         /// index 1 more document, and upon commit, creation of segments_2 will crash.
         /// </summary>
-        [Test]
+        [Fact]
         private void IndexAndCrashOnCreateOutputSegments2()
         {
             Directory realDirectory = FSDirectory.Open(Path);
@@ -79,19 +79,14 @@ namespace Lucene.Net.Index
 
             crashAfterCreateOutput.GetCrashAfterCreateOutput = "segments_2";
             indexWriter.AddDocument(Document);
-            try
+            Assert.Throws<CrashingException>(() =>
             {
                 // tries to write segments_2 but hits fake exc:
                 indexWriter.Commit();
-                Assert.Fail("should have hit CrashingException");
-            }
-            catch (CrashingException e)
-            {
-                // expected
-            }
+            });
             // writes segments_3
             indexWriter.Dispose();
-            Assert.IsFalse(SlowFileExists(realDirectory, "segments_2"));
+            Assert.False(SlowFileExists(realDirectory, "segments_2"));
             crashAfterCreateOutput.Dispose();
         }
 
@@ -111,7 +106,7 @@ namespace Lucene.Net.Index
             // however, to test the fix, the following lines should pass as well.
             indexWriter.AddDocument(Document);
             indexWriter.Dispose();
-            Assert.IsFalse(SlowFileExists(realDirectory, "segments_2"));
+            Assert.False(SlowFileExists(realDirectory, "segments_2"));
             realDirectory.Dispose();
         }
 
@@ -124,8 +119,8 @@ namespace Lucene.Net.Index
             IndexReader indexReader = DirectoryReader.Open(realDirectory);
             IndexSearcher indexSearcher = NewSearcher(indexReader);
             TopDocs topDocs = indexSearcher.Search(new TermQuery(new Term(TEXT_FIELD, "fleas")), 10);
-            Assert.IsNotNull(topDocs);
-            Assert.AreEqual(expectedTotalHits, topDocs.TotalHits);
+            Assert.NotNull(topDocs);
+            Assert.Equal(expectedTotalHits, topDocs.TotalHits);
             indexReader.Dispose();
             realDirectory.Dispose();
         }

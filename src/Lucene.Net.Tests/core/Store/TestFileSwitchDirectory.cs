@@ -1,6 +1,6 @@
 using Lucene.Net.Index;
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System.Collections.Generic;
 using System.IO;
 
@@ -41,7 +41,7 @@ namespace Lucene.Net.Store
         /// <summary>
         /// Test if writing doc stores to disk and everything else to ram works.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             HashSet<string> fileExtensions = new HashSet<string>();
@@ -60,23 +60,23 @@ namespace Lucene.Net.Store
             IndexWriter writer = new IndexWriter(fsd, (new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))).SetMergePolicy(NewLogMergePolicy(false)).SetCodec(Codec.ForName("Lucene40")).SetUseCompoundFile(false));
             TestIndexWriterReader.CreateIndexNoClose(true, "ram", writer);
             IndexReader reader = DirectoryReader.Open(writer, true);
-            Assert.AreEqual(100, reader.MaxDoc);
+            Assert.Equal(100, reader.MaxDoc);
             writer.Commit();
             // we should see only fdx,fdt files here
             string[] files = primaryDir.ListAll();
-            Assert.IsTrue(files.Length > 0);
+            Assert.True(files.Length > 0);
             for (int x = 0; x < files.Length; x++)
             {
                 string ext = FileSwitchDirectory.GetExtension(files[x]);
-                Assert.IsTrue(fileExtensions.Contains(ext));
+                Assert.True(fileExtensions.Contains(ext));
             }
             files = secondaryDir.ListAll();
-            Assert.IsTrue(files.Length > 0);
+            Assert.True(files.Length > 0);
             // we should not see fdx,fdt files here
             for (int x = 0; x < files.Length; x++)
             {
                 string ext = FileSwitchDirectory.GetExtension(files[x]);
-                Assert.IsFalse(fileExtensions.Contains(ext));
+                Assert.False(fileExtensions.Contains(ext));
             }
             reader.Dispose();
             writer.Dispose();
@@ -84,7 +84,7 @@ namespace Lucene.Net.Store
             files = fsd.ListAll();
             for (int i = 0; i < files.Length; i++)
             {
-                Assert.IsNotNull(files[i]);
+                Assert.NotNull(files[i]);
             }
             fsd.Dispose();
             OLD_FORMAT_IMPERSONATION_IS_ACTIVE = oldValue;
@@ -106,7 +106,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3380 -- make sure we get exception if the directory really does not exist.
-        [Test]
+        [Fact]
         public virtual void TestNoDir()
         {
             DirectoryInfo primDir = CreateTempDir("foo");
@@ -118,7 +118,7 @@ namespace Lucene.Net.Store
                 try
                 {
                     DirectoryReader.Open(dir);
-                    Assert.Fail("did not hit expected exception");
+                    Assert.True(false, "did not hit expected exception");
                 }
                 catch (NoSuchDirectoryException)
                 {
@@ -128,7 +128,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3380 test that we can add a file, and then when we call list() we get it back
-        [Test]
+        [Fact]
         public virtual void TestDirectoryFilter()
         {
             Directory dir = NewFSSwitchDirectory(new HashSet<string>());
@@ -136,8 +136,8 @@ namespace Lucene.Net.Store
             try
             {
                 dir.CreateOutput(name, NewIOContext(Random())).Dispose();
-                Assert.IsTrue(SlowFileExists(dir, name));
-                Assert.IsTrue(Arrays.AsList(dir.ListAll()).Contains(name));
+                Assert.True(SlowFileExists(dir, name));
+                Assert.True(Arrays.AsList(dir.ListAll()).Contains(name));
             }
             finally
             {
@@ -146,7 +146,7 @@ namespace Lucene.Net.Store
         }
 
         // LUCENE-3380 test that delegate compound files correctly.
-        [Test]
+        [Fact]
         public virtual void TestCompoundFileAppendTwice()
         {
             Directory newDir = NewFSSwitchDirectory(Collections.Singleton("cfs"));
@@ -155,14 +155,14 @@ namespace Lucene.Net.Store
             IndexOutput @out = csw.CreateOutput("d.xyz", NewIOContext(Random()));
             @out.WriteInt(0);
             @out.Dispose();
-            Assert.AreEqual(1, csw.ListAll().Length);
-            Assert.AreEqual("d.xyz", csw.ListAll()[0]);
+            Assert.Equal(1, csw.ListAll().Length);
+            Assert.Equal("d.xyz", csw.ListAll()[0]);
 
             csw.Dispose();
 
             CompoundFileDirectory cfr = new CompoundFileDirectory(newDir, "d.cfs", NewIOContext(Random()), false);
-            Assert.AreEqual(1, cfr.ListAll().Length);
-            Assert.AreEqual("d.xyz", cfr.ListAll()[0]);
+            Assert.Equal(1, cfr.ListAll().Length);
+            Assert.Equal("d.xyz", cfr.ListAll()[0]);
             cfr.Dispose();
             newDir.Dispose();
         }

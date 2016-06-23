@@ -1,5 +1,5 @@
-using NUnit.Framework;
 using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -20,7 +20,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestRollingBuffer : LuceneTestCase
     {
         private class Position : RollingBuffer.Resettable
@@ -33,7 +32,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             RollingBuffer<Position> buffer = new RollingBufferAnonymousInnerClassHelper(this);
@@ -60,12 +59,12 @@ namespace Lucene.Net.Util
                         Position posData = buffer.Get(pos);
                         if (!posSet.GetAndSet(pos))
                         {
-                            Assert.AreEqual(-1, posData.Pos);
+                            Assert.Equal(-1, posData.Pos);
                             posData.Pos = pos;
                         }
                         else
                         {
-                            Assert.AreEqual(pos, posData.Pos);
+                            Assert.Equal(pos, posData.Pos);
                         }
                     }
                     else

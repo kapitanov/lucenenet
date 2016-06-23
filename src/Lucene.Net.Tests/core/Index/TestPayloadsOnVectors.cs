@@ -1,14 +1,13 @@
-using Lucene.Net.Analysis.Tokenattributes;
 using System.Diagnostics;
+using System.IO;
+using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-    using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -38,12 +37,11 @@ namespace Lucene.Net.Index
     using Token = Lucene.Net.Analysis.Token;
     using TokenStream = Lucene.Net.Analysis.TokenStream;
 
-    [TestFixture]
     public class TestPayloadsOnVectors : LuceneTestCase
     {
         /// <summary>
         /// some docs have payload att, some not </summary>
-        [Test]
+        [Fact]
         public virtual void TestMixupDocs()
         {
             Directory dir = NewDirectory();
@@ -58,7 +56,7 @@ namespace Lucene.Net.Index
             customType.StoreTermVectorOffsets = Random().NextBoolean();
             Field field = new Field("field", "", customType);
             TokenStream ts = new MockTokenizer(new StringReader("here we go"), MockTokenizer.WHITESPACE, true);
-            Assert.IsFalse(ts.HasAttribute<IPayloadAttribute>());
+            Assert.False(ts.HasAttribute<IPayloadAttribute>());
             field.TokenStream = ts;
             doc.Add(field);
             writer.AddDocument(doc);
@@ -66,12 +64,12 @@ namespace Lucene.Net.Index
             Token withPayload = new Token("withPayload", 0, 11);
             withPayload.Payload = new BytesRef("test");
             ts = new CannedTokenStream(withPayload);
-            Assert.IsTrue(ts.HasAttribute<IPayloadAttribute>());
+            Assert.True(ts.HasAttribute<IPayloadAttribute>());
             field.TokenStream = ts;
             writer.AddDocument(doc);
 
             ts = new MockTokenizer(new StringReader("another"), MockTokenizer.WHITESPACE, true);
-            Assert.IsFalse(ts.HasAttribute<IPayloadAttribute>());
+            Assert.False(ts.HasAttribute<IPayloadAttribute>());
             field.TokenStream = ts;
             writer.AddDocument(doc);
 
@@ -79,11 +77,11 @@ namespace Lucene.Net.Index
             Terms terms = reader.GetTermVector(1, "field");
             Debug.Assert(terms != null);
             TermsEnum termsEnum = terms.Iterator(null);
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("withPayload")));
+            Assert.True(termsEnum.SeekExact(new BytesRef("withPayload")));
             DocsAndPositionsEnum de = termsEnum.DocsAndPositions(null, null);
-            Assert.AreEqual(0, de.NextDoc());
-            Assert.AreEqual(0, de.NextPosition());
-            Assert.AreEqual(new BytesRef("test"), de.Payload);
+            Assert.Equal(0, de.NextDoc());
+            Assert.Equal(0, de.NextPosition());
+            Assert.Equal(new BytesRef("test"), de.Payload);
             writer.Dispose();
             reader.Dispose();
             dir.Dispose();
@@ -91,7 +89,7 @@ namespace Lucene.Net.Index
 
         /// <summary>
         /// some field instances have payload att, some not </summary>
-        [Test]
+        [Fact]
         public virtual void TestMixupMultiValued()
         {
             Directory dir = NewDirectory();
@@ -104,19 +102,19 @@ namespace Lucene.Net.Index
             customType.StoreTermVectorOffsets = Random().NextBoolean();
             Field field = new Field("field", "", customType);
             TokenStream ts = new MockTokenizer(new StringReader("here we go"), MockTokenizer.WHITESPACE, true);
-            Assert.IsFalse(ts.HasAttribute<IPayloadAttribute>());
+            Assert.False(ts.HasAttribute<IPayloadAttribute>());
             field.TokenStream = ts;
             doc.Add(field);
             Field field2 = new Field("field", "", customType);
             Token withPayload = new Token("withPayload", 0, 11);
             withPayload.Payload = new BytesRef("test");
             ts = new CannedTokenStream(withPayload);
-            Assert.IsTrue(ts.HasAttribute<IPayloadAttribute>());
+            Assert.True(ts.HasAttribute<IPayloadAttribute>());
             field2.TokenStream = ts;
             doc.Add(field2);
             Field field3 = new Field("field", "", customType);
             ts = new MockTokenizer(new StringReader("nopayload"), MockTokenizer.WHITESPACE, true);
-            Assert.IsFalse(ts.HasAttribute<IPayloadAttribute>());
+            Assert.False(ts.HasAttribute<IPayloadAttribute>());
             field3.TokenStream = ts;
             doc.Add(field3);
             writer.AddDocument(doc);
@@ -124,17 +122,17 @@ namespace Lucene.Net.Index
             Terms terms = reader.GetTermVector(0, "field");
             Debug.Assert(terms != null);
             TermsEnum termsEnum = terms.Iterator(null);
-            Assert.IsTrue(termsEnum.SeekExact(new BytesRef("withPayload")));
+            Assert.True(termsEnum.SeekExact(new BytesRef("withPayload")));
             DocsAndPositionsEnum de = termsEnum.DocsAndPositions(null, null);
-            Assert.AreEqual(0, de.NextDoc());
-            Assert.AreEqual(3, de.NextPosition());
-            Assert.AreEqual(new BytesRef("test"), de.Payload);
+            Assert.Equal(0, de.NextDoc());
+            Assert.Equal(3, de.NextPosition());
+            Assert.Equal(new BytesRef("test"), de.Payload);
             writer.Dispose();
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPayloadsWithoutPositions()
         {
             Directory dir = NewDirectory();
@@ -146,15 +144,11 @@ namespace Lucene.Net.Index
             customType.StoreTermVectorPayloads = true;
             customType.StoreTermVectorOffsets = Random().NextBoolean();
             doc.Add(new Field("field", "foo", customType));
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 writer.AddDocument(doc);
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
+
             writer.Dispose();
             dir.Dispose();
         }

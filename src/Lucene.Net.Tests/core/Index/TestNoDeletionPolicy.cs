@@ -1,9 +1,9 @@
 using System.Reflection;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -31,7 +31,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestNoDeletionPolicy : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNoDeletionPolicy_Mem()
         {
             IndexDeletionPolicy idp = NoDeletionPolicy.INSTANCE;
@@ -40,16 +40,16 @@ namespace Lucene.Net.Index
         }
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestFinalSingleton()
 	    {
-		    Assert.IsTrue(Modifier.isFinal(typeof(NoDeletionPolicy).Modifiers));
+		    Assert.True(Modifier.isFinal(typeof(NoDeletionPolicy).Modifiers));
 		    Constructor<?>[] ctors = typeof(NoDeletionPolicy).DeclaredConstructors;
-		    Assert.AreEqual("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
-		    Assert.IsTrue("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
+		    Assert.Equal("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
+		    Assert.True("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
 	    }*/
 
-        [Test]
+        [Fact]
         public virtual void TestMethodsOverridden()
         {
             // Ensures that all methods of IndexDeletionPolicy are
@@ -67,12 +67,12 @@ namespace Lucene.Net.Index
                 // different class than Object, this will need to change.
                 if (m.DeclaringType != typeof(object))
                 {
-                    Assert.IsTrue(m.DeclaringType == typeof(NoDeletionPolicy), m + " is not overridden !");
+                    Assert.True(m.DeclaringType == typeof(NoDeletionPolicy), m + " is not overridden !");
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllCommitsRemain()
         {
             Directory dir = NewDirectory();
@@ -83,7 +83,7 @@ namespace Lucene.Net.Index
                 doc.Add(NewTextField("c", "a" + i, Field.Store.YES));
                 writer.AddDocument(doc);
                 writer.Commit();
-                Assert.AreEqual(i + 1, DirectoryReader.ListCommits(dir).Count, "wrong number of commits !");
+                Assert.Equal(i + 1, DirectoryReader.ListCommits(dir).Count, "wrong number of commits !");
             }
             writer.Dispose();
             dir.Dispose();

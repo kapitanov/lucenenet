@@ -5,7 +5,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using BytesRef = Lucene.Net.Util.BytesRef;
 
     /*
@@ -48,10 +48,9 @@ namespace Lucene.Net.Search
     ///
     ///
     /// </summary>
-    [TestFixture]
     public class TestMultiPhraseQuery : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestPhrasePrefix()
         {
             Directory indexStore = NewDirectory();
@@ -94,15 +93,15 @@ namespace Lucene.Net.Search
             } while (te.Next() != null);
 
             query1.Add(termsWithPrefix.ToArray(/*new Term[0]*/));
-            Assert.AreEqual("body:\"blueberry (piccadilly pie pizza)\"", query1.ToString());
+            Assert.Equal("body:\"blueberry (piccadilly pie pizza)\"", query1.ToString());
             query2.Add(termsWithPrefix.ToArray(/*new Term[0]*/));
-            Assert.AreEqual("body:\"strawberry (piccadilly pie pizza)\"", query2.ToString());
+            Assert.Equal("body:\"strawberry (piccadilly pie pizza)\"", query2.ToString());
 
             ScoreDoc[] result;
             result = searcher.Search(query1, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, result.Length);
+            Assert.Equal(2, result.Length);
             result = searcher.Search(query2, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, result.Length);
+            Assert.Equal(0, result.Length);
 
             // search for "blue* pizza":
             MultiPhraseQuery query3 = new MultiPhraseQuery();
@@ -122,8 +121,8 @@ namespace Lucene.Net.Search
             query3.Add(new Term("body", "pizza"));
 
             result = searcher.Search(query3, null, 1000).ScoreDocs;
-            Assert.AreEqual(2, result.Length); // blueberry pizza, bluebird pizza
-            Assert.AreEqual("body:\"(blueberry bluebird) pizza\"", query3.ToString());
+            Assert.Equal(2, result.Length); // blueberry pizza, bluebird pizza
+            Assert.Equal("body:\"(blueberry bluebird) pizza\"", query3.ToString());
 
             // test slop:
             query3.Slop = 1;
@@ -132,20 +131,15 @@ namespace Lucene.Net.Search
             // just make sure no exc:
             searcher.Explain(query3, 0);
 
-            Assert.AreEqual(3, result.Length); // blueberry pizza, bluebird pizza, bluebird
+            Assert.Equal(3, result.Length); // blueberry pizza, bluebird pizza, bluebird
             // foobar pizza
 
             MultiPhraseQuery query4 = new MultiPhraseQuery();
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 query4.Add(new Term("field1", "foo"));
                 query4.Add(new Term("field2", "foobar"));
-                Assert.Fail();
-            }
-            catch (System.ArgumentException e)
-            {
-                // okay, all terms must belong to the same field
-            }
+            });
 
             writer.Dispose();
             reader.Dispose();
@@ -153,7 +147,7 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-2580
-        [Test]
+        [Fact]
         public virtual void TestTall()
         {
             Directory indexStore = NewDirectory();
@@ -168,14 +162,13 @@ namespace Lucene.Net.Search
             q.Add(new Term("body", "blueberry"));
             q.Add(new Term("body", "chocolate"));
             q.Add(new Term[] { new Term("body", "pie"), new Term("body", "tart") });
-            Assert.AreEqual(2, searcher.Search(q, 1).TotalHits);
+            Assert.Equal(2, searcher.Search(q, 1).TotalHits);
             r.Dispose();
             indexStore.Dispose();
         }
 
         //ORIGINAL LINE: @Ignore public void testMultiSloppyWithRepeats() throws java.io.IOException
-        [Test]
-        [Ignore("This appears to be a known issue")]
+        [Fact(Skip = "This appears to be a known issue")]
         public virtual void TestMultiSloppyWithRepeats() //LUCENE-3821 fixes sloppy phrase scoring, except for this known problem
         {
             Directory indexStore = NewDirectory();
@@ -191,13 +184,13 @@ namespace Lucene.Net.Search
             q.Add(new Term[] { new Term("body", "a"), new Term("body", "b") });
             q.Add(new Term[] { new Term("body", "a") });
             q.Slop = 6;
-            Assert.AreEqual(1, searcher.Search(q, 1).TotalHits); // should match on "a b"
+            Assert.Equal(1, searcher.Search(q, 1).TotalHits); // should match on "a b"
 
             r.Dispose();
             indexStore.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultiExactWithRepeats()
         {
             Directory indexStore = NewDirectory();
@@ -210,7 +203,7 @@ namespace Lucene.Net.Search
             MultiPhraseQuery q = new MultiPhraseQuery();
             q.Add(new Term[] { new Term("body", "a"), new Term("body", "d") }, 0);
             q.Add(new Term[] { new Term("body", "a"), new Term("body", "f") }, 2);
-            Assert.AreEqual(1, searcher.Search(q, 1).TotalHits); // should match on "a b"
+            Assert.Equal(1, searcher.Search(q, 1).TotalHits); // should match on "a b"
             r.Dispose();
             indexStore.Dispose();
         }
@@ -222,7 +215,7 @@ namespace Lucene.Net.Search
             writer.AddDocument(doc);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanQueryContainingSingleTermPrefixQuery()
         {
             // this tests against bug 33161 (now fixed)
@@ -248,7 +241,7 @@ namespace Lucene.Net.Search
             // exception will be thrown here without fix
             ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
 
-            Assert.AreEqual(2, hits.Length, "Wrong number of hits");
+            Assert.Equal(2, hits.Length); //, "Wrong number of hits");
 
             // just make sure no exc:
             searcher.Explain(q, 0);
@@ -258,7 +251,7 @@ namespace Lucene.Net.Search
             indexStore.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPhrasePrefixWithBooleanQuery()
         {
             Directory indexStore = NewDirectory();
@@ -280,13 +273,13 @@ namespace Lucene.Net.Search
 
             // exception will be thrown here without fix for #35626:
             ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits.Length, "Wrong number of hits");
+            Assert.Equal(0, hits.Length); //, "Wrong number of hits");
             writer.Dispose();
             reader.Dispose();
             indexStore.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoDocs()
         {
             Directory indexStore = NewDirectory();
@@ -299,7 +292,7 @@ namespace Lucene.Net.Search
             MultiPhraseQuery q = new MultiPhraseQuery();
             q.Add(new Term("body", "a"));
             q.Add(new Term[] { new Term("body", "nope"), new Term("body", "nope") });
-            Assert.AreEqual(0, searcher.Search(q, null, 1).TotalHits, "Wrong number of hits");
+            Assert.Equal(0, searcher.Search(q, null, 1).TotalHits); //, "Wrong number of hits");
 
             // just make sure no exc:
             searcher.Explain(q, 0);
@@ -309,35 +302,35 @@ namespace Lucene.Net.Search
             indexStore.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHashCodeAndEquals()
         {
             MultiPhraseQuery query1 = new MultiPhraseQuery();
             MultiPhraseQuery query2 = new MultiPhraseQuery();
 
-            Assert.AreEqual(query1.GetHashCode(), query2.GetHashCode());
-            Assert.IsTrue(query1.Equals(query2));
-            Assert.AreEqual(query1, query2);
+            Assert.Equal(query1.GetHashCode(), query2.GetHashCode());
+            Assert.True(query1.Equals(query2));
+            Assert.Equal(query1, query2);
 
             Term term1 = new Term("someField", "someText");
 
             query1.Add(term1);
             query2.Add(term1);
 
-            Assert.AreEqual(query1.GetHashCode(), query2.GetHashCode());
-            Assert.AreEqual(query1, query2);
+            Assert.Equal(query1.GetHashCode(), query2.GetHashCode());
+            Assert.Equal(query1, query2);
 
             Term term2 = new Term("someField", "someMoreText");
 
             query1.Add(term2);
 
-            Assert.IsFalse(query1.GetHashCode() == query2.GetHashCode());
-            Assert.IsFalse(query1.Equals(query2));
+            Assert.False(query1.GetHashCode() == query2.GetHashCode());
+            Assert.False(query1.Equals(query2));
 
             query2.Add(term2);
 
-            Assert.AreEqual(query1.GetHashCode(), query2.GetHashCode());
-            Assert.AreEqual(query1, query2);
+            Assert.Equal(query1.GetHashCode(), query2.GetHashCode());
+            Assert.Equal(query1, query2);
         }
 
         private void Add(string s, string type, RandomIndexWriter writer)
@@ -349,13 +342,13 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-2526
-        [Test]
+        [Fact]
         public virtual void TestEmptyToString()
         {
             (new MultiPhraseQuery()).ToString();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustomIDF()
         {
             Directory indexStore = NewDirectory();
@@ -371,7 +364,7 @@ namespace Lucene.Net.Search
             query.Add(new Term[] { new Term("body", "this"), new Term("body", "that") });
             query.Add(new Term("body", "is"));
             Weight weight = query.CreateWeight(searcher);
-            Assert.AreEqual(10f * 10f, weight.ValueForNormalization, 0.001f);
+            Assert.Equal(10f * 10f, weight.ValueForNormalization); //, 0.001f);
 
             writer.Dispose();
             reader.Dispose();
@@ -393,7 +386,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncr()
         {
             Directory dir = new RAMDirectory();
@@ -438,8 +431,8 @@ namespace Lucene.Net.Search
                 mpq.Add(new Term[] { new Term("field", "b"), new Term("field", "c") }, 0);
             }
             TopDocs hits = s.Search(mpq, 2);
-            Assert.AreEqual(2, hits.TotalHits);
-            Assert.AreEqual(hits.ScoreDocs[0].Score, hits.ScoreDocs[1].Score, 1e-5);
+            Assert.Equal(2, hits.TotalHits);
+            Assert.Equal(hits.ScoreDocs[0].Score, hits.ScoreDocs[1].Score); //, 1e-5);
             /*
             for(int hit=0;hit<hits.TotalHits;hit++) {
               ScoreDoc sd = hits.ScoreDocs[hit];
@@ -470,7 +463,7 @@ namespace Lucene.Net.Search
         /// using query parser, MPQ will be created, and will not be strict about having all query terms
         /// in each position - one of each position is sufficient (OR logic)
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncrSloppyParsedAnd()
         {
             MultiPhraseQuery q = new MultiPhraseQuery();
@@ -502,7 +495,7 @@ namespace Lucene.Net.Search
             }
 
             TopDocs hits = s.Search(q, 1);
-            Assert.AreEqual(nExpected, hits.TotalHits, "wrong number of results");
+            Assert.Equal(nExpected, hits.TotalHits); //, "wrong number of results");
 
             if (VERBOSE)
             {
@@ -520,7 +513,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// PQ AND Mode - Manually creating a phrase query
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncrSloppyPqAnd()
         {
             PhraseQuery pq = new PhraseQuery();
@@ -540,7 +533,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// MPQ AND Mode - Manually creating a multiple phrase query
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncrSloppyMpqAnd()
         {
             MultiPhraseQuery mpq = new MultiPhraseQuery();
@@ -560,7 +553,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// MPQ Combined AND OR Mode - Manually creating a multiple phrase query
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncrSloppyMpqAndOrMatch()
         {
             MultiPhraseQuery mpq = new MultiPhraseQuery();
@@ -580,7 +573,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// MPQ Combined AND OR Mode - Manually creating a multiple phrase query - with no match
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestZeroPosIncrSloppyMpqAndOrNoMatch()
         {
             MultiPhraseQuery mpq = new MultiPhraseQuery();
@@ -605,7 +598,7 @@ namespace Lucene.Net.Search
             return terms;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNegativeSlop()
         {
             MultiPhraseQuery query = new MultiPhraseQuery();
@@ -614,7 +607,7 @@ namespace Lucene.Net.Search
             try
             {
                 query.Slop = -2;
-                Assert.Fail("didn't get expected exception");
+                Assert.True(false, "didn't get expected exception");
             }
             catch (System.ArgumentException expected)
             {

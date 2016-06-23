@@ -23,7 +23,7 @@ namespace Lucene.Net.Tests.Expressions
 		[SetUp]
 		public override void SetUp()
 		{
-			base.SetUp();
+			
 			dir = NewDirectory();
 			var iw = new RandomIndexWriter(Random(), dir);
 			var doc = new Document
@@ -64,11 +64,11 @@ namespace Lucene.Net.Tests.Expressions
 		{
 			reader.Dispose();
 			dir.Dispose();
-			base.TearDown();
+			base.Dispose();
 		}
 
 		/// <summary>an example of how to rank by an expression</summary>
-		[Test]
+		[Fact]
 		public virtual void Test()
 		{
 			// compile an expression:
@@ -84,7 +84,7 @@ namespace Lucene.Net.Tests.Expressions
 		}
 
 		/// <summary>tests the returned sort values are correct</summary>
-		[Test]
+		[Fact]
 		public virtual void TestSortValues()
 		{
 			var expr = JavascriptCompiler.Compile("sqrt(_score)");
@@ -103,7 +103,7 @@ namespace Lucene.Net.Tests.Expressions
 		}
 
 		/// <summary>tests same binding used more than once in an expression</summary>
-		[Test]
+		[Fact]
 		public virtual void TestTwoOfSameBinding()
 		{
 			var expr = JavascriptCompiler.Compile("_score + _score");
@@ -123,7 +123,7 @@ namespace Lucene.Net.Tests.Expressions
 		}
 
 		/// <summary>tests expression referring to another expression</summary>
-		[Test]
+		[Fact]
 		public virtual void TestExpressionRefersToExpression()
 		{
 			var expr1 = JavascriptCompiler.Compile("_score");
@@ -145,7 +145,7 @@ namespace Lucene.Net.Tests.Expressions
 		}
 
 		/// <summary>tests huge amounts of variables in the expression</summary>
-		[Test]
+		[Fact]
 		public virtual void TestLotsOfBindings()
 		{
 			DoTestLotsOfBindings(byte.MaxValue - 1);
@@ -182,7 +182,7 @@ namespace Lucene.Net.Tests.Expressions
 			}
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestDistanceSort()
 		{
 			var distance = JavascriptCompiler.Compile("haversin(40.7143528,-74.0059731,latitude,longitude)");

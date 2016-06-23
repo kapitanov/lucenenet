@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -35,7 +34,6 @@ namespace Lucene.Net.Search
     using SlowCompositeReaderWrapper = Lucene.Net.Index.SlowCompositeReaderWrapper;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestTermScorer : LuceneTestCase
     {
         protected internal Directory Directory;
@@ -45,10 +43,8 @@ namespace Lucene.Net.Search
         protected internal IndexSearcher IndexSearcher;
         protected internal IndexReader IndexReader;
 
-        [SetUp]
-        public override void SetUp()
+        public TestTermScorer() : base()
         {
-            base.SetUp();
             Directory = NewDirectory();
 
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()).SetSimilarity(new DefaultSimilarity()));
@@ -64,22 +60,21 @@ namespace Lucene.Net.Search
             IndexSearcher.Similarity = new DefaultSimilarity();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             IndexReader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Term allTerm = new Term(FIELD, "all");
             TermQuery termQuery = new TermQuery(allTerm);
 
             Weight weight = IndexSearcher.CreateNormalizedWeight(termQuery);
-            Assert.IsTrue(IndexSearcher.TopReaderContext is AtomicReaderContext);
+            Assert.True(IndexSearcher.TopReaderContext is AtomicReaderContext);
             AtomicReaderContext context = (AtomicReaderContext)IndexSearcher.TopReaderContext;
             BulkScorer ts = weight.BulkScorer(context, true, (context.AtomicReader).LiveDocs);
             // we have 2 documents with the term all in them, one document for all the
@@ -88,11 +83,11 @@ namespace Lucene.Net.Search
             // must call next first
 
             ts.Score(new CollectorAnonymousInnerClassHelper(this, context, docs));
-            Assert.IsTrue(docs.Count == 2, "docs Size: " + docs.Count + " is not: " + 2);
+            Assert.True(docs.Count == 2, "docs Size: " + docs.Count + " is not: " + 2);
             TestHit doc0 = docs[0];
             TestHit doc5 = docs[1];
             // The scores should be the same
-            Assert.IsTrue(doc0.Score == doc5.Score, doc0.Score + " does not equal: " + doc5.Score);
+            Assert.True(doc0.Score == doc5.Score, doc0.Score + " does not equal: " + doc5.Score);
             /*
              * Score should be (based on Default Sim.: All floats are approximate tf = 1
              * numDocs = 6 docFreq(all) = 2 idf = ln(6/3) + 1 = 1.693147 idf ^ 2 =
@@ -102,7 +97,7 @@ namespace Lucene.Net.Search
              *
              * score = 1 * 2.8667 * 1 * 1 * 0.590 = 1.69
              */
-            Assert.IsTrue(doc0.Score == 1.6931472f, doc0.Score + " does not equal: " + 1.6931472f);
+            Assert.True(doc0.Score == 1.6931472f, doc0.Score + " does not equal: " + 1.6931472f);
         }
 
         private class CollectorAnonymousInnerClassHelper : Collector
@@ -136,8 +131,8 @@ namespace Lucene.Net.Search
                 float score = scorer.Score();
                 doc = doc + @base;
                 Docs.Add(new TestHit(OuterInstance, doc, score));
-                Assert.IsTrue(score > 0, "score " + score + " is not greater than 0");
-                Assert.IsTrue(doc == 0 || doc == 5, "Doc: " + doc + " does not equal 0 or doc does not equal 5");
+                Assert.True(score > 0, "score " + score + " is not greater than 0");
+                Assert.True(doc == 0 || doc == 5, "Doc: " + doc + " does not equal 0 or doc does not equal 5");
             }
 
             public override AtomicReaderContext NextReader
@@ -154,36 +149,36 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNext()
         {
             Term allTerm = new Term(FIELD, "all");
             TermQuery termQuery = new TermQuery(allTerm);
 
             Weight weight = IndexSearcher.CreateNormalizedWeight(termQuery);
-            Assert.IsTrue(IndexSearcher.TopReaderContext is AtomicReaderContext);
+            Assert.True(IndexSearcher.TopReaderContext is AtomicReaderContext);
             AtomicReaderContext context = (AtomicReaderContext)IndexSearcher.TopReaderContext;
             Scorer ts = weight.Scorer(context, (context.AtomicReader).LiveDocs);
-            Assert.IsTrue(ts.NextDoc() != DocIdSetIterator.NO_MORE_DOCS, "next did not return a doc");
-            Assert.IsTrue(ts.Score() == 1.6931472f, "score is not correct");
-            Assert.IsTrue(ts.NextDoc() != DocIdSetIterator.NO_MORE_DOCS, "next did not return a doc");
-            Assert.IsTrue(ts.Score() == 1.6931472f, "score is not correct");
-            Assert.IsTrue(ts.NextDoc() == DocIdSetIterator.NO_MORE_DOCS, "next returned a doc and it should not have");
+            Assert.True(ts.NextDoc() != DocIdSetIterator.NO_MORE_DOCS, "next did not return a doc");
+            Assert.True(ts.Score() == 1.6931472f, "score is not correct");
+            Assert.True(ts.NextDoc() != DocIdSetIterator.NO_MORE_DOCS, "next did not return a doc");
+            Assert.True(ts.Score() == 1.6931472f, "score is not correct");
+            Assert.True(ts.NextDoc() == DocIdSetIterator.NO_MORE_DOCS, "next returned a doc and it should not have");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAdvance()
         {
             Term allTerm = new Term(FIELD, "all");
             TermQuery termQuery = new TermQuery(allTerm);
 
             Weight weight = IndexSearcher.CreateNormalizedWeight(termQuery);
-            Assert.IsTrue(IndexSearcher.TopReaderContext is AtomicReaderContext);
+            Assert.True(IndexSearcher.TopReaderContext is AtomicReaderContext);
             AtomicReaderContext context = (AtomicReaderContext)IndexSearcher.TopReaderContext;
             Scorer ts = weight.Scorer(context, (context.AtomicReader).LiveDocs);
-            Assert.IsTrue(ts.Advance(3) != DocIdSetIterator.NO_MORE_DOCS, "Didn't skip");
+            Assert.True(ts.Advance(3) != DocIdSetIterator.NO_MORE_DOCS, "Didn't skip");
             // The next doc should be doc 5
-            Assert.IsTrue(ts.DocID() == 5, "doc should be number 5");
+            Assert.True(ts.DocID() == 5, "doc should be number 5");
         }
 
         private class TestHit

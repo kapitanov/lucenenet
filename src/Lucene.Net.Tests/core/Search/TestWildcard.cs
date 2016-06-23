@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
@@ -37,16 +37,10 @@ namespace Lucene.Net.Search
     /// <summary>
     /// TestWildcard tests the '*' and '?' wildcard characters.
     /// </summary>
-    [TestFixture]
     public class TestWildcard : LuceneTestCase
     {
-        [SetUp]
-        public override void SetUp()
-        {
-            base.SetUp();
-        }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             WildcardQuery wq1 = new WildcardQuery(new Term("field", "b*a"));
@@ -54,18 +48,18 @@ namespace Lucene.Net.Search
             WildcardQuery wq3 = new WildcardQuery(new Term("field", "b*a"));
 
             // reflexive?
-            Assert.AreEqual(wq1, wq2);
-            Assert.AreEqual(wq2, wq1);
+            Assert.Equal(wq1, wq2);
+            Assert.Equal(wq2, wq1);
 
             // transitive?
-            Assert.AreEqual(wq2, wq3);
-            Assert.AreEqual(wq1, wq3);
+            Assert.Equal(wq2, wq3);
+            Assert.Equal(wq1, wq3);
 
-            Assert.IsFalse(wq1.Equals(null));
+            Assert.False(wq1.Equals(null));
 
             FuzzyQuery fq = new FuzzyQuery(new Term("field", "b*a"));
-            Assert.IsFalse(wq1.Equals(fq));
-            Assert.IsFalse(fq.Equals(wq1));
+            Assert.False(wq1.Equals(fq));
+            Assert.False(fq.Equals(wq1));
         }
 
         /// <summary>
@@ -73,7 +67,7 @@ namespace Lucene.Net.Search
         /// TermQuery. The boost should be preserved, and the rewrite should return
         /// a ConstantScoreQuery if the WildcardQuery had a ConstantScore rewriteMethod.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestTermWithoutWildcard()
         {
             Directory indexStore = GetIndexStore("field", new string[] { "nowildcard", "nowildcardx" });
@@ -86,26 +80,26 @@ namespace Lucene.Net.Search
             wq.SetRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
             wq.Boost = 0.1F;
             Query q = searcher.Rewrite(wq);
-            Assert.IsTrue(q is TermQuery);
-            Assert.AreEqual(q.Boost, wq.Boost, 0);
+            Assert.True(q is TermQuery);
+            Assert.Equal(q.Boost, wq.Boost, 0);
 
             wq.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
             wq.Boost = 0.2F;
             q = searcher.Rewrite(wq);
-            Assert.IsTrue(q is ConstantScoreQuery);
-            Assert.AreEqual(q.Boost, wq.Boost, 0.1);
+            Assert.True(q is ConstantScoreQuery);
+            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
 
             wq.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT);
             wq.Boost = 0.3F;
             q = searcher.Rewrite(wq);
-            Assert.IsTrue(q is ConstantScoreQuery);
-            Assert.AreEqual(q.Boost, wq.Boost, 0.1);
+            Assert.True(q is ConstantScoreQuery);
+            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
 
             wq.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
             wq.Boost = 0.4F;
             q = searcher.Rewrite(wq);
-            Assert.IsTrue(q is ConstantScoreQuery);
-            Assert.AreEqual(q.Boost, wq.Boost, 0.1);
+            Assert.True(q is ConstantScoreQuery);
+            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
             reader.Dispose();
             indexStore.Dispose();
         }
@@ -113,7 +107,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// Tests if a WildcardQuery with an empty term is rewritten to an empty BooleanQuery
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEmptyTerm()
         {
             Directory indexStore = GetIndexStore("field", new string[] { "nowildcard", "nowildcardx" });
@@ -124,8 +118,8 @@ namespace Lucene.Net.Search
             wq.SetRewriteMethod(MultiTermQuery.SCORING_BOOLEAN_QUERY_REWRITE);
             AssertMatches(searcher, wq, 0);
             Query q = searcher.Rewrite(wq);
-            Assert.IsTrue(q is BooleanQuery);
-            Assert.AreEqual(0, ((BooleanQuery)q).Clauses.Length);
+            Assert.True(q is BooleanQuery);
+            Assert.Equal(0, ((BooleanQuery)q).Clauses.Length);
             reader.Dispose();
             indexStore.Dispose();
         }
@@ -135,7 +129,7 @@ namespace Lucene.Net.Search
         /// rewritten to a single PrefixQuery. The boost and rewriteMethod should be
         /// preserved.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestPrefixTerm()
         {
             Directory indexStore = GetIndexStore("field", new string[] { "prefix", "prefixx" });
@@ -145,12 +139,12 @@ namespace Lucene.Net.Search
             MultiTermQuery wq = new WildcardQuery(new Term("field", "prefix*"));
             AssertMatches(searcher, wq, 2);
             Terms terms = MultiFields.GetTerms(searcher.IndexReader, "field");
-            Assert.IsTrue(wq.GetTermsEnum(terms) is PrefixTermsEnum);
+            Assert.True(wq.GetTermsEnum(terms) is PrefixTermsEnum);
 
             wq = new WildcardQuery(new Term("field", "*"));
             AssertMatches(searcher, wq, 2);
-            Assert.IsFalse(wq.GetTermsEnum(terms) is PrefixTermsEnum);
-            Assert.IsFalse(wq.GetTermsEnum(terms).GetType().Name.Contains("AutomatonTermsEnum"));
+            Assert.False(wq.GetTermsEnum(terms) is PrefixTermsEnum);
+            Assert.False(wq.GetTermsEnum(terms).GetType().Name.Contains("AutomatonTermsEnum"));
             reader.Dispose();
             indexStore.Dispose();
         }
@@ -158,7 +152,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// Tests Wildcard queries with an asterisk.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestAsterisk()
         {
             Directory indexStore = GetIndexStore("body", new string[] { "metal", "metals" });
@@ -200,7 +194,7 @@ namespace Lucene.Net.Search
         /// </summary>
         /// <exception cref="IOException"> if an error occurs </exception>
 
-        [Test]
+        [Fact]
         public virtual void TestQuestionmark()
         {
             Directory indexStore = GetIndexStore("body", new string[] { "metal", "metals", "mXtals", "mXtXls" });
@@ -226,7 +220,7 @@ namespace Lucene.Net.Search
         /// <summary>
         /// Tests if wildcard escaping works
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestEscapes()
         {
             Directory indexStore = GetIndexStore("field", new string[] { "foo*bar", "foo??bar", "fooCDbar", "fooSOMETHINGbar", "foo\\" });
@@ -275,7 +269,7 @@ namespace Lucene.Net.Search
         private void AssertMatches(IndexSearcher searcher, Query q, int expectedMatches)
         {
             ScoreDoc[] result = searcher.Search(q, null, 1000).ScoreDocs;
-            Assert.AreEqual(expectedMatches, result.Length);
+            Assert.Equal(expectedMatches, result.Length);
         }
 
         /// <summary>
@@ -284,7 +278,7 @@ namespace Lucene.Net.Search
         /// Although placed here, it also tests prefix queries, verifying that
         /// prefix queries are not parsed into wild card queries, and viceversa.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestParsingAndSearching()
         {
             string field = "content";
@@ -322,7 +316,7 @@ namespace Lucene.Net.Search
                     Console.WriteLine("matchAll: q=" + q + " " + q.GetType().Name);
                 }
                 ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
-                Assert.AreEqual(docs.Length, hits.Length);
+                Assert.Equal(docs.Length, hits.Length);
             }
 
             // test queries that must find none
@@ -333,7 +327,7 @@ namespace Lucene.Net.Search
                     Console.WriteLine("matchNone: q=" + q + " " + q.GetType().Name);
                 }
                 ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
-                Assert.AreEqual(0, hits.Length);
+                Assert.Equal(0, hits.Length);
             }
 
             // thest the prefi queries find only one doc
@@ -347,8 +341,8 @@ namespace Lucene.Net.Search
                         Console.WriteLine("match 1 prefix: doc=" + docs[i] + " q=" + q + " " + q.GetType().Name);
                     }
                     ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
-                    Assert.AreEqual(1, hits.Length);
-                    Assert.AreEqual(i, hits[0].Doc);
+                    Assert.Equal(1, hits.Length);
+                    Assert.Equal(i, hits[0].Doc);
                 }
             }
 
@@ -363,8 +357,8 @@ namespace Lucene.Net.Search
                         Console.WriteLine("match 1 wild: doc=" + docs[i] + " q=" + q + " " + q.GetType().Name);
                     }
                     ScoreDoc[] hits = searcher.Search(q, null, 1000).ScoreDocs;
-                    Assert.AreEqual(1, hits.Length);
-                    Assert.AreEqual(i, hits[0].Doc);
+                    Assert.Equal(1, hits.Length);
+                    Assert.Equal(i, hits[0].Doc);
                 }
             }
 

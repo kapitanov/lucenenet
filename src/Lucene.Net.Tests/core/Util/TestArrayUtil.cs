@@ -1,7 +1,7 @@
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
 using System;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,11 +22,10 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestArrayUtil : LuceneTestCase
     {
         // Ensure ArrayUtil.getNextSize gives linear amortized cost of realloc/copy
-        [Test]
+        [Fact]
         public virtual void TestGrowth()
         {
             int currentSize = 0;
@@ -36,29 +35,29 @@ namespace Lucene.Net.Util
             while (currentSize != int.MaxValue)
             {
                 int nextSize = ArrayUtil.Oversize(1 + currentSize, RamUsageEstimator.NUM_BYTES_OBJECT_REF);
-                Assert.IsTrue(nextSize > currentSize);
+                Assert.True(nextSize > currentSize);
                 if (currentSize > 0)
                 {
                     copyCost += currentSize;
                     double copyCostPerElement = ((double)copyCost) / currentSize;
-                    Assert.IsTrue(copyCostPerElement < 10.0, "cost " + copyCostPerElement);
+                    Assert.True(copyCostPerElement < 10.0, "cost " + copyCostPerElement);
                 }
                 currentSize = nextSize;
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMaxSize()
         {
             // intentionally pass invalid elemSizes:
             for (int elemSize = 0; elemSize < 10; elemSize++)
             {
-                Assert.AreEqual(int.MaxValue, ArrayUtil.Oversize(int.MaxValue, elemSize));
-                Assert.AreEqual(int.MaxValue, ArrayUtil.Oversize(int.MaxValue - 1, elemSize));
+                Assert.Equal(int.MaxValue, ArrayUtil.Oversize(int.MaxValue, elemSize));
+                Assert.Equal(int.MaxValue, ArrayUtil.Oversize(int.MaxValue - 1, elemSize));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestInvalidElementSizes()
         {
             Random rnd = Random();
@@ -68,18 +67,18 @@ namespace Lucene.Net.Util
                 int minTargetSize = rnd.Next(int.MaxValue);
                 int elemSize = rnd.Next(11);
                 int v = ArrayUtil.Oversize(minTargetSize, elemSize);
-                Assert.IsTrue(v >= minTargetSize);
+                Assert.True(v >= minTargetSize);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestParseInt()
         {
             int test;
             try
             {
                 test = ArrayUtil.ParseInt("".ToCharArray());
-                Assert.IsTrue(false);
+                Assert.True(false);
             }
             catch (FormatException e)
             {
@@ -88,7 +87,7 @@ namespace Lucene.Net.Util
             try
             {
                 test = ArrayUtil.ParseInt("foo".ToCharArray());
-                Assert.IsTrue(false);
+                Assert.True(false);
             }
             catch (FormatException e)
             {
@@ -97,7 +96,7 @@ namespace Lucene.Net.Util
             try
             {
                 test = ArrayUtil.ParseInt(Convert.ToString(long.MaxValue).ToCharArray());
-                Assert.IsTrue(false);
+                Assert.True(false);
             }
             catch (FormatException e)
             {
@@ -106,7 +105,7 @@ namespace Lucene.Net.Util
             try
             {
                 test = ArrayUtil.ParseInt("0.34".ToCharArray());
-                Assert.IsTrue(false);
+                Assert.True(false);
             }
             catch (FormatException e)
             {
@@ -116,38 +115,38 @@ namespace Lucene.Net.Util
             try
             {
                 test = ArrayUtil.ParseInt("1".ToCharArray());
-                Assert.IsTrue(test == 1, test + " does not equal: " + 1);
+                Assert.True(test == 1, test + " does not equal: " + 1);
                 test = ArrayUtil.ParseInt("-10000".ToCharArray());
-                Assert.IsTrue(test == -10000, test + " does not equal: " + -10000);
+                Assert.True(test == -10000, test + " does not equal: " + -10000);
                 test = ArrayUtil.ParseInt("1923".ToCharArray());
-                Assert.IsTrue(test == 1923, test + " does not equal: " + 1923);
+                Assert.True(test == 1923, test + " does not equal: " + 1923);
                 test = ArrayUtil.ParseInt("-1".ToCharArray());
-                Assert.IsTrue(test == -1, test + " does not equal: " + -1);
+                Assert.True(test == -1, test + " does not equal: " + -1);
                 test = ArrayUtil.ParseInt("foo 1923 bar".ToCharArray(), 4, 4);
-                Assert.IsTrue(test == 1923, test + " does not equal: " + 1923);
+                Assert.True(test == 1923, test + " does not equal: " + 1923);
             }
             catch (FormatException e)
             {
                 Console.WriteLine(e.ToString());
                 Console.Write(e.StackTrace);
-                Assert.IsTrue(false);
+                Assert.True(false);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSliceEquals()
         {
             string left = "this is equal";
             string right = left;
             char[] leftChars = left.ToCharArray();
             char[] rightChars = right.ToCharArray();
-            Assert.IsTrue(ArrayUtil.Equals(leftChars, 0, rightChars, 0, left.Length), left + " does not equal: " + right);
+            Assert.True(ArrayUtil.Equals(leftChars, 0, rightChars, 0, left.Length), left + " does not equal: " + right);
 
-            Assert.IsFalse(ArrayUtil.Equals(leftChars, 1, rightChars, 0, left.Length), left + " does not equal: " + right);
-            Assert.IsFalse(ArrayUtil.Equals(leftChars, 1, rightChars, 2, left.Length), left + " does not equal: " + right);
+            Assert.False(ArrayUtil.Equals(leftChars, 1, rightChars, 0, left.Length), left + " does not equal: " + right);
+            Assert.False(ArrayUtil.Equals(leftChars, 1, rightChars, 2, left.Length), left + " does not equal: " + right);
 
-            Assert.IsFalse(ArrayUtil.Equals(leftChars, 25, rightChars, 0, left.Length), left + " does not equal: " + right);
-            Assert.IsFalse(ArrayUtil.Equals(leftChars, 12, rightChars, 0, left.Length), left + " does not equal: " + right);
+            Assert.False(ArrayUtil.Equals(leftChars, 25, rightChars, 0, left.Length), left + " does not equal: " + right);
+            Assert.False(ArrayUtil.Equals(leftChars, 12, rightChars, 0, left.Length), left + " does not equal: " + right);
         }
 
         private int[] CreateRandomArray(int maxSize)
@@ -163,7 +162,7 @@ namespace Lucene.Net.Util
 
         private CollectionsHelper.ReverseComparer<int> ReverseOrder = new CollectionsHelper.ReverseComparer<int>();
 
-        [Test]
+        [Fact]
         public virtual void TestIntroSort()
         {
             int num = AtLeast(50);
@@ -173,17 +172,17 @@ namespace Lucene.Net.Util
                 int[] a2 = (int[])a1.Clone();
                 ArrayUtil.IntroSort(a1);
                 Array.Sort(a2);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
 
                 a1 = CreateRandomArray(2000);
                 a2 = (int[])a1.Clone();
                 ArrayUtil.IntroSort(a1, ReverseOrder);
                 Array.Sort(a2, ReverseOrder);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
                 // reverse back, so we can test that completely backwards sorted array (worst case) is working:
                 ArrayUtil.IntroSort(a1);
                 Array.Sort(a2);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
             }
         }
 
@@ -199,7 +198,7 @@ namespace Lucene.Net.Util
         }
 
         // this is a test for LUCENE-3054 (which fails without the merge sort fall back with stack overflow in most cases)
-        [Test]
+        [Fact]
         public virtual void TestQuickToHeapSortFallback()
         {
             int num = AtLeast(50);
@@ -209,11 +208,11 @@ namespace Lucene.Net.Util
                 int[] a2 = (int[])a1.Clone();
                 ArrayUtil.IntroSort(a1);
                 Array.Sort(a2);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTimSort()
         {
             int num = AtLeast(50);
@@ -222,17 +221,17 @@ namespace Lucene.Net.Util
                 int[] a1 = CreateRandomArray(2000), a2 = (int[])a1.Clone();
                 ArrayUtil.TimSort(a1);
                 Array.Sort(a2);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
 
                 a1 = CreateRandomArray(2000);
                 a2 = (int[])a1.Clone();
                 ArrayUtil.TimSort(a1, ReverseOrder);
                 Array.Sort(a2, ReverseOrder);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
                 // reverse back, so we can test that completely backwards sorted array (worst case) is working:
                 ArrayUtil.TimSort(a1);
                 Array.Sort(a2);
-                Assert.AreEqual(a2, a1);
+                Assert.Equal(a2, a1);
             }
         }
 
@@ -257,7 +256,7 @@ namespace Lucene.Net.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMergeSortStability()
         {
             Random rnd = Random();
@@ -290,14 +289,14 @@ namespace Lucene.Net.Util
                 if (act.Order == 0)
                 {
                     // order of "equal" items should be not mixed up
-                    Assert.IsTrue(act.Val > last.Val);
+                    Assert.True(act.Val > last.Val);
                 }
-                Assert.IsTrue(act.Order >= last.Order);
+                Assert.True(act.Order >= last.Order);
                 last = act;
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTimSortStability()
         {
             Random rnd = Random();
@@ -330,15 +329,15 @@ namespace Lucene.Net.Util
                 if (act.Order == 0)
                 {
                     // order of "equal" items should be not mixed up
-                    Assert.IsTrue(act.Val > last.Val);
+                    Assert.True(act.Val > last.Val);
                 }
-                Assert.IsTrue(act.Order >= last.Order);
+                Assert.True(act.Order >= last.Order);
                 last = act;
             }
         }
 
         // should produce no exceptions
-        [Test]
+        [Fact]
         public virtual void TestEmptyArraySort()
         {
             int[] a = new int[0];

@@ -16,7 +16,7 @@ namespace Lucene.Net.Tests.Queries
 {
     public class CommonTermsQueryTest : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestBasics()
         {
             Directory dir = NewDirectory();
@@ -90,7 +90,7 @@ namespace Lucene.Net.Tests.Queries
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestEqualsHashCode()
         {
             CommonTermsQuery query = new CommonTermsQuery(RandomOccur(Random()), RandomOccur(Random()), Random().NextFloat(), Random().NextBoolean());
@@ -133,7 +133,7 @@ namespace Lucene.Net.Tests.Queries
             return random.NextBoolean() ? BooleanClause.Occur.MUST : BooleanClause.Occur.SHOULD;
         }
 
-        [Test]
+        [Fact]
         public void TestNullTerm()
         {
             Random random = Random();
@@ -148,7 +148,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         public void TestMinShouldMatch()
         {
             Directory dir = NewDirectory();
@@ -277,7 +277,7 @@ namespace Lucene.Net.Tests.Queries
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestIllegalOccur()
         {
             Random random = Random();
@@ -300,7 +300,7 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Test]
+        [Fact]
         public void TestExtend()
         {
             Directory dir = NewDirectory();
@@ -360,7 +360,7 @@ namespace Lucene.Net.Tests.Queries
 
         /*
          * LUCENENET TODO requires a better comparator implementation for PriorityQueue
-        [Test]
+        [Fact]
         public void TestRandomIndex()
         {
             Directory dir = NewDirectory();

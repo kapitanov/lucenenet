@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
@@ -21,7 +22,7 @@ namespace Lucene.Net.Analysis
      */
 
     using Lucene.Net.Analysis.Tokenattributes;
-    using NUnit.Framework;
+    
     using Attribute = Lucene.Net.Util.Attribute;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
@@ -30,48 +31,48 @@ namespace Lucene.Net.Analysis
     [TestFixture]
     public class TestToken : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestCtor()
         {
             Token t = new Token();
             char[] content = "hello".ToCharArray();
             t.CopyBuffer(content, 0, content.Length);
-            Assert.AreNotSame(t.Buffer(), content);
-            Assert.AreEqual(0, t.StartOffset());
-            Assert.AreEqual(0, t.EndOffset());
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual("word", t.Type);
-            Assert.AreEqual(0, t.Flags);
+            Assert.NotSame(t.Buffer(), content);
+            Assert.Equal(0, t.StartOffset());
+            Assert.Equal(0, t.EndOffset());
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal("word", t.Type);
+            Assert.Equal(0, t.Flags);
 
             t = new Token(6, 22);
             t.CopyBuffer(content, 0, content.Length);
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual(6, t.StartOffset());
-            Assert.AreEqual(22, t.EndOffset());
-            Assert.AreEqual("word", t.Type);
-            Assert.AreEqual(0, t.Flags);
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal(6, t.StartOffset());
+            Assert.Equal(22, t.EndOffset());
+            Assert.Equal("word", t.Type);
+            Assert.Equal(0, t.Flags);
 
             t = new Token(6, 22, 7);
             t.CopyBuffer(content, 0, content.Length);
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual(6, t.StartOffset());
-            Assert.AreEqual(22, t.EndOffset());
-            Assert.AreEqual("word", t.Type);
-            Assert.AreEqual(7, t.Flags);
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal(6, t.StartOffset());
+            Assert.Equal(22, t.EndOffset());
+            Assert.Equal("word", t.Type);
+            Assert.Equal(7, t.Flags);
 
             t = new Token(6, 22, "junk");
             t.CopyBuffer(content, 0, content.Length);
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual("hello", t.ToString());
-            Assert.AreEqual(6, t.StartOffset());
-            Assert.AreEqual(22, t.EndOffset());
-            Assert.AreEqual("junk", t.Type);
-            Assert.AreEqual(0, t.Flags);
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal("hello", t.ToString());
+            Assert.Equal(6, t.StartOffset());
+            Assert.Equal(22, t.EndOffset());
+            Assert.Equal("junk", t.Type);
+            Assert.Equal(0, t.Flags);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestResize()
         {
             Token t = new Token();
@@ -80,12 +81,12 @@ namespace Lucene.Net.Analysis
             for (int i = 0; i < 2000; i++)
             {
                 t.ResizeBuffer(i);
-                Assert.IsTrue(i <= t.Buffer().Length);
-                Assert.AreEqual("hello", t.ToString());
+                Assert.True(i <= t.Buffer().Length);
+                Assert.Equal("hello", t.ToString());
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestGrow()
         {
             Token t = new Token();
@@ -94,11 +95,11 @@ namespace Lucene.Net.Analysis
             {
                 char[] content = buf.ToString().ToCharArray();
                 t.CopyBuffer(content, 0, content.Length);
-                Assert.AreEqual(buf.Length, t.Length);
-                Assert.AreEqual(buf.ToString(), t.ToString());
+                Assert.Equal(buf.Length, t.Length);
+                Assert.Equal(buf.ToString(), t.ToString());
                 buf.Append(buf.ToString());
             }
-            Assert.AreEqual(1048576, t.Length);
+            Assert.Equal(1048576, t.Length);
 
             // now as a string, second variant
             t = new Token();
@@ -107,11 +108,11 @@ namespace Lucene.Net.Analysis
             {
                 t.SetEmpty().Append(buf);
                 string content = buf.ToString();
-                Assert.AreEqual(content.Length, t.Length);
-                Assert.AreEqual(content, t.ToString());
+                Assert.Equal(content.Length, t.Length);
+                Assert.Equal(content, t.ToString());
                 buf.Append(content);
             }
-            Assert.AreEqual(1048576, t.Length);
+            Assert.Equal(1048576, t.Length);
 
             // Test for slow growth to a long term
             t = new Token();
@@ -120,11 +121,11 @@ namespace Lucene.Net.Analysis
             {
                 t.SetEmpty().Append(buf);
                 string content = buf.ToString();
-                Assert.AreEqual(content.Length, t.Length);
-                Assert.AreEqual(content, t.ToString());
+                Assert.Equal(content.Length, t.Length);
+                Assert.Equal(content, t.ToString());
                 buf.Append("a");
             }
-            Assert.AreEqual(20000, t.Length);
+            Assert.Equal(20000, t.Length);
 
             // Test for slow growth to a long term
             t = new Token();
@@ -133,26 +134,26 @@ namespace Lucene.Net.Analysis
             {
                 t.SetEmpty().Append(buf);
                 string content = buf.ToString();
-                Assert.AreEqual(content.Length, t.Length);
-                Assert.AreEqual(content, t.ToString());
+                Assert.Equal(content.Length, t.Length);
+                Assert.Equal(content, t.ToString());
                 buf.Append("a");
             }
-            Assert.AreEqual(20000, t.Length);
+            Assert.Equal(20000, t.Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestToString()
         {
             char[] b = new char[] { 'a', 'l', 'o', 'h', 'a' };
             Token t = new Token("", 0, 5);
             t.CopyBuffer(b, 0, 5);
-            Assert.AreEqual("aloha", t.ToString());
+            Assert.Equal("aloha", t.ToString());
 
             t.SetEmpty().Append("hi there");
-            Assert.AreEqual("hi there", t.ToString());
+            Assert.Equal("hi there", t.ToString());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermBufferEquals()
         {
             Token t1a = new Token();
@@ -164,29 +165,29 @@ namespace Lucene.Net.Analysis
             Token t2 = new Token();
             char[] content2 = "hello2".ToCharArray();
             t2.CopyBuffer(content2, 0, 6);
-            Assert.IsTrue(t1a.Equals(t1b));
-            Assert.IsFalse(t1a.Equals(t2));
-            Assert.IsFalse(t2.Equals(t1b));
+            Assert.True(t1a.Equals(t1b));
+            Assert.False(t1a.Equals(t2));
+            Assert.False(t2.Equals(t1b));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMixedStringArray()
         {
             Token t = new Token("hello", 0, 5);
-            Assert.AreEqual(t.Length, 5);
-            Assert.AreEqual(t.ToString(), "hello");
+            Assert.Equal(t.Length, 5);
+            Assert.Equal(t.ToString(), "hello");
             t.SetEmpty().Append("hello2");
-            Assert.AreEqual(t.Length, 6);
-            Assert.AreEqual(t.ToString(), "hello2");
+            Assert.Equal(t.Length, 6);
+            Assert.Equal(t.ToString(), "hello2");
             t.CopyBuffer("hello3".ToCharArray(), 0, 6);
-            Assert.AreEqual(t.ToString(), "hello3");
+            Assert.Equal(t.ToString(), "hello3");
 
             char[] buffer = t.Buffer();
             buffer[1] = 'o';
-            Assert.AreEqual(t.ToString(), "hollo3");
+            Assert.Equal(t.ToString(), "hollo3");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestClone()
         {
             Token t = new Token(0, 5);
@@ -194,37 +195,37 @@ namespace Lucene.Net.Analysis
             t.CopyBuffer(content, 0, 5);
             char[] buf = t.Buffer();
             Token copy = AssertCloneIsEqual(t);
-            Assert.AreEqual(t.ToString(), copy.ToString());
-            Assert.AreNotSame(buf, copy.Buffer());
+            Assert.Equal(t.ToString(), copy.ToString());
+            Assert.NotSame(buf, copy.Buffer());
 
             BytesRef pl = new BytesRef(new byte[] { 1, 2, 3, 4 });
             t.Payload = pl;
             copy = AssertCloneIsEqual(t);
-            Assert.AreEqual(pl, copy.Payload);
-            Assert.AreNotSame(pl, copy.Payload);
+            Assert.Equal(pl, copy.Payload);
+            Assert.NotSame(pl, copy.Payload);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCopyTo()
         {
             Token t = new Token();
             Token copy = AssertCopyIsEqual(t);
-            Assert.AreEqual("", t.ToString());
-            Assert.AreEqual("", copy.ToString());
+            Assert.Equal("", t.ToString());
+            Assert.Equal("", copy.ToString());
 
             t = new Token(0, 5);
             char[] content = "hello".ToCharArray();
             t.CopyBuffer(content, 0, 5);
             char[] buf = t.Buffer();
             copy = AssertCopyIsEqual(t);
-            Assert.AreEqual(t.ToString(), copy.ToString());
-            Assert.AreNotSame(buf, copy.Buffer());
+            Assert.Equal(t.ToString(), copy.ToString());
+            Assert.NotSame(buf, copy.Buffer());
 
             BytesRef pl = new BytesRef(new byte[] { 1, 2, 3, 4 });
             t.Payload = pl;
             copy = AssertCopyIsEqual(t);
-            Assert.AreEqual(pl, copy.Payload);
-            Assert.AreNotSame(pl, copy.Payload);
+            Assert.Equal(pl, copy.Payload);
+            Assert.NotSame(pl, copy.Payload);
         }
 
         public interface ISenselessAttribute : Lucene.Net.Util.IAttribute
@@ -252,22 +253,22 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTokenAttributeFactory()
         {
             TokenStream ts = new MockTokenizer(Token.TOKEN_ATTRIBUTE_FACTORY, new System.IO.StringReader("foo bar"), MockTokenizer.WHITESPACE, false, MockTokenizer.DEFAULT_MAX_TOKEN_LENGTH);
 
-            Assert.IsTrue(ts.AddAttribute<ISenselessAttribute>() is SenselessAttribute, "SenselessAttribute is not implemented by SenselessAttributeImpl");
+            Assert.True(ts.AddAttribute<ISenselessAttribute>() is SenselessAttribute, "SenselessAttribute is not implemented by SenselessAttributeImpl");
 
-            Assert.IsTrue(ts.AddAttribute<ICharTermAttribute>() is Token, "CharTermAttribute is not implemented by Token");
-            Assert.IsTrue(ts.AddAttribute<IOffsetAttribute>() is Token, "OffsetAttribute is not implemented by Token");
-            Assert.IsTrue(ts.AddAttribute<IFlagsAttribute>() is Token, "FlagsAttribute is not implemented by Token");
-            Assert.IsTrue(ts.AddAttribute<IPayloadAttribute>() is Token, "PayloadAttribute is not implemented by Token");
-            Assert.IsTrue(ts.AddAttribute<IPositionIncrementAttribute>() is Token, "PositionIncrementAttribute is not implemented by Token");
-            Assert.IsTrue(ts.AddAttribute<ITypeAttribute>() is Token, "TypeAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<ICharTermAttribute>() is Token, "CharTermAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<IOffsetAttribute>() is Token, "OffsetAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<IFlagsAttribute>() is Token, "FlagsAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<IPayloadAttribute>() is Token, "PayloadAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<IPositionIncrementAttribute>() is Token, "PositionIncrementAttribute is not implemented by Token");
+            Assert.True(ts.AddAttribute<ITypeAttribute>() is Token, "TypeAttribute is not implemented by Token");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAttributeReflection()
         {
             Token t = new Token("foobar", 6, 22, 8);
@@ -287,8 +288,8 @@ namespace Lucene.Net.Analysis
         public static T AssertCloneIsEqual<T>(T att) where T : Attribute
         {
             T clone = (T)att.Clone();
-            Assert.AreEqual(att, clone, "Clone must be equal");
-            Assert.AreEqual(att.GetHashCode(), clone.GetHashCode(), "Clone's hashcode must be equal");
+            Assert.Equal(att, clone); //, "Clone must be equal");
+            Assert.Equal(att.GetHashCode(), clone.GetHashCode()); //, "Clone's hashcode must be equal");
             return clone;
         }
 
@@ -296,8 +297,8 @@ namespace Lucene.Net.Analysis
         {
             T copy = (T)System.Activator.CreateInstance(att.GetType());
             att.CopyTo(copy);
-            Assert.AreEqual(att, copy, "Copied instance must be equal");
-            Assert.AreEqual(att.GetHashCode(), copy.GetHashCode(), "Copied instance's hashcode must be equal");
+            Assert.Equal(att, copy); //, "Copied instance must be equal");
+            Assert.Equal(att.GetHashCode(), copy.GetHashCode()); //, "Copied instance's hashcode must be equal");
             return copy;
         }
     }

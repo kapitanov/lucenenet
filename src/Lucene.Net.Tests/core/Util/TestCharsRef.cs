@@ -1,7 +1,8 @@
 using Lucene.Net.Support;
-using NUnit.Framework;
+
 using System;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,10 +23,9 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestCharsRef : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestUTF16InUTF8Order()
         {
             int numStrings = AtLeast(1000);
@@ -44,11 +44,11 @@ namespace Lucene.Net.Util
 
             for (int i = 0; i < numStrings; i++)
             {
-                Assert.AreEqual(utf8[i].Utf8ToString(), utf16[i].ToString());
+                Assert.Equal(utf8[i].Utf8ToString(), utf16[i].ToString());
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAppend()
         {
             CharsRef @ref = new CharsRef();
@@ -63,10 +63,10 @@ namespace Lucene.Net.Util
                 @ref.Append(charArray, offset, length);
             }
 
-            Assert.AreEqual(builder.ToString(), @ref.ToString());
+            Assert.Equal(builder.ToString(), @ref.ToString());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCopy()
         {
             int numIters = AtLeast(10);
@@ -78,74 +78,58 @@ namespace Lucene.Net.Util
                 int length = charArray.Length - offset;
                 string str = new string(charArray, offset, length);
                 @ref.CopyChars(charArray, offset, length);
-                Assert.AreEqual(str, @ref.ToString());
+                Assert.Equal(str, @ref.ToString());
             }
         }
 
         // LUCENE-3590, AIOOBE if you append to a charsref with offset != 0
-        [Test]
+        [Fact]
         public virtual void TestAppendChars()
         {
             char[] chars = new char[] { 'a', 'b', 'c', 'd' };
             CharsRef c = new CharsRef(chars, 1, 3); // bcd
             c.Append(new char[] { 'e' }, 0, 1);
-            Assert.AreEqual("bcde", c.ToString());
+            Assert.Equal("bcde", c.ToString());
         }
 
         // LUCENE-3590, AIOOBE if you copy to a charsref with offset != 0
-        [Test]
+        [Fact]
         public virtual void TestCopyChars()
         {
             char[] chars = new char[] { 'a', 'b', 'c', 'd' };
             CharsRef c = new CharsRef(chars, 1, 3); // bcd
             char[] otherchars = new char[] { 'b', 'c', 'd', 'e' };
             c.CopyChars(otherchars, 0, 4);
-            Assert.AreEqual("bcde", c.ToString());
+            Assert.Equal("bcde", c.ToString());
         }
 
         // LUCENE-3590, AIOOBE if you copy to a charsref with offset != 0
-        [Test]
+        [Fact]
         public virtual void TestCopyCharsRef()
         {
             char[] chars = new char[] { 'a', 'b', 'c', 'd' };
             CharsRef c = new CharsRef(chars, 1, 3); // bcd
             char[] otherchars = new char[] { 'b', 'c', 'd', 'e' };
             c.CopyChars(new CharsRef(otherchars, 0, 4));
-            Assert.AreEqual("bcde", c.ToString());
+            Assert.Equal("bcde", c.ToString());
         }
 
         // LUCENE-3590: fix charsequence to fully obey interface
-        [Test]
+        [Fact]
         public virtual void TestCharSequenceCharAt()
         {
             CharsRef c = new CharsRef("abc");
 
-            Assert.AreEqual('b', c.CharAt(1));
+            Assert.Equal('b', c.CharAt(1));
 
-            try
-            {
-                c.CharAt(-1);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<System.IndexOutOfRangeException>(() => c.CharAt(-1));
 
-            try
-            {
-                c.CharAt(3);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<System.IndexOutOfRangeException>(() => c.CharAt(3));
         }
 
         // LUCENE-3590: fix off-by-one in subsequence, and fully obey interface
         // LUCENE-4671: fix subSequence
-        [Test]
+        [Fact]
         public virtual void TestCharSequenceSubSequence()
         {
             ICharSequence[] sequences = { new CharsRef("abc"), new CharsRef("0abc".ToCharArray(), 1, 3), new CharsRef("abc0".ToCharArray(), 0, 3), new CharsRef("0abc0".ToCharArray(), 1, 3) };
@@ -159,53 +143,21 @@ namespace Lucene.Net.Util
         private void DoTestSequence(ICharSequence c)
         {
             // slice
-            Assert.AreEqual("a", c.SubSequence(0, 1).ToString());
+            Assert.Equal("a", c.SubSequence(0, 1).ToString());
             // mid subsequence
-            Assert.AreEqual("b", c.SubSequence(1, 2).ToString());
+            Assert.Equal("b", c.SubSequence(1, 2).ToString());
             // end subsequence
-            Assert.AreEqual("bc", c.SubSequence(1, 3).ToString());
+            Assert.Equal("bc", c.SubSequence(1, 3).ToString());
             // empty subsequence
-            Assert.AreEqual("", c.SubSequence(0, 0).ToString());
+            Assert.Equal("", c.SubSequence(0, 0).ToString());
 
-            try
-            {
-                c.SubSequence(-1, 1);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => c.SubSequence(-1, 1));
 
-            try
-            {
-                c.SubSequence(0, -1);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => c.SubSequence(0, -1));
 
-            try
-            {
-                c.SubSequence(0, 4);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => c.SubSequence(0, 4));
 
-            try
-            {
-                c.SubSequence(2, 1);
-                Assert.Fail();
-            }
-            catch (System.IndexOutOfRangeException expected)
-            {
-                // expected exception
-            }
+            Assert.Throws<IndexOutOfRangeException>(() => c.SubSequence(2, 1));
         }
     }
 }

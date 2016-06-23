@@ -1,11 +1,10 @@
 using System;
 using System.Globalization;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    using NUnit.Framework;
     using Analyzer = Lucene.Net.Analysis.Analyzer;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
@@ -50,7 +49,6 @@ namespace Lucene.Net.Search
     /// Test of the DisjunctionMaxQuery.
     ///
     /// </summary>
-    [TestFixture]
     public class TestDisjunctionMaxQuery : LuceneTestCase
     {
         /// <summary>
@@ -108,11 +106,8 @@ namespace Lucene.Net.Search
             NonAnalyzedType.Tokenized = false;
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestDisjunctionMaxQuery() : base()
         {
-            base.SetUp();
-
             Index = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Index, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetSimilarity(Sim).SetMergePolicy(NewLogMergePolicy()));
 
@@ -170,15 +165,14 @@ namespace Lucene.Net.Search
             s.Similarity = Sim;
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             r.Dispose();
             Index.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSkipToFirsttimeMiss()
         {
             DisjunctionMaxQuery dq = new DisjunctionMaxQuery(0.0f);
@@ -186,33 +180,33 @@ namespace Lucene.Net.Search
             dq.Add(Tq("dek", "DOES_NOT_EXIST"));
 
             QueryUtils.Check(Random(), dq, s);
-            Assert.IsTrue(s.TopReaderContext is AtomicReaderContext);
+            Assert.True(s.TopReaderContext is AtomicReaderContext);
             Weight dw = s.CreateNormalizedWeight(dq);
             AtomicReaderContext context = (AtomicReaderContext)s.TopReaderContext;
             Scorer ds = dw.Scorer(context, (context.AtomicReader).LiveDocs);
             bool skipOk = ds.Advance(3) != DocIdSetIterator.NO_MORE_DOCS;
             if (skipOk)
             {
-                Assert.Fail("firsttime skipTo found a match? ... " + r.Document(ds.DocID()).Get("id"));
+                Assert.True(false, "firsttime skipTo found a match? ... " + r.Document(ds.DocID()).Get("id"));
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSkipToFirsttimeHit()
         {
             DisjunctionMaxQuery dq = new DisjunctionMaxQuery(0.0f);
             dq.Add(Tq("dek", "albino"));
             dq.Add(Tq("dek", "DOES_NOT_EXIST"));
-            Assert.IsTrue(s.TopReaderContext is AtomicReaderContext);
+            Assert.True(s.TopReaderContext is AtomicReaderContext);
             QueryUtils.Check(Random(), dq, s);
             Weight dw = s.CreateNormalizedWeight(dq);
             AtomicReaderContext context = (AtomicReaderContext)s.TopReaderContext;
             Scorer ds = dw.Scorer(context, (context.AtomicReader).LiveDocs);
-            Assert.IsTrue(ds.Advance(3) != DocIdSetIterator.NO_MORE_DOCS, "firsttime skipTo found no match");
-            Assert.AreEqual("d4", r.Document(ds.DocID()).Get("id"), "found wrong docid");
+            Assert.True(ds.Advance(3) != DocIdSetIterator.NO_MORE_DOCS, "firsttime skipTo found no match");
+            Assert.Equal("d4", r.Document(ds.DocID()).Get("id")); //, "found wrong docid");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleEqualScores1()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.0f);
@@ -224,12 +218,15 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(4, h.Length, "all docs should match " + q.ToString());
+                Assert.Equal(4, h.Length); //, "all docs should match " + q.ToString());
 
                 float score = h[0].Score;
+                float min = score - SCORE_COMP_THRESH;
+                float max = score + SCORE_COMP_THRESH;
+
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.AreEqual(score, h[i].Score, SCORE_COMP_THRESH, "score #" + i + " is not the same");
+                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -239,7 +236,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleEqualScores2()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.0f);
@@ -251,11 +248,14 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(3, h.Length, "3 docs should match " + q.ToString());
+                Assert.Equal(3, h.Length); //, "3 docs should match " + q.ToString());
                 float score = h[0].Score;
+                float min = score - SCORE_COMP_THRESH;
+                float max = score + SCORE_COMP_THRESH;
+
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.AreEqual(score, h[i].Score, SCORE_COMP_THRESH, "score #" + i + " is not the same");
+                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -265,7 +265,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleEqualScores3()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.0f);
@@ -279,11 +279,13 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(4, h.Length, "all docs should match " + q.ToString());
+                Assert.Equal(4, h.Length); //, "all docs should match " + q.ToString());
                 float score = h[0].Score;
+                float min = score - SCORE_COMP_THRESH;
+                float max = score + SCORE_COMP_THRESH;
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.AreEqual(score, h[i].Score, SCORE_COMP_THRESH, "score #" + i + " is not the same");
+                    Assert.InRange(score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -293,7 +295,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSimpleTiebreaker()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.01f);
@@ -305,13 +307,17 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(3, h.Length, "3 docs should match " + q.ToString());
-                Assert.AreEqual("d2", s.Doc(h[0].Doc).Get("id"), "wrong first");
+                Assert.Equal(3, h.Length); //, "3 docs should match " + q.ToString());
+                Assert.Equal("d2", s.Doc(h[0].Doc).Get("id")); //, "wrong first");
                 float score0 = h[0].Score;
                 float score1 = h[1].Score;
                 float score2 = h[2].Score;
-                Assert.IsTrue(score0 > score1, "d2 does not have better score then others: " + score0 + " >? " + score1);
-                Assert.AreEqual(score1, score2, SCORE_COMP_THRESH, "d4 and d1 don't have equal scores");
+
+                float min = score1 - SCORE_COMP_THRESH;
+                float max = score1 + SCORE_COMP_THRESH;
+
+                Assert.True(score0 > score1, "d2 does not have better score then others: " + score0 + " >? " + score1);
+                Assert.InRange(score2, min, max); //, "d4 and d1 don't have equal scores");
             }
             catch (Exception e)
             {
@@ -320,7 +326,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanRequiredEqualScores()
         {
             BooleanQuery q = new BooleanQuery();
@@ -345,11 +351,14 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(3, h.Length, "3 docs should match " + q.ToString());
+                Assert.Equal(3, h.Length); //, "3 docs should match " + q.ToString());
                 float score = h[0].Score;
+                float min = score - SCORE_COMP_THRESH;
+                float max = score + SCORE_COMP_THRESH;
+
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.AreEqual(score, h[i].Score, SCORE_COMP_THRESH, "score #" + i + " is not the same");
+                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -359,7 +368,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanOptionalNoTiebreaker()
         {
             BooleanQuery q = new BooleanQuery();
@@ -381,15 +390,17 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(4, h.Length, "4 docs should match " + q.ToString());
+                Assert.Equal(4, h.Length); //, "4 docs should match " + q.ToString());
                 float score = h[0].Score;
+                float min = score - SCORE_COMP_THRESH;
+                float max = score + SCORE_COMP_THRESH;
                 for (int i = 1; i < h.Length - 1; i++) // note: -1
                 {
-                    Assert.AreEqual(score, h[i].Score, SCORE_COMP_THRESH, "score #" + i + " is not the same");
+                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
                 }
-                Assert.AreEqual("d1", s.Doc(h[h.Length - 1].Doc).Get("id"), "wrong last");
+                Assert.Equal("d1", s.Doc(h[h.Length - 1].Doc).Get("id")); //, "wrong last");
                 float score1 = h[h.Length - 1].Score;
-                Assert.IsTrue(score > score1, "d1 does not have worse score then others: " + score + " >? " + score1);
+                Assert.True(score > score1, "d1 does not have worse score then others: " + score + " >? " + score1);
             }
             catch (Exception e)
             {
@@ -398,7 +409,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanOptionalWithTiebreaker()
         {
             BooleanQuery q = new BooleanQuery();
@@ -420,7 +431,7 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(4, h.Length, "4 docs should match " + q.ToString());
+                Assert.Equal(4, h.Length); //, "4 docs should match " + q.ToString());
 
                 float score0 = h[0].Score;
                 float score1 = h[1].Score;
@@ -432,14 +443,18 @@ namespace Lucene.Net.Search
                 string doc2 = s.Doc(h[2].Doc).Get("id");
                 string doc3 = s.Doc(h[3].Doc).Get("id");
 
-                Assert.IsTrue(doc0.Equals("d2") || doc0.Equals("d4"), "doc0 should be d2 or d4: " + doc0);
-                Assert.IsTrue(doc1.Equals("d2") || doc1.Equals("d4"), "doc1 should be d2 or d4: " + doc0);
-                Assert.AreEqual(score0, score1, SCORE_COMP_THRESH, "score0 and score1 should match");
-                Assert.AreEqual("d3", doc2, "wrong third");
-                Assert.IsTrue(score1 > score2, "d3 does not have worse score then d2 and d4: " + score1 + " >? " + score2);
+                Assert.True(doc0.Equals("d2") || doc0.Equals("d4"), "doc0 should be d2 or d4: " + doc0);
+                Assert.True(doc1.Equals("d2") || doc1.Equals("d4"), "doc1 should be d2 or d4: " + doc0);
 
-                Assert.AreEqual("d1", doc3, "wrong fourth");
-                Assert.IsTrue(score2 > score3, "d1 does not have worse score then d3: " + score2 + " >? " + score3);
+                float min = score0 - SCORE_COMP_THRESH;
+                float max = score0 + SCORE_COMP_THRESH;
+
+                Assert.InRange(score1, min, max); //, "score0 and score1 should match");
+                Assert.Equal("d3", doc2);
+                Assert.True(score1 > score2, "d3 does not have worse score then d2 and d4: " + score1 + " >? " + score2);
+
+                Assert.Equal("d1", doc3);
+                Assert.True(score2 > score3, "d1 does not have worse score then d3: " + score2 + " >? " + score3);
             }
             catch (Exception e)
             {
@@ -448,7 +463,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanOptionalWithTiebreakerAndBoost()
         {
             BooleanQuery q = new BooleanQuery();
@@ -470,7 +485,7 @@ namespace Lucene.Net.Search
 
             try
             {
-                Assert.AreEqual(4, h.Length, "4 docs should match " + q.ToString());
+                Assert.Equal(4, h.Length); //, "4 docs should match " + q.ToString());
 
                 float score0 = h[0].Score;
                 float score1 = h[1].Score;
@@ -482,14 +497,14 @@ namespace Lucene.Net.Search
                 string doc2 = s.Doc(h[2].Doc).Get("id");
                 string doc3 = s.Doc(h[3].Doc).Get("id");
 
-                Assert.AreEqual("d4", doc0, "doc0 should be d4: ");
-                Assert.AreEqual("d3", doc1, "doc1 should be d3: ");
-                Assert.AreEqual("d2", doc2, "doc2 should be d2: ");
-                Assert.AreEqual("d1", doc3, "doc3 should be d1: ");
+                Assert.Equal("d4", doc0);
+                Assert.Equal("d3", doc1);
+                Assert.Equal("d2", doc2);
+                Assert.Equal("d1", doc3);
 
-                Assert.IsTrue(score0 > score1, "d4 does not have a better score then d3: " + score0 + " >? " + score1);
-                Assert.IsTrue(score1 > score2, "d3 does not have a better score then d2: " + score1 + " >? " + score2);
-                Assert.IsTrue(score2 > score3, "d3 does not have a better score then d1: " + score2 + " >? " + score3);
+                Assert.True(score0 > score1, "d4 does not have a better score then d3: " + score0 + " >? " + score1);
+                Assert.True(score1 > score2, "d3 does not have a better score then d2: " + score1 + " >? " + score2);
+                Assert.True(score2 > score3, "d3 does not have a better score then d1: " + score2 + " >? " + score3);
             }
             catch (Exception e)
             {
@@ -499,7 +514,7 @@ namespace Lucene.Net.Search
         }
 
         // LUCENE-4477 / LUCENE-4401:
-        [Test]
+        [Fact]
         public virtual void TestBooleanSpanQuery()
         {
             int hits = 0;
@@ -530,7 +545,7 @@ namespace Lucene.Net.Search
                 Console.WriteLine(scoreDoc.Doc);
             }
             indexReader.Dispose();
-            Assert.AreEqual(hits, 1);
+            Assert.Equal(hits, 1);
             directory.Dispose();
         }
 

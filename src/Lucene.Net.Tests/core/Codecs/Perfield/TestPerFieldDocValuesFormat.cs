@@ -2,11 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Perfield
 {
     using Lucene.Net.Index;
-    using NUnit.Framework;
+    
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -52,16 +53,13 @@ namespace Lucene.Net.Codecs.Perfield
     /// <summary>
     /// Basic tests of PerFieldDocValuesFormat
     /// </summary>
-    [TestFixture]
     public class TestPerFieldDocValuesFormat : BaseDocValuesFormatTestCase
     {
         private Codec Codec_Renamed;
 
-        [SetUp]
-        public override void SetUp()
+        public TestPerFieldDocValuesFormat() : base()
         {
             Codec_Renamed = new RandomCodec(new Random(Random().Next()), new HashSet<string>());
-            base.SetUp();
         }
 
         protected override Codec Codec
@@ -80,7 +78,7 @@ namespace Lucene.Net.Codecs.Perfield
         // just a simple trivial test
         // TODO: we should come up with a test that somehow checks that segment suffix
         // is respected by all codec apis (not just docvalues and postings)
-        [Test]
+        [Fact]
         public virtual void TestTwoFieldsTwoFormats()
         {
             Analyzer analyzer = new MockAnalyzer(Random());
@@ -105,22 +103,22 @@ namespace Lucene.Net.Codecs.Perfield
             IndexReader ireader = DirectoryReader.Open(directory); // read-only=true
             IndexSearcher isearcher = NewSearcher(ireader);
 
-            Assert.AreEqual(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
+            Assert.Equal(1, isearcher.Search(new TermQuery(new Term("fieldname", longTerm)), 1).TotalHits);
             Query query = new TermQuery(new Term("fieldname", "text"));
             TopDocs hits = isearcher.Search(query, null, 1);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             BytesRef scratch = new BytesRef();
             // Iterate through the results:
             for (int i = 0; i < hits.ScoreDocs.Length; i++)
             {
                 Document hitDoc = isearcher.Doc(hits.ScoreDocs[i].Doc);
-                Assert.AreEqual(text, hitDoc.Get("fieldname"));
+                Assert.Equal(text, hitDoc.Get("fieldname"));
                 Debug.Assert(ireader.Leaves.Count == 1);
                 NumericDocValues dv = ((AtomicReader)ireader.Leaves[0].Reader).GetNumericDocValues("dv1");
-                Assert.AreEqual(5, dv.Get(hits.ScoreDocs[i].Doc));
+                Assert.Equal(5, dv.Get(hits.ScoreDocs[i].Doc));
                 BinaryDocValues dv2 = ((AtomicReader)ireader.Leaves[0].Reader).GetBinaryDocValues("dv2");
                 dv2.Get(hits.ScoreDocs[i].Doc, scratch);
-                Assert.AreEqual(new BytesRef("hello world"), scratch);
+                Assert.Equal(new BytesRef("hello world"), scratch);
             }
 
             ireader.Dispose();

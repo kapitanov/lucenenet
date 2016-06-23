@@ -1,8 +1,8 @@
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -27,7 +27,7 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestIndexCommit : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestEqualsHashCode()
         {
             // LUCENE-2417: equals and hashCode() impl was inconsistent
@@ -37,8 +37,8 @@ namespace Lucene.Net.Index
 
             IndexCommit ic2 = new IndexCommitAnonymousInnerClassHelper2(this, dir);
 
-            Assert.AreEqual(ic1, ic2);
-            Assert.AreEqual(ic1.GetHashCode(), ic2.GetHashCode(), "hash codes are not equals");
+            Assert.Equal(ic1, ic2);
+            Assert.Equal(ic1.GetHashCode(), ic2.GetHashCode()); //, "hash codes are not equals");
             dir.Dispose();
         }
 

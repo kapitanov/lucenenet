@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
 
     /*
         /// Copyright 2006 The Apache Software Foundation
@@ -42,7 +42,7 @@ namespace Lucene.Net.Index
         /// Tests that index merging (specifically addIndexes(Directory...)) doesn't
         /// change the index order of documents.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestLucene()
         {
             int num = 100;
@@ -54,14 +54,14 @@ namespace Lucene.Net.Index
             bool fail = VerifyIndex(indexA, 0);
             if (fail)
             {
-                Assert.Fail("Index a is invalid");
+                Assert.True(false, "Index a is invalid");
             }
 
             FillIndex(Random(), indexB, num, num);
             fail = VerifyIndex(indexB, num);
             if (fail)
             {
-                Assert.Fail("Index b is invalid");
+                Assert.True(false, "Index b is invalid");
             }
 
             Directory merged = NewDirectory();
@@ -73,7 +73,7 @@ namespace Lucene.Net.Index
 
             fail = VerifyIndex(merged, 0);
 
-            Assert.IsFalse(fail, "The merged index is invalid");
+            Assert.False(fail, "The merged index is invalid");
             indexA.Dispose();
             indexB.Dispose();
             merged.Dispose();
@@ -116,7 +116,7 @@ namespace Lucene.Net.Index
 
         // LUCENE-325: test forceMergeDeletes, when 2 singular merges
         // are required
-        [Test]
+        [Fact]
         public virtual void TestForceMergeDeletes()
         {
             Directory dir = NewDirectory();
@@ -146,8 +146,8 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             IndexReader ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(10, ir.MaxDoc);
-            Assert.AreEqual(10, ir.NumDocs);
+            Assert.Equal(10, ir.MaxDoc);
+            Assert.Equal(10, ir.NumDocs);
             ir.Dispose();
 
             IndexWriterConfig dontMergeConfig = (new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))).SetMergePolicy(NoMergePolicy.COMPOUND_FILES);
@@ -157,24 +157,24 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(8, ir.NumDocs);
+            Assert.Equal(8, ir.NumDocs);
             ir.Dispose();
 
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
-            Assert.AreEqual(8, writer.NumDocs());
-            Assert.AreEqual(10, writer.MaxDoc);
+            Assert.Equal(8, writer.NumDocs());
+            Assert.Equal(10, writer.MaxDoc);
             writer.ForceMergeDeletes();
-            Assert.AreEqual(8, writer.NumDocs());
+            Assert.Equal(8, writer.NumDocs());
             writer.Dispose();
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(8, ir.MaxDoc);
-            Assert.AreEqual(8, ir.NumDocs);
+            Assert.Equal(8, ir.MaxDoc);
+            Assert.Equal(8, ir.NumDocs);
             ir.Dispose();
             dir.Dispose();
         }
 
         // LUCENE-325: test forceMergeDeletes, when many adjacent merges are required
-        [Test]
+        [Fact]
         public virtual void TestForceMergeDeletes2()
         {
             Directory dir = NewDirectory();
@@ -205,8 +205,8 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             IndexReader ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(98, ir.MaxDoc);
-            Assert.AreEqual(98, ir.NumDocs);
+            Assert.Equal(98, ir.MaxDoc);
+            Assert.Equal(98, ir.NumDocs);
             ir.Dispose();
 
             IndexWriterConfig dontMergeConfig = (new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))).SetMergePolicy(NoMergePolicy.COMPOUND_FILES);
@@ -218,23 +218,23 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(49, ir.NumDocs);
+            Assert.Equal(49, ir.NumDocs);
             ir.Dispose();
 
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy(3)));
-            Assert.AreEqual(49, writer.NumDocs());
+            Assert.Equal(49, writer.NumDocs());
             writer.ForceMergeDeletes();
             writer.Dispose();
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(49, ir.MaxDoc);
-            Assert.AreEqual(49, ir.NumDocs);
+            Assert.Equal(49, ir.MaxDoc);
+            Assert.Equal(49, ir.NumDocs);
             ir.Dispose();
             dir.Dispose();
         }
 
         // LUCENE-325: test forceMergeDeletes without waiting, when
         // many adjacent merges are required
-        [Test]
+        [Fact]
         public virtual void TestForceMergeDeletes3()
         {
             Directory dir = NewDirectory();
@@ -264,8 +264,8 @@ namespace Lucene.Net.Index
             writer.Dispose();
 
             IndexReader ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(98, ir.MaxDoc);
-            Assert.AreEqual(98, ir.NumDocs);
+            Assert.Equal(98, ir.MaxDoc);
+            Assert.Equal(98, ir.NumDocs);
             ir.Dispose();
 
             IndexWriterConfig dontMergeConfig = (new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()))).SetMergePolicy(NoMergePolicy.COMPOUND_FILES);
@@ -276,15 +276,15 @@ namespace Lucene.Net.Index
             }
             writer.Dispose();
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(49, ir.NumDocs);
+            Assert.Equal(49, ir.NumDocs);
             ir.Dispose();
 
             writer = new IndexWriter(dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy(3)));
             writer.ForceMergeDeletes(false);
             writer.Dispose();
             ir = DirectoryReader.Open(dir);
-            Assert.AreEqual(49, ir.MaxDoc);
-            Assert.AreEqual(49, ir.NumDocs);
+            Assert.Equal(49, ir.MaxDoc);
+            Assert.Equal(49, ir.NumDocs);
             ir.Dispose();
             dir.Dispose();
         }
@@ -326,7 +326,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1013
-        [Test]
+        [Fact]
         public virtual void TestSetMaxMergeDocs()
         {
             Directory dir = NewDirectory();
@@ -349,7 +349,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoWaitClose()
         {
             Directory directory = NewDirectory();

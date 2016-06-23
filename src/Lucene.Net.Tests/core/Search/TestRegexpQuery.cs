@@ -3,7 +3,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using Xunit;
     using Automaton = Lucene.Net.Util.Automaton.Automaton;
     using AutomatonProvider = Lucene.Net.Util.Automaton.AutomatonProvider;
     using BasicAutomata = Lucene.Net.Util.Automaton.BasicAutomata;
@@ -38,7 +38,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Some simple regex tests, mostly converted from contrib's TestRegexQuery.
     /// </summary>
-    [TestFixture]
     public class TestRegexpQuery : LuceneTestCase
     {
         private IndexSearcher Searcher;
@@ -49,7 +48,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
             Document doc = new Document();
@@ -65,7 +64,7 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private Term NewTerm(string value)
@@ -79,45 +78,45 @@ namespace Lucene.Net.Search
             return Searcher.Search(query, 5).TotalHits;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRegex1()
         {
-            Assert.AreEqual(1, RegexQueryNrHits("q.[aeiou]c.*"));
+            Assert.Equal(1, RegexQueryNrHits("q.[aeiou]c.*"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRegex2()
         {
-            Assert.AreEqual(0, RegexQueryNrHits(".[aeiou]c.*"));
+            Assert.Equal(0, RegexQueryNrHits(".[aeiou]c.*"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRegex3()
         {
-            Assert.AreEqual(0, RegexQueryNrHits("q.[aeiou]c"));
+            Assert.Equal(0, RegexQueryNrHits("q.[aeiou]c"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNumericRange()
         {
-            Assert.AreEqual(1, RegexQueryNrHits("<420000-600000>"));
-            Assert.AreEqual(0, RegexQueryNrHits("<493433-600000>"));
+            Assert.Equal(1, RegexQueryNrHits("<420000-600000>"));
+            Assert.Equal(0, RegexQueryNrHits("<493433-600000>"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRegexComplement()
         {
-            Assert.AreEqual(1, RegexQueryNrHits("4934~[3]"));
+            Assert.Equal(1, RegexQueryNrHits("4934~[3]"));
             // not the empty lang, i.e. match all docs
-            Assert.AreEqual(1, RegexQueryNrHits("~#"));
+            Assert.Equal(1, RegexQueryNrHits("~#"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustomProvider()
         {
             AutomatonProvider myProvider = new AutomatonProviderAnonymousInnerClassHelper(this);
             RegexpQuery query = new RegexpQuery(NewTerm("<quickBrown>"), RegExp.ALL, myProvider);
-            Assert.AreEqual(1, Searcher.Search(query, 5).TotalHits);
+            Assert.Equal(1, Searcher.Search(query, 5).TotalHits);
         }
 
         private class AutomatonProviderAnonymousInnerClassHelper : AutomatonProvider
@@ -152,10 +151,10 @@ namespace Lucene.Net.Search
         /// necessary to test that 4934 itself is ok before trying to append more
         /// characters.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestBacktracking()
         {
-            Assert.AreEqual(1, RegexQueryNrHits("4934[314]"));
+            Assert.Equal(1, RegexQueryNrHits("4934[314]"));
         }
     }
 }

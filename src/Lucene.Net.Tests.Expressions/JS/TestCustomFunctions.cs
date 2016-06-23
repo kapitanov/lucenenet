@@ -1,42 +1,37 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq.Expressions;
 using System.Reflection;
 using Lucene.Net.Expressions.JS;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions.JS
 {
-	[TestFixture]
 	public class TestCustomFunctions : Util.LuceneTestCase
 	{
 		private static double DELTA = 0.0000001;
 
 		/// <summary>empty list of methods</summary>
-		[Test]
+		[Fact]
 		public virtual void TestEmpty()
 		{
 			IDictionary<string, MethodInfo> functions = new HashMap<string,MethodInfo>();
-			try
-			{
-				JavascriptCompiler.Compile("sqrt(20)", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("Unrecognized method"));
-			}
+
+			var e = Assert.Throws< ArgumentException> (() => JavascriptCompiler.Compile("sqrt(20)", functions));
+			True(e.Message.Contains("Unrecognized method"));
 		}
 
 		/// <summary>using the default map explicitly</summary>
-		[Test]
+		[Fact]
 		public virtual void TestDefaultList()
 		{
 			IDictionary<string, MethodInfo> functions = JavascriptCompiler.DEFAULT_FUNCTIONS;
 			var expr = JavascriptCompiler.Compile("sqrt(20)", functions);
-			AreEqual(Math.Sqrt(20), expr.Evaluate(0, null), DELTA);
+			var value = Math.Sqrt(20);
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 
 		public static double ZeroArgMethod()
@@ -45,13 +40,16 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>tests a method with no arguments</summary>
-		[Test]
+		[Fact]
 		public virtual void TestNoArgMethod()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("ZeroArgMethod");
 			var expr = JavascriptCompiler.Compile("foo()", functions);
-			AreEqual(5, expr.Evaluate(0, null), DELTA);
+			var value = 5;
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 
 		public static double OneArgMethod(double arg1)
@@ -60,13 +58,16 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>tests a method with one arguments</summary>
-		[Test]
+		[Fact]
 		public virtual void TestOneArgMethod()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("OneArgMethod", new []{ typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo(3)", functions);
-			AreEqual(6, expr.Evaluate(0, null), DELTA);
+			var value = 6;
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 
 		public static double ThreeArgMethod(double arg1, double arg2, double arg3)
@@ -75,25 +76,31 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>tests a method with three arguments</summary>
-		[Test]
+		[Fact]
 		public virtual void TestThreeArgMethod()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("ThreeArgMethod", new []{ typeof(double), typeof(
 				double), typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo(3, 4, 5)", functions);
-			AreEqual(12, expr.Evaluate(0, null), DELTA);
+			var value = 12;
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 
 		/// <summary>tests a map with 2 functions</summary>
-		[Test]
+		[Fact]
 		public virtual void TestTwoMethods()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("ZeroArgMethod");
 			functions["bar"] = GetType().GetMethod("OneArgMethod", new []{typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo() + bar(3)", functions);
-			AreEqual(11, expr.Evaluate(0, null), DELTA);
+			var value = 11;
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 
 		public static string BogusReturnType()
@@ -102,7 +109,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>wrong return type: must be double</summary>
-		[Test]
+		[Fact]
 		public virtual void TestWrongReturnType()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
@@ -124,7 +131,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>wrong param type: must be doubles</summary>
-		[Test]
+		[Fact]
 		public virtual void TestWrongParameterType()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
@@ -147,7 +154,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>wrong modifiers: must be static</summary>
-		[Test]
+		[Fact]
 		public virtual void TestWrongNotStatic()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
@@ -169,7 +176,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>wrong modifiers: must be public</summary>
-		[Test]
+		[Fact]
 		public virtual void TestWrongNotPublic()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
@@ -195,20 +202,13 @@ namespace Lucene.Net.Tests.Expressions.JS
 		}
 
 		/// <summary>wrong class modifiers: class containing method is not public</summary>
-		[Test]
+		[Fact]
 		public virtual void TestWrongNestedNotPublic()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = typeof(NestedNotPublic).GetMethod("Method");
-			try
-			{
-				JavascriptCompiler.Compile("foo()", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("is not public"));
-			}
+			var e = Assert.Throws<ArgumentException>(() => JavascriptCompiler.Compile("foo()", functions));
+			True(e.Message.Contains("is not public"));
 		}
 
 		
@@ -225,7 +225,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		/// <summary>the method throws an exception.</summary>
 		/// <remarks>the method throws an exception. We should check the stack trace that it contains the source code of the expression as file name.
 		/// 	</remarks>
-		[Test]
+		[Fact]
 		public virtual void TestThrowingException()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
@@ -235,28 +235,31 @@ namespace Lucene.Net.Tests.Expressions.JS
 			try
 			{
 				expr.Evaluate(0, null);
-				Fail();
+				True(false);
 			}
 			catch (ArithmeticException e)
 			{
-				AreEqual(MESSAGE, e.Message);
+				Equal(MESSAGE, e.Message);
 				StringWriter sw = new StringWriter();
 				e.printStackTrace();
-                //.NET Port
-                IsTrue(e.StackTrace.Contains("Lucene.Net.Expressions.CompiledExpression.Evaluate(Int32 , FunctionValues[] )"));
+				//.NET Port
+				True(e.StackTrace.Contains("Lucene.Net.Expressions.CompiledExpression.Evaluate(Int32 , FunctionValues[] )"));
 			}
 		}
 
 		/// <summary>test that namespaces work with custom expressions.</summary>
 		/// <remarks>test that namespaces work with custom expressions.</remarks>
-		[Test]
+		[Fact]
 		public virtual void TestNamespaces()
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo.bar"] = GetType().GetMethod("ZeroArgMethod");
 			string source = "foo.bar()";
 			var expr = JavascriptCompiler.Compile(source, functions);
-			AreEqual(5, expr.Evaluate(0, null), DELTA);
+			var value = 5;
+			var min = value - DELTA;
+			var max = value + DELTA;
+			InRange(expr.Evaluate(0, null), min, max);
 		}
 	}
 }

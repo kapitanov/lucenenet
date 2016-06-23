@@ -1,7 +1,7 @@
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -22,10 +22,9 @@ namespace Lucene.Net.Util
      * the License.
      */
 
-    [TestFixture]
     public class TestBytesRefArray : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestAppend()
         {
             Random random = Random();
@@ -45,34 +44,34 @@ namespace Lucene.Net.Util
                 {
                     string randomRealisticUnicodeString = TestUtil.RandomRealisticUnicodeString(random);
                     spare.CopyChars(randomRealisticUnicodeString);
-                    Assert.AreEqual(i + initSize, list.Append(spare));
+                    Assert.Equal(i + initSize, list.Append(spare));
                     stringList.Add(randomRealisticUnicodeString);
                 }
                 for (int i = 0; i < entries; i++)
                 {
-                    Assert.IsNotNull(list.Get(spare, i));
-                    Assert.AreEqual(stringList[i], spare.Utf8ToString(), "entry " + i + " doesn't match");
+                    Assert.NotNull(list.Get(spare, i));
+                    Assert.Equal(stringList[i], spare.Utf8ToString(), "entry " + i + " doesn't match");
                 }
 
                 // check random
                 for (int i = 0; i < entries; i++)
                 {
                     int e = random.Next(entries);
-                    Assert.IsNotNull(list.Get(spare, e));
-                    Assert.AreEqual(stringList[e], spare.Utf8ToString(), "entry " + i + " doesn't match");
+                    Assert.NotNull(list.Get(spare, e));
+                    Assert.Equal(stringList[e], spare.Utf8ToString(), "entry " + i + " doesn't match");
                 }
                 for (int i = 0; i < 2; i++)
                 {
                     BytesRefIterator iterator = list.Iterator();
                     foreach (string @string in stringList)
                     {
-                        Assert.AreEqual(@string, iterator.Next().Utf8ToString());
+                        Assert.Equal(@string, iterator.Next().Utf8ToString());
                     }
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSort()
         {
             Random random = Random();
@@ -93,7 +92,7 @@ namespace Lucene.Net.Util
                 {
                     string randomRealisticUnicodeString = TestUtil.RandomRealisticUnicodeString(random);
                     spare.CopyChars(randomRealisticUnicodeString);
-                    Assert.AreEqual(initSize + i, list.Append(spare));
+                    Assert.Equal(initSize + i, list.Append(spare));
                     stringList.Add(randomRealisticUnicodeString);
                 }
 
@@ -102,11 +101,11 @@ namespace Lucene.Net.Util
                 int a = 0;
                 while ((spare = iter.Next()) != null)
                 {
-                    Assert.AreEqual(stringList[a], spare.Utf8ToString(), "entry " + a + " doesn't match");
+                    Assert.Equal(stringList[a], spare.Utf8ToString(), "entry " + a + " doesn't match");
                     a++;
                 }
-                Assert.IsNull(iter.Next());
-                Assert.AreEqual(a, stringList.Count);
+                Assert.Null(iter.Next());
+                Assert.Equal(a, stringList.Count);
             }
         }
     }

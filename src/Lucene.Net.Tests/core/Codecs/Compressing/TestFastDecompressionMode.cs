@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Compressing
 {
@@ -19,13 +19,10 @@ namespace Lucene.Net.Codecs.Compressing
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestFastDecompressionMode : AbstractTestLZ4CompressionMode
     {
-        [SetUp]
-        public override void SetUp()
+        public TestFastDecompressionMode() : base()
         {
-            base.SetUp();
             Mode = CompressionMode.FAST_DECOMPRESSION;
         }
 
@@ -35,7 +32,7 @@ namespace Lucene.Net.Codecs.Compressing
             var compressed2 = Compress(CompressionMode.FAST.NewCompressor(), decompressed, off, len);
             // because of the way this compression mode works, its output is necessarily
             // smaller than the output of CompressionMode.FAST
-            Assert.IsTrue(compressed.Length <= compressed2.Length);
+            Assert.True(compressed.Length <= compressed2.Length);
             return compressed;
         }
     }

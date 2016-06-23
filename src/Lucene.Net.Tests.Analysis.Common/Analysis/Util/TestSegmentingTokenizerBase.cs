@@ -5,7 +5,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
@@ -51,27 +51,27 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasics()
         {
             AssertAnalyzesTo(sentence, "The acronym for United States is U.S. but this doesn't end a sentence", new[] { "The acronym for United States is U.S. but this doesn't end a sentence" });
             AssertAnalyzesTo(sentence, "He said, \"Are you going?\" John shook his head.", new[] { "He said, \"Are you going?\" ", "John shook his head." });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustomAttributes()
         {
             AssertAnalyzesTo(sentenceAndWord, "He said, \"Are you going?\" John shook his head.", new[] { "He", "said", "Are", "you", "going", "John", "shook", "his", "head" }, new[] { 0, 3, 10, 14, 18, 26, 31, 37, 41 }, new[] { 2, 7, 13, 17, 23, 30, 36, 40, 45 }, new[] { 1, 1, 1, 1, 1, 2, 1, 1, 1 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReuse()
         {
             AssertAnalyzesTo(sentenceAndWord, "He said, \"Are you going?\"", new[] { "He", "said", "Are", "you", "going" }, new[] { 0, 3, 10, 14, 18 }, new[] { 2, 7, 13, 17, 23 }, new[] { 1, 1, 1, 1, 1 });
             AssertAnalyzesTo(sentenceAndWord, "John shook his head.", new[] { "John", "shook", "his", "head" }, new[] { 0, 5, 11, 15 }, new[] { 4, 10, 14, 19 }, new[] { 1, 1, 1, 1 });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEnd()
         {
             // BaseTokenStreamTestCase asserts that end() is set to our StringReader's length for us here.
@@ -80,7 +80,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             AssertAnalyzesTo(sentenceAndWord, "John shook his head.          ", new[] { "John", "shook", "his", "head" });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHugeDoc()
         {
             var sb = new StringBuilder();
@@ -92,7 +92,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             AssertAnalyzesTo(sentenceAndWord, input, new[] { "testing", "1234" });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHugeTerm()
         {
             var sb = new StringBuilder();
@@ -108,7 +108,7 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
             AssertAnalyzesTo(sentence, input, expected);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomStrings()
         {
             CheckRandomData(Random(), sentence, 10000 * RANDOM_MULTIPLIER);

@@ -2,11 +2,10 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests
 {
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -109,7 +108,7 @@ namespace Lucene.Net.Tests
 		    }
         }
 
-        [Test]
+        [Fact]
         public void TestSubclassConcurrentMergeScheduler()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -130,9 +129,9 @@ namespace Lucene.Net.Tests
             ((MyMergeScheduler)writer.Config.MergeScheduler).Sync();
             writer.Dispose();
 
-            Assert.IsTrue(MergeThreadCreated);
-            Assert.IsTrue(MergeCalled);
-            Assert.IsTrue(ExcCalled);
+            Assert.True(MergeThreadCreated);
+            Assert.True(MergeCalled);
+            Assert.True(ExcCalled);
             dir.Dispose();
         }
 
@@ -158,7 +157,7 @@ namespace Lucene.Net.Tests
 
         }
 
-        [Test]
+        [Fact]
         public void TestCustomMergeScheduler()
         {
             // we don't really need to execute anything, just to make sure the custom MS

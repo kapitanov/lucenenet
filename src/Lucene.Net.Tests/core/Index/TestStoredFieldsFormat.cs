@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -27,7 +27,6 @@ namespace Lucene.Net.Index
     /// other specific instantiations since we want to test some test-only impls
     /// like Asserting, as well as make it easy to write a codec and pass -Dtests.codec
     /// </summary>
-    [TestFixture]
     public class TestStoredFieldsFormat : BaseStoredFieldsFormatTestCase
     {
         protected override Codec Codec
@@ -38,7 +37,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public override void TestWriteReadMerge()
         {
             AssumeFalse("impersonation isnt good enough", Codec is Lucene3xCodec);

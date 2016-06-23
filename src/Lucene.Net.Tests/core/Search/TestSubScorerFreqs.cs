@@ -3,12 +3,11 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    
     using Lucene.Net.Index;
     using Lucene.Net.Store;
     using Lucene.Net.Support;
     using Lucene.Net.Util;
-    using NUnit.Framework;
+    using Xunit;
     using ChildScorer = Lucene.Net.Search.Scorer.ChildScorer;
 
     /*
@@ -31,7 +30,6 @@ namespace Lucene.Net.Search
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
 
-    [TestFixture]
     public class TestSubScorerFreqs : LuceneTestCase
     {
         private static Directory Dir;
@@ -141,27 +139,39 @@ namespace Lucene.Net.Search
 
         private const float FLOAT_TOLERANCE = 0.00001F;
 
-        [Test]
+        [Fact]
         public virtual void TestTermQuery()
         {
             TermQuery q = new TermQuery(new Term("f", "d"));
             CountingCollector c = new CountingCollector(TopScoreDocCollector.Create(10, true));
             s.Search(q, null, c);
             int maxDocs = s.IndexReader.MaxDoc;
-            Assert.AreEqual(maxDocs, c.DocCounts.Count);
+            Assert.Equal(maxDocs, c.DocCounts.Count);
             for (int i = 0; i < maxDocs; i++)
             {
                 IDictionary<Query, float?> doc0 = c.DocCounts[i];
-                Assert.AreEqual(1, doc0.Count);
-                Assert.AreEqual(4.0F, doc0[q], FLOAT_TOLERANCE);
+                Assert.Equal(1, doc0.Count);
+
+                float value = 4.0F;
+                float min = value - FLOAT_TOLERANCE;
+                float max = value + FLOAT_TOLERANCE;
+
+                Assert.NotNull(doc0[q]);
+                Assert.InRange(doc0[q].Value, min, max);
 
                 IDictionary<Query, float?> doc1 = c.DocCounts[++i];
-                Assert.AreEqual(1, doc1.Count);
-                Assert.AreEqual(1.0F, doc1[q], FLOAT_TOLERANCE);
+                Assert.Equal(1, doc1.Count);
+
+                value = 1.0F;
+                min = value - FLOAT_TOLERANCE;
+                max = value + FLOAT_TOLERANCE;
+
+                Assert.NotNull(doc1[q]);
+                Assert.InRange(doc1[q].Value, min, max);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanQuery()
         {
             TermQuery aQuery = new TermQuery(new Term("f", "a"));
@@ -187,32 +197,57 @@ namespace Lucene.Net.Search
                 var c = new CountingCollector(TopScoreDocCollector.Create(10, true), occur);
                 s.Search(query, null, c);
                 int maxDocs = s.IndexReader.MaxDoc;
-                Assert.AreEqual(maxDocs, c.DocCounts.Count);
+                Assert.Equal(maxDocs, c.DocCounts.Count);
                 bool includeOptional = occur.Contains("SHOULD");
+
+                float value10 = 1.0F;
+                float min10 = value10 - FLOAT_TOLERANCE;
+                float max10 = value10 + FLOAT_TOLERANCE;
+
+                float value40 = 4.0F;
+                float min40 = value40 - FLOAT_TOLERANCE;
+                float max40 = value40 + FLOAT_TOLERANCE;
+
+                float value30 = 3.0F;
+                float min30 = value30 - FLOAT_TOLERANCE;
+                float max30 = value30 + FLOAT_TOLERANCE;
+
                 for (int i = 0; i < maxDocs; i++)
                 {
                     IDictionary<Query, float?> doc0 = c.DocCounts[i];
-                    Assert.AreEqual(includeOptional ? 5 : 4, doc0.Count);
-                    Assert.AreEqual(1.0F, doc0[aQuery], FLOAT_TOLERANCE);
-                    Assert.AreEqual(4.0F, doc0[dQuery], FLOAT_TOLERANCE);
+                    Assert.Equal(includeOptional ? 5 : 4, doc0.Count);
+
+                    Assert.True(doc0[aQuery].HasValue);
+                    Assert.InRange(doc0[aQuery].Value, min10, max10);
+
+                    Assert.True(doc0[dQuery].HasValue);
+                    Assert.InRange(doc0[dQuery].Value, min40, max40);
+
                     if (includeOptional)
                     {
-                        Assert.AreEqual(3.0F, doc0[cQuery], FLOAT_TOLERANCE);
+                        Assert.True(doc0[cQuery].HasValue);
+                        Assert.InRange(doc0[cQuery].Value, min30, max30);
                     }
 
                     IDictionary<Query, float?> doc1 = c.DocCounts[++i];
-                    Assert.AreEqual(includeOptional ? 5 : 4, doc1.Count);
-                    Assert.AreEqual(1.0F, doc1[aQuery], FLOAT_TOLERANCE);
-                    Assert.AreEqual(1.0F, doc1[dQuery], FLOAT_TOLERANCE);
+                    Assert.Equal(includeOptional ? 5 : 4, doc1.Count);
+
+                    Assert.True(doc1[aQuery].HasValue);
+                    Assert.InRange(doc1[aQuery].Value, min10, max10);
+
+                    Assert.True(doc1[dQuery].HasValue);
+                    Assert.InRange(doc1[dQuery].Value, min10, max10);
+
                     if (includeOptional)
                     {
-                        Assert.AreEqual(1.0F, doc1[cQuery], FLOAT_TOLERANCE);
+                        Assert.True(doc1[cQuery].HasValue);
+                        Assert.InRange(doc1[cQuery].Value, min10, max10);
                     }
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPhraseQuery()
         {
             PhraseQuery q = new PhraseQuery();
@@ -221,16 +256,29 @@ namespace Lucene.Net.Search
             CountingCollector c = new CountingCollector(TopScoreDocCollector.Create(10, true));
             s.Search(q, null, c);
             int maxDocs = s.IndexReader.MaxDoc;
-            Assert.AreEqual(maxDocs, c.DocCounts.Count);
+            Assert.Equal(maxDocs, c.DocCounts.Count);
+
+            float value10 = 1.0F;
+            float min10 = value10 - FLOAT_TOLERANCE;
+            float max10 = value10 + FLOAT_TOLERANCE;
+
+            float value20 = 2.0F;
+            float min20 = value20 - FLOAT_TOLERANCE;
+            float max20 = value20 + FLOAT_TOLERANCE;
+
             for (int i = 0; i < maxDocs; i++)
             {
                 IDictionary<Query, float?> doc0 = c.DocCounts[i];
-                Assert.AreEqual(1, doc0.Count);
-                Assert.AreEqual(2.0F, doc0[q], FLOAT_TOLERANCE);
+                Assert.Equal(1, doc0.Count);
+
+                Assert.True(doc0[q].HasValue);
+                Assert.InRange(doc0[q].Value, min20, max20);
 
                 IDictionary<Query, float?> doc1 = c.DocCounts[++i];
-                Assert.AreEqual(1, doc1.Count);
-                Assert.AreEqual(1.0F, doc1[q], FLOAT_TOLERANCE);
+                Assert.Equal(1, doc1.Count);
+
+                Assert.True(doc1[q].HasValue);
+                Assert.InRange(doc1[q].Value, min10, max10);
             }
         }
     }

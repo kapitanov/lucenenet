@@ -26,7 +26,7 @@ namespace Lucene.Net.Tests.Queries
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory);
             // we use the default Locale/TZ since LuceneTestCase randomizes it
@@ -68,7 +68,7 @@ namespace Lucene.Net.Tests.Queries
         {
             reader.Dispose();
             directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
         private ChainedFilter GetChainedFilter(Filter[] chain, int[] logic)
@@ -86,7 +86,7 @@ namespace Lucene.Net.Tests.Queries
         }
 
         
-        [Test]
+        [Fact]
         public virtual void TestSingleFilter()
         {
             ChainedFilter chain = GetChainedFilter(new Filter[] { dateFilter }, null);
@@ -111,7 +111,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals("sue", searcher.Doc(hits.ScoreDocs[0].Doc).Get("owner"));
         }
         
-        [Test]
+        [Fact]
         public virtual void TestOR()
         {
             ChainedFilter chain = GetChainedFilter(new Filter[] { sueFilter, bobFilter }, null);
@@ -120,7 +120,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals("OR matches all", Max, numHits);
         }
         
-        [Test]
+        [Fact]
         public virtual void TestAND()
         {
             ChainedFilter chain = GetChainedFilter(new Filter[] { dateFilter, bobFilter }, ChainedFilter.AND);
@@ -130,7 +130,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals("bob", searcher.Doc(hits.ScoreDocs[0].Doc).Get("owner"));
         }
         
-        [Test]
+        [Fact]
         public virtual void TestXOR()
         {
             ChainedFilter chain = GetChainedFilter(new Filter[] { dateFilter, bobFilter }, ChainedFilter.XOR);
@@ -140,7 +140,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals("sue", searcher.Doc(hits.ScoreDocs[0].Doc).Get("owner"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestANDNOT()
         {
             ChainedFilter chain = GetChainedFilter(new Filter[] { dateFilter, sueFilter }, new int[] { ChainedFilter.AND, ChainedFilter.ANDNOT });
@@ -156,7 +156,7 @@ namespace Lucene.Net.Tests.Queries
             assertEquals("sue", searcher.Doc(hits.ScoreDocs[0].Doc).Get("owner"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWithCachingFilter()
         {
             Directory dir = NewDirectory();

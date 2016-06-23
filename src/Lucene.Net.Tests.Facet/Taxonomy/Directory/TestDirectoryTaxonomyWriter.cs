@@ -4,7 +4,6 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
@@ -78,7 +77,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCommit()
         {
             // Verifies that nothing is committed to the underlying Directory, if
@@ -90,13 +89,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             ltw.AddCategory(new FacetLabel("a"));
 
             IndexReader r = DirectoryReader.Open(dir);
-            Assert.AreEqual(1, r.NumDocs, "No categories should have been committed to the underlying directory");
+            Assert.Equal(1, r.NumDocs, "No categories should have been committed to the underlying directory");
             r.Dispose();
             ltw.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCommitUserData()
         {
             // Verifies taxonomy commit data
@@ -109,7 +108,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.CommitData = userCommitData;
             taxoWriter.Dispose();
             var r = DirectoryReader.Open(dir);
-            Assert.AreEqual(3, r.NumDocs, "2 categories plus root should have been committed to the underlying directory");
+            Assert.Equal(3, r.NumDocs, "2 categories plus root should have been committed to the underlying directory");
             var readUserCommitData = r.IndexCommit.UserData;
             Assert.True("1 2 3".Equals(readUserCommitData["testing"]), "wrong value extracted from commit data");
             Assert.NotNull(DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in commitData", readUserCommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
@@ -140,7 +139,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRollback()
         {
             // Verifies that if rollback is called, DTW is closed.
@@ -151,7 +150,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             try
             {
                 dtw.AddCategory(new FacetLabel("a"));
-                Fail("should not have succeeded to add a category following rollback.");
+                True(false, "should not have succeeded to add a category following rollback.");
             }
             catch (AlreadyClosedException)
             {
@@ -161,20 +160,20 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRecreateRollback()
         {
             // Tests rollback with OpenMode.CREATE
             Directory dir = NewDirectory();
             (new DirectoryTaxonomyWriter(dir)).Dispose();
-            Assert.AreEqual(1, getEpoch(dir));
+            Assert.Equal(1, getEpoch(dir));
             (new DirectoryTaxonomyWriter(dir, OpenMode.CREATE)).Rollback();
-            Assert.AreEqual(1, getEpoch(dir));
+            Assert.Equal(1, getEpoch(dir));
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEnsureOpen()
         {
             // verifies that an exception is thrown if DTW was closed
@@ -184,7 +183,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             try
             {
                 dtw.AddCategory(new FacetLabel("a"));
-                Fail("should not have succeeded to add a category following close.");
+                True(false, "should not have succeeded to add a category following close.");
             }
             catch (AlreadyClosedException)
             {
@@ -193,7 +192,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         private void TouchTaxo(DirectoryTaxonomyWriter taxoWriter, FacetLabel cp)
         {
             taxoWriter.AddCategory(cp);
@@ -204,7 +203,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.Commit();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRecreateAndRefresh()
         {
             // DirTaxoWriter lost the INDEX_EPOCH property if it was opened in
@@ -222,7 +221,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             var newtr = TaxonomyReader.OpenIfChanged(taxoReader);
             taxoReader.Dispose();
             taxoReader = newtr;
-            Assert.AreEqual(1, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
+            Assert.Equal(1, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
 
             // now recreate the taxonomy, and check that the epoch is preserved after opening DirTW again.
             taxoWriter.Dispose();
@@ -237,13 +236,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             newtr = TaxonomyReader.OpenIfChanged(taxoReader);
             taxoReader.Dispose();
             taxoReader = newtr;
-            Assert.AreEqual(2, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
+            Assert.Equal(2, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
 
             taxoReader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBackwardsCompatibility()
         {
             // tests that if the taxonomy index doesn't have the INDEX_EPOCH
@@ -257,14 +256,14 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.Dispose();
 
             var taxoReader = new DirectoryTaxonomyReader(dir);
-            Assert.AreEqual(1, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
+            Assert.Equal(1, Convert.ToInt32(taxoReader.CommitUserData[DirectoryTaxonomyWriter.INDEX_EPOCH]));
             Assert.Null(TaxonomyReader.OpenIfChanged(taxoReader));
             (taxoReader).Dispose();
 
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConcurrency()
         {
             int ncats = AtLeast(100000); // add many categories
@@ -323,7 +322,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                         Console.WriteLine("FAIL: path=" + label + " not recognized");
                     }
                 }
-                Fail("mismatch number of categories");
+                True(false, "mismatch number of categories");
             }
 
             int[] parents = dtr.ParallelTaxonomyArrays.Parents();
@@ -338,7 +337,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 {
                     path = cp.Subpath(i + 1);
                     int ord = dtr.GetOrdinal(path);
-                    Assert.AreEqual(parentOrd, parents[ord], "invalid parent for cp=" + path);
+                    Assert.Equal(parentOrd, parents[ord], "invalid parent for cp=" + path);
                     parentOrd = ord; // next level should have this parent
                 }
             }
@@ -399,7 +398,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             return Convert.ToInt64(infos.UserData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReplaceTaxonomy()
         {
             Directory input = NewDirectory();
@@ -420,13 +419,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
             // LUCENE-4633: make sure that category "a" is not added again in any case
             taxoWriter.AddTaxonomy(input, new MemoryOrdinalMap());
-            Assert.AreEqual(2, taxoWriter.Size, "no categories should have been added"); // root + 'a'
-            Assert.AreEqual(ordA, taxoWriter.AddCategory(new FacetLabel("a")), "category 'a' received new ordinal?");
+            Assert.Equal(2, taxoWriter.Size, "no categories should have been added"); // root + 'a'
+            Assert.Equal(ordA, taxoWriter.AddCategory(new FacetLabel("a")), "category 'a' received new ordinal?");
 
             // add the same category again -- it should not receive the same ordinal !
             int newOrdB = taxoWriter.AddCategory(new FacetLabel("b"));
-            Assert.AreNotSame(ordB, newOrdB, "new ordinal cannot be the original ordinal");
-            Assert.AreEqual(2, newOrdB, "ordinal should have been 2 since only one category was added by replaceTaxonomy");
+            Assert.NotSame(ordB, newOrdB, "new ordinal cannot be the original ordinal");
+            Assert.Equal(2, newOrdB, "ordinal should have been 2 since only one category was added by replaceTaxonomy");
 
             taxoWriter.Dispose();
 
@@ -437,7 +436,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             input.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReaderFreshness()
         {
             // ensures that the internal index reader is always kept fresh. Previously,
@@ -452,7 +451,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCommitNoEmptyCommits()
         {
             // LUCENE-4972: DTW used to create empty commits even if no changes were made
@@ -464,13 +463,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             long gen1 = SegmentInfos.GetLastCommitGeneration(dir);
             taxoWriter.Commit();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.AreEqual(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCloseNoEmptyCommits()
         {
             // LUCENE-4972: DTW used to create empty commits even if no changes were made
@@ -482,13 +481,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             long gen1 = SegmentInfos.GetLastCommitGeneration(dir);
             taxoWriter.Dispose();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.AreEqual(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPrepareCommitNoEmptyCommits()
         {
             // LUCENE-4972: DTW used to create empty commits even if no changes were made
@@ -502,13 +501,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.PrepareCommit();
             taxoWriter.Commit();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.AreEqual(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestHugeLabel()
         {
             Directory indexDir = NewDirectory(), taxoDir = NewDirectory();
@@ -540,7 +539,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             }
 
             // when too large components were allowed to be added, this resulted in a new added category
-            Assert.AreEqual(ordinal, taxoWriter.AddCategory(cp));
+            Assert.Equal(ordinal, taxoWriter.AddCategory(cp));
 
             IOUtils.Close(indexWriter, taxoWriter);
 
@@ -549,12 +548,12 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             IndexSearcher searcher = new IndexSearcher(indexReader);
             DrillDownQuery ddq = new DrillDownQuery(new FacetsConfig());
             ddq.Add("dim", bigs);
-            Assert.AreEqual(1, searcher.Search(ddq, 10).TotalHits);
+            Assert.Equal(1, searcher.Search(ddq, 10).TotalHits);
 
             IOUtils.Close(indexReader, taxoReader, indexDir, taxoDir);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestReplaceTaxoWithLargeTaxonomy()
         {
             var srcTaxoDir = NewDirectory();
@@ -567,11 +566,11 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
             taxoWriter = new DirectoryTaxonomyWriter(targetTaxoDir);
             int ordinal = taxoWriter.AddCategory(new FacetLabel("B", "1"));
-            Assert.AreEqual(1, taxoWriter.GetParent(ordinal)); // call getParent to initialize taxoArrays
+            Assert.Equal(1, taxoWriter.GetParent(ordinal)); // call getParent to initialize taxoArrays
             taxoWriter.Commit();
 
             taxoWriter.ReplaceTaxonomy(srcTaxoDir);
-            Assert.AreEqual(ord - 1, taxoWriter.GetParent(ord));
+            Assert.Equal(ord - 1, taxoWriter.GetParent(ord));
             taxoWriter.Dispose();
 
             srcTaxoDir.Dispose();

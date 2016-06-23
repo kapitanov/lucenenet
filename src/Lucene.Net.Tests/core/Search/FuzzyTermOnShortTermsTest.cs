@@ -16,10 +16,10 @@
  */
 
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using System.IO;
     using Analyzer = Lucene.Net.Analysis.Analyzer;
     using Directory = Lucene.Net.Store.Directory;
@@ -39,7 +39,7 @@ namespace Lucene.Net.Search
     {
         private const string FIELD = "field";
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             // proves rule that edit distance between the two terms
@@ -70,7 +70,7 @@ namespace Lucene.Net.Search
             IndexSearcher s = new IndexSearcher(r);
             TotalHitCountCollector c = new TotalHitCountCollector();
             s.Search(q, c);
-            Assert.AreEqual(expected, c.TotalHits, q.ToString());
+            Assert.Equal(expected, c.TotalHits, q.ToString());
             r.Dispose();
             d.Dispose();
         }

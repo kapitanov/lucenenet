@@ -5,7 +5,6 @@ using System.Linq;
 using Lucene.Net.Facet;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
 
 namespace Lucene.Net.Facet
 {
@@ -250,7 +249,7 @@ namespace Lucene.Net.Facet
 
         protected internal virtual void AssertFloatValuesEquals(IList<FacetResult> a, IList<FacetResult> b)
         {
-            Assert.AreEqual(a.Count, b.Count);
+            Assert.Equal(a.Count, b.Count);
             float lastValue = float.PositiveInfinity;
             IDictionary<string, FacetResult> aByDim = new Dictionary<string, FacetResult>();
             for (int i = 0; i < a.Count; i++)
@@ -275,15 +274,15 @@ namespace Lucene.Net.Facet
 
         protected internal virtual void AssertFloatValuesEquals(FacetResult a, FacetResult b)
         {
-            Assert.AreEqual(a.Dim, b.Dim);
+            Assert.Equal(a.Dim, b.Dim);
             Assert.True(Arrays.Equals(a.Path, b.Path));
-            Assert.AreEqual(a.ChildCount, b.ChildCount);
-            Assert.AreEqual((float)a.Value, (float)b.Value, (float)a.Value / 1e5);
-            Assert.AreEqual(a.LabelValues.Length, b.LabelValues.Length);
+            Assert.Equal(a.ChildCount, b.ChildCount);
+            Assert.Equal((float)a.Value, (float)b.Value, (float)a.Value / 1e5);
+            Assert.Equal(a.LabelValues.Length, b.LabelValues.Length);
             for (int i = 0; i < a.LabelValues.Length; i++)
             {
-                Assert.AreEqual(a.LabelValues[i].label, b.LabelValues[i].label);
-                Assert.AreEqual((float)a.LabelValues[i].value, (float)b.LabelValues[i].value, (float)a.LabelValues[i].value / 1e5);
+                Assert.Equal(a.LabelValues[i].label, b.LabelValues[i].label);
+                Assert.Equal((float)a.LabelValues[i].value, (float)b.LabelValues[i].value, (float)a.LabelValues[i].value / 1e5);
             }
         }
     }

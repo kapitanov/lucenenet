@@ -1,6 +1,6 @@
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -28,14 +28,13 @@ namespace Lucene.Net.Index
 
     using TokenStream = Lucene.Net.Analysis.TokenStream;
 
-    [TestFixture]
     public class TestSameTokenSamePosition : LuceneTestCase
     {
         /// <summary>
         /// Attempt to reproduce an assertion error that happens
         /// only with the trunk version around April 2011.
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             Directory dir = NewDirectory();
@@ -50,7 +49,7 @@ namespace Lucene.Net.Index
         /// <summary>
         /// Same as the above, but with more docs
         /// </summary>
-        [Test]
+        [Fact]
         public virtual void TestMoreDocs()
         {
             Directory dir = NewDirectory();

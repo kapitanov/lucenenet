@@ -2,7 +2,7 @@
 using ICU4NET;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 using CharacterIterator = Lucene.Net.Analysis.Util.CharacterIterator;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
@@ -24,16 +24,15 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    [TestFixture]
     public class TestCharArrayIterator : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestWordInstance()
         {
             DoTests(CharArrayIterator.NewWordInstance());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConsumeWordInstance()
         {
             // we use the default locale, as its randomized by LuceneTestCase
@@ -62,13 +61,13 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
         }
         */
 
-        [Test]
+        [Fact]
         public virtual void TestSentenceInstance()
         {
             DoTests(CharArrayIterator.NewSentenceInstance());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestConsumeSentenceInstance()
         {
             // we use the default locale, as its randomized by LuceneTestCase

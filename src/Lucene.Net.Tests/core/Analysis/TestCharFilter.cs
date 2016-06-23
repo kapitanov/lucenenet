@@ -1,6 +1,8 @@
+using Xunit;
+
 namespace Lucene.Net.Analysis
 {
-    using NUnit.Framework;
+    
     using System.IO;
 
     /*
@@ -25,32 +27,32 @@ namespace Lucene.Net.Analysis
     [TestFixture]
     public class TestCharFilter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestCharFilter1()
         {
             CharFilter cs = new CharFilter1(new StringReader(""));
-            Assert.AreEqual(1, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(1, cs.CorrectOffset(0), "corrected offset is invalid");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCharFilter2()
         {
             CharFilter cs = new CharFilter2(new StringReader(""));
-            Assert.AreEqual(2, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(2, cs.CorrectOffset(0), "corrected offset is invalid");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCharFilter12()
         {
             CharFilter cs = new CharFilter2(new CharFilter1(new StringReader("")));
-            Assert.AreEqual(3, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(3, cs.CorrectOffset(0), "corrected offset is invalid");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCharFilter11()
         {
             CharFilter cs = new CharFilter1(new CharFilter1(new StringReader("")));
-            Assert.AreEqual(2, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(2, cs.CorrectOffset(0), "corrected offset is invalid");
         }
 
         internal class CharFilter1 : CharFilter

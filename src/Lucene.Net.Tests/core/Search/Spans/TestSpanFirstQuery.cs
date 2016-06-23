@@ -1,9 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search.Spans
 {
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -37,7 +36,7 @@ namespace Lucene.Net.Search.Spans
     [TestFixture]
     public class TestSpanFirstQuery : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestStartPositions()
         {
             Directory dir = NewDirectory();
@@ -59,12 +58,12 @@ namespace Lucene.Net.Search.Spans
 
             // user queries on "starts-with quick"
             SpanQuery sfq = new SpanFirstQuery(new SpanTermQuery(new Term("field", "quick")), 1);
-            Assert.AreEqual(1, searcher.Search(sfq, 10).TotalHits);
+            Assert.Equal(1, searcher.Search(sfq, 10).TotalHits);
 
             // user queries on "starts-with the quick"
             SpanQuery include = new SpanFirstQuery(new SpanTermQuery(new Term("field", "quick")), 2);
             sfq = new SpanNotQuery(include, sfq);
-            Assert.AreEqual(1, searcher.Search(sfq, 10).TotalHits);
+            Assert.Equal(1, searcher.Search(sfq, 10).TotalHits);
 
             writer.Dispose();
             reader.Dispose();

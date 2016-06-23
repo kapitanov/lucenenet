@@ -1,5 +1,5 @@
 using Lucene.Net.Documents;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Text;
 
@@ -40,17 +40,14 @@ namespace Lucene.Net.Codecs.Lucene41
     /// <summary>
     /// Tests special cases of BlockPostingsFormat
     /// </summary>
-    [TestFixture]
     public class TestBlockPostingsFormat2 : LuceneTestCase
     {
         internal Directory Dir;
         internal RandomIndexWriter Iw;
         internal IndexWriterConfig Iwc;
 
-        [SetUp]
-        public override void SetUp()
+        public TestBlockPostingsFormat2() : base()
         {
-            base.SetUp();
             Dir = NewFSDirectory(CreateTempDir("testDFBlockSize"));
             Iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             Iwc.SetCodec(TestUtil.AlwaysPostingsFormat(new Lucene41PostingsFormat()));
@@ -58,8 +55,7 @@ namespace Lucene.Net.Codecs.Lucene41
             Iw.RandomForceMerge = false; // we will ourselves
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Iw.Dispose();
             TestUtil.CheckIndex(Dir); // for some extra coverage, checkIndex before we forceMerge
@@ -68,7 +64,7 @@ namespace Lucene.Net.Codecs.Lucene41
             iw.ForceMerge(1);
             iw.Dispose();
             Dir.Dispose(); // just force a checkindex for now
-            base.TearDown();
+            base.Dispose();
         }
 
         private Document NewDocument()
@@ -92,7 +88,7 @@ namespace Lucene.Net.Codecs.Lucene41
 
         /// <summary>
         /// tests terms with df = blocksize </summary>
-        [Test]
+        [Fact]
         public virtual void TestDFBlockSize()
         {
             Document doc = NewDocument();
@@ -108,7 +104,7 @@ namespace Lucene.Net.Codecs.Lucene41
 
         /// <summary>
         /// tests terms with df % blocksize = 0 </summary>
-        [Test]
+        [Fact]
         public virtual void TestDFBlockSizeMultiple()
         {
             Document doc = NewDocument();
@@ -124,7 +120,7 @@ namespace Lucene.Net.Codecs.Lucene41
 
         /// <summary>
         /// tests terms with ttf = blocksize </summary>
-        [Test]
+        [Fact]
         public virtual void TestTTFBlockSize()
         {
             Document doc = NewDocument();
@@ -140,7 +136,7 @@ namespace Lucene.Net.Codecs.Lucene41
 
         /// <summary>
         /// tests terms with ttf % blocksize = 0 </summary>
-        [Test]
+        [Fact]
         public virtual void TestTTFBlockSizeMultiple()
         {
             Document doc = NewDocument();

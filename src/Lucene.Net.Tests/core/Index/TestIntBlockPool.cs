@@ -3,7 +3,7 @@ using System.Collections.Generic;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
 
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -30,10 +30,9 @@ namespace Lucene.Net.Index
     /// <summary>
     /// tests basic <seealso cref="IntBlockPool"/> functionality
     /// </summary>
-    [TestFixture]
     public class TestIntBlockPool : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSingleWriterReader()
         {
             Counter bytesUsed = Util.Counter.NewCounter();
@@ -54,23 +53,23 @@ namespace Lucene.Net.Index
                 reader.Reset(start, upto);
                 for (int i = 0; i < num; i++)
                 {
-                    Assert.AreEqual(i, reader.ReadInt());
+                    Assert.Equal(i, reader.ReadInt());
                 }
-                Assert.IsTrue(reader.EndOfSlice());
+                Assert.True(reader.EndOfSlice());
                 if (Random().NextBoolean())
                 {
                     pool.Reset(true, false);
-                    Assert.AreEqual(0, bytesUsed.Get());
+                    Assert.Equal(0, bytesUsed.Get());
                 }
                 else
                 {
                     pool.Reset(true, true);
-                    Assert.AreEqual(IntBlockPool.INT_BLOCK_SIZE * RamUsageEstimator.NUM_BYTES_INT, bytesUsed.Get());
+                    Assert.Equal(IntBlockPool.INT_BLOCK_SIZE * RamUsageEstimator.NUM_BYTES_INT, bytesUsed.Get());
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMultipleWriterReader()
         {
             Counter bytesUsed = Util.Counter.NewCounter();
@@ -117,12 +116,12 @@ namespace Lucene.Net.Index
                 if (Random().NextBoolean())
                 {
                     pool.Reset(true, false);
-                    Assert.AreEqual(0, bytesUsed.Get());
+                    Assert.Equal(0, bytesUsed.Get());
                 }
                 else
                 {
                     pool.Reset(true, true);
-                    Assert.AreEqual(IntBlockPool.INT_BLOCK_SIZE * RamUsageEstimator.NUM_BYTES_INT, bytesUsed.Get());
+                    Assert.Equal(IntBlockPool.INT_BLOCK_SIZE * RamUsageEstimator.NUM_BYTES_INT, bytesUsed.Get());
                 }
             }
         }
@@ -162,9 +161,9 @@ namespace Lucene.Net.Index
             reader.Reset(values.Start, values.End);
             for (int i = 0; i < values.ValueCount; i++)
             {
-                Assert.AreEqual(values.ValueOffset + i, reader.ReadInt());
+                Assert.Equal(values.ValueOffset + i, reader.ReadInt());
             }
-            Assert.IsTrue(reader.EndOfSlice());
+            Assert.True(reader.EndOfSlice());
         }
 
         private class StartEndAndValues

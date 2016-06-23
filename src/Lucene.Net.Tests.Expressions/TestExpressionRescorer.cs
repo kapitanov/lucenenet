@@ -19,7 +19,7 @@ namespace Lucene.Net.Tests.Expressions
 		[SetUp]
 		public override void SetUp()
 		{
-			base.SetUp();
+			
 			dir = NewDirectory();
 			var iw = new RandomIndexWriter(Random(), dir);
 			var doc = new Document
@@ -54,10 +54,10 @@ namespace Lucene.Net.Tests.Expressions
 		{
 			reader.Dispose();
 			dir.Dispose();
-			base.TearDown();
+			base.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public virtual void TestBasic()
 		{
 			// create a sort field and sort by it (reverse order)

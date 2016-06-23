@@ -1,12 +1,12 @@
 using System;
 using System.Text;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-    using NUnit.Framework;
     using System.Collections.Generic;
     using System.IO;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
@@ -44,7 +44,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestQueryRescorer : LuceneTestCase
     {
         private IndexSearcher GetSearcher(IndexReader r)
@@ -57,7 +56,7 @@ namespace Lucene.Net.Search
             return searcher;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -83,9 +82,9 @@ namespace Lucene.Net.Search
             searcher.Similarity = new DefaultSimilarity();
 
             TopDocs hits = searcher.Search(bq, 10);
-            Assert.AreEqual(2, hits.TotalHits);
-            Assert.AreEqual("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits.TotalHits);
+            Assert.Equal("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
 
             // Now, resort using PhraseQuery:
             PhraseQuery pq = new PhraseQuery();
@@ -96,9 +95,9 @@ namespace Lucene.Net.Search
             TopDocs hits2 = QueryRescorer.Rescore(searcher, hits, pq, 2.0, 10);
 
             // Resorting changed the order:
-            Assert.AreEqual(2, hits2.TotalHits);
-            Assert.AreEqual("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits2.TotalHits);
+            Assert.Equal("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
 
             // Resort using SpanNearQuery:
             SpanTermQuery t1 = new SpanTermQuery(new Term("field", "wizard"));
@@ -108,15 +107,15 @@ namespace Lucene.Net.Search
             TopDocs hits3 = QueryRescorer.Rescore(searcher, hits, snq, 2.0, 10);
 
             // Resorting changed the order:
-            Assert.AreEqual(2, hits3.TotalHits);
-            Assert.AreEqual("1", searcher.Doc(hits3.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("0", searcher.Doc(hits3.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits3.TotalHits);
+            Assert.Equal("1", searcher.Doc(hits3.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("0", searcher.Doc(hits3.ScoreDocs[1].Doc).Get("id"));
 
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestCustomCombine()
         {
             Directory dir = NewDirectory();
@@ -141,9 +140,9 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = GetSearcher(r);
 
             TopDocs hits = searcher.Search(bq, 10);
-            Assert.AreEqual(2, hits.TotalHits);
-            Assert.AreEqual("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits.TotalHits);
+            Assert.Equal("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
 
             // Now, resort using PhraseQuery, but with an
             // opposite-world combine:
@@ -156,9 +155,9 @@ namespace Lucene.Net.Search
               .Rescore(searcher, hits, 10);
 
             // Resorting didn't change the order:
-            Assert.AreEqual(2, hits2.TotalHits);
-            Assert.AreEqual("0", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits2.TotalHits);
+            Assert.Equal("0", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
 
             r.Dispose();
             dir.Dispose();
@@ -185,7 +184,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExplain()
         {
             Directory dir = NewDirectory();
@@ -210,9 +209,9 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = GetSearcher(r);
 
             TopDocs hits = searcher.Search(bq, 10);
-            Assert.AreEqual(2, hits.TotalHits);
-            Assert.AreEqual("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits.TotalHits);
+            Assert.Equal("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
 
             // Now, resort using PhraseQuery:
             PhraseQuery pq = new PhraseQuery();
@@ -224,29 +223,29 @@ namespace Lucene.Net.Search
             TopDocs hits2 = rescorer.Rescore(searcher, hits, 10);
 
             // Resorting changed the order:
-            Assert.AreEqual(2, hits2.TotalHits);
-            Assert.AreEqual("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits2.TotalHits);
+            Assert.Equal("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
 
             int docID = hits2.ScoreDocs[0].Doc;
             Explanation explain = rescorer.Explain(searcher, searcher.Explain(bq, docID), docID);
             string s = explain.ToString();
-            Assert.IsTrue(s.Contains("TestQueryRescorer+"));
-            Assert.IsTrue(s.Contains("combined first and second pass score"));
-            Assert.IsTrue(s.Contains("first pass score"));
-            Assert.IsTrue(s.Contains("= second pass score"));
-            Assert.AreEqual(hits2.ScoreDocs[0].Score, explain.Value, 0.0f);
+            Assert.True(s.Contains("TestQueryRescorer+"));
+            Assert.True(s.Contains("combined first and second pass score"));
+            Assert.True(s.Contains("first pass score"));
+            Assert.True(s.Contains("= second pass score"));
+            Assert.Equal(hits2.ScoreDocs[0].Score, explain.Value, 0.0f);
 
             docID = hits2.ScoreDocs[1].Doc;
             explain = rescorer.Explain(searcher, searcher.Explain(bq, docID), docID);
             s = explain.ToString();
-            Assert.IsTrue(s.Contains("TestQueryRescorer+"));
-            Assert.IsTrue(s.Contains("combined first and second pass score"));
-            Assert.IsTrue(s.Contains("first pass score"));
-            Assert.IsTrue(s.Contains("no second pass score"));
-            Assert.IsFalse(s.Contains("= second pass score"));
-            Assert.IsTrue(s.Contains("NON-MATCH"));
-            Assert.IsTrue(Math.Abs(hits2.ScoreDocs[1].Score - explain.Value) < 0.0000001f);
+            Assert.True(s.Contains("TestQueryRescorer+"));
+            Assert.True(s.Contains("combined first and second pass score"));
+            Assert.True(s.Contains("first pass score"));
+            Assert.True(s.Contains("no second pass score"));
+            Assert.False(s.Contains("= second pass score"));
+            Assert.True(s.Contains("NON-MATCH"));
+            Assert.True(Math.Abs(hits2.ScoreDocs[1].Score - explain.Value) < 0.0000001f);
 
             r.Dispose();
             dir.Dispose();
@@ -273,7 +272,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMissingSecondPassScore()
         {
             Directory dir = NewDirectory();
@@ -298,9 +297,9 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = GetSearcher(r);
 
             TopDocs hits = searcher.Search(bq, 10);
-            Assert.AreEqual(2, hits.TotalHits);
-            Assert.AreEqual("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits.TotalHits);
+            Assert.Equal("0", searcher.Doc(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", searcher.Doc(hits.ScoreDocs[1].Doc).Get("id"));
 
             // Now, resort using PhraseQuery, no slop:
             PhraseQuery pq = new PhraseQuery();
@@ -310,9 +309,9 @@ namespace Lucene.Net.Search
             TopDocs hits2 = QueryRescorer.Rescore(searcher, hits, pq, 2.0, 10);
 
             // Resorting changed the order:
-            Assert.AreEqual(2, hits2.TotalHits);
-            Assert.AreEqual("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits2.TotalHits);
+            Assert.Equal("1", searcher.Doc(hits2.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("0", searcher.Doc(hits2.ScoreDocs[1].Doc).Get("id"));
 
             // Resort using SpanNearQuery:
             SpanTermQuery t1 = new SpanTermQuery(new Term("field", "wizard"));
@@ -322,15 +321,15 @@ namespace Lucene.Net.Search
             TopDocs hits3 = QueryRescorer.Rescore(searcher, hits, snq, 2.0, 10);
 
             // Resorting changed the order:
-            Assert.AreEqual(2, hits3.TotalHits);
-            Assert.AreEqual("1", searcher.Doc(hits3.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("0", searcher.Doc(hits3.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal(2, hits3.TotalHits);
+            Assert.Equal("1", searcher.Doc(hits3.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("0", searcher.Doc(hits3.ScoreDocs[1].Doc).Get("id"));
 
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             Directory dir = NewDirectory();
@@ -387,7 +386,7 @@ namespace Lucene.Net.Search
                     fail = true;
                 }
             }
-            Assert.IsFalse(fail);
+            Assert.False(fail);
 
             r.Dispose();
             dir.Dispose();

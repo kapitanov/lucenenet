@@ -1,6 +1,6 @@
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
@@ -26,12 +26,12 @@ namespace Lucene.Net.Index
     [TestFixture]
     public class TestNewestSegment : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNewestSegment_Mem()
         {
             Directory directory = NewDirectory();
             IndexWriter writer = new IndexWriter(directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
-            Assert.IsNull(writer.NewestSegment());
+            Assert.Null(writer.NewestSegment());
             writer.Dispose();
             directory.Dispose();
         }

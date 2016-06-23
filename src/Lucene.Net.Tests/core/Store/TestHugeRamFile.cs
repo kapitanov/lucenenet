@@ -1,11 +1,9 @@
-using Lucene.Net.Attributes;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 
 namespace Lucene.Net.Store
 {
-    /*
+    using Xunit;    /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
      * this work for additional information regarding copyright ownership.
@@ -26,7 +24,6 @@ namespace Lucene.Net.Store
 
     /// <summary>
     /// Test huge RAMFile with more than Integer.MAX_VALUE bytes. </summary>
-    [TestFixture]
     public class TestHugeRamFile : LuceneTestCase
     {
         private static readonly long MAX_VALUE = (long)2 * (long)int.MaxValue;
@@ -63,7 +60,9 @@ namespace Lucene.Net.Store
 
         /// <summary>
         /// Test huge RAMFile with more than Integer.MAX_VALUE bytes. (LUCENE-957) </summary>
-        [Test, LongRunningTest, Timeout(int.MaxValue)]
+        //[Test, LongRunningTest, Timeout(int.MaxValue)]
+        [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestHugeFile()
         {
             var f = new DenseRAMFile();
@@ -80,13 +79,13 @@ namespace Lucene.Net.Store
                 b2[i] = (byte)(sbyte)(i & 0x0003F);
             }
             long n = 0;
-            Assert.AreEqual(n, @out.Length, "output length must match");
+            Assert.Equal(n, @out.Length);
             while (n <= MAX_VALUE - b1.Length)
             {
                 @out.WriteBytes(b1, 0, b1.Length);
                 @out.Flush();
                 n += b1.Length;
-                Assert.AreEqual(n, @out.Length, "output length must match");
+                Assert.Equal(n, @out.Length);
             }
             //System.out.println("after writing b1's, length = "+out.Length()+" (MAX_VALUE="+MAX_VALUE+")");
             int m = b2.Length;
@@ -100,12 +99,12 @@ namespace Lucene.Net.Store
                 @out.WriteBytes(b2, 0, m);
                 @out.Flush();
                 n += m;
-                Assert.AreEqual(n, @out.Length, "output length must match");
-            }
+                Assert.Equal(n, @out.Length);
+        }
             @out.Dispose();
             // input part
             var @in = new RAMInputStream("testcase", f);
-            Assert.AreEqual(n, @in.Length(), "input length must match");
+            Assert.Equal(n, @in.Length());
             //System.out.println("input length = "+in.Length()+" % 1024 = "+in.Length()%1024);
             for (int j = 0; j < L; j++)
             {
@@ -116,7 +115,7 @@ namespace Lucene.Net.Store
                 {
                     var bt = (sbyte)@in.ReadByte();
                     var expected = (sbyte)(1 + j + (i & 0x0003F));
-                    Assert.AreEqual(expected, bt, "must read same value that was written! j=" + j + " i=" + i);
+                    Assert.Equal(expected, bt);//, "must read same value that was written! j=" + j + " i=" + i);
                 }
             }
         }

@@ -5,8 +5,9 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Support;
-    using NUnit.Framework;
+    using System.Collections.Generic;
     using System.IO;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using English = Lucene.Net.Util.English;
@@ -36,7 +37,6 @@ namespace Lucene.Net.Index
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using StringField = StringField;
 
-    [TestFixture]
     public class TestTransactions : LuceneTestCase
     {
         private static volatile bool DoFail;
@@ -279,10 +279,11 @@ namespace Lucene.Net.Index
             writer.Dispose();
         }
 
-        [Test, Sequential]
+        [Theory]
+        [MemberData("GetTestTransactions_MemData")]
         public virtual void TestTransactions_Mem(
-            [ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler1, 
-            [ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler2)
+            IConcurrentMergeScheduler scheduler1,
+            IConcurrentMergeScheduler scheduler2)
         {
             Console.WriteLine("Start test");
             // we cant use non-ramdir on windows, because this test needs to double-write.
@@ -325,12 +326,21 @@ namespace Lucene.Net.Index
 
             for (int i = 0; i < numThread; i++)
             {
-                Assert.IsTrue(!threads[i].Failed);
+                Assert.True(!threads[i].Failed);
             }
             dir1.Dispose();
             dir2.Dispose();
 
             Console.WriteLine("End test");
+        }
+
+        public static IEnumerable<object[]> GetTestTransactions_MemData
+        {
+            get
+            {
+                yield return new [] { new ConcurrentMergeScheduler(), new ConcurrentMergeScheduler() };
+                yield return new [] { new TaskMergeScheduler(), new TaskMergeScheduler() };
+            }
         }
     }
 }

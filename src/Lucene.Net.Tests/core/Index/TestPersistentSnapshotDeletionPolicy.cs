@@ -1,8 +1,8 @@
 using System.Diagnostics;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using System;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
@@ -28,19 +28,10 @@ namespace Lucene.Net.Index
     using MockDirectoryWrapper = Lucene.Net.Store.MockDirectoryWrapper;
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
 
-    [TestFixture]
     public class TestPersistentSnapshotDeletionPolicy : TestSnapshotDeletionPolicy
     {
-        [SetUp]
-        public override void SetUp()
+        public TestPersistentSnapshotDeletionPolicy() : base()
         {
-            base.SetUp();
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
         }
 
         private SnapshotDeletionPolicy GetDeletionPolicy(Directory dir)
@@ -48,16 +39,16 @@ namespace Lucene.Net.Index
             return new PersistentSnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy(), dir, OpenMode_e.CREATE);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExistingSnapshots()
         {
             int numSnapshots = 3;
             MockDirectoryWrapper dir = NewMockDirectory();
             IndexWriter writer = new IndexWriter(dir, GetConfig(Random(), GetDeletionPolicy(dir)));
             PersistentSnapshotDeletionPolicy psdp = (PersistentSnapshotDeletionPolicy)writer.Config.DelPolicy;
-            Assert.IsNull(psdp.LastSaveFile);
+            Assert.Null(psdp.LastSaveFile);
             PrepareIndexAndSnapshots(psdp, writer, numSnapshots);
-            Assert.IsNotNull(psdp.LastSaveFile);
+            Assert.NotNull(psdp.LastSaveFile);
             writer.Dispose();
 
             // Make sure only 1 save file exists:
@@ -69,7 +60,7 @@ namespace Lucene.Net.Index
                     count++;
                 }
             }
-            Assert.AreEqual(1, count);
+            Assert.Equal(1, count);
 
             // Make sure we fsync:
             dir.Crash();
@@ -81,22 +72,22 @@ namespace Lucene.Net.Index
             writer = new IndexWriter(dir, GetConfig(Random(), psdp));
             psdp = (PersistentSnapshotDeletionPolicy)writer.Config.DelPolicy;
 
-            Assert.AreEqual(numSnapshots, psdp.Snapshots.Count);
-            Assert.AreEqual(numSnapshots, psdp.SnapshotCount);
+            Assert.Equal(numSnapshots, psdp.Snapshots.Count);
+            Assert.Equal(numSnapshots, psdp.SnapshotCount);
             AssertSnapshotExists(dir, psdp, numSnapshots, false);
 
             writer.AddDocument(new Document());
             writer.Commit();
             Snapshots.Add(psdp.Snapshot());
-            Assert.AreEqual(numSnapshots + 1, psdp.Snapshots.Count);
-            Assert.AreEqual(numSnapshots + 1, psdp.SnapshotCount);
+            Assert.Equal(numSnapshots + 1, psdp.Snapshots.Count);
+            Assert.Equal(numSnapshots + 1, psdp.SnapshotCount);
             AssertSnapshotExists(dir, psdp, numSnapshots + 1, false);
 
             writer.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoSnapshotInfos()
         {
             Directory dir = NewDirectory();
@@ -104,23 +95,15 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMissingSnapshots()
         {
             Directory dir = NewDirectory();
-            try
-            {
-                new PersistentSnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy(), dir, OpenMode_e.APPEND);
-                Assert.Fail("did not hit expected exception");
-            }
-            catch (InvalidOperationException ise)
-            {
-                // expected
-            }
+            Assert.Throws<InvalidOperationException>(() => new PersistentSnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy(), dir, OpenMode_e.APPEND));
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestExceptionDuringSave()
         {
             MockDirectoryWrapper dir = NewMockDirectory();
@@ -130,24 +113,13 @@ namespace Lucene.Net.Index
             writer.Commit();
 
             PersistentSnapshotDeletionPolicy psdp = (PersistentSnapshotDeletionPolicy)writer.Config.DelPolicy;
-            try
-            {
-                psdp.Snapshot();
-            }
-            catch (IOException ioe)
-            {
-                if (ioe.Message.Equals("now fail on purpose"))
-                {
-                    // ok
-                }
-                else
-                {
-                    throw ioe;
-                }
-            }
-            Assert.AreEqual(0, psdp.SnapshotCount);
+
+            IOException ioe = Assert.Throws<IOException>(() => psdp.Snapshot());
+            Assert.Equal("now fail on purpose", ioe.Message);
+
+            Assert.Equal(0, psdp.SnapshotCount);
             writer.Dispose();
-            Assert.AreEqual(1, DirectoryReader.ListCommits(dir).Count);
+            Assert.Equal(1, DirectoryReader.ListCommits(dir).Count);
             dir.Dispose();
         }
 
@@ -177,7 +149,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSnapshotRelease()
         {
             Directory dir = NewDirectory();
@@ -189,11 +161,11 @@ namespace Lucene.Net.Index
             psdp.Release(Snapshots[0]);
 
             psdp = new PersistentSnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy(), dir, OpenMode_e.APPEND);
-            Assert.AreEqual(0, psdp.SnapshotCount, "Should have no snapshots !");
+            Assert.Equal(0, psdp.SnapshotCount); //, "Should have no snapshots !");
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSnapshotReleaseByGeneration()
         {
             Directory dir = NewDirectory();
@@ -205,7 +177,7 @@ namespace Lucene.Net.Index
             psdp.Release(Snapshots[0].Generation);
 
             psdp = new PersistentSnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy(), dir, OpenMode_e.APPEND);
-            Assert.AreEqual(0, psdp.SnapshotCount, "Should have no snapshots !");
+            Assert.Equal(0, psdp.SnapshotCount); //, "Should have no snapshots !");
             dir.Dispose();
         }
     }

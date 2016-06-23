@@ -1,12 +1,11 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -33,10 +32,9 @@ namespace Lucene.Net.Search
     /// A basic unit test for FieldCacheTermsFilter
     /// </summary>
     /// <seealso cref= Lucene.Net.Search.FieldCacheTermsFilter </seealso>
-    [TestFixture]
     public class TestFieldCacheTermsFilter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestMissingTerms()
         {
             string fieldName = "field1";
@@ -60,18 +58,18 @@ namespace Lucene.Net.Search
             List<string> terms = new List<string>();
             terms.Add("5");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.AreEqual(0, results.Length, "Must match nothing");
+            Assert.Equal(0, results.Length, "Must match nothing");
 
             terms = new List<string>();
             terms.Add("10");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.AreEqual(1, results.Length, "Must match 1");
+            Assert.Equal(1, results.Length, "Must match 1");
 
             terms = new List<string>();
             terms.Add("10");
             terms.Add("20");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.AreEqual(2, results.Length, "Must match 2");
+            Assert.Equal(2, results.Length, "Must match 2");
 
             reader.Dispose();
             rd.Dispose();

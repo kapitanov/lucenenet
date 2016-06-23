@@ -1,11 +1,11 @@
 using System;
 using System.Globalization;
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -37,7 +37,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Test that BooleanQuery.setMinimumNumberShouldMatch works.
     /// </summary>
-    [TestFixture]
     public class TestBooleanMinShouldMatch : LuceneTestCase
     {
         private static Directory Index;
@@ -88,7 +87,7 @@ namespace Lucene.Net.Search
             {
                 PrintHits(TestName, h, s);
             }
-            Assert.AreEqual(expected, h.Length, "result count");
+            Assert.Equal(expected, h.Length, "result count");
             //System.out.println("TEST: now check");
             // bs2
             TopScoreDocCollector collector = TopScoreDocCollector.Create(1000, true);
@@ -98,12 +97,12 @@ namespace Lucene.Net.Search
             {
                 PrintHits(TestName, h2, s);
             }
-            Assert.AreEqual(expected, h2.Length, "result count (bs2)");
+            Assert.Equal(expected, h2.Length, "result count (bs2)");
 
             QueryUtils.Check(Random(), q, s);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAllOptional()
         {
             BooleanQuery q = new BooleanQuery();
@@ -115,7 +114,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 2);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneReqAndSomeOptional()
         {
             /* one required, some optional */
@@ -130,7 +129,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 5);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeReqAndSomeOptional()
         {
             /* two required, some optional */
@@ -146,7 +145,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 5);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneProhibAndSomeOptional()
         {
             /* one prohibited, some optional */
@@ -161,7 +160,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeProhibAndSomeOptional()
         {
             /* two prohibited, some optional */
@@ -177,7 +176,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneReqOneProhibAndSomeOptional()
         {
             /* one required, one prohibited, some optional */
@@ -194,7 +193,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeReqOneProhibAndSomeOptional()
         {
             /* two required, one prohibited, some optional */
@@ -212,7 +211,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneReqSomeProhibAndSomeOptional()
         {
             /* one required, two prohibited, some optional */
@@ -230,7 +229,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSomeReqSomeProhibAndSomeOptional()
         {
             /* two required, two prohibited, some optional */
@@ -249,7 +248,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMinHigherThenNumOptional()
         {
             /* two required, two prohibited, some optional */
@@ -268,7 +267,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 0);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMinEqualToNumOptional()
         {
             /* two required, two optional */
@@ -283,7 +282,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestOneOptionalEqualToMin()
         {
             /* two required, one optional */
@@ -297,7 +296,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 1);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoOptionalButMin()
         {
             /* two required, no optional */
@@ -310,7 +309,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 0);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestNoOptionalButMin2()
         {
             /* one required, no optional */
@@ -322,7 +321,7 @@ namespace Lucene.Net.Search
             VerifyNrHits(q, 0);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomQueries()
         {
             const string field = "data";
@@ -401,7 +400,7 @@ namespace Lucene.Net.Search
             // should be a subset to the unconstrained query.
             if (top2.TotalHits > top1.TotalHits)
             {
-                Assert.Fail("Constrained results not a subset:\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
+                Assert.True(false, "Constrained results not a subset:\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
             }
 
             for (int hit = 0; hit < top2.TotalHits; hit++)
@@ -417,19 +416,19 @@ namespace Lucene.Net.Search
                         found = true;
                         float otherScore = top1.ScoreDocs[other].Score;
                         // check if scores match
-                        Assert.AreEqual(score, otherScore, CheckHits.ExplainToleranceDelta(score, otherScore), "Doc " + id + " scores don't match\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
+                        Assert.Equal(score, otherScore, CheckHits.ExplainToleranceDelta(score, otherScore), "Doc " + id + " scores don't match\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
                     }
                 }
 
                 // check if subset
                 if (!found)
                 {
-                    Assert.Fail("Doc " + id + " not found\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
+                    Assert.True(false, "Doc " + id + " not found\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewriteCoord1()
         {
             Similarity oldSimilarity = s.Similarity;
@@ -466,7 +465,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRewriteNegate()
         {
             Similarity oldSimilarity = s.Similarity;

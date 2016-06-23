@@ -8,7 +8,7 @@ using System.Threading;
 namespace Lucene.Net.Search
 {
     
-    using NUnit.Framework;
+    
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
@@ -39,7 +39,6 @@ namespace Lucene.Net.Search
     using Terms = Lucene.Net.Index.Terms;
     using TermsEnum = Lucene.Net.Index.TermsEnum;
 
-    [TestFixture]
     public class TestMultiThreadTermVectors : LuceneTestCase
     {
         private Directory Directory;
@@ -49,7 +48,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Directory = NewDirectory();
             IndexWriter writer = new IndexWriter(Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
             //writer.setNoCFSRatio(0.0);
@@ -71,10 +70,10 @@ namespace Lucene.Net.Search
         public override void TearDown()
         {
             Directory.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void Test()
         {
             IndexReader reader = null;
@@ -89,7 +88,7 @@ namespace Lucene.Net.Search
             }
             catch (IOException ioe)
             {
-                Assert.Fail(ioe.Message);
+                Assert.True(false, ioe.Message);
             }
             finally
             {
@@ -177,7 +176,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public void Run()
         {
             try

@@ -1,7 +1,7 @@
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Xunit;
 
 namespace Lucene.Net.Util.Automaton
 {
@@ -22,7 +22,6 @@ namespace Lucene.Net.Util.Automaton
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestCompiledAutomaton : LuceneTestCase
     {
         private CompiledAutomaton Build(params string[] strings)
@@ -43,12 +42,12 @@ namespace Lucene.Net.Util.Automaton
             BytesRef result = c.Floor(b, b);
             if (expected == null)
             {
-                Assert.IsNull(result);
+                Assert.Null(result);
             }
             else
             {
-                Assert.IsNotNull(result);
-                Assert.AreEqual(result, new BytesRef(expected), "actual=" + result.Utf8ToString() + " vs expected=" + expected + " (input=" + input + ")");
+                Assert.NotNull(result);
+                Assert.Equal(result, new BytesRef(expected)); //, "actual=" + result.Utf8ToString() + " vs expected=" + expected + " (input=" + input + ")");
             }
         }
 
@@ -106,7 +105,7 @@ namespace Lucene.Net.Util.Automaton
             }
         }
 
-        [Test]
+        [Fact]
         public void TestRandom()
         {
             int numTerms = AtLeast(400);
@@ -129,7 +128,7 @@ namespace Lucene.Net.Util.Automaton
             return TestUtil.RandomRealisticUnicodeString(Random());
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             CompiledAutomaton c = Build("fob", "foo", "goo");

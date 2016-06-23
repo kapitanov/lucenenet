@@ -33,7 +33,7 @@ namespace Lucene.Net.Tests.Join
      
     public class TestJoinUtil : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public void TestSimple()
         {
             const string idField = "id";
@@ -118,13 +118,13 @@ namespace Lucene.Net.Tests.Join
         }
 
         // TermsWithScoreCollector.MV.Avg forgets to grow beyond TermsWithScoreCollector.INITIAL_ARRAY_SIZE
-        [Test]
+        [Fact]
         public void TestOverflowTermsWithScoreCollector()
         {
             Test300spartans(true, ScoreMode.Avg);
         }
 
-        [Test]
+        [Fact]
         public void TestOverflowTermsWithScoreCollectorRandom()
         {
             var scoreModeLength = Enum.GetNames(typeof(ScoreMode)).Length;
@@ -181,7 +181,7 @@ namespace Lucene.Net.Tests.Join
         /// LUCENE-5487: verify a join query inside a SHOULD BQ
         ///  will still use the join query's optimized BulkScorers 
         /// </summary>
-        [Test]
+        [Fact]
         public void TestInsideBooleanQuery()
         {
             const string idField = "id";
@@ -296,7 +296,7 @@ namespace Lucene.Net.Tests.Join
             }
         }
 
-        [Test]
+        [Fact]
         public void TestSimpleWithScoring()
         {
             const string idField = "id";
@@ -389,7 +389,7 @@ namespace Lucene.Net.Tests.Join
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSingleValueRandomJoin()
         {
             int maxIndexIter = TestUtil.NextInt(Random(), 6, 12);
@@ -397,7 +397,7 @@ namespace Lucene.Net.Tests.Join
             ExecuteRandomJoin(false, maxIndexIter, maxSearchIter, TestUtil.NextInt(Random(), 87, 764));
         }
 
-        [Test]
+        [Fact]
         public void TestMultiValueRandomJoin()
             // this test really takes more time, that is why the number of iterations are smaller.
         {

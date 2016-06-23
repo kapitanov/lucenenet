@@ -2,7 +2,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -38,7 +38,6 @@ namespace Lucene.Net.Search
     ///
     /// Line 273, end=8192, subScorerDocID=11378, then more got false?
     /// </summary>
-    [TestFixture]
     public class TestPrefixInBooleanQuery : LuceneTestCase
     {
         private const string FIELD = "name";
@@ -88,36 +87,36 @@ namespace Lucene.Net.Search
             Directory = null;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPrefixQuery()
         {
             Query query = new PrefixQuery(new Term(FIELD, "tang"));
-            Assert.AreEqual(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
+            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermQuery()
         {
             Query query = new TermQuery(new Term(FIELD, "tangfulin"));
-            Assert.AreEqual(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
+            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestTermBooleanQuery()
         {
             BooleanQuery query = new BooleanQuery();
             query.Add(new TermQuery(new Term(FIELD, "tangfulin")), BooleanClause.Occur.SHOULD);
             query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
-            Assert.AreEqual(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
+            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPrefixBooleanQuery()
         {
             BooleanQuery query = new BooleanQuery();
             query.Add(new PrefixQuery(new Term(FIELD, "tang")), BooleanClause.Occur.SHOULD);
             query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
-            Assert.AreEqual(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
+            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
         }
     }
 }

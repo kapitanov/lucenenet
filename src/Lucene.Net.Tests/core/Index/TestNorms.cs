@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using CollectionStatistics = Lucene.Net.Search.CollectionStatistics;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
@@ -44,7 +44,6 @@ namespace Lucene.Net.Index
     /// Test that norms info is preserved during index life - including
     /// separate norms, addDocument, addIndexes, forceMerge.
     /// </summary>
-    [TestFixture]
     public class TestNorms : LuceneTestCase
     {
         internal readonly string ByteTestField = "normsTestByte";
@@ -105,7 +104,7 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-1260
-        [Test]
+        [Fact]
         public virtual void TestCustomEncoder()
         {
             Directory dir = NewDirectory();
@@ -132,32 +131,32 @@ namespace Lucene.Net.Index
             NumericDocValues fooNorms = MultiDocValues.GetNormValues(reader, "foo");
             for (int i = 0; i < reader.MaxDoc; i++)
             {
-                Assert.AreEqual(0, fooNorms.Get(i));
+                Assert.Equal(0, fooNorms.Get(i));
             }
 
             NumericDocValues barNorms = MultiDocValues.GetNormValues(reader, "bar");
             for (int i = 0; i < reader.MaxDoc; i++)
             {
-                Assert.AreEqual(1, barNorms.Get(i));
+                Assert.Equal(1, barNorms.Get(i));
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestMaxByteNorms()
         {
             Directory dir = NewFSDirectory(CreateTempDir("TestNorms.testMaxByteNorms"));
             BuildIndex(dir);
             AtomicReader open = SlowCompositeReaderWrapper.Wrap(DirectoryReader.Open(dir));
             NumericDocValues normValues = open.GetNormValues(ByteTestField);
-            Assert.IsNotNull(normValues);
+            Assert.NotNull(normValues);
             for (int i = 0; i < open.MaxDoc; i++)
             {
                 Document document = open.Document(i);
                 int expected = Convert.ToInt32(document.Get(ByteTestField));
-                Assert.AreEqual(expected, normValues.Get(i) & 0xff);
+                Assert.Equal(expected, normValues.Get(i) & 0xff);
             }
             open.Dispose();
             dir.Dispose();

@@ -5,7 +5,7 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    
     using System.Collections.Generic;
     using System.IO;
     using Directory = Lucene.Net.Store.Directory;
@@ -37,7 +37,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestSortRescorer : LuceneTestCase
     {
         internal IndexSearcher Searcher;
@@ -47,7 +46,7 @@ namespace Lucene.Net.Search
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
             Dir = NewDirectory();
             RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
 
@@ -79,10 +78,10 @@ namespace Lucene.Net.Search
         {
             Reader.Dispose();
             Dir.Dispose();
-            base.TearDown();
+            base.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             // create a sort field and sort by it (reverse order)
@@ -91,32 +90,32 @@ namespace Lucene.Net.Search
 
             // Just first pass query
             TopDocs hits = Searcher.Search(query, 10);
-            Assert.AreEqual(3, hits.TotalHits);
-            Assert.AreEqual("3", r.Document(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", r.Document(hits.ScoreDocs[1].Doc).Get("id"));
-            Assert.AreEqual("2", r.Document(hits.ScoreDocs[2].Doc).Get("id"));
+            Assert.Equal(3, hits.TotalHits);
+            Assert.Equal("3", r.Document(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", r.Document(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal("2", r.Document(hits.ScoreDocs[2].Doc).Get("id"));
 
             // Now, rescore:
             Sort sort = new Sort(new SortField("popularity", SortField.Type_e.INT, true));
             Rescorer rescorer = new SortRescorer(sort);
             hits = rescorer.Rescore(Searcher, hits, 10);
-            Assert.AreEqual(3, hits.TotalHits);
-            Assert.AreEqual("2", r.Document(hits.ScoreDocs[0].Doc).Get("id"));
-            Assert.AreEqual("1", r.Document(hits.ScoreDocs[1].Doc).Get("id"));
-            Assert.AreEqual("3", r.Document(hits.ScoreDocs[2].Doc).Get("id"));
+            Assert.Equal(3, hits.TotalHits);
+            Assert.Equal("2", r.Document(hits.ScoreDocs[0].Doc).Get("id"));
+            Assert.Equal("1", r.Document(hits.ScoreDocs[1].Doc).Get("id"));
+            Assert.Equal("3", r.Document(hits.ScoreDocs[2].Doc).Get("id"));
 
             string expl = rescorer.Explain(Searcher, Searcher.Explain(query, hits.ScoreDocs[0].Doc), hits.ScoreDocs[0].Doc).ToString();
 
             // Confirm the explanation breaks out the individual
             // sort fields:
-            Assert.IsTrue(expl.Contains("= sort field <int: \"popularity\">! value=20"));
+            Assert.True(expl.Contains("= sort field <int: \"popularity\">! value=20"));
 
             // Confirm the explanation includes first pass details:
-            Assert.IsTrue(expl.Contains("= first pass score"));
-            Assert.IsTrue(expl.Contains("body:contents in"));
+            Assert.True(expl.Contains("= first pass score"));
+            Assert.True(expl.Contains("body:contents in"));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             Directory dir = NewDirectory();
@@ -167,7 +166,7 @@ namespace Lucene.Net.Search
             {
                 fail |= (int)expected[i] != hits2.ScoreDocs[i].Doc;
             }
-            Assert.IsFalse(fail);
+            Assert.False(fail);
 
             r.Dispose();
             dir.Dispose();

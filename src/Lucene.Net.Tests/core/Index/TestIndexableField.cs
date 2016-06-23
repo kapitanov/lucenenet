@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using NUnit.Framework;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -228,7 +228,7 @@ namespace Lucene.Net.Index
 
         // Silly test showing how to index documents w/o using Lucene's core
         // Document nor Field class
-        [Test]
+        [Fact]
         public virtual void TestArbitraryFields()
         {
             Directory dir = NewDirectory();
@@ -271,7 +271,7 @@ namespace Lucene.Net.Index
                     Console.WriteLine("TEST: verify doc id=" + id + " (" + fieldsPerDoc[id] + " fields) counter=" + counter);
                 }
                 TopDocs hits = s.Search(new TermQuery(new Term("id", "" + id)), 1);
-                Assert.AreEqual(1, hits.TotalHits);
+                Assert.Equal(1, hits.TotalHits);
                 int docID = hits.ScoreDocs[0].Doc;
                 Document doc = s.Doc(docID);
                 int endCounter = counter + fieldsPerDoc[id];
@@ -298,22 +298,22 @@ namespace Lucene.Net.Index
                     if (stored)
                     {
                         IndexableField f = doc.GetField(name);
-                        Assert.IsNotNull(f, "doc " + id + " doesn't have field f" + counter);
+                        Assert.NotNull(f); //, "doc " + id + " doesn't have field f" + counter);
                         if (binary)
                         {
-                            Assert.IsNotNull(f, "doc " + id + " doesn't have field f" + counter);
+                            Assert.NotNull(f); //, "doc " + id + " doesn't have field f" + counter);
                             BytesRef b = f.BinaryValue();
-                            Assert.IsNotNull(b);
-                            Assert.AreEqual(10, b.Length);
+                            Assert.NotNull(b);
+                            Assert.Equal(10, b.Length);
                             for (int idx = 0; idx < 10; idx++)
                             {
-                                Assert.AreEqual((byte)(idx + counter), b.Bytes[b.Offset + idx]);
+                                Assert.Equal((byte)(idx + counter), b.Bytes[b.Offset + idx]);
                             }
                         }
                         else
                         {
                             Debug.Assert(stringValue != null);
-                            Assert.AreEqual(stringValue, f.StringValue);
+                            Assert.Equal(stringValue, f.StringValue);
                         }
                     }
 
@@ -323,45 +323,45 @@ namespace Lucene.Net.Index
                         if (tv)
                         {
                             Terms tfv = r.GetTermVectors(docID).Terms(name);
-                            Assert.IsNotNull(tfv);
+                            Assert.NotNull(tfv);
                             TermsEnum termsEnum = tfv.Iterator(null);
-                            Assert.AreEqual(new BytesRef("" + counter), termsEnum.Next());
-                            Assert.AreEqual(1, termsEnum.TotalTermFreq());
+                            Assert.Equal(new BytesRef("" + counter), termsEnum.Next());
+                            Assert.Equal(1, termsEnum.TotalTermFreq());
                             DocsAndPositionsEnum dpEnum = termsEnum.DocsAndPositions(null, null);
-                            Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                            Assert.AreEqual(1, dpEnum.Freq());
-                            Assert.AreEqual(1, dpEnum.NextPosition());
+                            Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                            Assert.Equal(1, dpEnum.Freq());
+                            Assert.Equal(1, dpEnum.NextPosition());
 
-                            Assert.AreEqual(new BytesRef("text"), termsEnum.Next());
-                            Assert.AreEqual(1, termsEnum.TotalTermFreq());
+                            Assert.Equal(new BytesRef("text"), termsEnum.Next());
+                            Assert.Equal(1, termsEnum.TotalTermFreq());
                             dpEnum = termsEnum.DocsAndPositions(null, dpEnum);
-                            Assert.IsTrue(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
-                            Assert.AreEqual(1, dpEnum.Freq());
-                            Assert.AreEqual(0, dpEnum.NextPosition());
+                            Assert.True(dpEnum.NextDoc() != DocIdSetIterator.NO_MORE_DOCS);
+                            Assert.Equal(1, dpEnum.Freq());
+                            Assert.Equal(0, dpEnum.NextPosition());
 
-                            Assert.IsNull(termsEnum.Next());
+                            Assert.Null(termsEnum.Next());
 
                             // TODO: offsets
                         }
                         else
                         {
                             Fields vectors = r.GetTermVectors(docID);
-                            Assert.IsTrue(vectors == null || vectors.Terms(name) == null);
+                            Assert.True(vectors == null || vectors.Terms(name) == null);
                         }
 
                         BooleanQuery bq = new BooleanQuery();
                         bq.Add(new TermQuery(new Term("id", "" + id)), BooleanClause.Occur.MUST);
                         bq.Add(new TermQuery(new Term(name, "text")), BooleanClause.Occur.MUST);
                         TopDocs hits2 = s.Search(bq, 1);
-                        Assert.AreEqual(1, hits2.TotalHits);
-                        Assert.AreEqual(docID, hits2.ScoreDocs[0].Doc);
+                        Assert.Equal(1, hits2.TotalHits);
+                        Assert.Equal(docID, hits2.ScoreDocs[0].Doc);
 
                         bq = new BooleanQuery();
                         bq.Add(new TermQuery(new Term("id", "" + id)), BooleanClause.Occur.MUST);
                         bq.Add(new TermQuery(new Term(name, "" + counter)), BooleanClause.Occur.MUST);
                         TopDocs hits3 = s.Search(bq, 1);
-                        Assert.AreEqual(1, hits3.TotalHits);
-                        Assert.AreEqual(docID, hits3.ScoreDocs[0].Doc);
+                        Assert.Equal(1, hits3.TotalHits);
+                        Assert.Equal(docID, hits3.ScoreDocs[0].Doc);
                     }
 
                     counter++;

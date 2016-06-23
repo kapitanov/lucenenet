@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Perfield
 {
-    using NUnit.Framework;
+    
 
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -39,7 +40,7 @@ namespace Lucene.Net.Codecs.Perfield
             }
         }
 
-        [Test]
+        [Fact]
         public override void TestMergeStability()
         {
             //LUCENE TO-DO

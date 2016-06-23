@@ -1,10 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Directory = Lucene.Net.Store.Directory;
     using IndexReader = Lucene.Net.Index.IndexReader;
@@ -39,7 +38,7 @@ namespace Lucene.Net.Search
     [TestFixture]
     public class TestDocBoost : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestDocBoost_Mem()
         {
             Directory store = NewDirectory();
@@ -74,7 +73,7 @@ namespace Lucene.Net.Search
                 {
                     Console.WriteLine(searcher.Explain(new TermQuery(new Term("field", "word")), i));
                 }
-                Assert.IsTrue(scores[i] > lastScore, "score: " + scores[i] + " should be > lastScore: " + lastScore);
+                Assert.True(scores[i] > lastScore, "score: " + scores[i] + " should be > lastScore: " + lastScore);
                 lastScore = scores[i];
             }
 

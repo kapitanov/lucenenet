@@ -1,10 +1,11 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Document = Documents.Document;
     using Field = Field;
@@ -35,12 +36,12 @@ namespace Lucene.Net.Index
     /// <summary>
     /// this test creates an index with one segment that is a little larger than 4GB.
     /// </summary>
-    [Ignore]
-    [TestFixture]
+    [Trait("Category", "Ignore")]
     public class Test4GBStoredFields : LuceneTestCase
     {
-        [Test]
-        public virtual void Test([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
+        [Theory]
+        [ClassData(typeof(ConcurrentMergeSchedulers))]
+        public virtual void Test(IConcurrentMergeScheduler scheduler)
         {
             MockDirectoryWrapper dir = new MockDirectoryWrapper(Random(), new MMapDirectory(CreateTempDir("4GBStoredFields")));
             dir.Throttling = MockDirectoryWrapper.Throttling_e.NEVER;
@@ -109,11 +110,11 @@ namespace Lucene.Net.Index
 
             DirectoryReader rd = DirectoryReader.Open(dir);
             Document sd = rd.Document(numDocs - 1);
-            Assert.IsNotNull(sd);
-            Assert.AreEqual(1, sd.Fields.Count);
+            Assert.NotNull(sd);
+            Assert.Equal(1, sd.Fields.Count);
             BytesRef valueRef = sd.GetBinaryValue("fld");
-            Assert.IsNotNull(valueRef);
-            Assert.AreEqual(new BytesRef(value), valueRef);
+            Assert.NotNull(valueRef);
+            Assert.Equal(new BytesRef(value), valueRef);
             rd.Dispose();
 
             dir.Dispose();

@@ -1,8 +1,9 @@
 using Lucene.Net.Analysis.Tokenattributes;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
-    using NUnit.Framework;
+    
     using System;
 
     /*
@@ -43,17 +44,17 @@ namespace Lucene.Net.Analysis
                 NumericTokenStream.INumericTermAttribute numericAtt = stream.GetAttribute<NumericTokenStream.INumericTermAttribute>();
                 BytesRef bytes = bytesAtt.BytesRef;
                 stream.Reset();
-                Assert.AreEqual(64, numericAtt.ValueSize);
+                Assert.Equal(64, numericAtt.ValueSize);
                 for (int shift = 0; shift < 64; shift += NumericUtils.PRECISION_STEP_DEFAULT)
                 {
-                    Assert.IsTrue(stream.IncrementToken(), "New token is available");
-                    Assert.AreEqual(shift, numericAtt.Shift, "Shift value wrong");
+                    Assert.True(stream.IncrementToken(), "New token is available");
+                    Assert.Equal(shift, numericAtt.Shift); //, "Shift value wrong");
                     bytesAtt.FillBytesRef();
-                    Assert.AreEqual(Lvalue & ~((1L << shift) - 1L), NumericUtils.PrefixCodedToLong(bytes), "Term is incorrectly encoded");
-                    Assert.AreEqual(Lvalue & ~((1L << shift) - 1L), numericAtt.RawValue, "Term raw value is incorrectly encoded");
-                    Assert.AreEqual((shift == 0) ? NumericTokenStream.TOKEN_TYPE_FULL_PREC : NumericTokenStream.TOKEN_TYPE_LOWER_PREC, typeAtt.Type, "Type incorrect");
+                    Assert.Equal(Lvalue & ~((1L << shift) - 1L), NumericUtils.PrefixCodedToLong(bytes)); //, "Term is incorrectly encoded");
+                    Assert.Equal(Lvalue & ~((1L << shift) - 1L), numericAtt.RawValue); //, "Term raw value is incorrectly encoded");
+                    Assert.Equal((shift == 0) ? NumericTokenStream.TOKEN_TYPE_FULL_PREC : NumericTokenStream.TOKEN_TYPE_LOWER_PREC, typeAtt.Type); //, "Type incorrect");
                 }
-                Assert.IsFalse(stream.IncrementToken(), "More tokens available");
+                Assert.False(stream.IncrementToken(), "More tokens available");
                 stream.End();
             }
         }
@@ -68,17 +69,17 @@ namespace Lucene.Net.Analysis
             NumericTokenStream.INumericTermAttribute numericAtt = stream.GetAttribute<NumericTokenStream.INumericTermAttribute>();
             BytesRef bytes = bytesAtt.BytesRef;
             stream.Reset();
-            Assert.AreEqual(32, numericAtt.ValueSize);
+            Assert.Equal(32, numericAtt.ValueSize);
             for (int shift = 0; shift < 32; shift += NumericUtils.PRECISION_STEP_DEFAULT)
             {
-                Assert.IsTrue(stream.IncrementToken(), "New token is available");
-                Assert.AreEqual(shift, numericAtt.Shift, "Shift value wrong");
+                Assert.True(stream.IncrementToken(), "New token is available");
+                Assert.Equal(shift, numericAtt.Shift); //, "Shift value wrong");
                 bytesAtt.FillBytesRef();
-                Assert.AreEqual(Ivalue & ~((1 << shift) - 1), NumericUtils.PrefixCodedToInt(bytes), "Term is incorrectly encoded");
-                Assert.AreEqual(((long)Ivalue) & ~((1L << shift) - 1L), numericAtt.RawValue, "Term raw value is incorrectly encoded");
-                Assert.AreEqual((shift == 0) ? NumericTokenStream.TOKEN_TYPE_FULL_PREC : NumericTokenStream.TOKEN_TYPE_LOWER_PREC, typeAtt.Type, "Type incorrect");
+                Assert.Equal(Ivalue & ~((1 << shift) - 1), NumericUtils.PrefixCodedToInt(bytes)); //, "Term is incorrectly encoded");
+                Assert.Equal(((long)Ivalue) & ~((1L << shift) - 1L), numericAtt.RawValue); //, "Term raw value is incorrectly encoded");
+                Assert.Equal((shift == 0) ? NumericTokenStream.TOKEN_TYPE_FULL_PREC : NumericTokenStream.TOKEN_TYPE_LOWER_PREC, typeAtt.Type); //, "Type incorrect");
             }
-            Assert.IsFalse(stream.IncrementToken(), "More tokens available");
+            Assert.False(stream.IncrementToken(), "More tokens available");
             stream.End();
             stream.Dispose();
         }
@@ -91,7 +92,7 @@ namespace Lucene.Net.Analysis
             try
             {
                 stream.Reset();
-                Assert.Fail("reset() should not succeed.");
+                Assert.True(false, "reset() should not succeed.");
             }
             catch (Exception)
             {
@@ -101,7 +102,7 @@ namespace Lucene.Net.Analysis
             try
             {
                 stream.IncrementToken();
-                Assert.Fail("IncrementToken() should not succeed.");
+                Assert.True(false, "IncrementToken() should not succeed.");
             }
             catch (Exception)
             {
@@ -124,20 +125,20 @@ namespace Lucene.Net.Analysis
             try
             {
                 stream.AddAttribute<ICharTermAttribute>();
-                Assert.Fail("Succeeded to add CharTermAttribute.");
+                Assert.True(false, "Succeeded to add CharTermAttribute.");
             }
             catch (System.ArgumentException iae)
             {
-                Assert.IsTrue(iae.Message.StartsWith("NumericTokenStream does not support"));
+                Assert.True(iae.Message.StartsWith("NumericTokenStream does not support"));
             }
             try
             {
                 stream.AddAttribute<ITestAttribute>();
-                Assert.Fail("Succeeded to add TestAttribute.");
+                Assert.True(false, "Succeeded to add TestAttribute.");
             }
             catch (System.ArgumentException iae)
             {
-                Assert.IsTrue(iae.Message.StartsWith("NumericTokenStream does not support"));
+                Assert.True(iae.Message.StartsWith("NumericTokenStream does not support"));
             }
         }
     }

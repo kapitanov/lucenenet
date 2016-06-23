@@ -1,5 +1,5 @@
 ﻿using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Store
 {
@@ -22,20 +22,19 @@ namespace Lucene.Net.Store
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestBufferedChecksum : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             IChecksum c = new BufferedChecksum(new CRC32());
             c.Update(1);
             c.Update(2);
             c.Update(3);
-            Assert.AreEqual(1438416925L, c.Value);
+            Assert.Equal(1438416925L, c.Value);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             IChecksum c1 = new CRC32();
@@ -69,11 +68,11 @@ namespace Lucene.Net.Store
 
                     case 3:
                         // getValue()
-                        Assert.AreEqual(c1.Value, c2.Value);
+                        Assert.Equal(c1.Value, c2.Value);
                         break;
                 }
             }
-            Assert.AreEqual(c1.Value, c2.Value);
+            Assert.Equal(c1.Value, c2.Value);
         }
     }
 }

@@ -1,9 +1,9 @@
 using System;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -47,7 +47,7 @@ namespace Lucene.Net.Search
 
         public static void AssertEquals(string m, int e, int a)
         {
-            Assert.AreEqual(e, a, m);
+            Assert.Equal(e, a, m);
         }
 
         [TestFixtureSetUp]
@@ -127,8 +127,8 @@ namespace Lucene.Net.Search
             return query;
         }
 
-        [Ignore]
-        [Test]
+        [Ignore("Ignored test")]
+        [Fact]
         public virtual void TestBasics()
         {
             QueryUtils.Check(Csrq("data", "1", "6", T, T));
@@ -142,7 +142,7 @@ namespace Lucene.Net.Search
             QueryUtils.CheckUnequal(Cswcq(new Term("data", "pre*n?t")), Cswcq(new Term("data", "pr*t?j")));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEqualScores()
         {
             // NOTE: uses index build in *this* setUp
@@ -159,7 +159,7 @@ namespace Lucene.Net.Search
             float score = result[0].Score;
             for (int i = 1; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
 
             result = search.Search(Csrq("data", "1", "6", T, T, MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE), null, 1000).ScoreDocs;
@@ -167,7 +167,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 6, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
 
             result = search.Search(Csrq("data", "1", "6", T, T, MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT), null, 1000).ScoreDocs;
@@ -175,11 +175,11 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 6, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEqualScoresWhenNoHits() // Test for LUCENE-5245: Empty MTQ rewrites should have a consistent norm, so always need to return a CSQ!
         {
             // NOTE: uses index build in *this* setUp
@@ -199,7 +199,7 @@ namespace Lucene.Net.Search
             float score = result[0].Score;
             for (int i = 1; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
 
             bq = new BooleanQuery();
@@ -210,7 +210,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 1, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
 
             bq = new BooleanQuery();
@@ -221,11 +221,11 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 1, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.AreEqual(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBoost()
         {
             // NOTE: uses index build in *this* setUp
@@ -252,9 +252,9 @@ namespace Lucene.Net.Search
             bq.Add(q2, BooleanClause.Occur.SHOULD);
 
             ScoreDoc[] hits = search.Search(bq, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits[0].Doc);
-            Assert.AreEqual(0, hits[1].Doc);
-            Assert.IsTrue(hits[0].Score > hits[1].Score);
+            Assert.Equal(1, hits[0].Doc);
+            Assert.Equal(0, hits[1].Doc);
+            Assert.True(hits[0].Score > hits[1].Score);
 
             q1 = Csrq("data", "A", "A", T, T, MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE); // matches document #0
             q1.Boost = .1f;
@@ -264,9 +264,9 @@ namespace Lucene.Net.Search
             bq.Add(q2, BooleanClause.Occur.SHOULD);
 
             hits = search.Search(bq, null, 1000).ScoreDocs;
-            Assert.AreEqual(1, hits[0].Doc);
-            Assert.AreEqual(0, hits[1].Doc);
-            Assert.IsTrue(hits[0].Score > hits[1].Score);
+            Assert.Equal(1, hits[0].Doc);
+            Assert.Equal(0, hits[1].Doc);
+            Assert.True(hits[0].Score > hits[1].Score);
 
             q1 = Csrq("data", "A", "A", T, T); // matches document #0
             q1.Boost = 10f;
@@ -276,9 +276,9 @@ namespace Lucene.Net.Search
             bq.Add(q2, BooleanClause.Occur.SHOULD);
 
             hits = search.Search(bq, null, 1000).ScoreDocs;
-            Assert.AreEqual(0, hits[0].Doc);
-            Assert.AreEqual(1, hits[1].Doc);
-            Assert.IsTrue(hits[0].Score > hits[1].Score);
+            Assert.Equal(0, hits[0].Doc);
+            Assert.Equal(1, hits[1].Doc);
+            Assert.True(hits[0].Score > hits[1].Score);
         }
 
         private class CollectorAnonymousInnerClassHelper : Collector
@@ -304,7 +304,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.AreEqual(1.0f, scorer.Score(), SCORE_COMP_THRESH, "score for doc " + (doc + @base) + " was not correct");
+                Assert.Equal(1.0f, scorer.Score(), SCORE_COMP_THRESH, "score for doc " + (doc + @base) + " was not correct");
             }
 
             public override AtomicReaderContext NextReader
@@ -321,7 +321,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBooleanOrderUnAffected()
         {
             // NOTE: uses index build in *this* setUp
@@ -352,7 +352,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRangeQueryId()
         {
             // NOTE: uses index build in *super* setUp
@@ -486,7 +486,7 @@ namespace Lucene.Net.Search
             AssertEquals("med,med,T,T", 1, result.Length);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRangeQueryRand()
         {
             // NOTE: uses index build in *super* setUp

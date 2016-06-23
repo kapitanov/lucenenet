@@ -1,11 +1,11 @@
 using System;
 using System.Threading;
 using Lucene.Net.Documents;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Support;
-    using NUnit.Framework;
     using Analyzer = Lucene.Net.Analysis.Analyzer;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -102,19 +102,19 @@ namespace Lucene.Net.Index
                     threads[i].Join();
                 }
 
-                Assert.IsTrue(!Failed);
+                Assert.True(!Failed);
 
                 int expectedDocCount = (int)((1 + iter) * (200 + 8 * NUM_ITER2 * (NUM_THREADS / 2.0) * (1 + NUM_THREADS)));
 
-                Assert.AreEqual(expectedDocCount, writer.NumDocs(), "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
-                Assert.AreEqual(expectedDocCount, writer.MaxDoc, "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
+                Assert.Equal(expectedDocCount, writer.NumDocs(), "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
+                Assert.Equal(expectedDocCount, writer.MaxDoc, "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
 
                 writer.Dispose();
                 writer = new IndexWriter(directory, (IndexWriterConfig)NewIndexWriterConfig(TEST_VERSION_CURRENT, ANALYZER).SetOpenMode(OpenMode_e.APPEND).SetMaxBufferedDocs(2));
 
                 DirectoryReader reader = DirectoryReader.Open(directory);
-                Assert.AreEqual(1, reader.Leaves.Count, "reader=" + reader);
-                Assert.AreEqual(expectedDocCount, reader.NumDocs);
+                Assert.Equal(1, reader.Leaves.Count, "reader=" + reader);
+                Assert.Equal(expectedDocCount, reader.NumDocs);
                 reader.Dispose();
             }
             writer.Dispose();
@@ -173,7 +173,7 @@ namespace Lucene.Net.Index
           FSDirectory.
         */
 
-        [Test]
+        [Fact]
         public virtual void TestThreadedForceMerge_Mem()
         {
             Directory directory = NewDirectory();

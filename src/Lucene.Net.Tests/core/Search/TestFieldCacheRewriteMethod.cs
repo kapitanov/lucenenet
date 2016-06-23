@@ -1,6 +1,6 @@
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
+    using Xunit;
     using RegExp = Lucene.Net.Util.Automaton.RegExp;
 
     /*
@@ -25,7 +25,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Tests the FieldcacheRewriteMethod with random regular expressions
     /// </summary>
-    [TestFixture]
     public class TestFieldCacheRewriteMethod : TestRegexpRandom2
     {
         /// <summary>
@@ -44,20 +43,20 @@ namespace Lucene.Net.Search
             CheckHits.CheckEqual(fieldCache, fieldCacheDocs.ScoreDocs, filterDocs.ScoreDocs);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestEquals()
         {
             RegexpQuery a1 = new RegexpQuery(new Term(FieldName, "[aA]"), RegExp.NONE);
             RegexpQuery a2 = new RegexpQuery(new Term(FieldName, "[aA]"), RegExp.NONE);
             RegexpQuery b = new RegexpQuery(new Term(FieldName, "[bB]"), RegExp.NONE);
-            Assert.AreEqual(a1, a2);
-            Assert.IsFalse(a1.Equals(b));
+            Assert.Equal(a1, a2);
+            Assert.False(a1.Equals(b));
 
             a1.SetRewriteMethod(new FieldCacheRewriteMethod());
             a2.SetRewriteMethod(new FieldCacheRewriteMethod());
             b.SetRewriteMethod(new FieldCacheRewriteMethod());
-            Assert.AreEqual(a1, a2);
-            Assert.IsFalse(a1.Equals(b));
+            Assert.Equal(a1, a2);
+            Assert.False(a1.Equals(b));
             QueryUtils.Check(a1);
         }
     }

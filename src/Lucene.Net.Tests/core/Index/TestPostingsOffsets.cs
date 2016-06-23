@@ -8,7 +8,7 @@ using Lucene.Net.Search;
 namespace Lucene.Net.Index
 {
     using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -50,19 +50,16 @@ namespace Lucene.Net.Index
     // TODO: we really need to test indexingoffsets, but then getting only docs / docs + freqs.
     // not all codecs store prx separate...
     // TODO: fix sep codec to index offsets so we can greatly reduce this list!
-    [TestFixture]
     public class TestPostingsOffsets : LuceneTestCase
     {
         internal IndexWriterConfig Iwc;
 
-        [SetUp]
-        public override void SetUp()
+        public TestPostingsOffsets() : base()
         {
-            base.SetUp();
             Iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -86,46 +83,46 @@ namespace Lucene.Net.Index
             w.Dispose();
 
             DocsAndPositionsEnum dp = MultiFields.GetTermPositionsEnum(r, null, "content", new BytesRef("a"));
-            Assert.IsNotNull(dp);
-            Assert.AreEqual(0, dp.NextDoc());
-            Assert.AreEqual(2, dp.Freq());
-            Assert.AreEqual(0, dp.NextPosition());
-            Assert.AreEqual(0, dp.StartOffset());
-            Assert.AreEqual(6, dp.EndOffset());
-            Assert.AreEqual(2, dp.NextPosition());
-            Assert.AreEqual(9, dp.StartOffset());
-            Assert.AreEqual(17, dp.EndOffset());
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
+            Assert.NotNull(dp);
+            Assert.Equal(0, dp.NextDoc());
+            Assert.Equal(2, dp.Freq());
+            Assert.Equal(0, dp.NextPosition());
+            Assert.Equal(0, dp.StartOffset());
+            Assert.Equal(6, dp.EndOffset());
+            Assert.Equal(2, dp.NextPosition());
+            Assert.Equal(9, dp.StartOffset());
+            Assert.Equal(17, dp.EndOffset());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
 
             dp = MultiFields.GetTermPositionsEnum(r, null, "content", new BytesRef("b"));
-            Assert.IsNotNull(dp);
-            Assert.AreEqual(0, dp.NextDoc());
-            Assert.AreEqual(1, dp.Freq());
-            Assert.AreEqual(1, dp.NextPosition());
-            Assert.AreEqual(8, dp.StartOffset());
-            Assert.AreEqual(9, dp.EndOffset());
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
+            Assert.NotNull(dp);
+            Assert.Equal(0, dp.NextDoc());
+            Assert.Equal(1, dp.Freq());
+            Assert.Equal(1, dp.NextPosition());
+            Assert.Equal(8, dp.StartOffset());
+            Assert.Equal(9, dp.EndOffset());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
 
             dp = MultiFields.GetTermPositionsEnum(r, null, "content", new BytesRef("c"));
-            Assert.IsNotNull(dp);
-            Assert.AreEqual(0, dp.NextDoc());
-            Assert.AreEqual(1, dp.Freq());
-            Assert.AreEqual(3, dp.NextPosition());
-            Assert.AreEqual(19, dp.StartOffset());
-            Assert.AreEqual(50, dp.EndOffset());
-            Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
+            Assert.NotNull(dp);
+            Assert.Equal(0, dp.NextDoc());
+            Assert.Equal(1, dp.Freq());
+            Assert.Equal(3, dp.NextPosition());
+            Assert.Equal(19, dp.StartOffset());
+            Assert.Equal(50, dp.EndOffset());
+            Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
 
             r.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSkipping()
         {
             DoTestNumbers(false);
         }
 
-        [Test]
+        [Fact]
         public virtual void TestPayloads()
         {
             DoTestNumbers(true);
@@ -179,13 +176,13 @@ namespace Lucene.Net.Index
                         int end = dp.EndOffset();
                         Debug.Assert(end >= 0 && end >= start);
                         // check that the offsets correspond to the term in the src text
-                        Assert.IsTrue(storedNumbers.Substring(start, end - start).Equals(term));
+                        Assert.True(storedNumbers.Substring(start, end - start).Equals(term));
                         if (withPayloads)
                         {
                             // check that we have a payload and it starts with "pos"
-                            Assert.IsNotNull(dp.Payload);
+                            Assert.NotNull(dp.Payload);
                             BytesRef payload = dp.Payload;
-                            Assert.IsTrue(payload.Utf8ToString().StartsWith("pos:"));
+                            Assert.True(payload.Utf8ToString().StartsWith("pos:"));
                         } // note: withPayloads=false doesnt necessarily mean we dont have them from MockAnalyzer!
                     }
                 }
@@ -199,7 +196,7 @@ namespace Lucene.Net.Index
                 int num = TestUtil.NextInt(Random(), 100, Math.Min(numDocs - 1, 999));
                 DocsAndPositionsEnum dp = MultiFields.GetTermPositionsEnum(reader, null, "numbers", new BytesRef("hundred"));
                 int doc = dp.Advance(num);
-                Assert.AreEqual(num, doc);
+                Assert.Equal(num, doc);
                 int freq = dp.Freq();
                 for (int i = 0; i < freq; i++)
                 {
@@ -210,13 +207,13 @@ namespace Lucene.Net.Index
                     int end = dp.EndOffset();
                     Debug.Assert(end >= 0 && end >= start);
                     // check that the offsets correspond to the term in the src text
-                    Assert.IsTrue(storedNumbers.Substring(start, end - start).Equals("hundred"));
+                    Assert.True(storedNumbers.Substring(start, end - start).Equals("hundred"));
                     if (withPayloads)
                     {
                         // check that we have a payload and it starts with "pos"
-                        Assert.IsNotNull(dp.Payload);
+                        Assert.NotNull(dp.Payload);
                         BytesRef payload = dp.Payload;
-                        Assert.IsTrue(payload.Utf8ToString().StartsWith("pos:"));
+                        Assert.True(payload.Utf8ToString().StartsWith("pos:"));
                     } // note: withPayloads=false doesnt necessarily mean we dont have them from MockAnalyzer!
                 }
             }
@@ -226,15 +223,15 @@ namespace Lucene.Net.Index
             for (int i = 0; i < numDocs; i++)
             {
                 DocsEnum dp = MultiFields.GetTermDocsEnum(reader, null, "id", new BytesRef("" + i), 0);
-                Assert.AreEqual(i, dp.NextDoc());
-                Assert.AreEqual(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
+                Assert.Equal(i, dp.NextDoc());
+                Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, dp.NextDoc());
             }
 
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             // token -> docID -> tokens
@@ -337,51 +334,51 @@ namespace Lucene.Net.Index
                     if (termsEnum.SeekExact(new BytesRef(term)))
                     {
                         docs = termsEnum.Docs(null, docs);
-                        Assert.IsNotNull(docs);
+                        Assert.NotNull(docs);
                         int doc;
                         //System.out.println("    doc/freq");
                         while ((doc = docs.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
                         {
                             IList<Token> expected = actualTokens[term][docIDToID.Get(doc)];
                             //System.out.println("      doc=" + docIDToID.Get(doc) + " docID=" + doc + " " + expected.Size() + " freq");
-                            Assert.IsNotNull(expected);
-                            Assert.AreEqual(expected.Count, docs.Freq());
+                            Assert.NotNull(expected);
+                            Assert.Equal(expected.Count, docs.Freq());
                         }
 
                         // explicitly exclude offsets here
                         docsAndPositions = termsEnum.DocsAndPositions(null, docsAndPositions, DocsAndPositionsEnum.FLAG_PAYLOADS);
-                        Assert.IsNotNull(docsAndPositions);
+                        Assert.NotNull(docsAndPositions);
                         //System.out.println("    doc/freq/pos");
                         while ((doc = docsAndPositions.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
                         {
                             IList<Token> expected = actualTokens[term][docIDToID.Get(doc)];
                             //System.out.println("      doc=" + docIDToID.Get(doc) + " " + expected.Size() + " freq");
-                            Assert.IsNotNull(expected);
-                            Assert.AreEqual(expected.Count, docsAndPositions.Freq());
+                            Assert.NotNull(expected);
+                            Assert.Equal(expected.Count, docsAndPositions.Freq());
                             foreach (Token token in expected)
                             {
                                 int pos = Convert.ToInt32(token.Type);
                                 //System.out.println("        pos=" + pos);
-                                Assert.AreEqual(pos, docsAndPositions.NextPosition());
+                                Assert.Equal(pos, docsAndPositions.NextPosition());
                             }
                         }
 
                         docsAndPositionsAndOffsets = termsEnum.DocsAndPositions(null, docsAndPositions);
-                        Assert.IsNotNull(docsAndPositionsAndOffsets);
+                        Assert.NotNull(docsAndPositionsAndOffsets);
                         //System.out.println("    doc/freq/pos/offs");
                         while ((doc = docsAndPositionsAndOffsets.NextDoc()) != DocIdSetIterator.NO_MORE_DOCS)
                         {
                             IList<Token> expected = actualTokens[term][docIDToID.Get(doc)];
                             //System.out.println("      doc=" + docIDToID.Get(doc) + " " + expected.Size() + " freq");
-                            Assert.IsNotNull(expected);
-                            Assert.AreEqual(expected.Count, docsAndPositionsAndOffsets.Freq());
+                            Assert.NotNull(expected);
+                            Assert.Equal(expected.Count, docsAndPositionsAndOffsets.Freq());
                             foreach (Token token in expected)
                             {
                                 int pos = Convert.ToInt32(token.Type);
                                 //System.out.println("        pos=" + pos);
-                                Assert.AreEqual(pos, docsAndPositionsAndOffsets.NextPosition());
-                                Assert.AreEqual(token.StartOffset(), docsAndPositionsAndOffsets.StartOffset());
-                                Assert.AreEqual(token.EndOffset(), docsAndPositionsAndOffsets.EndOffset());
+                                Assert.Equal(pos, docsAndPositionsAndOffsets.NextPosition());
+                                Assert.Equal(token.StartOffset(), docsAndPositionsAndOffsets.StartOffset());
+                                Assert.Equal(token.EndOffset(), docsAndPositionsAndOffsets.EndOffset());
                             }
                         }
                     }
@@ -392,7 +389,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestWithUnindexedFields()
         {
             Directory dir = NewDirectory();
@@ -427,14 +424,14 @@ namespace Lucene.Net.Index
             CompositeReader ir = riw.Reader;
             AtomicReader slow = SlowCompositeReaderWrapper.Wrap(ir);
             FieldInfos fis = slow.FieldInfos;
-            Assert.AreEqual(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS, fis.FieldInfo("foo").FieldIndexOptions);
+            Assert.Equal(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS, fis.FieldInfo("foo").FieldIndexOptions);
             slow.Dispose();
             ir.Dispose();
             riw.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestAddFieldTwice()
         {
             Directory dir = NewDirectory();
@@ -453,55 +450,40 @@ namespace Lucene.Net.Index
         }
 
         // NOTE: the next two tests aren't that good as we need an EvilToken...
-        [Test]
+        [Fact]
         public virtual void TestNegativeOffsets()
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 CheckTokens(new Token[] { MakeToken("foo", 1, -1, -1) });
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                //expected
-            }
+            });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIllegalOffsets()
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 CheckTokens(new Token[] { MakeToken("foo", 1, 1, 0) });
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                //expected
-            }
+            });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestBackwardsOffsets()
         {
-            try
+            Assert.Throws<System.ArgumentException>(() =>
             {
                 CheckTokens(new Token[] { MakeToken("foo", 1, 0, 3), MakeToken("foo", 1, 4, 7), MakeToken("foo", 0, 3, 6) });
-                Assert.Fail();
-            }
-            catch (System.ArgumentException expected)
-            {
-                // expected
-            }
+            });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestStackedTokens()
         {
             CheckTokens(new Token[] { MakeToken("foo", 1, 0, 3), MakeToken("foo", 0, 0, 3), MakeToken("foo", 0, 0, 3) });
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLegalbutVeryLargeOffsets()
         {
             Directory dir = NewDirectory();

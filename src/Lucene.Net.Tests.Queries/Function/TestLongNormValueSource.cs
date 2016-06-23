@@ -23,7 +23,7 @@ namespace Lucene.Net.Tests.Queries.Function
         [SetUp]
         public override void SetUp()
         {
-            base.SetUp();
+            
 
             dir = NewDirectory();
             IndexWriterConfig iwConfig = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
@@ -47,7 +47,7 @@ namespace Lucene.Net.Tests.Queries.Function
         [TearDown]
         public override void TearDown()
         {
-            base.TearDown();
+            base.Dispose();
 
             searcher = null;
             reader.Dispose();
@@ -56,7 +56,7 @@ namespace Lucene.Net.Tests.Queries.Function
             dir = null;
         }
         
-        [Test]
+        [Fact]
         public void TestNorm()
         {
             Similarity saved = searcher.Similarity;

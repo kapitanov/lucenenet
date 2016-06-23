@@ -1,9 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    using NUnit.Framework;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -47,7 +46,7 @@ namespace Lucene.Net.Search
     {
         private const float SCORE_EPSILON = 0.001f; // for comparing floats
 
-        [Test]
+        [Fact]
         public virtual void TestSimple()
         {
             Directory dir = NewDirectory();
@@ -85,11 +84,11 @@ namespace Lucene.Net.Search
 
             TopDocs noboost = searcher1.Search(tq, 10);
             TopDocs boost = searcher2.Search(tq, 10);
-            Assert.AreEqual(1, noboost.TotalHits);
-            Assert.AreEqual(1, boost.TotalHits);
+            Assert.Equal(1, noboost.TotalHits);
+            Assert.Equal(1, boost.TotalHits);
 
             //System.out.println(searcher2.Explain(tq, boost.ScoreDocs[0].Doc));
-            Assert.AreEqual(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 2f, SCORE_EPSILON);
+            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 2f, SCORE_EPSILON);
 
             // this query matches only the second document, which should have 4x the score.
             tq = new TermQuery(new Term("foo", "jumps"));
@@ -98,10 +97,10 @@ namespace Lucene.Net.Search
 
             noboost = searcher1.Search(tq, 10);
             boost = searcher2.Search(tq, 10);
-            Assert.AreEqual(1, noboost.TotalHits);
-            Assert.AreEqual(1, boost.TotalHits);
+            Assert.Equal(1, noboost.TotalHits);
+            Assert.Equal(1, boost.TotalHits);
 
-            Assert.AreEqual(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 4f, SCORE_EPSILON);
+            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 4f, SCORE_EPSILON);
 
             // search on on field bar just for kicks, nothing should happen, since we setup
             // our sim provider to only use foo_boost for field foo.
@@ -111,10 +110,10 @@ namespace Lucene.Net.Search
 
             noboost = searcher1.Search(tq, 10);
             boost = searcher2.Search(tq, 10);
-            Assert.AreEqual(1, noboost.TotalHits);
-            Assert.AreEqual(1, boost.TotalHits);
+            Assert.Equal(1, noboost.TotalHits);
+            Assert.Equal(1, boost.TotalHits);
 
-            Assert.AreEqual(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score, SCORE_EPSILON);
+            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score, SCORE_EPSILON);
 
             ir.Dispose();
             dir.Dispose();

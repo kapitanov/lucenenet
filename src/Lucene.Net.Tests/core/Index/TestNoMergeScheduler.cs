@@ -1,12 +1,11 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Randomized.Generators;
-    using NUnit.Framework;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -26,10 +25,9 @@ namespace Lucene.Net.Index
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestNoMergeScheduler : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestNoMergeScheduler_Mem()
         {
             MergeScheduler ms = NoMergeScheduler.INSTANCE;
@@ -38,16 +36,16 @@ namespace Lucene.Net.Index
         }
 
         //LUCENE TODO: Compilation problems
-        /*[Test]
+        /*[Fact]
         public virtual void TestFinalSingleton()
 	    {
-		    Assert.IsTrue(Modifier.isFinal(typeof(NoMergeScheduler).Modifiers));
+		    Assert.True(Modifier.isFinal(typeof(NoMergeScheduler).Modifiers));
 		    Constructor<?>[] ctors = typeof(NoMergeScheduler).DeclaredConstructors;
-		    Assert.AreEqual("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
-		    Assert.IsTrue("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
+		    Assert.Equal("expected 1 private ctor only: " + Arrays.ToString(ctors), 1, ctors.Length);
+		    Assert.True("that 1 should be private: " + ctors[0], Modifier.isPrivate(ctors[0].Modifiers));
 	    }*/
 
-        [Test]
+        [Fact]
         public virtual void TestMethodsOverridden()
         {
             // Ensures that all methods of MergeScheduler are overridden. That's
@@ -62,7 +60,7 @@ namespace Lucene.Net.Index
                 // this will need to change.
                 if (m.DeclaringType != typeof(object))
                 {
-                    Assert.IsTrue(m.DeclaringType == typeof(NoMergeScheduler), m + " is not overridden !");
+                    Assert.True(m.DeclaringType == typeof(NoMergeScheduler), m + " is not overridden !");
                 }
             }
         }

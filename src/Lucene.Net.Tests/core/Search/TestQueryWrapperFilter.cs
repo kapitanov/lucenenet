@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using NUnit.Framework;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -32,10 +32,9 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestQueryWrapperFilter : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestBasic()
         {
             Directory dir = NewDirectory();
@@ -53,9 +52,9 @@ namespace Lucene.Net.Search
 
             IndexSearcher searcher = NewSearcher(reader);
             TopDocs hits = searcher.Search(new MatchAllDocsQuery(), qwf, 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             hits = searcher.Search(new MatchAllDocsQuery(), new CachingWrapperFilter(qwf), 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
 
             // should not throw exception with complex primitive query
             BooleanQuery booleanQuery = new BooleanQuery();
@@ -64,31 +63,31 @@ namespace Lucene.Net.Search
             qwf = new QueryWrapperFilter(termQuery);
 
             hits = searcher.Search(new MatchAllDocsQuery(), qwf, 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             hits = searcher.Search(new MatchAllDocsQuery(), new CachingWrapperFilter(qwf), 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
 
             // should not throw exception with non primitive Query (doesn't implement
             // Query#createWeight)
             qwf = new QueryWrapperFilter(new FuzzyQuery(new Term("field", "valu")));
 
             hits = searcher.Search(new MatchAllDocsQuery(), qwf, 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
             hits = searcher.Search(new MatchAllDocsQuery(), new CachingWrapperFilter(qwf), 10);
-            Assert.AreEqual(1, hits.TotalHits);
+            Assert.Equal(1, hits.TotalHits);
 
             // test a query with no hits
             termQuery = new TermQuery(new Term("field", "not_exist"));
             qwf = new QueryWrapperFilter(termQuery);
             hits = searcher.Search(new MatchAllDocsQuery(), qwf, 10);
-            Assert.AreEqual(0, hits.TotalHits);
+            Assert.Equal(0, hits.TotalHits);
             hits = searcher.Search(new MatchAllDocsQuery(), new CachingWrapperFilter(qwf), 10);
-            Assert.AreEqual(0, hits.TotalHits);
+            Assert.Equal(0, hits.TotalHits);
             reader.Dispose();
             dir.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandom()
         {
             Directory d = NewDirectory();
@@ -126,16 +125,16 @@ namespace Lucene.Net.Search
             IndexReader r = w.Reader;
             w.Dispose();
             TopDocs hits = NewSearcher(r).Search(new MatchAllDocsQuery(), new QueryWrapperFilter(new TermQuery(new Term("field", "a"))), numDocs);
-            Assert.AreEqual(aDocs.Count, hits.TotalHits);
+            Assert.Equal(aDocs.Count, hits.TotalHits);
             foreach (ScoreDoc sd in hits.ScoreDocs)
             {
-                Assert.IsTrue(aDocs.Contains(r.Document(sd.Doc).Get("id")));
+                Assert.True(aDocs.Contains(r.Document(sd.Doc).Get("id")));
             }
             r.Dispose();
             d.Dispose();
         }
 
-        [Test]
+        [Fact]
         public virtual void TestThousandDocuments()
         {
             Directory dir = NewDirectory();
@@ -157,7 +156,7 @@ namespace Lucene.Net.Search
                 TermQuery termQuery = new TermQuery(new Term("field", English.IntToEnglish(i)));
                 QueryWrapperFilter qwf = new QueryWrapperFilter(termQuery);
                 TopDocs td = searcher.Search(new MatchAllDocsQuery(), qwf, 10);
-                Assert.AreEqual(1, td.TotalHits);
+                Assert.Equal(1, td.TotalHits);
             }
 
             reader.Dispose();

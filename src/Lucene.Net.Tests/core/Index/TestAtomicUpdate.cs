@@ -1,8 +1,8 @@
 using System;
 using System.IO;
 using System.Threading;
-using Lucene.Net.Attributes;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -10,7 +10,7 @@ namespace Lucene.Net.Index
     using Lucene.Net.Store;
     using Lucene.Net.Support;
     using Lucene.Net.Util;
-    using NUnit.Framework;
+    
 
     /*
         /// Copyright 2004 The Apache Software Foundation
@@ -122,7 +122,7 @@ namespace Lucene.Net.Index
             public override void DoWork()
             {
                 IndexReader r = DirectoryReader.Open(Directory);
-                Assert.AreEqual(100, r.NumDocs);
+                Assert.Equal(100, r.NumDocs);
                 r.Dispose();
             }
         }
@@ -155,7 +155,7 @@ namespace Lucene.Net.Index
             writer.Commit();
 
             IndexReader r = DirectoryReader.Open(directory);
-            Assert.AreEqual(100, r.NumDocs);
+            Assert.Equal(100, r.NumDocs);
             r.Dispose();
 
             IndexerThread indexerThread = new IndexerThread(writer, threads);
@@ -181,10 +181,10 @@ namespace Lucene.Net.Index
 
             writer.Dispose();
 
-            Assert.IsTrue(!indexerThread.Failed, "hit unexpected exception in indexer");
-            Assert.IsTrue(!indexerThread2.Failed, "hit unexpected exception in indexer2");
-            Assert.IsTrue(!searcherThread1.Failed, "hit unexpected exception in search1");
-            Assert.IsTrue(!searcherThread2.Failed, "hit unexpected exception in search2");
+            Assert.True(!indexerThread.Failed, "hit unexpected exception in indexer");
+            Assert.True(!indexerThread2.Failed, "hit unexpected exception in indexer2");
+            Assert.True(!searcherThread1.Failed, "hit unexpected exception in search1");
+            Assert.True(!searcherThread2.Failed, "hit unexpected exception in search2");
             //System.out.println("    Writer: " + indexerThread.count + " iterations");
             //System.out.println("Searcher 1: " + searcherThread1.count + " searchers created");
             //System.out.println("Searcher 2: " + searcherThread2.count + " searchers created");
@@ -195,7 +195,7 @@ namespace Lucene.Net.Index
           FSDirectory.
         */
 
-        [Test]
+        [Fact]
         public virtual void TestAtomicUpdates()
         {
             Directory directory;

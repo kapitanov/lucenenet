@@ -1,8 +1,8 @@
-using Lucene.Net.Randomized.Generators;
-using Lucene.Net.Support;
-using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Util
 {
@@ -23,10 +23,9 @@ namespace Lucene.Net.Util
     /// limitations under the License.
     /// </summary>
 
-    [TestFixture]
     public class TestNumericUtils : LuceneTestCase
     {
-        [Test]
+        [Fact]
         public virtual void TestLongConversionAndOrdering()
         {
             // generate a series of encoded longs, each numerical one bigger than the one before
@@ -37,18 +36,18 @@ namespace Lucene.Net.Util
                 if (last != null)
                 {
                     // test if smaller
-                    Assert.IsTrue(last.CompareTo(act) < 0, "actual bigger than last (BytesRef)");
-                    //Assert.IsTrue(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
+                    Assert.True(last.CompareTo(act) < 0, "actual bigger than last (BytesRef)");
+                    //Assert.True(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
                 }
                 // test is back and forward conversion works
-                Assert.AreEqual(l, NumericUtils.PrefixCodedToLong(act), "forward and back conversion should generate same long");
+                Assert.Equal(l, NumericUtils.PrefixCodedToLong(act), "forward and back conversion should generate same long");
                 // next step
                 last = act;
                 act = new BytesRef(NumericUtils.BUF_SIZE_LONG);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntConversionAndOrdering()
         {
             // generate a series of encoded ints, each numerical one bigger than the one before
@@ -59,18 +58,18 @@ namespace Lucene.Net.Util
                 if (last != null)
                 {
                     // test if smaller
-                    Assert.IsTrue(last.CompareTo(act) < 0, "actual bigger than last (BytesRef)");
-                    //Assert.IsTrue(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
+                    Assert.True(last.CompareTo(act) < 0, "actual bigger than last (BytesRef)");
+                    //Assert.True(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
                 }
                 // test is back and forward conversion works
-                Assert.AreEqual(i, NumericUtils.PrefixCodedToInt(act), "forward and back conversion should generate same int");
+                Assert.Equal(i, NumericUtils.PrefixCodedToInt(act), "forward and back conversion should generate same int");
                 // next step
                 last = act;
                 act = new BytesRef(NumericUtils.BUF_SIZE_INT);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestLongSpecialValues()
         {
             long[] vals = new long[] { long.MinValue, long.MinValue + 1, long.MinValue + 2, -5003400000000L, -4000L, -3000L, -2000L, -1000L, -1L, 0L, 1L, 10L, 300L, 50006789999999999L, long.MaxValue - 2, long.MaxValue - 1, long.MaxValue };
@@ -82,13 +81,13 @@ namespace Lucene.Net.Util
                 NumericUtils.LongToPrefixCodedBytes(vals[i], 0, prefixVals[i]);
 
                 // check forward and back conversion
-                Assert.AreEqual(vals[i], NumericUtils.PrefixCodedToLong(prefixVals[i]), "forward and back conversion should generate same long");
+                Assert.Equal(vals[i], NumericUtils.PrefixCodedToLong(prefixVals[i]), "forward and back conversion should generate same long");
 
                 // test if decoding values as int fails correctly
                 try
                 {
                     NumericUtils.PrefixCodedToInt(prefixVals[i]);
-                    Assert.Fail("decoding a prefix coded long value as int should fail");
+                    Assert.True(false, "decoding a prefix coded long value as int should fail");
                 }
                 catch (FormatException e)
                 {
@@ -99,7 +98,7 @@ namespace Lucene.Net.Util
             // check sort order (prefixVals should be ascending)
             for (int i = 1; i < prefixVals.Length; i++)
             {
-                Assert.IsTrue(prefixVals[i - 1].CompareTo(prefixVals[i]) < 0, "check sort order");
+                Assert.True(prefixVals[i - 1].CompareTo(prefixVals[i]) < 0, "check sort order");
             }
 
             // check the prefix encoding, lower precision should have the difference to original value equal to the lower removed bits
@@ -111,12 +110,12 @@ namespace Lucene.Net.Util
                     NumericUtils.LongToPrefixCodedBytes(vals[i], j, @ref);
                     long prefixVal = NumericUtils.PrefixCodedToLong(@ref);
                     long mask = (1L << j) - 1L;
-                    Assert.AreEqual(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
+                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestIntSpecialValues()
         {
             int[] vals = new int[] { int.MinValue, int.MinValue + 1, int.MinValue + 2, -64765767, -4000, -3000, -2000, -1000, -1, 0, 1, 10, 300, 765878989, int.MaxValue - 2, int.MaxValue - 1, int.MaxValue };
@@ -128,13 +127,13 @@ namespace Lucene.Net.Util
                 NumericUtils.IntToPrefixCodedBytes(vals[i], 0, prefixVals[i]);
 
                 // check forward and back conversion
-                Assert.AreEqual(vals[i], NumericUtils.PrefixCodedToInt(prefixVals[i]), "forward and back conversion should generate same int");
+                Assert.Equal(vals[i], NumericUtils.PrefixCodedToInt(prefixVals[i]), "forward and back conversion should generate same int");
 
                 // test if decoding values as long fails correctly
                 try
                 {
                     NumericUtils.PrefixCodedToLong(prefixVals[i]);
-                    Assert.Fail("decoding a prefix coded int value as long should fail");
+                    Assert.True(false, "decoding a prefix coded int value as long should fail");
                 }
                 catch (FormatException e)
                 {
@@ -145,7 +144,7 @@ namespace Lucene.Net.Util
             // check sort order (prefixVals should be ascending)
             for (int i = 1; i < prefixVals.Length; i++)
             {
-                Assert.IsTrue(prefixVals[i - 1].CompareTo(prefixVals[i]) < 0, "check sort order");
+                Assert.True(prefixVals[i - 1].CompareTo(prefixVals[i]) < 0, "check sort order");
             }
 
             // check the prefix encoding, lower precision should have the difference to original value equal to the lower removed bits
@@ -157,12 +156,12 @@ namespace Lucene.Net.Util
                     NumericUtils.IntToPrefixCodedBytes(vals[i], j, @ref);
                     int prefixVal = NumericUtils.PrefixCodedToInt(@ref);
                     int mask = (1 << j) - 1;
-                    Assert.AreEqual(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
+                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
                 }
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestDoubles()
         {
             double[] vals = new double[] { double.NegativeInfinity, -2.3E25, -1.0E15, -1.0, -1.0E-1, -1.0E-2, -0.0, +0.0, 1.0E-2, 1.0E-1, 1.0, 1.0E15, 2.3E25, double.PositiveInfinity, double.NaN };
@@ -172,31 +171,31 @@ namespace Lucene.Net.Util
             for (int i = 0; i < vals.Length; i++)
             {
                 longVals[i] = NumericUtils.DoubleToSortableLong(vals[i]);
-                Assert.IsTrue(vals[i].CompareTo(NumericUtils.SortableLongToDouble(longVals[i])) == 0, "forward and back conversion should generate same double");
+                Assert.True(vals[i].CompareTo(NumericUtils.SortableLongToDouble(longVals[i])) == 0, "forward and back conversion should generate same double");
             }
 
             // check sort order (prefixVals should be ascending)
             for (int i = 1; i < longVals.Length; i++)
             {
-                Assert.IsTrue(longVals[i - 1] < longVals[i], "check sort order");
+                Assert.True(longVals[i - 1] < longVals[i], "check sort order");
             }
         }
 
         public static readonly double[] DOUBLE_NANs = new double[] { double.NaN, BitConverter.Int64BitsToDouble(0x7ff0000000000001L), BitConverter.Int64BitsToDouble(0x7fffffffffffffffL), BitConverter.Int64BitsToDouble(unchecked((long)0xfff0000000000001L)), BitConverter.Int64BitsToDouble(unchecked((long)0xffffffffffffffffL)) };
 
-        [Test]
+        [Fact]
         public virtual void TestSortableDoubleNaN()
         {
             long plusInf = NumericUtils.DoubleToSortableLong(double.PositiveInfinity);
             foreach (double nan in DOUBLE_NANs)
             {
-                Assert.IsTrue(double.IsNaN(nan));
+                Assert.True(double.IsNaN(nan));
                 long sortable = NumericUtils.DoubleToSortableLong(nan);
-                Assert.IsTrue((ulong)sortable > (ulong)plusInf, "Double not sorted correctly: " + nan + ", long repr: " + sortable + ", positive inf.: " + plusInf);
+                Assert.True((ulong)sortable > (ulong)plusInf, "Double not sorted correctly: " + nan + ", long repr: " + sortable + ", positive inf.: " + plusInf);
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestFloats()
         {
             float[] vals = new float[] { float.NegativeInfinity, -2.3E25f, -1.0E15f, -1.0f, -1.0E-1f, -1.0E-2f, -0.0f, +0.0f, 1.0E-2f, 1.0E-1f, 1.0f, 1.0E15f, 2.3E25f, float.PositiveInfinity, float.NaN };
@@ -206,27 +205,27 @@ namespace Lucene.Net.Util
             for (int i = 0; i < vals.Length; i++)
             {
                 intVals[i] = NumericUtils.FloatToSortableInt(vals[i]);
-                Assert.IsTrue(vals[i].CompareTo(NumericUtils.SortableIntToFloat(intVals[i])) == 0, "forward and back conversion should generate same double");
+                Assert.True(vals[i].CompareTo(NumericUtils.SortableIntToFloat(intVals[i])) == 0, "forward and back conversion should generate same double");
             }
 
             // check sort order (prefixVals should be ascending)
             for (int i = 1; i < intVals.Length; i++)
             {
-                Assert.IsTrue(intVals[i - 1] < intVals[i], "check sort order");
+                Assert.True(intVals[i - 1] < intVals[i], "check sort order");
             }
         }
 
         public static readonly float[] FLOAT_NANs = new float[] { float.NaN, Number.IntBitsToFloat(0x7f800001), Number.IntBitsToFloat(0x7fffffff), Number.IntBitsToFloat(unchecked((int)0xff800001)), Number.IntBitsToFloat(unchecked((int)0xffffffff)) };
 
-        [Test]
+        [Fact]
         public virtual void TestSortableFloatNaN()
         {
             int plusInf = NumericUtils.FloatToSortableInt(float.PositiveInfinity);
             foreach (float nan in FLOAT_NANs)
             {
-                Assert.IsTrue(float.IsNaN(nan));
+                Assert.True(float.IsNaN(nan));
                 uint sortable = (uint)NumericUtils.FloatToSortableInt(nan);
-                Assert.IsTrue(sortable > plusInf, "Float not sorted correctly: " + nan + ", int repr: " + sortable + ", positive inf.: " + plusInf);
+                Assert.True(sortable > plusInf, "Float not sorted correctly: " + nan + ", int repr: " + sortable + ", positive inf.: " + plusInf);
             }
         }
 
@@ -247,7 +246,7 @@ namespace Lucene.Net.Util
             {
                 // after flipping all bits in the range, the cardinality should be zero
                 bits.Flip(0, upper - lower + 1);
-                Assert.AreEqual(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
+                Assert.Equal(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
             }
         }
 
@@ -275,12 +274,12 @@ namespace Lucene.Net.Util
 
             public override void AddRange(long min, long max, int shift)
             {
-                Assert.IsTrue(min >= Lower && min <= Upper && max >= Lower && max <= Upper, "min, max should be inside bounds");
+                Assert.True(min >= Lower && min <= Upper && max >= Lower && max <= Upper, "min, max should be inside bounds");
                 if (UseBitSet)
                 {
                     for (long l = min; l <= max; l++)
                     {
-                        Assert.IsFalse(Bits.GetAndSet(l - Lower), "ranges should not overlap");
+                        Assert.False(Bits.GetAndSet(l - Lower), "ranges should not overlap");
                         // extra exit condition to prevent overflow on MAX_VALUE
                         if (l == max)
                         {
@@ -297,17 +296,17 @@ namespace Lucene.Net.Util
                 max ^= unchecked((long)0x8000000000000000L);
                 //System.out.println("0x"+Long.toHexString(min>>>shift)+"L,0x"+Long.toHexString(max>>>shift)+"L)/*shift="+shift+"*/,");
                 NeededShifts.MoveNext();
-                Assert.AreEqual(NeededShifts.Current, shift, "shift");
+                Assert.Equal(NeededShifts.Current, shift, "shift");
                 NeededBounds.MoveNext();
-                Assert.AreEqual(NeededBounds.Current, (long)((ulong)min >> shift), "inner min bound");
+                Assert.Equal(NeededBounds.Current, (long)((ulong)min >> shift), "inner min bound");
                 NeededBounds.MoveNext();
-                Assert.AreEqual(NeededBounds.Current, (long)((ulong)max >> shift), "inner max bound");
+                Assert.Equal(NeededBounds.Current, (long)((ulong)max >> shift), "inner max bound");
             }
         }
 
         /// <summary>
         /// LUCENE-2541: NumericRangeQuery errors with endpoints near long min and max values </summary>
-        [Test]
+        [Fact]
         public virtual void TestLongExtremeValues()
         {
             // upper end extremes
@@ -333,7 +332,7 @@ namespace Lucene.Net.Util
             AssertLongRangeSplit(long.MinValue, long.MinValue + 0x10L, 4, true, Arrays.AsList(0x0000000000000010L, 0x0000000000000010L, 0x000000000000000L, 0x000000000000000L), Arrays.AsList(0, 4));
         }
 
-        [Test]
+        [Fact]
         public virtual void TestRandomSplit()
         {
             long num = (long)AtLeast(10);
@@ -397,7 +396,7 @@ namespace Lucene.Net.Util
             return val;
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSplitLongRange()
         {
             // a hard-coded "standard" range
@@ -443,7 +442,7 @@ namespace Lucene.Net.Util
             {
                 // after flipping all bits in the range, the cardinality should be zero
                 bits.Flip(0, upper - lower + 1);
-                Assert.AreEqual(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
+                Assert.Equal(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
             }
         }
 
@@ -471,12 +470,12 @@ namespace Lucene.Net.Util
 
             public override void AddRange(int min, int max, int shift)
             {
-                Assert.IsTrue(min >= Lower && min <= Upper && max >= Lower && max <= Upper, "min, max should be inside bounds");
+                Assert.True(min >= Lower && min <= Upper && max >= Lower && max <= Upper, "min, max should be inside bounds");
                 if (UseBitSet)
                 {
                     for (int i = min; i <= max; i++)
                     {
-                        Assert.IsFalse(Bits.GetAndSet(i - Lower), "ranges should not overlap");
+                        Assert.False(Bits.GetAndSet(i - Lower), "ranges should not overlap");
                         // extra exit condition to prevent overflow on MAX_VALUE
                         if (i == max)
                         {
@@ -493,15 +492,15 @@ namespace Lucene.Net.Util
                 max ^= unchecked((int)0x80000000);
                 //System.out.println("0x"+Integer.toHexString(min>>>shift)+",0x"+Integer.toHexString(max>>>shift)+")/*shift="+shift+"*/,");
                 NeededShifts.MoveNext();
-                Assert.AreEqual(NeededShifts.Current, shift, "shift");
+                Assert.Equal(NeededShifts.Current, shift, "shift");
                 NeededBounds.MoveNext();
-                Assert.AreEqual(NeededBounds.Current, (int)((uint)min >> shift), "inner min bound");
+                Assert.Equal(NeededBounds.Current, (int)((uint)min >> shift), "inner min bound");
                 NeededBounds.MoveNext();
-                Assert.AreEqual(NeededBounds.Current, (int)((uint)max >> shift), "inner max bound");
+                Assert.Equal(NeededBounds.Current, (int)((uint)max >> shift), "inner max bound");
             }
         }
 
-        [Test]
+        [Fact]
         public virtual void TestSplitIntRange()
         {
             // a hard-coded "standard" range
