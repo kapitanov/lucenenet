@@ -6,7 +6,7 @@ using Lucene.Net.Queries.Function;
 using Lucene.Net.Queries.Function.ValueSources;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {
@@ -15,7 +15,6 @@ namespace Lucene.Net.Tests.Queries.Function
     /// </summary>
     public abstract class FunctionTestSetup : LuceneTestCase
     {
-
         /// <summary>
         /// Actual score computation order is slightly different than assumptios
         /// this allows for a small amount of variation
@@ -56,8 +55,7 @@ namespace Lucene.Net.Tests.Queries.Function
         protected internal static Directory dir;
         protected internal static Analyzer anlzr;
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             base.Dispose();
             dir.Dispose();
@@ -65,7 +63,6 @@ namespace Lucene.Net.Tests.Queries.Function
             anlzr = null;
         }
 
-        
         protected internal static void CreateIndex(bool doMultiSegment)
         {
             if (VERBOSE)

@@ -8,7 +8,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Search.Similarities;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {
@@ -20,11 +20,8 @@ namespace Lucene.Net.Tests.Queries.Function
         internal static IndexSearcher searcher;
         private static Similarity sim = new PreciseDefaultSimilarity();
         
-        [SetUp]
-        public override void SetUp()
+        public TestLongNormValueSource() : base()
         {
-            
-
             dir = NewDirectory();
             IndexWriterConfig iwConfig = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             iwConfig.SetMergePolicy(NewLogMergePolicy());
@@ -43,9 +40,8 @@ namespace Lucene.Net.Tests.Queries.Function
             searcher = NewSearcher(reader);
             iw.Dispose();
         }
-        
-        [TearDown]
-        public override void TearDown()
+
+        public override void Dispose()
         {
             base.Dispose();
 

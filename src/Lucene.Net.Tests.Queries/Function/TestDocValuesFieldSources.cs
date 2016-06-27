@@ -9,7 +9,7 @@ using Lucene.Net.Store;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
 using Lucene.Net.Util.Packed;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {

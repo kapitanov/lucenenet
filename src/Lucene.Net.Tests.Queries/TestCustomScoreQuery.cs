@@ -5,7 +5,7 @@ using Lucene.Net.Queries;
 using Lucene.Net.Queries.Function;
 using Lucene.Net.Search;
 using Lucene.Net.Tests.Queries.Function;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {
@@ -14,10 +14,8 @@ namespace Lucene.Net.Tests.Queries
     /// </summary>
     public class TestCustomScoreQuery : FunctionTestSetup
     {
-        [SetUp]
-        public override void SetUp()
+        public TestCustomScoreQuery() : base()
         {
-            
             CreateIndex(true);
         }
 

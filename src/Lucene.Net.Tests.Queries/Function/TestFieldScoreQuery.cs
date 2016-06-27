@@ -1,7 +1,7 @@
 ﻿using Lucene.Net.Index;
 using Lucene.Net.Queries.Function;
 using Lucene.Net.Search;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {
@@ -18,10 +18,8 @@ namespace Lucene.Net.Tests.Queries.Function
     /// </summary>
     public class TestFieldScoreQuery : FunctionTestSetup
     {
-        [SetUp]
-        public override void SetUp()
+        public TestFieldScoreQuery() : base()
         {
-            
             CreateIndex(true);
         }
 

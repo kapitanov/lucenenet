@@ -7,7 +7,7 @@ using Lucene.Net.Queries;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {
@@ -140,23 +140,8 @@ namespace Lucene.Net.Tests.Queries
         [Fact]
         public void TestNoTerms()
         {
-            try
-            {
-                new TermFilter(null);
-                Fail(@"must fail - no term!");
-            }
-            catch (ArgumentException e)
-            {
-            }
-
-            try
-            {
-                new TermFilter(new Term(null));
-                Fail(@"must fail - no field!");
-            }
-            catch (ArgumentException e)
-            {
-            }
+            Assert.Throws<ArgumentException>(() => new TermFilter(null));
+            Assert.Throws<ArgumentException>(() => new TermFilter(new Term(null)));
         }
 
         [Fact]

@@ -5,7 +5,7 @@ using Lucene.Net.Queries;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {
@@ -14,10 +14,8 @@ namespace Lucene.Net.Tests.Queries
         private Directory directory;
         private AtomicReader reader;
 
-        [SetUp]
-        public override void SetUp()
+        public BooleanFilterTest() : base()
         {
-            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory, new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
 
@@ -30,8 +28,7 @@ namespace Lucene.Net.Tests.Queries
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             reader.Dispose();
             directory.Dispose();
@@ -139,7 +136,6 @@ namespace Lucene.Net.Tests.Queries
             }
         }
 
-        [Fact]
         private void TstFilterCard(string mes, int expected, Filter filt)
         {
             DocIdSet docIdSet = filt.GetDocIdSet(reader.AtomicContext, reader.LiveDocs);

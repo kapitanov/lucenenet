@@ -5,7 +5,7 @@ using Lucene.Net.Queries.Function.ValueSources;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {

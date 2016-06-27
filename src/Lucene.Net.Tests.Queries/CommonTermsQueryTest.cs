@@ -10,7 +10,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {
@@ -138,14 +138,7 @@ namespace Lucene.Net.Tests.Queries
         {
             Random random = Random();
             CommonTermsQuery query = new CommonTermsQuery(RandomOccur(random), RandomOccur(random), Random().NextFloat());
-            try
-            {
-                query.Add(null);
-                Fail(@"null values are not supported");
-            }
-            catch (ArgumentException ex)
-            {
-            }
+            Assert.Throws<ArgumentException>(() => query.Add(null));
         }
 
         [Fact]
@@ -281,23 +274,8 @@ namespace Lucene.Net.Tests.Queries
         public void TestIllegalOccur()
         {
             Random random = Random();
-            try
-            {
-                new CommonTermsQuery(BooleanClause.Occur.MUST_NOT, RandomOccur(random), Random().NextFloat());
-                Fail(@"MUST_NOT is not supproted");
-            }
-            catch (ArgumentException ex)
-            {
-            }
-
-            try
-            {
-                new CommonTermsQuery(RandomOccur(random), BooleanClause.Occur.MUST_NOT, Random().NextFloat());
-                Fail(@"MUST_NOT is not supproted");
-            }
-            catch (ArgumentException ex)
-            {
-            }
+            Assert.Throws<ArgumentException>(() => new CommonTermsQuery(BooleanClause.Occur.MUST_NOT, RandomOccur(random), Random().NextFloat()));
+            Assert.Throws<ArgumentException>(() => new CommonTermsQuery(RandomOccur(random), BooleanClause.Occur.MUST_NOT, Random().NextFloat()));
         }
 
         [Fact]

@@ -6,7 +6,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Queries.Mlt;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Lucene.Net.Tests.Queries.Mlt
@@ -17,10 +17,8 @@ namespace Lucene.Net.Tests.Queries.Mlt
         private IndexReader reader;
         private IndexSearcher searcher;
         
-        [SetUp]
-        public override void SetUp()
+        public TestMoreLikeThis() : base()
         {
-            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory);
 
@@ -32,9 +30,8 @@ namespace Lucene.Net.Tests.Queries.Mlt
             writer.Dispose();
             searcher = NewSearcher(reader);
         }
-        
-        [TearDown]
-        public override void TearDown()
+
+        public override void Dispose()
         {
             reader.Dispose();
             directory.Dispose();

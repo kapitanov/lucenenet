@@ -2,7 +2,7 @@
 using Lucene.Net.Queries;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {

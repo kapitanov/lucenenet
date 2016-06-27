@@ -6,7 +6,7 @@ using Lucene.Net.Queries.Function.ValueSources;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries.Function
 {
@@ -20,10 +20,8 @@ namespace Lucene.Net.Tests.Queries.Function
         internal static IndexReader ir;
         internal static IndexSearcher @is;
         
-        [SetUp]
-        public override void SetUp()
+        public TestBoostedQuery() : base()
         {
-            
             dir = NewDirectory();
             IndexWriterConfig iwConfig = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             iwConfig.SetMergePolicy(NewLogMergePolicy());
@@ -37,8 +35,7 @@ namespace Lucene.Net.Tests.Queries.Function
             iw.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             base.Dispose();
             @is = null;

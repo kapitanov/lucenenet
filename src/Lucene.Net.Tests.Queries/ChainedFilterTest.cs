@@ -6,7 +6,7 @@ using Lucene.Net.Queries;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Queries
 {
@@ -23,10 +23,8 @@ namespace Lucene.Net.Tests.Queries
         private QueryWrapperFilter bobFilter;
         private QueryWrapperFilter sueFilter;
 
-        [SetUp]
-        public override void SetUp()
+        public ChainedFilterTest() : base()
         {
-            
             directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), directory);
             // we use the default Locale/TZ since LuceneTestCase randomizes it
@@ -63,8 +61,7 @@ namespace Lucene.Net.Tests.Queries
             sueFilter = new QueryWrapperFilter(new TermQuery(new Term("owner", "sue")));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             reader.Dispose();
             directory.Dispose();
