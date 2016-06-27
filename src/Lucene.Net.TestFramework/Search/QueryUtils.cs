@@ -479,10 +479,12 @@ namespace Lucene.Net.Search
                         Assert.True(scorer_.Advance(i) != DocIdSetIterator.NO_MORE_DOCS, "query collected " + doc + " but skipTo(" + i + ") says no more docs!");
                         Assert.Equal(doc, scorer_.DocID()); //, "query collected " + doc + " but skipTo(" + i + ") got to " + scorer_.DocID());
                         float skipToScore = scorer_.Score();
-                        float min = scorer_.Score() - MaxDiff;
-                        float max = scorer_.Score() + MaxDiff;
-                        Assert.InRange(skipToScore, min, max); //, "unstable skipTo(" + i + ") score!");
-                        Assert.InRange(score, skipToScore, skipToScore + MaxDiff); //, "query assigned doc " + doc + " a score of <" + score + "> but skipTo(" + i + ") has <" + skipToScore + ">!");
+                        float min = skipToScore - MaxDiff;
+                        float max = skipToScore + MaxDiff;
+                        float min2 = score - MaxDiff;
+                        float max2 = score + MaxDiff;
+                        Assert.InRange(scorer_.Score(), min, max); //, "unstable skipTo(" + i + ") score!");
+                        Assert.InRange(skipToScore, min2, max2); //, "query assigned doc " + doc + " a score of <" + score + "> but skipTo(" + i + ") has <" + skipToScore + ">!");
 
                         // Hurry things along if they are going slow (eg
                         // if you got SimpleText codec this will kick in):

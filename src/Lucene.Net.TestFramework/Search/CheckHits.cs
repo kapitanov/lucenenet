@@ -347,6 +347,7 @@ namespace Lucene.Net.Search
             float tolerance = ExplainToleranceDelta(score, value);
             float minValue = value - tolerance;
             float maxValue = value + tolerance;
+
             Assert.InRange(score, minValue, maxValue); //, q + ": score(doc=" + doc + ")=" + score + " != explanationScore=" + value + " Explanation: " + expl);
 
             if (!deep)

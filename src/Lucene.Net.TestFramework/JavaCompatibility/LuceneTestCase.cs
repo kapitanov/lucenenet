@@ -75,18 +75,25 @@ namespace Lucene.Net.Util
             Assert.NotSame(unexpected, actual); //, message);
         }
 
-        protected static void assertEquals(double d1, double d2, double delta)
+        protected static void assertEquals(double expected, double actual, double delta)
         {
-            double min = d2 - delta;
-            double max = d2 + delta;
-            Assert.InRange(d1, min, max);
+            double min = expected - delta;
+            double max = expected + delta;
+            Assert.InRange(actual, min, max);
         }
 
-        protected static void assertEquals(string msg, double d1, double d2, double delta)
+        protected static void assertEquals(float expected, float actual, float delta)
         {
-            double min = d2 - delta;
-            double max = d2 + delta;
-            Assert.InRange(d1, min, max);//, msg);
+            float min = expected - delta;
+            float max = expected + delta;
+            Assert.InRange(actual, min, max);
+        }
+
+        protected static void assertEquals(string msg, double expected, double actual, double delta)
+        {
+            double min = expected - delta;
+            double max = expected + delta;
+            Assert.InRange(actual, min, max);//, msg);
         }
 
         protected static void assertNotNull(object o)

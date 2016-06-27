@@ -66,7 +66,7 @@ namespace Lucene.Net.Index
                 bytesUsedByExtension[ext] = previousLength + d.FileLength(file);
             }
 			foreach (string item in ExcludedExtensionsFromByteCounts()) {
-				bytesUsedByExtension.Remove(item);							
+				bytesUsedByExtension.Remove(item);
 			}
             return bytesUsedByExtension;
         }

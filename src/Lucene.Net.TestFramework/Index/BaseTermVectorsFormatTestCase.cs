@@ -751,7 +751,8 @@ namespace Lucene.Net.Index
             }
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         // different options for the same field
         public virtual void TestMixedOptions()

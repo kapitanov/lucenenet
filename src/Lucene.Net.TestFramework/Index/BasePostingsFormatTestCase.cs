@@ -857,49 +857,56 @@ namespace Lucene.Net.Index
             }
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsOnly()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_ONLY, false);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsAndFreqs()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_AND_FREQS, false);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsAndFreqsAndPositions()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, false);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsAndFreqsAndPositionsAndPayloads()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS, true);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsAndFreqsAndPositionsAndOffsets()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS, false);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestDocsAndFreqsAndPositionsAndOffsetsAndPayloads()
         {
             TestFull(FieldInfo.IndexOptions.DOCS_AND_FREQS_AND_POSITIONS_AND_OFFSETS, true);
         }
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestRandom()
         {
