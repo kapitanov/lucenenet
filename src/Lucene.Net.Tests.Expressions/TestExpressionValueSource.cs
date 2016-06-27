@@ -7,7 +7,7 @@ using Lucene.Net.Index;
 using Lucene.Net.Queries.Function;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions
 {
@@ -17,10 +17,8 @@ namespace Lucene.Net.Tests.Expressions
 
 		internal Directory dir;
 
-		[SetUp]
-		public override void SetUp()
+		public TestExpressionValueSource() : base()
 		{
-			
 			dir = NewDirectory();
 			IndexWriterConfig iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer
 				(Random()));
@@ -53,8 +51,7 @@ namespace Lucene.Net.Tests.Expressions
 			iw.Dispose();
 		}
 
-		[TearDown]
-		public override void TearDown()
+		public override void Dispose()
 		{
 			reader.Dispose();
 			dir.Dispose();
@@ -68,33 +65,33 @@ namespace Lucene.Net.Tests.Expressions
 			SimpleBindings bindings = new SimpleBindings();
 			bindings.Add(new SortField("popularity", SortField.Type_e.LONG));
 			ValueSource vs = expr.GetValueSource(bindings);
-			AreEqual(1, reader.Leaves.Count);
+			Equal(1, reader.Leaves.Count);
 			AtomicReaderContext leaf = reader.Leaves[0];
 			FunctionValues values = vs.GetValues(new Dictionary<string, object>(), leaf);
-			AreEqual(10, values.DoubleVal(0), 0);
-			AreEqual(10, values.FloatVal(0), 0);
-			AreEqual(10, values.LongVal(0));
-			AreEqual(10, values.IntVal(0));
-			AreEqual(10, values.ShortVal(0));
-			AreEqual(10, values.ByteVal(0));
-			AreEqual("10", values.StrVal(0));
-			AreEqual(System.Convert.ToDouble(10), values.ObjectVal(0));
-			AreEqual(40, values.DoubleVal(1), 0);
-			AreEqual(40, values.FloatVal(1), 0);
-			AreEqual(40, values.LongVal(1));
-			AreEqual(40, values.IntVal(1));
-			AreEqual(40, values.ShortVal(1));
-			AreEqual(40, values.ByteVal(1));
-			AreEqual("40", values.StrVal(1));
-			AreEqual(System.Convert.ToDouble(40), values.ObjectVal(1));
-			AreEqual(4, values.DoubleVal(2), 0);
-			AreEqual(4, values.FloatVal(2), 0);
-			AreEqual(4, values.LongVal(2));
-			AreEqual(4, values.IntVal(2));
-			AreEqual(4, values.ShortVal(2));
-			AreEqual(4, values.ByteVal(2));
-			AreEqual("4", values.StrVal(2));
-			AreEqual(System.Convert.ToDouble(4), values.ObjectVal(2));
+			assertEquals(10, values.DoubleVal(0), 0);
+			assertEquals(10, values.FloatVal(0), 0);
+			Equal(10, values.LongVal(0));
+			Equal(10, values.IntVal(0));
+			Equal(10, values.ShortVal(0));
+			Equal(10, values.ByteVal(0));
+			Equal("10", values.StrVal(0));
+			Equal(System.Convert.ToDouble(10), values.ObjectVal(0));
+			assertEquals(40, values.DoubleVal(1), 0);
+			assertEquals(40, values.FloatVal(1), 0);
+			Equal(40, values.LongVal(1));
+			Equal(40, values.IntVal(1));
+			Equal(40, values.ShortVal(1));
+			Equal(40, values.ByteVal(1));
+			Equal("40", values.StrVal(1));
+			Equal(System.Convert.ToDouble(40), values.ObjectVal(1));
+			assertEquals(4, values.DoubleVal(2), 0);
+			assertEquals(4, values.FloatVal(2), 0);
+			Equal(4, values.LongVal(2));
+			Equal(4, values.IntVal(2));
+			Equal(4, values.ShortVal(2));
+			Equal(4, values.ByteVal(2));
+			Equal("4", values.StrVal(2));
+			Equal(System.Convert.ToDouble(4), values.ObjectVal(2));
 		}
 
 		[Fact]
@@ -104,22 +101,22 @@ namespace Lucene.Net.Tests.Expressions
 			SimpleBindings bindings = new SimpleBindings();
 			bindings.Add(new SortField("popularity", SortField.Type_e.LONG));
 			ValueSource vs = expr.GetValueSource(bindings);
-			AreEqual(1, reader.Leaves.Count);
+			Equal(1, reader.Leaves.Count);
 			AtomicReaderContext leaf = reader.Leaves[0];
 			FunctionValues values = vs.GetValues(new Dictionary<string, object>(), leaf);
 			// everything
 			ValueSourceScorer scorer = values.GetRangeScorer(leaf.Reader, "4"
 				, "40", true, true);
-			AreEqual(-1, scorer.DocID());
-			AreEqual(0, scorer.NextDoc());
-			AreEqual(1, scorer.NextDoc());
-			AreEqual(2, scorer.NextDoc());
-			AreEqual(DocIdSetIterator.NO_MORE_DOCS, scorer.NextDoc());
+			Equal(-1, scorer.DocID());
+			Equal(0, scorer.NextDoc());
+			Equal(1, scorer.NextDoc());
+			Equal(2, scorer.NextDoc());
+			Equal(DocIdSetIterator.NO_MORE_DOCS, scorer.NextDoc());
 			// just the first doc
 			scorer = values.GetRangeScorer(leaf.Reader, "4", "40", false, false);
-			AreEqual(-1, scorer.DocID());
-			AreEqual(0, scorer.NextDoc());
-			AreEqual(DocIdSetIterator.NO_MORE_DOCS, scorer.NextDoc());
+			Equal(-1, scorer.DocID());
+			Equal(0, scorer.NextDoc());
+			Equal(DocIdSetIterator.NO_MORE_DOCS, scorer.NextDoc());
 		}
 
 		[Fact]
@@ -131,27 +128,27 @@ namespace Lucene.Net.Tests.Expressions
 			bindings.Add(new SortField("b", SortField.Type_e.INT));
 			ValueSource vs1 = expr.GetValueSource(bindings);
 			// same instance
-			AreEqual(vs1, vs1);
+			Equal(vs1, vs1);
 			// null
-			IsFalse(vs1.Equals(null));
+			False(vs1.Equals(null));
 			// other object
-			IsFalse(vs1.Equals("foobar"));
+			False(vs1.Equals("foobar"));
 			// same bindings and expression instances
 			ValueSource vs2 = expr.GetValueSource(bindings);
-			AreEqual(vs1.GetHashCode(), vs2.GetHashCode());
-			AreEqual(vs1, vs2);
+			Equal(vs1.GetHashCode(), vs2.GetHashCode());
+			Equal(vs1, vs2);
 			// equiv bindings (different instance)
 			SimpleBindings bindings2 = new SimpleBindings();
 			bindings2.Add(new SortField("a", SortField.Type_e.INT));
 			bindings2.Add(new SortField("b", SortField.Type_e.INT));
 			ValueSource vs3 = expr.GetValueSource(bindings2);
-			AreEqual(vs1, vs3);
+			Equal(vs1, vs3);
 			// different bindings (same names, different types)
 			SimpleBindings bindings3 = new SimpleBindings();
 			bindings3.Add(new SortField("a", SortField.Type_e.LONG));
 			bindings3.Add(new SortField("b", SortField.Type_e.INT));
 			ValueSource vs4 = expr.GetValueSource(bindings3);
-			IsFalse(vs1.Equals(vs4));
+			False(vs1.Equals(vs4));
 		}
 	}
 }

@@ -1,7 +1,7 @@
 using Lucene.Net.Expressions;
 using Lucene.Net.Expressions.JS;
 using Lucene.Net.Search;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions
 {
@@ -15,7 +15,7 @@ namespace Lucene.Net.Tests.Expressions
 			bindings.Add(new SortField("_score", SortField.Type_e.SCORE));
 			bindings.Add(new SortField("popularity", SortField.Type_e.INT));
 			SortField sf = expr.GetSortField(bindings, true);
-			AreEqual("<expr \"sqrt(_score) + ln(popularity)\">!", sf.ToString());
+			Equal("<expr \"sqrt(_score) + ln(popularity)\">!", sf.ToString());
 		}
 
 		[Fact]
@@ -31,18 +31,18 @@ namespace Lucene.Net.Tests.Expressions
 			SortField sf1 = expr.GetSortField(bindings, true);
 			// different order
 			SortField sf2 = expr.GetSortField(bindings, false);
-			IsFalse(sf1.Equals(sf2));
+			False(sf1.Equals(sf2));
 			// different bindings
 			sf2 = expr.GetSortField(otherBindings, true);
-			IsFalse(sf1.Equals(sf2));
+			False(sf1.Equals(sf2));
 			// different expression
 			Expression other = JavascriptCompiler.Compile("popularity/2");
 			sf2 = other.GetSortField(bindings, true);
-			IsFalse(sf1.Equals(sf2));
+			False(sf1.Equals(sf2));
 			// null
-			IsFalse(sf1.Equals(null));
+			False(sf1.Equals(null));
 			// same instance:
-			AreEqual(sf1, sf1);
+			Equal(sf1, sf1);
 		}
 
 		[Fact]
@@ -78,15 +78,15 @@ namespace Lucene.Net.Tests.Expressions
 			bindings.Add("g", exprG);
 			bindings.Add("h", exprH);
 			bindings.Add("i", exprI);
-			IsTrue(exprA.GetSortField(bindings, true).NeedsScores());
-			IsFalse(exprB.GetSortField(bindings, true).NeedsScores());
-			IsFalse(exprC.GetSortField(bindings, true).NeedsScores());
-			IsTrue(exprD.GetSortField(bindings, true).NeedsScores());
-			IsFalse(exprE.GetSortField(bindings, true).NeedsScores());
-			IsTrue(exprF.GetSortField(bindings, true).NeedsScores());
-			IsFalse(exprG.GetSortField(bindings, true).NeedsScores());
-			IsTrue(exprH.GetSortField(bindings, true).NeedsScores());
-			IsFalse(exprI.GetSortField(bindings, false).NeedsScores());
+			True(exprA.GetSortField(bindings, true).NeedsScores());
+			False(exprB.GetSortField(bindings, true).NeedsScores());
+			False(exprC.GetSortField(bindings, true).NeedsScores());
+			True(exprD.GetSortField(bindings, true).NeedsScores());
+			False(exprE.GetSortField(bindings, true).NeedsScores());
+			True(exprF.GetSortField(bindings, true).NeedsScores());
+			False(exprG.GetSortField(bindings, true).NeedsScores());
+			True(exprH.GetSortField(bindings, true).NeedsScores());
+			False(exprI.GetSortField(bindings, false).NeedsScores());
 		}
 	}
 }

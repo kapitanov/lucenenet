@@ -6,8 +6,7 @@ using Lucene.Net.Expressions.JS;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Store;
-using NUnit.Framework;
-using Expression = System.Linq.Expressions.Expression;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions
 {
@@ -20,10 +19,8 @@ namespace Lucene.Net.Tests.Expressions
 
 		internal Directory dir;
 
-		[SetUp]
-		public override void SetUp()
+		public TestDemoExpressions() : base()
 		{
-			
 			dir = NewDirectory();
 			var iw = new RandomIndexWriter(Random(), dir);
 			var doc = new Document
@@ -59,8 +56,7 @@ namespace Lucene.Net.Tests.Expressions
 			iw.Dispose();
 		}
 
-		[TearDown]
-		public override void TearDown()
+		public override void Dispose()
 		{
 			reader.Dispose();
 			dir.Dispose();
@@ -98,7 +94,7 @@ namespace Lucene.Net.Tests.Expressions
 				FieldDoc d = (FieldDoc)td.ScoreDocs[i];
 				float expected = (float)Math.Sqrt(d.Score);
 				float actual = (float)((double)d.Fields[0]);
-				AreEqual(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
+				assertEquals(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
 			}
 		}
 
@@ -117,8 +113,7 @@ namespace Lucene.Net.Tests.Expressions
 				FieldDoc d = (FieldDoc)td.ScoreDocs[i];
 				float expected = 2 * d.Score;
 				float actual = (float)((double)d.Fields[0]);
-				AreEqual(expected, actual, CheckHits.ExplainToleranceDelta
-					(expected, actual));
+				assertEquals(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
 			}
 		}
 
@@ -139,8 +134,7 @@ namespace Lucene.Net.Tests.Expressions
 				FieldDoc d = (FieldDoc)td.ScoreDocs[i];
 				float expected = 2 * d.Score;
 				float actual = (float)((double)d.Fields[0]);
-				AreEqual(expected, actual, CheckHits.ExplainToleranceDelta
-					(expected, actual));
+				assertEquals(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
 			}
 		}
 
@@ -178,7 +172,7 @@ namespace Lucene.Net.Tests.Expressions
 				FieldDoc d = (FieldDoc)td.ScoreDocs[i_1];
 				float expected = n * d.Score;
 				float actual = (float)((double)d.Fields[0]);
-				AreEqual(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
+				assertEquals(expected, actual, CheckHits.ExplainToleranceDelta(expected, actual));
 			}
 		}
 
@@ -192,11 +186,11 @@ namespace Lucene.Net.Tests.Expressions
 			Sort sort = new Sort(distance.GetSortField(bindings, false));
 			TopFieldDocs td = searcher.Search(new MatchAllDocsQuery(), null, 3, sort);
 			FieldDoc d = (FieldDoc)td.ScoreDocs[0];
-			AreEqual(0.4619D, (double)d.Fields[0], 1E-4);
+			assertEquals(0.4619D, (double)d.Fields[0], 1E-4);
 			d = (FieldDoc)td.ScoreDocs[1];
-			AreEqual(1.0546D, (double)d.Fields[0], 1E-4);
+			assertEquals(1.0546D, (double)d.Fields[0], 1E-4);
 			d = (FieldDoc)td.ScoreDocs[2];
-			AreEqual(5.2842D, (double)d.Fields[0], 1E-4);
+			assertEquals(5.2842D, (double)d.Fields[0], 1E-4);
 		}
 	}
 }

@@ -1,7 +1,7 @@
 using System;
 using Lucene.Net.Expressions;
 using Lucene.Net.Expressions.JS;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions.JS
 {
@@ -14,7 +14,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			Expression evaluator = JavascriptCompiler.Compile(expression);
 			double actual = evaluator.Evaluate(0, null);
-			AreEqual(expected, actual, DELTA);
+			assertEquals(expected, actual, DELTA);
 		}
 
 		[Fact]

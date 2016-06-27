@@ -28,10 +28,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			IDictionary<string, MethodInfo> functions = JavascriptCompiler.DEFAULT_FUNCTIONS;
 			var expr = JavascriptCompiler.Compile("sqrt(20)", functions);
-			var value = Math.Sqrt(20);
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+			assertEquals(Math.Sqrt(20), expr.Evaluate(0, null), DELTA);
 		}
 
 		public static double ZeroArgMethod()
@@ -46,10 +43,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("ZeroArgMethod");
 			var expr = JavascriptCompiler.Compile("foo()", functions);
-			var value = 5;
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+			assertEquals(5, expr.Evaluate(0, null), DELTA);
 		}
 
 		public static double OneArgMethod(double arg1)
@@ -64,10 +58,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("OneArgMethod", new []{ typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo(3)", functions);
-			var value = 6;
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+            assertEquals(6, expr.Evaluate(0, null), DELTA);
 		}
 
 		public static double ThreeArgMethod(double arg1, double arg2, double arg3)
@@ -83,10 +74,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			functions["foo"] = GetType().GetMethod("ThreeArgMethod", new []{ typeof(double), typeof(
 				double), typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo(3, 4, 5)", functions);
-			var value = 12;
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+            assertEquals(12, expr.Evaluate(0, null), DELTA);
 		}
 
 		/// <summary>tests a map with 2 functions</summary>
@@ -97,10 +85,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			functions["foo"] = GetType().GetMethod("ZeroArgMethod");
 			functions["bar"] = GetType().GetMethod("OneArgMethod", new []{typeof(double)});
 			var expr = JavascriptCompiler.Compile("foo() + bar(3)", functions);
-			var value = 11;
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+            assertEquals(11, expr.Evaluate(0, null), DELTA);
 		}
 
 		public static string BogusReturnType()
@@ -114,15 +99,8 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("BogusReturnType");
-			try
-			{
-				JavascriptCompiler.Compile("foo()", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("does not return a double"));
-			}
+            var e = Assert.Throws<ArgumentException>(() => JavascriptCompiler.Compile("foo()", functions));
+			True(e.Message.Contains("does not return a double"));
 		}
 
 		public static double BogusParameterType(string s)
@@ -136,16 +114,8 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("BogusParameterType", new []{ typeof(string)});
-			try
-			{
-				JavascriptCompiler.Compile("foo(2)", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("must take only double parameters"
-					));
-			}
+            var e = Assert.Throws<ArgumentException>(() => JavascriptCompiler.Compile("foo(2)", functions));
+			True(e.Message.Contains("must take only double parameters"));
 		}
 
 		public virtual double NonStaticMethod()
@@ -159,15 +129,8 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("NonStaticMethod");
-			try
-			{
-				JavascriptCompiler.Compile("foo()", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("is not static"));
-			}
+            var e = Assert.Throws<ArgumentException>(() => JavascriptCompiler.Compile("foo()", functions));
+			True(e.Message.Contains("is not static"));
 		}
 
 		internal static double NonPublicMethod()
@@ -181,16 +144,9 @@ namespace Lucene.Net.Tests.Expressions.JS
 		{
 			IDictionary<string, MethodInfo> functions = new Dictionary<string, MethodInfo>();
 			functions["foo"] = GetType().GetMethod("NonPublicMethod",BindingFlags.NonPublic|BindingFlags.Static);
-				
-			try
-			{
-				JavascriptCompiler.Compile("foo()", functions);
-				Fail();
-			}
-			catch (ArgumentException e)
-			{
-				IsTrue(e.Message.Contains("is not public"));
-			}
+
+            var e = Assert.Throws<ArgumentException>(() => JavascriptCompiler.Compile("foo()", functions));
+			True(e.Message.Contains("is not public"));
 		}
 
 		internal class NestedNotPublic
@@ -256,10 +212,7 @@ namespace Lucene.Net.Tests.Expressions.JS
 			functions["foo.bar"] = GetType().GetMethod("ZeroArgMethod");
 			string source = "foo.bar()";
 			var expr = JavascriptCompiler.Compile(source, functions);
-			var value = 5;
-			var min = value - DELTA;
-			var max = value + DELTA;
-			InRange(expr.Evaluate(0, null), min, max);
+			assertEquals(5, expr.Evaluate(0, null), DELTA);
 		}
 	}
 }

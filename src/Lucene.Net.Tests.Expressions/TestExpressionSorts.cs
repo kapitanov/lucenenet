@@ -7,7 +7,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Expressions
 {
@@ -19,7 +19,7 @@ namespace Lucene.Net.Tests.Expressions
     /// Tests some basic expressions against different queries,
     /// and fieldcache/docvalues fields against an equivalent sort.
     /// </remarks>
-    public class TestExpressionSorts : Util.LuceneTestCase
+    public class TestExpressionSorts : LuceneTestCase
     {
         private Directory dir;
 
@@ -27,10 +27,8 @@ namespace Lucene.Net.Tests.Expressions
 
         private IndexSearcher searcher;
 
-        [SetUp]
-        public override void SetUp()
+        public TestExpressionSorts() : base()
         {
-            
             dir = NewDirectory();
             var iw = new RandomIndexWriter(Random(), dir);
             int numDocs = TestUtil.NextInt(Random(), 2049, 4000);
@@ -59,8 +57,7 @@ namespace Lucene.Net.Tests.Expressions
             searcher = NewSearcher(reader);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             reader.Dispose();
             dir.Dispose();
