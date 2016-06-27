@@ -10,7 +10,7 @@ using Lucene.Net.Search;
 using Lucene.Net.Store;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Join
 {
@@ -44,8 +44,7 @@ namespace Lucene.Net.Tests.Join
         private IndexSearcher IndexSearcher;
         private Filter ParentsFilter;
         
-        [SetUp]
-        public override void SetUp()
+        public TestBlockJoinValidation() : base()
         {
             Directory = NewDirectory();
             IndexWriterConfig config = new IndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
@@ -62,11 +61,11 @@ namespace Lucene.Net.Tests.Join
             ParentsFilter = new FixedBitSetCachingWrapperFilter(new QueryWrapperFilter(new WildcardQuery(new Term("parent", "*"))));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             IndexReader.Dispose();
             Directory.Dispose();
+            base.Dispose();
         }
 
         [Fact]
@@ -76,8 +75,7 @@ namespace Lucene.Net.Tests.Join
             var blockJoinQuery = new ToParentBlockJoinQuery(parentQueryWithRandomChild, ParentsFilter, ScoreMode.None);
 
             var ex = Throws<InvalidOperationException>(() => IndexSearcher.Search(blockJoinQuery, 1));
-            StringAssert.Contains("child query must only match non-parent docs", ex.Message);
-
+            Assert.Contains("child query must only match non-parent docs", ex.Message);
         }
 
         [Fact]
@@ -96,7 +94,7 @@ namespace Lucene.Net.Tests.Join
             conjunctionQuery.Add(new BooleanClause(blockJoinQuery, BooleanClause.Occur.MUST));
 
             var ex = Throws<InvalidOperationException>(() => IndexSearcher.Search(conjunctionQuery, 1));
-            StringAssert.Contains("child query must only match non-parent docs", ex.Message);
+            Assert.Contains("child query must only match non-parent docs", ex.Message);
         }
 
         [Fact]
@@ -106,7 +104,7 @@ namespace Lucene.Net.Tests.Join
             var blockJoinQuery = new ToChildBlockJoinQuery(parentQueryWithRandomChild, ParentsFilter, false);
 
             var ex = Throws<InvalidOperationException>(() => IndexSearcher.Search(blockJoinQuery, 1));
-            StringAssert.Contains(ToChildBlockJoinQuery.InvalidQueryMessage, ex.Message);
+            Assert.Contains(ToChildBlockJoinQuery.InvalidQueryMessage, ex.Message);
         }
         
         [Fact]
@@ -125,7 +123,7 @@ namespace Lucene.Net.Tests.Join
             conjunctionQuery.Add(new BooleanClause(blockJoinQuery, BooleanClause.Occur.MUST));
             
             var ex = Throws<InvalidOperationException>(() => IndexSearcher.Search(conjunctionQuery, 1));
-            StringAssert.Contains(ToChildBlockJoinQuery.InvalidQueryMessage, ex.Message);
+            Assert.Contains(ToChildBlockJoinQuery.InvalidQueryMessage, ex.Message);
         }
 
         private static IList<Document> CreateDocsForSegment(int segmentNumber)
