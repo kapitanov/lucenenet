@@ -311,6 +311,7 @@ namespace Lucene.Net.Index
         }
 
         //[Test, Timeout(40000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestTermVectors()
         {

@@ -8,7 +8,6 @@ using System.Text;
 namespace Lucene.Net.Analysis
 {
     using Lucene.Net.Support;
-    
     using System.IO;
 
     /*
@@ -32,7 +31,6 @@ namespace Lucene.Net.Analysis
     using BasicAutomata = Lucene.Net.Util.Automaton.BasicAutomata;
     using BasicOperations = Lucene.Net.Util.Automaton.BasicOperations;
 
-    [TestFixture]
     public class TestGraphTokenizers : BaseTokenStreamTestCase
     {
         // Makes a graph TokenStream from the string; separate

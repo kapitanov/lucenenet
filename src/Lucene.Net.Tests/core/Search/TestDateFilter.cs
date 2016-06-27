@@ -36,12 +36,12 @@ namespace Lucene.Net.Search
     ///
     ///
     /// </summary>
-    [TestFixture]
     public class TestDateFilter : LuceneTestCase
     {
         ///
-        [TestFixtureSetUp]
-        public virtual void TestBefore()
+        //[TestFixtureSetUp]
+        [Fact]
+        public void TestBefore()
         {
             // create an index
             Directory indexStore = NewDirectory();
@@ -103,8 +103,7 @@ namespace Lucene.Net.Search
             // noop, required for the before and after tests to run
         }
 
-        ///
-        [TestFixtureTearDown]
+        [Fact]
         public virtual void TestAfter()
         {
             // create an index

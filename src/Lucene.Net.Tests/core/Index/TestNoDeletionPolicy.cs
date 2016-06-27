@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestNoDeletionPolicy : LuceneTestCase
     {
         [Fact]
@@ -83,7 +82,7 @@ namespace Lucene.Net.Index
                 doc.Add(NewTextField("c", "a" + i, Field.Store.YES));
                 writer.AddDocument(doc);
                 writer.Commit();
-                Assert.Equal(i + 1, DirectoryReader.ListCommits(dir).Count, "wrong number of commits !");
+                Assert.Equal(i + 1, DirectoryReader.ListCommits(dir).Count); //, "wrong number of commits !");
             }
             writer.Dispose();
             dir.Dispose();

@@ -43,10 +43,8 @@ namespace Lucene.Net.Util
         protected internal Directory DirA, DirB;
         private const int NUM_DOCS = 1000;
 
-        [SetUp]
-        public override void SetUp()
+        public TestFieldCacheSanityChecker() : base()
         {
-            
             DirA = NewDirectory();
             DirB = NewDirectory();
 
@@ -88,8 +86,7 @@ namespace Lucene.Net.Util
             ReaderX = SlowCompositeReaderWrapper.Wrap(new MultiReader(ReaderA, ReaderB));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             ReaderA.Dispose();
             ReaderAclone.Dispose();
@@ -123,7 +120,7 @@ namespace Lucene.Net.Util
                 DumpArray(TestClass.Name + "#" + TestName + " INSANITY", insanity, Console.Error);
             }
 
-            Assert.Equal(0, insanity.Length, "shouldn't be any cache insanity");
+            Assert.Equal(0, insanity.Length); //, "shouldn't be any cache insanity");
             cache.PurgeAllCaches();
         }
 
@@ -141,9 +138,9 @@ namespace Lucene.Net.Util
 
             Insanity[] insanity = FieldCacheSanityChecker.CheckSanity(cache.CacheEntries);
 
-            Assert.Equal(1, insanity.Length, "wrong number of cache errors");
-            Assert.Equal(InsanityType.VALUEMISMATCH, insanity[0].Type, "wrong type of cache error");
-            Assert.Equal(2, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
+            Assert.Equal(1, insanity.Length); //, "wrong number of cache errors");
+            Assert.Equal(InsanityType.VALUEMISMATCH, insanity[0].Type); //, "wrong type of cache error");
+            Assert.Equal(2, insanity[0].CacheEntries.Length); //, "wrong number of entries in cache error");
 
             // we expect bad things, don't let tearDown complain about them
             cache.PurgeAllCaches();
@@ -165,9 +162,9 @@ namespace Lucene.Net.Util
 
             Insanity[] insanity = FieldCacheSanityChecker.CheckSanity(cache.CacheEntries);
 
-            Assert.Equal(1, insanity.Length, "wrong number of cache errors");
-            Assert.Equal(InsanityType.SUBREADER, insanity[0].Type, "wrong type of cache error");
-            Assert.Equal(3, insanity[0].CacheEntries.Length, "wrong number of entries in cache error");
+            Assert.Equal(1, insanity.Length); //, "wrong number of cache errors");
+            Assert.Equal(InsanityType.SUBREADER, insanity[0].Type); //, "wrong type of cache error");
+            Assert.Equal(3, insanity[0].CacheEntries.Length); //, "wrong number of entries in cache error");
 
             // we expect bad things, don't let tearDown complain about them
             cache.PurgeAllCaches();

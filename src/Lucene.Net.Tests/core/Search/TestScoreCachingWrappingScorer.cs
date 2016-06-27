@@ -144,7 +144,7 @@ namespace Lucene.Net.Search
 
             for (int i = 0; i < Scores.Length; i++)
             {
-                Assert.Equal(Scores[i], scc.Mscores[i]); //, 0f);
+                assertEquals(Scores[i], scc.Mscores[i], 0f);
             }
             ir.Dispose();
             directory.Dispose();

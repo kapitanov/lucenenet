@@ -27,7 +27,6 @@ namespace Lucene.Net.Index
     using Lucene.Net.Util;
     using Lucene41PostingsFormat = Lucene.Net.Codecs.Lucene41.Lucene41PostingsFormat;
 
-    [TestFixture]
     public class TestFlex : LuceneTestCase
     {
         // Test non-flex API emulated on flex index

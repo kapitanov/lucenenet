@@ -153,11 +153,13 @@ namespace Lucene.Net.Index
                                 break;
 
                             case 4:
-                                Assert.Equal(Number.IntBitsToFloat((int)Numbers[docID]), FieldCache.DEFAULT.GetFloats(Ar, "number", false).Get(docID)); //, 0.0f);
+                                float expected = Number.IntBitsToFloat((int)Numbers[docID]);
+                                assertEquals(expected, FieldCache.DEFAULT.GetFloats(Ar, "number", false).Get(docID), 0.0f);
                                 break;
 
                             case 5:
-                                Assert.Equal(BitConverter.Int64BitsToDouble((long)Numbers[docID]), FieldCache.DEFAULT.GetDoubles(Ar, "number", false).Get(docID)); //, 0.0);
+                                double expected2 = BitConverter.Int64BitsToDouble((long)Numbers[docID]);
+                                assertEquals(expected2, FieldCache.DEFAULT.GetDoubles(Ar, "number", false).Get(docID), 0.0);
                                 break;
                         }
                         bdv.Get(docID, scratch);

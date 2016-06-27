@@ -35,7 +35,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Test indexing and searching some byte[] terms
     /// </summary>
-    [TestFixture]
     public class TestBinaryTerms : LuceneTestCase
     {
         [Fact(Skip = "Ignored test")]

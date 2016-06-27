@@ -1,6 +1,7 @@
 namespace Lucene.Net.Codecs.Lucene40
 {
-    
+    using Tests.Codecs;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -24,14 +25,14 @@ namespace Lucene.Net.Codecs.Lucene40
     /// <summary>
     /// Tests Lucene40DocValuesFormat
     /// </summary>
-    public class TestLucene40DocValuesFormat : BaseDocValuesFormatTestCase
+    public class TestLucene40DocValuesFormat : BaseDocValuesFormatTestCase, IClassFixture<OldFormatCodecFixture>
     {
         private readonly Codec Codec_Renamed = new Lucene40RWCodec();
+        private readonly OldFormatCodecFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestLucene40DocValuesFormat(OldFormatCodecFixture fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixture = fixture;
         }
 
         protected override Codec Codec

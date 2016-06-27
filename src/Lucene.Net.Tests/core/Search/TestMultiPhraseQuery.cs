@@ -364,7 +364,7 @@ namespace Lucene.Net.Search
             query.Add(new Term[] { new Term("body", "this"), new Term("body", "that") });
             query.Add(new Term("body", "is"));
             Weight weight = query.CreateWeight(searcher);
-            Assert.Equal(10f * 10f, weight.ValueForNormalization); //, 0.001f);
+            assertEquals(10f * 10f, weight.ValueForNormalization, 0.001f);
 
             writer.Dispose();
             reader.Dispose();
@@ -432,7 +432,7 @@ namespace Lucene.Net.Search
             }
             TopDocs hits = s.Search(mpq, 2);
             Assert.Equal(2, hits.TotalHits);
-            Assert.Equal(hits.ScoreDocs[0].Score, hits.ScoreDocs[1].Score); //, 1e-5);
+            assertEquals(hits.ScoreDocs[0].Score, hits.ScoreDocs[1].Score, 1e-5);
             /*
             for(int hit=0;hit<hits.TotalHits;hit++) {
               ScoreDoc sd = hits.ScoreDocs[hit];

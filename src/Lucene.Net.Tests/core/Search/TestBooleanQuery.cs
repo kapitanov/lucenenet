@@ -97,7 +97,7 @@ namespace Lucene.Net.Search
             subQuery.Boost = 0;
             q.Add(subQuery, BooleanClause.Occur.SHOULD);
             float score2 = s.Search(q, 10).MaxScore;
-            Assert.Equal(score * .5F, score2); //, 1e-6);
+            assertEquals(score * .5F, score2, 1e-6);
 
             // LUCENE-2617: make sure that a clause not in the index still contributes to the score via coord factor
             BooleanQuery qq = (BooleanQuery)q.Clone();
@@ -107,14 +107,14 @@ namespace Lucene.Net.Search
             phrase.Boost = 0;
             qq.Add(phrase, BooleanClause.Occur.SHOULD);
             score2 = s.Search(qq, 10).MaxScore;
-            Assert.Equal(score * (1 / 3F), score2); //, 1e-6);
+            assertEquals(score * (1 / 3F), score2, 1e-6);
 
             // now test BooleanScorer2
             subQuery = new TermQuery(new Term("field", "b"));
             subQuery.Boost = 0;
             q.Add(subQuery, BooleanClause.Occur.MUST);
             score2 = s.Search(q, 10).MaxScore;
-            Assert.Equal(score * (2 / 3F), score2); //, 1e-6);
+            assertEquals(score * (2 / 3F), score2, 1e-6);
 
             // PhraseQuery w/ no terms added returns a null scorer
             PhraseQuery pq = new PhraseQuery();

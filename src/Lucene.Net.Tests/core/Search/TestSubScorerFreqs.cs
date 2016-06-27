@@ -3,6 +3,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
+    using System;
     using Lucene.Net.Index;
     using Lucene.Net.Store;
     using Lucene.Net.Support;
@@ -30,40 +31,14 @@ namespace Lucene.Net.Search
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using Occur = Lucene.Net.Search.BooleanClause.Occur;
 
-    public class TestSubScorerFreqs : LuceneTestCase
+    public class TestSubScorerFreqs : LuceneTestCase, IClassFixture<TestSubScorerFreqsFixture>
     {
-        private static Directory Dir;
-        private static IndexSearcher s;
+        private const float FLOAT_TOLERANCE = 0.00001F;
+        private readonly TestSubScorerFreqsFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void MakeIndex()
+        public TestSubScorerFreqs(TestSubScorerFreqsFixture fixture)
         {
-            Dir = new RAMDirectory();
-            RandomIndexWriter w = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
-            // make sure we have more than one segment occationally
-            int num = AtLeast(31);
-            for (int i = 0; i < num; i++)
-            {
-                Documents.Document doc = new Documents.Document();
-                doc.Add(NewTextField("f", "a b c d b c d c d d", Field.Store.NO));
-                w.AddDocument(doc);
-
-                doc = new Documents.Document();
-                doc.Add(NewTextField("f", "a b c d", Field.Store.NO));
-                w.AddDocument(doc);
-            }
-
-            s = NewSearcher(w.Reader);
-            w.Dispose();
-        }
-
-        [TestFixtureTearDown]
-        public static void Finish()
-        {
-            s.IndexReader.Dispose();
-            s = null;
-            Dir.Dispose();
-            Dir = null;
+            _fixture = fixture;
         }
 
         private class CountingCollector : Collector
@@ -137,37 +112,27 @@ namespace Lucene.Net.Search
             }
         }
 
-        private const float FLOAT_TOLERANCE = 0.00001F;
-
         [Fact]
         public virtual void TestTermQuery()
         {
             TermQuery q = new TermQuery(new Term("f", "d"));
             CountingCollector c = new CountingCollector(TopScoreDocCollector.Create(10, true));
-            s.Search(q, null, c);
-            int maxDocs = s.IndexReader.MaxDoc;
+            _fixture.Searcher.Search(q, null, c);
+            int maxDocs = _fixture.Searcher.IndexReader.MaxDoc;
             Assert.Equal(maxDocs, c.DocCounts.Count);
             for (int i = 0; i < maxDocs; i++)
             {
                 IDictionary<Query, float?> doc0 = c.DocCounts[i];
                 Assert.Equal(1, doc0.Count);
 
-                float value = 4.0F;
-                float min = value - FLOAT_TOLERANCE;
-                float max = value + FLOAT_TOLERANCE;
-
                 Assert.NotNull(doc0[q]);
-                Assert.InRange(doc0[q].Value, min, max);
+                assertEquals(4.0F, doc0[q].Value, FLOAT_TOLERANCE);
 
                 IDictionary<Query, float?> doc1 = c.DocCounts[++i];
                 Assert.Equal(1, doc1.Count);
 
-                value = 1.0F;
-                min = value - FLOAT_TOLERANCE;
-                max = value + FLOAT_TOLERANCE;
-
                 Assert.NotNull(doc1[q]);
-                Assert.InRange(doc1[q].Value, min, max);
+                assertEquals(1.0F, doc1[q].Value, FLOAT_TOLERANCE);
             }
         }
 
@@ -195,22 +160,14 @@ namespace Lucene.Net.Search
             foreach (var occur in occurList)
             {
                 var c = new CountingCollector(TopScoreDocCollector.Create(10, true), occur);
-                s.Search(query, null, c);
-                int maxDocs = s.IndexReader.MaxDoc;
+                _fixture.Searcher.Search(query, null, c);
+                int maxDocs = _fixture.Searcher.IndexReader.MaxDoc;
                 Assert.Equal(maxDocs, c.DocCounts.Count);
                 bool includeOptional = occur.Contains("SHOULD");
 
                 float value10 = 1.0F;
-                float min10 = value10 - FLOAT_TOLERANCE;
-                float max10 = value10 + FLOAT_TOLERANCE;
-
-                float value40 = 4.0F;
-                float min40 = value40 - FLOAT_TOLERANCE;
-                float max40 = value40 + FLOAT_TOLERANCE;
-
                 float value30 = 3.0F;
-                float min30 = value30 - FLOAT_TOLERANCE;
-                float max30 = value30 + FLOAT_TOLERANCE;
+                float value40 = 4.0F;
 
                 for (int i = 0; i < maxDocs; i++)
                 {
@@ -218,30 +175,30 @@ namespace Lucene.Net.Search
                     Assert.Equal(includeOptional ? 5 : 4, doc0.Count);
 
                     Assert.True(doc0[aQuery].HasValue);
-                    Assert.InRange(doc0[aQuery].Value, min10, max10);
+                    assertEquals(value10, doc0[aQuery].Value, FLOAT_TOLERANCE);
 
                     Assert.True(doc0[dQuery].HasValue);
-                    Assert.InRange(doc0[dQuery].Value, min40, max40);
+                    assertEquals(value40, doc0[dQuery].Value, FLOAT_TOLERANCE);
 
                     if (includeOptional)
                     {
                         Assert.True(doc0[cQuery].HasValue);
-                        Assert.InRange(doc0[cQuery].Value, min30, max30);
+                        assertEquals(value30, doc0[cQuery].Value, FLOAT_TOLERANCE);
                     }
 
                     IDictionary<Query, float?> doc1 = c.DocCounts[++i];
                     Assert.Equal(includeOptional ? 5 : 4, doc1.Count);
 
                     Assert.True(doc1[aQuery].HasValue);
-                    Assert.InRange(doc1[aQuery].Value, min10, max10);
+                    assertEquals(value10, doc1[aQuery].Value, FLOAT_TOLERANCE);
 
                     Assert.True(doc1[dQuery].HasValue);
-                    Assert.InRange(doc1[dQuery].Value, min10, max10);
+                    assertEquals(value10, doc1[dQuery].Value, FLOAT_TOLERANCE);
 
                     if (includeOptional)
                     {
                         Assert.True(doc1[cQuery].HasValue);
-                        Assert.InRange(doc1[cQuery].Value, min10, max10);
+                        assertEquals(value10, doc1[cQuery].Value, FLOAT_TOLERANCE);
                     }
                 }
             }
@@ -254,17 +211,12 @@ namespace Lucene.Net.Search
             q.Add(new Term("f", "b"));
             q.Add(new Term("f", "c"));
             CountingCollector c = new CountingCollector(TopScoreDocCollector.Create(10, true));
-            s.Search(q, null, c);
-            int maxDocs = s.IndexReader.MaxDoc;
+            _fixture.Searcher.Search(q, null, c);
+            int maxDocs = _fixture.Searcher.IndexReader.MaxDoc;
             Assert.Equal(maxDocs, c.DocCounts.Count);
 
             float value10 = 1.0F;
-            float min10 = value10 - FLOAT_TOLERANCE;
-            float max10 = value10 + FLOAT_TOLERANCE;
-
             float value20 = 2.0F;
-            float min20 = value20 - FLOAT_TOLERANCE;
-            float max20 = value20 + FLOAT_TOLERANCE;
 
             for (int i = 0; i < maxDocs; i++)
             {
@@ -272,14 +224,53 @@ namespace Lucene.Net.Search
                 Assert.Equal(1, doc0.Count);
 
                 Assert.True(doc0[q].HasValue);
-                Assert.InRange(doc0[q].Value, min20, max20);
+                assertEquals(value20, doc0[q].Value, FLOAT_TOLERANCE);
 
                 IDictionary<Query, float?> doc1 = c.DocCounts[++i];
                 Assert.Equal(1, doc1.Count);
 
                 Assert.True(doc1[q].HasValue);
-                Assert.InRange(doc1[q].Value, min10, max10);
+                assertEquals(value10, doc1[q].Value, FLOAT_TOLERANCE);
             }
         }
+    }
+
+    public class TestSubScorerFreqsFixture : IDisposable
+    {
+        internal Directory Dir { get; private set; }
+        internal IndexSearcher Searcher { get; private set; }
+
+        public TestSubScorerFreqsFixture()
+        {
+            var random = LuceneTestCase.Random();
+            Dir = new RAMDirectory();
+            RandomIndexWriter w = new RandomIndexWriter(random, Dir, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random))
+                .SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
+            // make sure we have more than one segment occationally
+            int num = LuceneTestCase.AtLeast(31);
+            for (int i = 0; i < num; i++)
+            {
+                Documents.Document doc = new Documents.Document();
+                doc.Add(LuceneTestCase.NewTextField("f", "a b c d b c d c d d", Field.Store.NO));
+                w.AddDocument(doc);
+
+                doc = new Documents.Document();
+                doc.Add(LuceneTestCase.NewTextField("f", "a b c d", Field.Store.NO));
+                w.AddDocument(doc);
+            }
+
+            Searcher = LuceneTestCase.NewSearcher(w.Reader);
+            w.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Searcher.IndexReader.Dispose();
+            Searcher = null;
+            Dir.Dispose();
+            Dir = null;
+        }
+
     }
 }

@@ -1,7 +1,7 @@
 using Lucene.Net.Documents;
 using Lucene.Net.Store;
-using Xunit;
 using System;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -29,7 +29,6 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestTieredMergePolicy : BaseMergePolicyTestCase
     {
         protected override MergePolicy MergePolicy()
@@ -211,64 +210,46 @@ namespace Lucene.Net.Index
         [Fact]
         public virtual void TestSetters()
         {
+            var expected = 0.5;
+            var expected2 = long.MaxValue / 1024 / 1024.0;
+            var delta = EPSILON * long.MaxValue;
+
             TieredMergePolicy tmp = new TieredMergePolicy();
 
             tmp.MaxMergedSegmentMB = 0.5;
-            Assert.Equal(0.5, tmp.MaxMergedSegmentMB, EPSILON);
+            assertEquals(expected, tmp.MaxMergedSegmentMB, EPSILON);
 
             tmp.MaxMergedSegmentMB = double.PositiveInfinity;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.MaxMergedSegmentMB, delta);
 
             tmp.MaxMergedSegmentMB = long.MaxValue / 1024 / 1024.0;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxMergedSegmentMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.MaxMergedSegmentMB, delta);
 
-            try
-            {
-                tmp.MaxMergedSegmentMB = -2.0;
-                Assert.True(false, "Didn't throw IllegalArgumentException");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // pass
-            }
+            Assert.Throws<ArgumentException>(() => tmp.MaxMergedSegmentMB = -2.0);
+
+            expected = 2.0;
 
             tmp.FloorSegmentMB = 2.0;
-            Assert.Equal(2.0, tmp.FloorSegmentMB, EPSILON);
+            assertEquals(expected, tmp.FloorSegmentMB, EPSILON);
 
             tmp.FloorSegmentMB = double.PositiveInfinity;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.FloorSegmentMB, delta);
 
             tmp.FloorSegmentMB = long.MaxValue / 1024 / 1024.0;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.FloorSegmentMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.FloorSegmentMB, delta);
 
-            try
-            {
-                tmp.FloorSegmentMB = -2.0;
-                Assert.True(false, "Didn't throw IllegalArgumentException");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // pass
-            }
+            Assert.Throws<ArgumentException>(() => tmp.FloorSegmentMB = -2.0);
 
             tmp.MaxCFSSegmentSizeMB = 2.0;
-            Assert.Equal(2.0, tmp.MaxCFSSegmentSizeMB, EPSILON);
+            assertEquals(2.0, tmp.MaxCFSSegmentSizeMB, EPSILON);
 
             tmp.MaxCFSSegmentSizeMB = double.PositiveInfinity;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.MaxCFSSegmentSizeMB, delta);
 
             tmp.MaxCFSSegmentSizeMB = long.MaxValue / 1024 / 1024.0;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, tmp.MaxCFSSegmentSizeMB, EPSILON * long.MaxValue);
+            assertEquals(expected2, tmp.MaxCFSSegmentSizeMB, delta);
 
-            try
-            {
-                tmp.MaxCFSSegmentSizeMB = -2.0;
-                Assert.True(false, "Didn't throw IllegalArgumentException");
-            }
-            catch (System.ArgumentException iae)
-            {
-                // pass
-            }
+            Assert.Throws<ArgumentException>(() => tmp.MaxCFSSegmentSizeMB = -2.0);
 
             // TODO: Add more checks for other non-double setters!
         }

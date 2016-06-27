@@ -40,7 +40,7 @@ namespace Lucene.Net.Util
                     //Assert.True(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
                 }
                 // test is back and forward conversion works
-                Assert.Equal(l, NumericUtils.PrefixCodedToLong(act), "forward and back conversion should generate same long");
+                Assert.Equal(l, NumericUtils.PrefixCodedToLong(act)); //, "forward and back conversion should generate same long");
                 // next step
                 last = act;
                 act = new BytesRef(NumericUtils.BUF_SIZE_LONG);
@@ -62,7 +62,7 @@ namespace Lucene.Net.Util
                     //Assert.True(last.Utf8ToString().CompareTo(act.Utf8ToString()) < 0, "actual bigger than last (as String)");
                 }
                 // test is back and forward conversion works
-                Assert.Equal(i, NumericUtils.PrefixCodedToInt(act), "forward and back conversion should generate same int");
+                Assert.Equal(i, NumericUtils.PrefixCodedToInt(act)); //, "forward and back conversion should generate same int");
                 // next step
                 last = act;
                 act = new BytesRef(NumericUtils.BUF_SIZE_INT);
@@ -81,7 +81,7 @@ namespace Lucene.Net.Util
                 NumericUtils.LongToPrefixCodedBytes(vals[i], 0, prefixVals[i]);
 
                 // check forward and back conversion
-                Assert.Equal(vals[i], NumericUtils.PrefixCodedToLong(prefixVals[i]), "forward and back conversion should generate same long");
+                Assert.Equal(vals[i], NumericUtils.PrefixCodedToLong(prefixVals[i])); //, "forward and back conversion should generate same long");
 
                 // test if decoding values as int fails correctly
                 try
@@ -110,7 +110,7 @@ namespace Lucene.Net.Util
                     NumericUtils.LongToPrefixCodedBytes(vals[i], j, @ref);
                     long prefixVal = NumericUtils.PrefixCodedToLong(@ref);
                     long mask = (1L << j) - 1L;
-                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
+                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal); //, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
                 }
             }
         }
@@ -127,7 +127,7 @@ namespace Lucene.Net.Util
                 NumericUtils.IntToPrefixCodedBytes(vals[i], 0, prefixVals[i]);
 
                 // check forward and back conversion
-                Assert.Equal(vals[i], NumericUtils.PrefixCodedToInt(prefixVals[i]), "forward and back conversion should generate same int");
+                Assert.Equal(vals[i], NumericUtils.PrefixCodedToInt(prefixVals[i])); //, "forward and back conversion should generate same int");
 
                 // test if decoding values as long fails correctly
                 try
@@ -156,7 +156,7 @@ namespace Lucene.Net.Util
                     NumericUtils.IntToPrefixCodedBytes(vals[i], j, @ref);
                     int prefixVal = NumericUtils.PrefixCodedToInt(@ref);
                     int mask = (1 << j) - 1;
-                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
+                    Assert.Equal(vals[i] & mask, vals[i] - prefixVal); //, "difference between prefix val and original value for " + vals[i] + " with shift=" + j);
                 }
             }
         }
@@ -246,7 +246,7 @@ namespace Lucene.Net.Util
             {
                 // after flipping all bits in the range, the cardinality should be zero
                 bits.Flip(0, upper - lower + 1);
-                Assert.Equal(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
+                Assert.Equal(0, bits.Cardinality()); //, "The sub-range concenated should match the whole range");
             }
         }
 
@@ -296,11 +296,11 @@ namespace Lucene.Net.Util
                 max ^= unchecked((long)0x8000000000000000L);
                 //System.out.println("0x"+Long.toHexString(min>>>shift)+"L,0x"+Long.toHexString(max>>>shift)+"L)/*shift="+shift+"*/,");
                 NeededShifts.MoveNext();
-                Assert.Equal(NeededShifts.Current, shift, "shift");
+                Assert.Equal(NeededShifts.Current, shift); //, "shift");
                 NeededBounds.MoveNext();
-                Assert.Equal(NeededBounds.Current, (long)((ulong)min >> shift), "inner min bound");
+                Assert.Equal(NeededBounds.Current, (long)((ulong)min >> shift)); //, "inner min bound");
                 NeededBounds.MoveNext();
-                Assert.Equal(NeededBounds.Current, (long)((ulong)max >> shift), "inner max bound");
+                Assert.Equal(NeededBounds.Current, (long)((ulong)max >> shift)); //, "inner max bound");
             }
         }
 
@@ -442,7 +442,7 @@ namespace Lucene.Net.Util
             {
                 // after flipping all bits in the range, the cardinality should be zero
                 bits.Flip(0, upper - lower + 1);
-                Assert.Equal(0, bits.Cardinality(), "The sub-range concenated should match the whole range");
+                Assert.Equal(0, bits.Cardinality()); //, "The sub-range concenated should match the whole range");
             }
         }
 
@@ -492,11 +492,11 @@ namespace Lucene.Net.Util
                 max ^= unchecked((int)0x80000000);
                 //System.out.println("0x"+Integer.toHexString(min>>>shift)+",0x"+Integer.toHexString(max>>>shift)+")/*shift="+shift+"*/,");
                 NeededShifts.MoveNext();
-                Assert.Equal(NeededShifts.Current, shift, "shift");
+                Assert.Equal(NeededShifts.Current, shift); //, "shift");
                 NeededBounds.MoveNext();
-                Assert.Equal(NeededBounds.Current, (int)((uint)min >> shift), "inner min bound");
+                Assert.Equal(NeededBounds.Current, (int)((uint)min >> shift)); //, "inner min bound");
                 NeededBounds.MoveNext();
-                Assert.Equal(NeededBounds.Current, (int)((uint)max >> shift), "inner max bound");
+                Assert.Equal(NeededBounds.Current, (int)((uint)max >> shift)); //, "inner max bound");
             }
         }
 

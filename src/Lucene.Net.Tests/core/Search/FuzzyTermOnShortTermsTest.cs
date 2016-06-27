@@ -34,7 +34,6 @@ namespace Lucene.Net.Search
     using TestUtil = Lucene.Net.Util.TestUtil;
     using Tokenizer = Lucene.Net.Analysis.Tokenizer;
 
-    [TestFixture]
     public class FuzzyTermOnShortTermsTest : LuceneTestCase
     {
         private const string FIELD = "field";
@@ -70,7 +69,7 @@ namespace Lucene.Net.Search
             IndexSearcher s = new IndexSearcher(r);
             TotalHitCountCollector c = new TotalHitCountCollector();
             s.Search(q, c);
-            Assert.Equal(expected, c.TotalHits, q.ToString());
+            Assert.Equal(expected, c.TotalHits); //, q.ToString());
             r.Dispose();
             d.Dispose();
         }

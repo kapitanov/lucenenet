@@ -1,6 +1,5 @@
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Documents;
-
 using System;
 
 namespace Lucene.Net.Search.Payloads
@@ -42,7 +41,7 @@ namespace Lucene.Net.Search.Payloads
     ///
     ///
     ///
-    public class PayloadHelper
+    public class PayloadHelper : IDisposable
     {
         private byte[] PayloadField = new byte[] { 1 };
         private byte[] PayloadMultiField1 = new byte[] { 2 };
@@ -149,8 +148,7 @@ namespace Lucene.Net.Search.Payloads
             return searcher;
         }
 
-        [TearDown]
-        public virtual void TearDown()
+        public virtual void Dispose()
         {
             Reader.Dispose();
         }

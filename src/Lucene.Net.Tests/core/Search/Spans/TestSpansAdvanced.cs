@@ -41,7 +41,6 @@ namespace Lucene.Net.Search.Spans
     /// work correctly in a BooleanQuery.
     ///
     /// </summary>
-    [TestFixture]
     public class TestSpansAdvanced : LuceneTestCase
     {
         // location to the index
@@ -58,10 +57,8 @@ namespace Lucene.Net.Search.Spans
         /// <summary>
         /// Initializes the tests by adding 4 identical documents to the index.
         /// </summary>
-        [SetUp]
-        public override void SetUp()
+        public TestSpansAdvanced() : base()
         {
-            
             // create test index
             MDirectory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), MDirectory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET)).SetMergePolicy(NewLogMergePolicy()).SetSimilarity(new DefaultSimilarity()));
@@ -75,8 +72,7 @@ namespace Lucene.Net.Search.Spans
             Searcher.Similarity = new DefaultSimilarity();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             MDirectory.Dispose();
@@ -163,8 +159,8 @@ namespace Lucene.Net.Search.Spans
                     Console.WriteLine(i + " warning, expected score: " + expectedScores[i] + ", actual " + score);
                     Console.WriteLine(s.Explain(query, id));
                 }
-                Assert.Equal(expectedScores[i], score, tolerance);
-                Assert.Equal(s.Explain(query, id).Value, score, tolerance);
+                assertEquals(expectedScores[i], score, tolerance);
+                assertEquals(s.Explain(query, id).Value, score, tolerance);
             }
         }
     }

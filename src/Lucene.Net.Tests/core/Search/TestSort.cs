@@ -1428,10 +1428,12 @@ namespace Lucene.Net.Search
             Query q = new TermQuery(new Term("body", "text"));
             IndexSearcher s = NewSearcher(r);
             float maxScore = s.Search(q, 10).MaxScore;
-            Assert.Equal(maxScore, s.Search(q, null, 3, Sort.INDEXORDER, Random().NextBoolean(), true).MaxScore); //, 0.0);
-            Assert.Equal(maxScore, s.Search(q, null, 3, Sort.RELEVANCE, Random().NextBoolean(), true).MaxScore); //, 0.0);
-            Assert.Equal(maxScore, s.Search(q, null, 3, new Sort(new SortField[] { new SortField("id", SortField.Type_e.INT, false) }), Random().NextBoolean(), true).MaxScore, 0.0);
-            Assert.Equal(maxScore, s.Search(q, null, 3, new Sort(new SortField[] { new SortField("id", SortField.Type_e.INT, true) }), Random().NextBoolean(), true).MaxScore, 0.0);
+            var expected = maxScore;
+            var delta = 0.0;
+            assertEquals(maxScore, s.Search(q, null, 3, Sort.INDEXORDER, Random().NextBoolean(), true).MaxScore, delta);
+            assertEquals(maxScore, s.Search(q, null, 3, Sort.RELEVANCE, Random().NextBoolean(), true).MaxScore, delta);
+            assertEquals(maxScore, s.Search(q, null, 3, new Sort(new SortField[] { new SortField("id", SortField.Type_e.INT, false) }), Random().NextBoolean(), true).MaxScore, delta);
+            assertEquals(maxScore, s.Search(q, null, 3, new Sort(new SortField[] { new SortField("id", SortField.Type_e.INT, true) }), Random().NextBoolean(), true).MaxScore, delta);
             r.Dispose();
             d.Dispose();
         }
@@ -1859,7 +1861,7 @@ namespace Lucene.Net.Search
             TopDocs actual = searcher.Search(new TermQuery(new Term("value", "foo")), null, 10, sort, true, true);
 
             Assert.Equal(expected.TotalHits, actual.TotalHits);
-            Assert.Equal(expected.ScoreDocs[0].Score, actual.ScoreDocs[0].Score); //, 0F);
+            assertEquals(expected.ScoreDocs[0].Score, actual.ScoreDocs[0].Score, 0F);
 
             ir.Dispose();
             dir.Dispose();

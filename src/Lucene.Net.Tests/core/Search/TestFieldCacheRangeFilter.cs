@@ -42,21 +42,25 @@ namespace Lucene.Net.Search
     /// </summary>
     public class TestFieldCacheRangeFilter : BaseTestRangeFilter
     {
+        public TestFieldCacheRangeFilter(BaseTestRangeFilterFixture fixture) : base(fixture)
+        {
+        }
+
         [Fact]
         public virtual void TestRangeFilterId()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
-            int medId = ((MaxId - MinId) / 2);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
 
-            string minIP = Pad(MinId);
-            string maxIP = Pad(MaxId);
+            string minIP = Pad(_fixture.MinId);
+            string maxIP = Pad(_fixture.MaxId);
             string medIP = Pad(medId);
 
             int numDocs = reader.NumDocs;
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -75,10 +79,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 2, result.Length); //, "all but ends");
 
             result = search.Search(q, FieldCacheRangeFilter.NewStringRange("id", medIP, maxIP, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + MaxId - medId, result.Length); //, "med and up");
+            Assert.Equal(1 + _fixture.MaxId - medId, result.Length); //, "med and up");
 
             result = search.Search(q, FieldCacheRangeFilter.NewStringRange("id", minIP, medIP, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + medId - MinId, result.Length); //, "up to med");
+            Assert.Equal(1 + medId - _fixture.MinId, result.Length); //, "up to med");
 
             // unbounded id
 
@@ -98,10 +102,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 1, result.Length); //, "not max, but down");
 
             result = search.Search(q, FieldCacheRangeFilter.NewStringRange("id", medIP, maxIP, T, F), numDocs).ScoreDocs;
-            Assert.Equal(MaxId - medId, result.Length); //, "med and up, not max");
+            Assert.Equal(_fixture.MaxId - medId, result.Length); //, "med and up, not max");
 
             result = search.Search(q, FieldCacheRangeFilter.NewStringRange("id", minIP, medIP, F, T), numDocs).ScoreDocs;
-            Assert.Equal(medId - MinId, result.Length); //, "not min, up to med");
+            Assert.Equal(medId - _fixture.MinId, result.Length); //, "not min, up to med");
 
             // very small sets
 
@@ -129,15 +133,15 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterRand()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
-            string minRP = Pad(SignedIndexDir.MinR);
-            string maxRP = Pad(SignedIndexDir.MaxR);
+            string minRP = Pad(_fixture.SignedIndexDir.MinR);
+            string maxRP = Pad(_fixture.SignedIndexDir.MaxR);
 
             int numDocs = reader.NumDocs;
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -193,16 +197,16 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterShorts()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             int numDocs = reader.NumDocs;
-            int medId = ((MaxId - MinId) / 2);
-            short? minIdO = Convert.ToInt16((short)MinId);
-            short? maxIdO = Convert.ToInt16((short)MaxId);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
+            short? minIdO = Convert.ToInt16((short)_fixture.MinId);
+            short? maxIdO = Convert.ToInt16((short)_fixture.MaxId);
             short? medIdO = Convert.ToInt16((short)medId);
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -221,10 +225,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 2, result.Length); //, "all but ends");
 
             result = search.Search(q, FieldCacheRangeFilter.NewShortRange("id", medIdO, maxIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + MaxId - medId, result.Length); //, "med and up");
+            Assert.Equal(1 + _fixture.MaxId - medId, result.Length); //, "med and up");
 
             result = search.Search(q, FieldCacheRangeFilter.NewShortRange("id", minIdO, medIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + medId - MinId, result.Length); //, "up to med");
+            Assert.Equal(1 + medId - _fixture.MinId, result.Length); //, "up to med");
 
             // unbounded id
 
@@ -244,10 +248,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 1, result.Length); //, "not max, but down");
 
             result = search.Search(q, FieldCacheRangeFilter.NewShortRange("id", medIdO, maxIdO, T, F), numDocs).ScoreDocs;
-            Assert.Equal(MaxId - medId, result.Length); //, "med and up, not max");
+            Assert.Equal(_fixture.MaxId - medId, result.Length); //, "med and up, not max");
 
             result = search.Search(q, FieldCacheRangeFilter.NewShortRange("id", minIdO, medIdO, F, T), numDocs).ScoreDocs;
-            Assert.Equal(medId - MinId, result.Length); //, "not min, up to med");
+            Assert.Equal(medId - _fixture.MinId, result.Length); //, "not min, up to med");
 
             // very small sets
 
@@ -283,16 +287,16 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterInts()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             int numDocs = reader.NumDocs;
-            int medId = ((MaxId - MinId) / 2);
-            int? minIdO = Convert.ToInt32(MinId);
-            int? maxIdO = Convert.ToInt32(MaxId);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
+            int? minIdO = Convert.ToInt32(_fixture.MinId);
+            int? maxIdO = Convert.ToInt32(_fixture.MaxId);
             int? medIdO = Convert.ToInt32(medId);
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -312,10 +316,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 2, result.Length); //, "all but ends");
 
             result = search.Search(q, FieldCacheRangeFilter.NewIntRange("id", medIdO, maxIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + MaxId - medId, result.Length); //, "med and up");
+            Assert.Equal(1 + _fixture.MaxId - medId, result.Length); //, "med and up");
 
             result = search.Search(q, FieldCacheRangeFilter.NewIntRange("id", minIdO, medIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + medId - MinId, result.Length); //, "up to med");
+            Assert.Equal(1 + medId - _fixture.MinId, result.Length); //, "up to med");
 
             // unbounded id
 
@@ -335,10 +339,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 1, result.Length); //, "not max, but down");
 
             result = search.Search(q, FieldCacheRangeFilter.NewIntRange("id", medIdO, maxIdO, T, F), numDocs).ScoreDocs;
-            Assert.Equal(MaxId - medId, result.Length); //, "med and up, not max");
+            Assert.Equal(_fixture.MaxId - medId, result.Length); //, "med and up, not max");
 
             result = search.Search(q, FieldCacheRangeFilter.NewIntRange("id", minIdO, medIdO, F, T), numDocs).ScoreDocs;
-            Assert.Equal(medId - MinId, result.Length); //, "not min, up to med");
+            Assert.Equal(medId - _fixture.MinId, result.Length); //, "not min, up to med");
 
             // very small sets
 
@@ -374,16 +378,16 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterLongs()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             int numDocs = reader.NumDocs;
-            int medId = ((MaxId - MinId) / 2);
-            long? minIdO = Convert.ToInt64(MinId);
-            long? maxIdO = Convert.ToInt64(MaxId);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
+            long? minIdO = Convert.ToInt64(_fixture.MinId);
+            long? maxIdO = Convert.ToInt64(_fixture.MaxId);
             long? medIdO = Convert.ToInt64(medId);
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -403,10 +407,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 2, result.Length); //, "all but ends");
 
             result = search.Search(q, FieldCacheRangeFilter.NewLongRange("id", medIdO, maxIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + MaxId - medId, result.Length); //, "med and up");
+            Assert.Equal(1 + _fixture.MaxId - medId, result.Length); //, "med and up");
 
             result = search.Search(q, FieldCacheRangeFilter.NewLongRange("id", minIdO, medIdO, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + medId - MinId, result.Length); //, "up to med");
+            Assert.Equal(1 + medId - _fixture.MinId, result.Length); //, "up to med");
 
             // unbounded id
 
@@ -426,10 +430,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 1, result.Length); //, "not max, but down");
 
             result = search.Search(q, FieldCacheRangeFilter.NewLongRange("id", medIdO, maxIdO, T, F), numDocs).ScoreDocs;
-            Assert.Equal(MaxId - medId, result.Length); //, "med and up, not max");
+            Assert.Equal(_fixture.MaxId - medId, result.Length); //, "med and up, not max");
 
             result = search.Search(q, FieldCacheRangeFilter.NewLongRange("id", minIdO, medIdO, F, T), numDocs).ScoreDocs;
-            Assert.Equal(medId - MinId, result.Length); //, "not min, up to med");
+            Assert.Equal(medId - _fixture.MinId, result.Length); //, "not min, up to med");
 
             // very small sets
 
@@ -467,12 +471,12 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterFloats()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             int numDocs = reader.NumDocs;
-            float? minIdO = Convert.ToSingle(MinId + .5f);
-            float? medIdO = Convert.ToSingle((float)minIdO + ((MaxId - MinId)) / 2.0f);
+            float? minIdO = Convert.ToSingle(_fixture.MinId + .5f);
+            float? medIdO = Convert.ToSingle((float)minIdO + ((_fixture.MaxId - _fixture.MinId)) / 2.0f);
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -496,12 +500,12 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFieldCacheRangeFilterDoubles()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             int numDocs = reader.NumDocs;
-            double? minIdO = Convert.ToDouble(MinId + .5);
-            double? medIdO = Convert.ToDouble((float)minIdO + ((MaxId - MinId)) / 2.0);
+            double? minIdO = Convert.ToDouble(_fixture.MinId + .5);
+            double? medIdO = Convert.ToDouble((float)minIdO + ((_fixture.MaxId - _fixture.MinId)) / 2.0);
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));

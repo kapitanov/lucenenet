@@ -34,7 +34,6 @@ namespace Lucene.Net.Index
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestFilterAtomicReader : LuceneTestCase
     {
         private class TestReader : FilterAtomicReader

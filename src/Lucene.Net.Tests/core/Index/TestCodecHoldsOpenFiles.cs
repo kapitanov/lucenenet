@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestCodecHoldsOpenFiles : LuceneTestCase
     {
         [Fact]

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Index
 {
@@ -38,7 +39,6 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestDirectoryReaderReopen : LuceneTestCase
     {
         [Fact]

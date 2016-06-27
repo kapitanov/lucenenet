@@ -35,7 +35,6 @@ namespace Lucene.Net.Search
     ///
     ///
     /// </summary>
-    [TestFixture]
     public class TestDocBoost : LuceneTestCase
     {
         [Fact]

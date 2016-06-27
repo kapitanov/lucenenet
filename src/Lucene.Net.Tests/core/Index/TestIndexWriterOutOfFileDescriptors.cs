@@ -33,7 +33,6 @@ namespace Lucene.Net.Index
     using PrintStreamInfoStream = Lucene.Net.Util.PrintStreamInfoStream;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestIndexWriterOutOfFileDescriptors : LuceneTestCase
     {
         [Fact]

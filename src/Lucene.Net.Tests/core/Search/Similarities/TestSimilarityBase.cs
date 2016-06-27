@@ -215,7 +215,7 @@ namespace Lucene.Net.Search.Similarities
                 Assert.False(float.IsInfinity(score), "Score infinite: " + sim.ToString());
                 Assert.False(float.IsNaN(score), "Score NaN: " + sim.ToString());
                 Assert.True(score >= 0, "Score negative: " + sim.ToString());
-                Assert.Equal(score, explScore, FLOAT_EPSILON, "score() and explain() return different values: " + sim.ToString());
+                assertEquals(score, explScore, FLOAT_EPSILON); //, "score() and explain() return different values: " + sim.ToString());
             }
         }
 
@@ -575,9 +575,7 @@ namespace Lucene.Net.Search.Similarities
             BasicStats stats = CreateStats();
             BasicStats realStats = (BasicStats)sim.ComputeWeight(stats.TotalBoost, ToCollectionStats(stats), ToTermStats(stats));
             float score = sim.Score(realStats, FREQ, DOC_LEN);
-            float min = gold - FLOAT_EPSILON;
-            float max = gold + FLOAT_EPSILON;
-            Assert.InRange(score, min, max); //, sim.ToString() + " score not correct.");
+            assertEquals(gold, score, FLOAT_EPSILON); //, sim.ToString() + " score not correct.");
         }
 
         // ---------------------------- Integration tests ----------------------------

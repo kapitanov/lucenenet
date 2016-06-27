@@ -39,7 +39,6 @@ namespace Lucene.Net.Index
     /// A "keep all" deletion policy is used to ensure we keep all commit points for testing purposes
     /// </summary>
 
-    [TestFixture]
     public class TestTransactionRollback : LuceneTestCase
     {
         private const string FIELD_RECORD_ID = "record_id";
@@ -113,7 +112,7 @@ namespace Lucene.Net.Index
                 }
             }
             r.Dispose();
-            Assert.Equal(0, expecteds.Cardinality(), "Should have 0 docs remaining ");
+            Assert.Equal(0, expecteds.Cardinality()); //, "Should have 0 docs remaining ");
         }
 
         /*
@@ -132,10 +131,8 @@ namespace Lucene.Net.Index
         }
         */
 
-        [SetUp]
-        public override void SetUp()
+        public TestTransactionRollback() : base()
         {
-            
             Dir = NewDirectory();
 
             //Build index, of records 1 to 100, committing after each batch of 10
@@ -160,8 +157,7 @@ namespace Lucene.Net.Index
             w.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
             base.Dispose();

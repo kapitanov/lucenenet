@@ -1,8 +1,10 @@
+using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Tokenattributes;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using Lucene.Net.Documents;
+using System;
+using System.IO;
+using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
@@ -23,9 +25,6 @@ namespace Lucene.Net.Search
      * limitations under the License.
      */
 
-    using Lucene.Net.Analysis;
-    
-    using System.IO;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -50,7 +49,7 @@ namespace Lucene.Net.Search
     /// </summary>
     public class TestPositionIncrement : LuceneTestCase
     {
-        internal const bool VERBOSE = false;
+        internal new const bool VERBOSE = false;
 
         [Fact]
         public virtual void TestSetPosition()

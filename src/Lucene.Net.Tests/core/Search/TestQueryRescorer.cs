@@ -234,7 +234,9 @@ namespace Lucene.Net.Search
             Assert.True(s.Contains("combined first and second pass score"));
             Assert.True(s.Contains("first pass score"));
             Assert.True(s.Contains("= second pass score"));
-            Assert.Equal(hits2.ScoreDocs[0].Score, explain.Value, 0.0f);
+
+            float expected = hits2.ScoreDocs[0].Score;
+            assertEquals(expected, explain.Value, 0.0f);
 
             docID = hits2.ScoreDocs[1].Doc;
             explain = rescorer.Explain(searcher, searcher.Explain(bq, docID), docID);

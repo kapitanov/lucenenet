@@ -1,6 +1,7 @@
 using Lucene.Net.Support;
 
 using System.Collections;
+using Xunit;
 
 namespace Lucene.Net.Util
 {

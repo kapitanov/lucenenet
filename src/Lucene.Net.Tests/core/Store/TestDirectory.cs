@@ -162,6 +162,7 @@ namespace Lucene.Net.Store
         // path, can read, write, and lock files.
         //[Test, Timeout(int.MaxValue)]
         [Fact]
+        [Trait("Category", "LongRunningTest")]
         public virtual void TestDirectInstantiation()
         {
             DirectoryInfo path = CreateTempDir("testDirectInstantiation");

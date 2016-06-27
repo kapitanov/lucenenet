@@ -6,7 +6,6 @@ namespace Lucene.Net.Analysis
 {
     using Lucene.Net.Randomized.Generators;
     using Lucene.Net.Support;
-
     using System.IO;
     using Xunit;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
@@ -46,7 +45,6 @@ namespace Lucene.Net.Analysis
     using TermsEnum = Lucene.Net.Index.TermsEnum;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestMockAnalyzer : BaseTokenStreamTestCase
     {
         /// <summary>

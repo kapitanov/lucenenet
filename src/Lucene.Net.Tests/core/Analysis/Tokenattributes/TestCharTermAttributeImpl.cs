@@ -1,10 +1,10 @@
+using Lucene.Net.Support;
 using System.Collections.Generic;
 using System.Text;
 using Xunit;
 
 namespace Lucene.Net.Analysis.Tokenattributes
 {
-    using Lucene.Net.Support;
     using BytesRef = Lucene.Net.Util.BytesRef;
 
     /*
@@ -27,7 +27,6 @@ namespace Lucene.Net.Analysis.Tokenattributes
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestCharTermAttributeImpl : LuceneTestCase
     {
         [Fact]

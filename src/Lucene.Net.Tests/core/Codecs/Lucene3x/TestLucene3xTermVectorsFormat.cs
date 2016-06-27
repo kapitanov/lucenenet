@@ -28,7 +28,7 @@ namespace Lucene.Net.Codecs.Lucene3x
     {
         public TestLucene3xTermVectorsFormat() : base()
         {
-            LuceneTestCase.OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true;
+            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true;
         }
 
         protected override Codec Codec
@@ -42,6 +42,12 @@ namespace Lucene.Net.Codecs.Lucene3x
         protected override IEnumerable<Options> ValidOptions()
         {
             return ValidOptions(Options.NONE, Options.POSITIONS_AND_OFFSETS);
+        }
+
+        public override void Dispose()
+        {
+            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = false;
+            base.Dispose();
         }
     }
 }

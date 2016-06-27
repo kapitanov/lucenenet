@@ -75,22 +75,22 @@ namespace Lucene.Net.Index
     //   - skipTo(term)
     //   - skipTo(doc)
 
-    [TestFixture]
-    public class TestCodecs : LuceneTestCase
+    public class TestCodecs : LuceneTestCase, IClassFixture<TestCodecsFixture>
     {
-        private static string[] FieldNames = new string[] { "one", "two", "three", "four" };
+        private readonly static string[] FieldNames = new string[] { "one", "two", "three", "four" };
 
-        private static int NUM_TEST_ITER;
         private const int NUM_TEST_THREADS = 3;
         private const int NUM_FIELDS = 4;
         private const int NUM_TERMS_RAND = 50; // must be > 16 to test skipping
         private const int DOC_FREQ_RAND = 500; // must be > 16 to test skipping
         private const int TERM_DOC_FREQ_RAND = 20;
+        private const string SEGMENT = "0";
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        private readonly TestCodecsFixture _fixture;
+
+        public TestCodecs(TestCodecsFixture fixture)
         {
-            NUM_TEST_ITER = AtLeast(20);
+            _fixture = fixture;
         }
 
         internal class FieldData : IComparable<FieldData>
@@ -297,8 +297,6 @@ namespace Lucene.Net.Index
             }
         }
 
-        private const string SEGMENT = "0";
-
         internal virtual TermData[] MakeRandomTerms(bool omitTF, bool storePayloads)
         {
             int numTerms = 1 + Random().Next(NUM_TERMS_RAND);
@@ -471,12 +469,12 @@ namespace Lucene.Net.Index
             Verify[] threads = new Verify[NUM_TEST_THREADS - 1];
             for (int i = 0; i < NUM_TEST_THREADS - 1; i++)
             {
-                threads[i] = new Verify(this, si, fields, terms);
+                threads[i] = new Verify(this, si, fields, terms, _fixture.NUM_TEST_ITER);
                 threads[i].SetDaemon(true);
                 threads[i].Start();
             }
 
-            (new Verify(this, si, fields, terms)).Run();
+            (new Verify(this, si, fields, terms, _fixture.NUM_TEST_ITER)).Run();
 
             for (int i = 0; i < NUM_TEST_THREADS - 1; i++)
             {
@@ -556,18 +554,20 @@ namespace Lucene.Net.Index
         private class Verify : ThreadClass
         {
             private readonly TestCodecs OuterInstance;
+            private readonly int _numberIterations;
 
             internal readonly Fields TermsDict;
             internal readonly FieldData[] Fields;
             internal readonly SegmentInfo Si;
             internal volatile bool Failed;
 
-            internal Verify(TestCodecs outerInstance, SegmentInfo si, FieldData[] fields, Fields termsDict)
+            internal Verify(TestCodecs outerInstance, SegmentInfo si, FieldData[] fields, Fields termsDict, int numberIterations)
             {
                 this.OuterInstance = outerInstance;
                 this.Fields = fields;
                 this.TermsDict = termsDict;
                 this.Si = si;
+                _numberIterations = numberIterations;
             }
 
             public override void Run()
@@ -625,7 +625,7 @@ namespace Lucene.Net.Index
 
             public virtual void _run()
             {
-                for (int iter = 0; iter < NUM_TEST_ITER; iter++)
+                for (int iter = 0; iter < _numberIterations; iter++)
                 {
                     FieldData field = Fields[Random().Next(Fields.Length)];
                     TermsEnum termsEnum = TermsDict.Terms(field.FieldInfo.Name).Iterator(null);
@@ -710,7 +710,7 @@ namespace Lucene.Net.Index
                     }
                     for (int i = field.Terms.Length - 1; i >= 0; i--)
                     {
-                        Assert.Equal(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef(field.Terms[i].Text2)), Thread.CurrentThread.Name + ": field=" + field.FieldInfo.Name + " term=" + field.Terms[i].Text2);
+                        Assert.Equal(TermsEnum.SeekStatus.FOUND, termsEnum.SeekCeil(new BytesRef(field.Terms[i].Text2))); //, Thread.CurrentThread.Name + ": field=" + field.FieldInfo.Name + " term=" + field.Terms[i].Text2);
                         Assert.Equal(field.Terms[i].Docs.Length, termsEnum.DocFreq());
                     }
 
@@ -879,7 +879,7 @@ namespace Lucene.Net.Index
                 DocsEnum de = ((AtomicReader)ctx.Reader).TermDocsEnum(term);
                 while (de.NextDoc() != DocIdSetIterator.NO_MORE_DOCS)
                 {
-                    Assert.Equal(1, de.Freq(), "wrong freq for doc " + de.DocID());
+                    Assert.Equal(1, de.Freq()); //, "wrong freq for doc " + de.DocID());
                 }
             }
             reader.Dispose();
@@ -917,6 +917,16 @@ namespace Lucene.Net.Index
             }
 
             dir.Dispose();
+        }
+    }
+
+    public class TestCodecsFixture
+    {
+        public readonly int NUM_TEST_ITER;
+
+        public TestCodecsFixture()
+        {
+            NUM_TEST_ITER = LuceneTestCase.AtLeast(20);
         }
     }
 }

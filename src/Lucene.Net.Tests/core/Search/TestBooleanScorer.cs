@@ -68,7 +68,7 @@ namespace Lucene.Net.Search
 
             IndexSearcher indexSearcher = NewSearcher(ir);
             ScoreDoc[] hits = indexSearcher.Search(query, null, 1000).ScoreDocs;
-            Assert.Equal(2, hits.Length, "Number of matched documents");
+            Assert.Equal(2, hits.Length); //, "Number of matched documents");
             ir.Dispose();
             directory.Dispose();
         }
@@ -98,8 +98,8 @@ namespace Lucene.Net.Search
             IList<int> hits = new List<int>();
             bs.Score(new CollectorAnonymousInnerClassHelper(this, hits));
 
-            Assert.Equal(1, hits.Count, "should have only 1 hit");
-            Assert.Equal(3000, (int)hits[0], "hit should have been docID=3000");
+            Assert.Equal(1, hits.Count); //, "should have only 1 hit");
+            Assert.Equal(3000, (int)hits[0]); //, "hit should have been docID=3000");
             ir.Dispose();
             directory.Dispose();
         }
@@ -213,7 +213,7 @@ namespace Lucene.Net.Search
                 {
                     // Make sure we got BooleanScorer:
                     Type clazz = value.GetType();
-                    Assert.Equal(typeof(FakeScorer).Name, clazz.Name, "Scorer is implemented by wrong class");
+                    Assert.Equal(typeof(FakeScorer).Name, clazz.Name); //, "Scorer is implemented by wrong class");
                 }
             }
 

@@ -51,10 +51,8 @@ namespace Lucene.Net.Index
         private Document Doc2;
         private SegmentReader Reader2;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSegmentMerger() : base()
         {
-            
             this.Doc1 = new Document();
             this.Doc2 = new Document();
             MergedDir = NewDirectory();
@@ -68,8 +66,7 @@ namespace Lucene.Net.Index
             Reader2 = new SegmentReader(info2, DirectoryReader.DEFAULT_TERMS_INDEX_DIVISOR, NewIOContext(Random()));
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader1.Dispose();
             Reader2.Dispose();
@@ -125,7 +122,7 @@ namespace Lucene.Net.Index
             }
 
             //System.out.println("stored size: " + stored.Size());
-            Assert.Equal(3, tvCount, "We do not have 3 fields that were indexed with term vector");
+            Assert.Equal(3, tvCount); //, "We do not have 3 fields that were indexed with term vector");
 
             Terms vector = mergedReader.GetTermVectors(0).Terms(DocHelper.TEXT_FIELD_2_KEY);
             Assert.NotNull(vector);

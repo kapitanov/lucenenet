@@ -24,7 +24,6 @@ namespace Lucene.Net.Index
     using Directory = Lucene.Net.Store.Directory;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestIndexCommit : LuceneTestCase
     {
         [Fact]

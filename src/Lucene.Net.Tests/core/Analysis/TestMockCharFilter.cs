@@ -1,4 +1,3 @@
-
 using System.IO;
 using Xunit;
 
@@ -21,7 +20,6 @@ namespace Lucene.Net.Analysis
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestMockCharFilter : BaseTokenStreamTestCase
     {
         [Fact]

@@ -45,10 +45,8 @@ namespace Lucene.Net.Search
         private Directory Directory;
         private readonly string FN = "field";
 
-        [SetUp]
-        public override void SetUp()
+        public TestRegexpQuery() : base()
         {
-            
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
             Document doc = new Document();
@@ -59,8 +57,7 @@ namespace Lucene.Net.Search
             Searcher = NewSearcher(Reader);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();

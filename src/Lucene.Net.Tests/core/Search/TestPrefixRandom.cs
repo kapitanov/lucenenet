@@ -43,17 +43,14 @@ namespace Lucene.Net.Search
     /// Create an index with random unicode terms
     /// Generates random prefix queries, and validates against a simple impl.
     /// </summary>
-    [TestFixture]
     public class TestPrefixRandom : LuceneTestCase
     {
         private IndexSearcher Searcher;
         private IndexReader Reader;
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestPrefixRandom() : base()
         {
-            
             Dir = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
 
@@ -75,8 +72,7 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();

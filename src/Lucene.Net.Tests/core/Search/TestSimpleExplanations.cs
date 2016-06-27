@@ -39,13 +39,13 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestT1()
         {
-            Qtest(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), new int[] { 0, 1, 2, 3 });
+            Qtest(new TermQuery(new Term(FIELD, "w1")), new int[] { 0, 1, 2, 3 });
         }
 
         [Fact]
         public virtual void TestT2()
         {
-            TermQuery termQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1"));
+            TermQuery termQuery = new TermQuery(new Term(FIELD, "w1"));
             termQuery.Boost = 100;
             Qtest(termQuery, new int[] { 0, 1, 2, 3 });
         }
@@ -72,8 +72,8 @@ namespace Lucene.Net.Search
         public virtual void TestP1()
         {
             PhraseQuery phraseQuery = new PhraseQuery();
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w1"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
             Qtest(phraseQuery, new int[] { 0 });
         }
 
@@ -81,8 +81,8 @@ namespace Lucene.Net.Search
         public virtual void TestP2()
         {
             PhraseQuery phraseQuery = new PhraseQuery();
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
+            phraseQuery.Add(new Term(FIELD, "w1"));
+            phraseQuery.Add(new Term(FIELD, "w3"));
             Qtest(phraseQuery, new int[] { 1, 3 });
         }
 
@@ -91,8 +91,8 @@ namespace Lucene.Net.Search
         {
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 1;
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w1"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
             Qtest(phraseQuery, new int[] { 0, 1, 2 });
         }
 
@@ -101,8 +101,8 @@ namespace Lucene.Net.Search
         {
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 1;
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w3"));
             Qtest(phraseQuery, new int[] { 0, 1, 2, 3 });
         }
 
@@ -111,8 +111,8 @@ namespace Lucene.Net.Search
         {
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 1;
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w3"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
             Qtest(phraseQuery, new int[] { 1, 3 });
         }
 
@@ -121,8 +121,8 @@ namespace Lucene.Net.Search
         {
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 2;
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w3"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
             Qtest(phraseQuery, new int[] { 0, 1, 3 });
         }
 
@@ -131,8 +131,8 @@ namespace Lucene.Net.Search
         {
             PhraseQuery phraseQuery = new PhraseQuery();
             phraseQuery.Slop = 3;
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            phraseQuery.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            phraseQuery.Add(new Term(FIELD, "w3"));
+            phraseQuery.Add(new Term(FIELD, "w2"));
             Qtest(phraseQuery, new int[] { 0, 1, 2, 3 });
         }
 
@@ -141,25 +141,25 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFQ1()
         {
-            Qtest(new FilteredQuery(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), new ItemizedFilter(new int[] { 0, 1, 2, 3 })), new int[] { 0, 1, 2, 3 });
+            Qtest(new FilteredQuery(new TermQuery(new Term(FIELD, "w1")), new ItemizedFilter(new int[] { 0, 1, 2, 3 })), new int[] { 0, 1, 2, 3 });
         }
 
         [Fact]
         public virtual void TestFQ2()
         {
-            Qtest(new FilteredQuery(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), new ItemizedFilter(new int[] { 0, 2, 3 })), new int[] { 0, 2, 3 });
+            Qtest(new FilteredQuery(new TermQuery(new Term(FIELD, "w1")), new ItemizedFilter(new int[] { 0, 2, 3 })), new int[] { 0, 2, 3 });
         }
 
         [Fact]
         public virtual void TestFQ3()
         {
-            Qtest(new FilteredQuery(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 })), new int[] { 3 });
+            Qtest(new FilteredQuery(new TermQuery(new Term(FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 })), new int[] { 3 });
         }
 
         [Fact]
         public virtual void TestFQ4()
         {
-            TermQuery termQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx"));
+            TermQuery termQuery = new TermQuery(new Term(FIELD, "xx"));
             termQuery.Boost = 1000;
             Qtest(new FilteredQuery(termQuery, new ItemizedFilter(new int[] { 1, 3 })), new int[] { 3 });
         }
@@ -167,7 +167,7 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestFQ6()
         {
-            Query q = new FilteredQuery(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
+            Query q = new FilteredQuery(new TermQuery(new Term(FIELD, "xx")), new ItemizedFilter(new int[] { 1, 3 }));
             q.Boost = 1000;
             Qtest(q, new int[] { 3 });
         }
@@ -202,8 +202,8 @@ namespace Lucene.Net.Search
         public virtual void TestDMQ1()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.0f);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")));
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5")));
+            q.Add(new TermQuery(new Term(FIELD, "w1")));
+            q.Add(new TermQuery(new Term(FIELD, "w5")));
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -211,8 +211,8 @@ namespace Lucene.Net.Search
         public virtual void TestDMQ2()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")));
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5")));
+            q.Add(new TermQuery(new Term(FIELD, "w1")));
+            q.Add(new TermQuery(new Term(FIELD, "w5")));
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -220,8 +220,8 @@ namespace Lucene.Net.Search
         public virtual void TestDMQ3()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQ")));
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5")));
+            q.Add(new TermQuery(new Term(FIELD, "QQ")));
+            q.Add(new TermQuery(new Term(FIELD, "w5")));
             Qtest(q, new int[] { 0 });
         }
 
@@ -229,8 +229,8 @@ namespace Lucene.Net.Search
         public virtual void TestDMQ4()
         {
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQ")));
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")));
+            q.Add(new TermQuery(new Term(FIELD, "QQ")));
+            q.Add(new TermQuery(new Term(FIELD, "xx")));
             Qtest(q, new int[] { 2, 3 });
         }
 
@@ -240,11 +240,11 @@ namespace Lucene.Net.Search
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQ")), BooleanClause.Occur.MUST_NOT);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "QQ")), BooleanClause.Occur.MUST_NOT);
 
             q.Add(booleanQuery);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")));
+            q.Add(new TermQuery(new Term(FIELD, "xx")));
             Qtest(q, new int[] { 2, 3 });
         }
 
@@ -254,11 +254,11 @@ namespace Lucene.Net.Search
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.SHOULD);
 
             q.Add(booleanQuery);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")));
+            q.Add(new TermQuery(new Term(FIELD, "xx")));
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -268,11 +268,11 @@ namespace Lucene.Net.Search
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.SHOULD);
 
             q.Add(booleanQuery);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")));
+            q.Add(new TermQuery(new Term(FIELD, "w2")));
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -282,14 +282,14 @@ namespace Lucene.Net.Search
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
 
-            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5"));
+            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w5"));
             boostedQuery.Boost = 100;
             booleanQuery.Add(boostedQuery, BooleanClause.Occur.SHOULD);
             q.Add(booleanQuery);
 
-            TermQuery xxBoostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx"));
+            TermQuery xxBoostedQuery = new TermQuery(new Term(FIELD, "xx"));
             xxBoostedQuery.Boost = 100000;
             q.Add(xxBoostedQuery);
 
@@ -302,14 +302,14 @@ namespace Lucene.Net.Search
             DisjunctionMaxQuery q = new DisjunctionMaxQuery(0.5f);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
 
-            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5"));
+            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w5"));
             boostedQuery.Boost = 100;
             booleanQuery.Add(boostedQuery, BooleanClause.Occur.SHOULD);
             q.Add(booleanQuery);
 
-            TermQuery xxBoostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx"));
+            TermQuery xxBoostedQuery = new TermQuery(new Term(FIELD, "xx"));
             xxBoostedQuery.Boost = 0;
             q.Add(xxBoostedQuery);
 
@@ -380,8 +380,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ1()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.MUST);
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
 
@@ -389,8 +389,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ2()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.MUST);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
             Qtest(query, new int[] { 2, 3 });
         }
 
@@ -398,8 +398,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ3()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            query.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
 
@@ -407,11 +407,11 @@ namespace Lucene.Net.Search
         public virtual void TestBQ4()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
 
             Qtest(outerQuery, new int[] { 0, 1, 2, 3 });
@@ -421,11 +421,11 @@ namespace Lucene.Net.Search
         public virtual void TestBQ5()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.MUST);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.MUST);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
 
             Qtest(outerQuery, new int[] { 0, 1, 2, 3 });
@@ -435,11 +435,11 @@ namespace Lucene.Net.Search
         public virtual void TestBQ6()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.MUST_NOT);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.MUST_NOT);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "w5")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST_NOT);
 
             Qtest(outerQuery, new int[] { 1, 2, 3 });
@@ -449,19 +449,19 @@ namespace Lucene.Net.Search
         public virtual void TestBQ7()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.SHOULD);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.SHOULD);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST);
@@ -473,19 +473,19 @@ namespace Lucene.Net.Search
         public virtual void TestBQ8()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.SHOULD);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.SHOULD);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
@@ -497,19 +497,19 @@ namespace Lucene.Net.Search
         public virtual void TestBQ9()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.MUST_NOT);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
@@ -521,19 +521,19 @@ namespace Lucene.Net.Search
         public virtual void TestBQ10()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.MUST_NOT);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST);
@@ -545,8 +545,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ11()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
-            TermQuery boostedQuery = new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1"));
+            query.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            TermQuery boostedQuery = new TermQuery(new Term(FIELD, "w1"));
             boostedQuery.Boost = 1000;
             query.Add(boostedQuery, BooleanClause.Occur.SHOULD);
 
@@ -557,8 +557,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ14()
         {
             BooleanQuery q = new BooleanQuery(true);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -566,8 +566,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ15()
         {
             BooleanQuery q = new BooleanQuery(true);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQQQQ")), BooleanClause.Occur.MUST_NOT);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "QQQQQ")), BooleanClause.Occur.MUST_NOT);
+            q.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
             Qtest(q, new int[] { 0, 1, 2, 3 });
         }
 
@@ -575,11 +575,11 @@ namespace Lucene.Net.Search
         public virtual void TestBQ16()
         {
             BooleanQuery q = new BooleanQuery(true);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
 
             q.Add(booleanQuery, BooleanClause.Occur.SHOULD);
             Qtest(q, new int[] { 0, 1 });
@@ -589,11 +589,11 @@ namespace Lucene.Net.Search
         public virtual void TestBQ17()
         {
             BooleanQuery q = new BooleanQuery(true);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery booleanQuery = new BooleanQuery();
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
-            booleanQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            booleanQuery.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
 
             q.Add(booleanQuery, BooleanClause.Occur.SHOULD);
             Qtest(q, new int[] { 0, 1, 2, 3 });
@@ -603,8 +603,8 @@ namespace Lucene.Net.Search
         public virtual void TestBQ19()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w3")), BooleanClause.Occur.SHOULD);
+            query.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.MUST_NOT);
+            query.Add(new TermQuery(new Term(FIELD, "w3")), BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1 });
         }
@@ -614,23 +614,23 @@ namespace Lucene.Net.Search
         {
             BooleanQuery q = new BooleanQuery();
             q.MinimumNumberShouldMatch = 2;
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "zz")), BooleanClause.Occur.SHOULD);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w5")), BooleanClause.Occur.SHOULD);
-            q.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "QQQQQ")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "zz")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "w5")), BooleanClause.Occur.SHOULD);
+            q.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.SHOULD);
 
             Qtest(q, new int[] { 0, 3 });
         }
 
-        /* BQ of TQ: using alt so some TestExplanationsFixture.FIELDs have zero boost and some don't */
+        /* BQ of TQ: using alt so some FIELDs have zero boost and some don't */
 
         [Fact]
         public virtual void TestMultiFieldBQ1()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w2")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(ALTFIELD, "w2")), BooleanClause.Occur.MUST);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
@@ -639,8 +639,8 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ2()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.MUST);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
 
             Qtest(query, new int[] { 2, 3 });
         }
@@ -649,8 +649,8 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ3()
         {
             BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "yy")), BooleanClause.Occur.SHOULD);
-            query.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            query.Add(new TermQuery(new Term(FIELD, "yy")), BooleanClause.Occur.SHOULD);
+            query.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });
         }
@@ -659,11 +659,11 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ4()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
 
             Qtest(outerQuery, new int[] { 0, 1, 2, 3 });
@@ -673,11 +673,11 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ5()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "qq")), BooleanClause.Occur.MUST);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "qq")), BooleanClause.Occur.MUST);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
 
             Qtest(outerQuery, new int[] { 0, 1, 2, 3 });
@@ -687,11 +687,11 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ6()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "qq")), BooleanClause.Occur.MUST_NOT);
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w5")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "qq")), BooleanClause.Occur.MUST_NOT);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "w5")), BooleanClause.Occur.SHOULD);
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST_NOT);
 
             Qtest(outerQuery, new int[] { 1, 2, 3 });
@@ -701,19 +701,19 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ7()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "xx")), BooleanClause.Occur.SHOULD);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w2")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(ALTFIELD, "xx")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(ALTFIELD, "w2")), BooleanClause.Occur.MUST_NOT);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(ALTFIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.SHOULD);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST);
@@ -725,19 +725,19 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ8()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(ALTFIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(FIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "xx")), BooleanClause.Occur.SHOULD);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(ALTFIELD, "xx")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.MUST_NOT);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.SHOULD);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
@@ -749,19 +749,19 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ9()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w2")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(FIELD, "w2")), BooleanClause.Occur.SHOULD);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.MUST_NOT);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.SHOULD);
@@ -773,19 +773,19 @@ namespace Lucene.Net.Search
         public virtual void TestMultiFieldBQ10()
         {
             BooleanQuery outerQuery = new BooleanQuery();
-            outerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.MUST);
+            outerQuery.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.MUST);
 
             BooleanQuery innerQuery = new BooleanQuery();
-            innerQuery.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
+            innerQuery.Add(new TermQuery(new Term(ALTFIELD, "qq")), BooleanClause.Occur.SHOULD);
 
             BooleanQuery childLeft = new BooleanQuery();
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
-            childLeft.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
+            childLeft.Add(new TermQuery(new Term(FIELD, "xx")), BooleanClause.Occur.MUST_NOT);
+            childLeft.Add(new TermQuery(new Term(ALTFIELD, "w2")), BooleanClause.Occur.SHOULD);
             innerQuery.Add(childLeft, BooleanClause.Occur.SHOULD);
 
             BooleanQuery childRight = new BooleanQuery();
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.ALTFIELD, "w3")), BooleanClause.Occur.MUST);
-            childRight.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w4")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(ALTFIELD, "w3")), BooleanClause.Occur.MUST);
+            childRight.Add(new TermQuery(new Term(FIELD, "w4")), BooleanClause.Occur.MUST);
             innerQuery.Add(childRight, BooleanClause.Occur.MUST_NOT);
 
             outerQuery.Add(innerQuery, BooleanClause.Occur.MUST);
@@ -793,7 +793,7 @@ namespace Lucene.Net.Search
             Qtest(outerQuery, new int[] { 1 });
         }
 
-        /* BQ of PQ: using alt so some TestExplanationsFixture.FIELDs have zero boost and some don't */
+        /* BQ of PQ: using alt so some FIELDs have zero boost and some don't */
 
         [Fact]
         public virtual void TestMultiFieldBQofPQ1()
@@ -801,13 +801,13 @@ namespace Lucene.Net.Search
             BooleanQuery query = new BooleanQuery();
 
             PhraseQuery leftChild = new PhraseQuery();
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w1"));
+            leftChild.Add(new Term(FIELD, "w2"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w1"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w1"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0 });
@@ -819,13 +819,13 @@ namespace Lucene.Net.Search
             BooleanQuery query = new BooleanQuery();
 
             PhraseQuery leftChild = new PhraseQuery();
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
+            leftChild.Add(new Term(FIELD, "w1"));
+            leftChild.Add(new Term(FIELD, "w3"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w1"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w3"));
+            rightChild.Add(new Term(ALTFIELD, "w1"));
+            rightChild.Add(new Term(ALTFIELD, "w3"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 1, 3 });
@@ -838,14 +838,14 @@ namespace Lucene.Net.Search
 
             PhraseQuery leftChild = new PhraseQuery();
             leftChild.Slop = 1;
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w1"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w1"));
+            leftChild.Add(new Term(FIELD, "w2"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
             rightChild.Slop = 1;
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w1"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w1"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 2 });
@@ -858,14 +858,14 @@ namespace Lucene.Net.Search
 
             PhraseQuery leftChild = new PhraseQuery();
             leftChild.Slop = 1;
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
+            leftChild.Add(new Term(FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w3"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
             rightChild.Slop = 1;
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w3"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w3"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });
@@ -878,14 +878,14 @@ namespace Lucene.Net.Search
 
             PhraseQuery leftChild = new PhraseQuery();
             leftChild.Slop = 1;
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w3"));
+            leftChild.Add(new Term(FIELD, "w2"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
             rightChild.Slop = 1;
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w3"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w3"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 1, 3 });
@@ -898,14 +898,14 @@ namespace Lucene.Net.Search
 
             PhraseQuery leftChild = new PhraseQuery();
             leftChild.Slop = 2;
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w3"));
+            leftChild.Add(new Term(FIELD, "w2"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
             rightChild.Slop = 2;
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w3"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w3"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 3 });
@@ -918,14 +918,14 @@ namespace Lucene.Net.Search
 
             PhraseQuery leftChild = new PhraseQuery();
             leftChild.Slop = 3;
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w3"));
-            leftChild.Add(new Term(TestExplanationsFixture.FIELD, "w2"));
+            leftChild.Add(new Term(FIELD, "w3"));
+            leftChild.Add(new Term(FIELD, "w2"));
             query.Add(leftChild, BooleanClause.Occur.SHOULD);
 
             PhraseQuery rightChild = new PhraseQuery();
             rightChild.Slop = 1;
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w3"));
-            rightChild.Add(new Term(TestExplanationsFixture.ALTFIELD, "w2"));
+            rightChild.Add(new Term(ALTFIELD, "w3"));
+            rightChild.Add(new Term(ALTFIELD, "w2"));
             query.Add(rightChild, BooleanClause.Occur.SHOULD);
 
             Qtest(query, new int[] { 0, 1, 2, 3 });

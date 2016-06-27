@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
 
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
 
-    [TestFixture]
     public class TestMultiFields : LuceneTestCase
     {
         [Fact]

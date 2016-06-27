@@ -36,7 +36,6 @@ namespace Lucene.Net.Index
     using TermQuery = Lucene.Net.Search.TermQuery;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestCrashCausesCorruptIndex : LuceneTestCase
     {
         internal DirectoryInfo Path;

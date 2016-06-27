@@ -40,7 +40,6 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestStressNRT : LuceneTestCase
     {
         internal volatile DirectoryReader Reader;

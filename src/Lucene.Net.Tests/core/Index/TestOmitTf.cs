@@ -445,7 +445,7 @@ namespace Lucene.Net.Index
             {
                 //System.out.println("Q2: Doc=" + doc + " score=" + score);
                 float score = scorer.Score();
-                Assert.Equal(1.0f + doc, score); //, 0.00001f);
+                assertEquals(1.0f + doc, score, 0.00001f);
                 base.Collect(doc);
             }
         }

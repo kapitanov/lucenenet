@@ -4,7 +4,8 @@ using Xunit;
 
 namespace Lucene.Net.Codecs.Perfield
 {
-    
+    using Index;
+
 
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -29,9 +30,12 @@ namespace Lucene.Net.Codecs.Perfield
     /// <summary>
     /// Basic tests of PerFieldPostingsFormat
     /// </summary>
-    [TestFixture]
     public class TestPerFieldPostingsFormat : BasePostingsFormatTestCase
     {
+        public TestPerFieldPostingsFormat(BasePostingsFormatTestCaseFixture fixture) : base(fixture)
+        {
+        }
+
         protected override Codec Codec
         {
             get

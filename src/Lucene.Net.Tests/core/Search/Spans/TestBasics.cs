@@ -25,6 +25,7 @@ namespace Lucene.Net.Search.Spans
 
     using Lucene.Net.Analysis;
     using Lucene.Net.Util;
+    using System;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -36,7 +37,6 @@ namespace Lucene.Net.Search.Spans
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
     using TestUtil = Lucene.Net.Util.TestUtil;
-
     /// <summary>
     /// Tests basic search capabilities.
     ///
@@ -49,90 +49,13 @@ namespace Lucene.Net.Search.Spans
     /// testing of the indexing and search code.
     ///
     /// </summary>
-    public class TestBasics : LuceneTestCase
+    public class TestBasics : LuceneTestCase, IClassFixture<TestBasicsFixture>
     {
-        private static IndexSearcher Searcher;
-        private static IndexReader Reader;
-        private static Directory Directory;
+        private readonly TestBasicsFixture _fixture;
 
-        internal sealed class SimplePayloadFilter : TokenFilter
+        public TestBasics(TestBasicsFixture fixture)
         {
-            internal int Pos;
-            internal readonly IPayloadAttribute PayloadAttr;
-            internal readonly ICharTermAttribute TermAttr;
-
-            public SimplePayloadFilter(TokenStream input)
-                : base(input)
-            {
-                Pos = 0;
-                PayloadAttr = input.AddAttribute<IPayloadAttribute>();
-                TermAttr = input.AddAttribute<ICharTermAttribute>();
-            }
-
-            public override bool IncrementToken()
-            {
-                if (input.IncrementToken())
-                {
-                    PayloadAttr.Payload = new BytesRef(("pos: " + Pos).GetBytes(IOUtils.CHARSET_UTF_8));
-                    Pos++;
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
-            }
-
-            public override void Reset()
-            {
-                base.Reset();
-                Pos = 0;
-            }
-        }
-
-        internal static Analyzer SimplePayloadAnalyzer;
-
-        [TestFixtureSetUp]
-        public static void BeforeClass()
-        {
-            SimplePayloadAnalyzer = new AnalyzerAnonymousInnerClassHelper();
-
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, SimplePayloadAnalyzer).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 100, 1000)).SetMergePolicy(NewLogMergePolicy()));
-            //writer.infoStream = System.out;
-            for (int i = 0; i < 2000; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewTextField("field", English.IntToEnglish(i), Field.Store.YES));
-                writer.AddDocument(doc);
-            }
-            Reader = writer.Reader;
-            Searcher = NewSearcher(Reader);
-            writer.Dispose();
-        }
-
-        private class AnalyzerAnonymousInnerClassHelper : Analyzer
-        {
-            public AnalyzerAnonymousInnerClassHelper()
-            {
-            }
-
-            public override TokenStreamComponents CreateComponents(string fieldName, TextReader reader)
-            {
-                Tokenizer tokenizer = new MockTokenizer(reader, MockTokenizer.SIMPLE, true);
-                return new TokenStreamComponents(tokenizer, new SimplePayloadFilter(tokenizer));
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Reader.Dispose();
-            Directory.Dispose();
-            Searcher = null;
-            Reader = null;
-            Directory = null;
-            SimplePayloadAnalyzer = null;
+            _fixture = fixture;
         }
 
         [Fact]
@@ -193,8 +116,8 @@ namespace Lucene.Net.Search.Spans
             SpanNearQuery query = new SpanNearQuery(new SpanQuery[] { term1, term2 }, 0, true);
             CheckHits(query, new int[] { 77, 177, 277, 377, 477, 577, 677, 777, 877, 977, 1077, 1177, 1277, 1377, 1477, 1577, 1677, 1777, 1877, 1977 });
 
-            Assert.True(Searcher.Explain(query, 77).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 977).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 77).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 977).Value > 0.0f);
 
             QueryUtils.Check(term1);
             QueryUtils.Check(term2);
@@ -238,8 +161,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 801, 821, 831, 851, 861, 871, 881, 891, 1801, 1821, 1831, 1851, 1861, 1871, 1881, 1891 });
 
-            Assert.True(Searcher.Explain(query, 801).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 891).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 801).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 891).Value > 0.0f);
         }
 
         [Fact]
@@ -256,8 +179,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 801, 821, 831, 851, 861, 871, 881, 891, 1801, 1821, 1831, 1851, 1861, 1871, 1881, 1891 });
 
-            Assert.True(Searcher.Explain(query, 801).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 891).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 801).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 891).Value > 0.0f);
         }
 
         [Fact]
@@ -276,8 +199,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 801, 821, 831, 851, 871, 891, 1801, 1821, 1831, 1851, 1871, 1891 });
 
-            Assert.True(Searcher.Explain(query, 801).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 891).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 801).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 891).Value > 0.0f);
         }
 
         [Fact]
@@ -294,8 +217,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 801, 821, 831, 851, 861, 871, 881, 891, 1801, 1821, 1831, 1851, 1861, 1871, 1881, 1891 });
 
-            Assert.True(Searcher.Explain(query, 801).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 891).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 801).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 891).Value > 0.0f);
         }
 
         [Fact]
@@ -325,8 +248,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 840, 842, 843, 844, 845, 846, 847, 848, 849, 1840, 1842, 1843, 1844, 1845, 1846, 1847, 1848, 1849 });
 
-            Assert.True(Searcher.Explain(query, 840).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 1842).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 840).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 1842).Value > 0.0f);
         }
 
         [Fact]
@@ -340,8 +263,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 840, 841, 842, 843, 844, 845, 846, 847, 848, 849 });
 
-            Assert.True(Searcher.Explain(query, 840).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 849).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 840).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 849).Value > 0.0f);
         }
 
         [Fact]
@@ -359,8 +282,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 801, 821, 831, 851, 861, 871, 881, 891, 1801, 1821, 1831, 1851, 1861, 1871, 1881, 1891 });
 
-            Assert.True(Searcher.Explain(query, 801).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 891).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 801).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 891).Value > 0.0f);
         }
 
         [Fact]
@@ -376,8 +299,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 42, 242, 342, 442, 542, 642, 742, 842, 942 });
 
-            Assert.True(Searcher.Explain(query, 242).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 942).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 242).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 942).Value > 0.0f);
         }
 
         [Fact]
@@ -388,8 +311,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 5, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599 });
 
-            Assert.True(Searcher.Explain(query, 5).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 599).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 5).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 599).Value > 0.0f);
         }
 
         [Fact]
@@ -399,8 +322,8 @@ namespace Lucene.Net.Search.Spans
             SpanTermQuery term1 = new SpanTermQuery(new Term("field", "five"));
             query = new SpanPositionRangeQuery(term1, 1, 2);
             CheckHits(query, new int[] { 25, 35, 45, 55, 65, 75, 85, 95 });
-            Assert.True(Searcher.Explain(query, 25).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 95).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 25).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 95).Value > 0.0f);
 
             query = new SpanPositionRangeQuery(term1, 0, 1);
             CheckHits(query, new int[] { 5, 500, 501, 502, 503, 504, 505, 506, 507, 508, 509, 510, 511, 512, 513, 514, 515, 516, 517, 518, 519, 520, 521, 522, 523, 524, 525, 526, 527, 528, 529, 530, 531, 532, 533, 534, 535, 536, 537, 538, 539, 540, 541, 542, 543, 544, 545, 546, 547, 548, 549, 550, 551, 552, 553, 554, 555, 556, 557, 558, 559, 560, 561, 562, 563, 564, 565, 566, 567, 568, 569, 570, 571, 572, 573, 574, 575, 576, 577, 578, 579, 580, 581, 582, 583, 584, 585, 586, 587, 588, 589, 590, 591, 592, 593, 594, 595, 596, 597, 598, 599 });
@@ -416,7 +339,7 @@ namespace Lucene.Net.Search.Spans
             BytesRef pay = new BytesRef(("pos: " + 5).GetBytes(IOUtils.CHARSET_UTF_8));
             SpanQuery query = new SpanPayloadCheckQuery(term1, new List<byte[]>() { pay.Bytes });
             CheckHits(query, new int[] { 1125, 1135, 1145, 1155, 1165, 1175, 1185, 1195, 1225, 1235, 1245, 1255, 1265, 1275, 1285, 1295, 1325, 1335, 1345, 1355, 1365, 1375, 1385, 1395, 1425, 1435, 1445, 1455, 1465, 1475, 1485, 1495, 1525, 1535, 1545, 1555, 1565, 1575, 1585, 1595, 1625, 1635, 1645, 1655, 1665, 1675, 1685, 1695, 1725, 1735, 1745, 1755, 1765, 1775, 1785, 1795, 1825, 1835, 1845, 1855, 1865, 1875, 1885, 1895, 1925, 1935, 1945, 1955, 1965, 1975, 1985, 1995 });
-            Assert.True(Searcher.Explain(query, 1125).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 1125).Value > 0.0f);
 
             SpanTermQuery term2 = new SpanTermQuery(new Term("field", "hundred"));
             SpanNearQuery snq;
@@ -497,8 +420,8 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 33, 47, 133, 147, 233, 247, 333, 347, 433, 447, 533, 547, 633, 647, 733, 747, 833, 847, 933, 947, 1033, 1047, 1133, 1147, 1233, 1247, 1333, 1347, 1433, 1447, 1533, 1547, 1633, 1647, 1733, 1747, 1833, 1847, 1933, 1947 });
 
-            Assert.True(Searcher.Explain(query, 33).Value > 0.0f);
-            Assert.True(Searcher.Explain(query, 947).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 33).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 947).Value > 0.0f);
         }
 
         [Fact]
@@ -515,7 +438,7 @@ namespace Lucene.Net.Search.Spans
 
             CheckHits(query, new int[] { 333, 1333 });
 
-            Assert.True(Searcher.Explain(query, 333).Value > 0.0f);
+            Assert.True(_fixture.Searcher.Explain(query, 333).Value > 0.0f);
         }
 
         [Fact]
@@ -562,8 +485,8 @@ namespace Lucene.Net.Search.Spans
         {
             SpanTermQuery t1 = new SpanTermQuery(new Term("field", "seventy"));
             SpanTermQuery t2 = new SpanTermQuery(new Term("field", "seventy"));
-            Spans s1 = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, t1);
-            Spans s2 = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, t2);
+            Spans s1 = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, t1);
+            Spans s2 = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, t2);
 
             Assert.True(s1.Next());
             Assert.True(s2.Next());
@@ -605,7 +528,98 @@ namespace Lucene.Net.Search.Spans
 
         private void CheckHits(Query query, int[] results)
         {
-            Search.CheckHits.DoCheckHits(Random(), query, "field", Searcher, results);
+            Search.CheckHits.DoCheckHits(Random(), query, "field", _fixture.Searcher, results);
         }
+    }
+
+    public class TestBasicsFixture : IDisposable
+    {
+        internal IndexSearcher Searcher { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal Directory Directory { get; private set; }
+
+        internal Analyzer SimplePayloadAnalyzer { get; private set; }
+
+        public TestBasicsFixture()
+        {
+            var random = LuceneTestCase.Random();
+
+            SimplePayloadAnalyzer = new AnalyzerAnonymousInnerClassHelper();
+
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(random, Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, SimplePayloadAnalyzer)
+                .SetMaxBufferedDocs(TestUtil.NextInt(random, 100, 1000))
+                .SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
+            //writer.infoStream = System.out;
+            for (int i = 0; i < 2000; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewTextField("field", English.IntToEnglish(i), Field.Store.YES));
+                writer.AddDocument(doc);
+            }
+            Reader = writer.Reader;
+            Searcher = LuceneTestCase.NewSearcher(Reader);
+            writer.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            Directory.Dispose();
+            Searcher = null;
+            Reader = null;
+            Directory = null;
+            SimplePayloadAnalyzer = null;
+        }
+
+        private class AnalyzerAnonymousInnerClassHelper : Analyzer
+        {
+            public AnalyzerAnonymousInnerClassHelper()
+            {
+            }
+
+            public override TokenStreamComponents CreateComponents(string fieldName, TextReader reader)
+            {
+                Tokenizer tokenizer = new MockTokenizer(reader, MockTokenizer.SIMPLE, true);
+                return new TokenStreamComponents(tokenizer, new SimplePayloadFilter(tokenizer));
+            }
+        }
+
+        internal sealed class SimplePayloadFilter : TokenFilter
+        {
+            internal int Pos;
+            internal readonly IPayloadAttribute PayloadAttr;
+            internal readonly ICharTermAttribute TermAttr;
+
+            public SimplePayloadFilter(TokenStream input)
+                : base(input)
+            {
+                Pos = 0;
+                PayloadAttr = input.AddAttribute<IPayloadAttribute>();
+                TermAttr = input.AddAttribute<ICharTermAttribute>();
+            }
+
+            public override bool IncrementToken()
+            {
+                if (input.IncrementToken())
+                {
+                    PayloadAttr.Payload = new BytesRef(("pos: " + Pos).GetBytes(IOUtils.CHARSET_UTF_8));
+                    Pos++;
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            public override void Reset()
+            {
+                base.Reset();
+                Pos = 0;
+            }
+        }
+
     }
 }

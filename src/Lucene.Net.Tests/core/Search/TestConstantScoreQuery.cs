@@ -36,7 +36,6 @@ namespace Lucene.Net.Search
     /// this class only tests some basic functionality in CSQ, the main parts are mostly
     /// tested by MultiTermQuery tests, explanations seems to be tested in TestExplanations!
     /// </summary>
-    [TestFixture]
     public class TestConstantScoreQuery : LuceneTestCase
     {
         [Fact]
@@ -60,7 +59,7 @@ namespace Lucene.Net.Search
         {
             int[] count = new int[1];
             searcher.Search(q, new CollectorAnonymousInnerClassHelper(this, expectedScore, scorerClassName, innerScorerClassName, count));
-            Assert.Equal(1, count[0], "invalid number of results");
+            Assert.Equal(1, count[0]); //, "invalid number of results");
         }
 
         private class CollectorAnonymousInnerClassHelper : Collector
@@ -88,18 +87,18 @@ namespace Lucene.Net.Search
                 set
                 {
                     this.scorer = value;
-                    Assert.Equal(ScorerClassName, value.GetType().Name, "Scorer is implemented by wrong class");
+                    Assert.Equal(ScorerClassName, value.GetType().Name); //, "Scorer is implemented by wrong class");
                     if (InnerScorerClassName != null && value is ConstantScoreQuery.ConstantScorer)
                     {
                         ConstantScoreQuery.ConstantScorer innerScorer = (ConstantScoreQuery.ConstantScorer)value;
-                        Assert.Equal(InnerScorerClassName, innerScorer.GetDocIDIteratorTypeName(), "inner Scorer is implemented by wrong class");
+                        Assert.Equal(InnerScorerClassName, innerScorer.GetDocIDIteratorTypeName()); //, "inner Scorer is implemented by wrong class");
                     }
                 }
             }
 
             public override void Collect(int doc)
             {
-                Assert.Equal(ExpectedScore, this.scorer.Score(), 0, "Score differs from expected");
+                assertEquals(ExpectedScore, this.scorer.Score(), 0); //, "Score differs from expected");
                 Count[0]++;
             }
 

@@ -39,7 +39,6 @@ namespace Lucene.Net.Index
     using TermQuery = Lucene.Net.Search.TermQuery;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestTryDelete : LuceneTestCase
     {
         private static IndexWriter GetWriter(Directory directory)

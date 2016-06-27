@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using StringField = StringField;
 
-    [TestFixture]
     public class TestSizeBoundedForceMerge : LuceneTestCase
     {
         private void AddDocs(IndexWriter writer, int numDocs)

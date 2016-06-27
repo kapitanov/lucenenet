@@ -5,9 +5,9 @@ using Lucene.Net.Documents;
 namespace Lucene.Net.Search
 {
     using Lucene.Net.Randomized.Generators;
-    
     using System.Collections.Generic;
     using System.IO;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
 
@@ -43,10 +43,8 @@ namespace Lucene.Net.Search
         internal DirectoryReader Reader;
         internal Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSortRescorer() : base()
         {
-            
             Dir = NewDirectory();
             RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
 
@@ -73,8 +71,7 @@ namespace Lucene.Net.Search
             iw.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();

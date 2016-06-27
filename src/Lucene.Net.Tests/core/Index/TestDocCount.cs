@@ -33,7 +33,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Tests the Terms.DocCount statistic
     /// </summary>
-    [TestFixture]
     public class TestDocCount : LuceneTestCase
     {
         [Fact]

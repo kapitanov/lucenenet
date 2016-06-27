@@ -1,11 +1,10 @@
 using System;
 using Lucene.Net.Documents;
+using Lucene.Net.Support;
 using Xunit;
 
 namespace Lucene.Net.Index
 {
-    using Lucene.Net.Support;
-    
     using CollectionStatistics = Lucene.Net.Search.CollectionStatistics;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -38,7 +37,6 @@ namespace Lucene.Net.Index
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestCustomNorms : LuceneTestCase
     {
         internal readonly string FloatTestField = "normsTestFloat";
@@ -82,7 +80,7 @@ namespace Lucene.Net.Index
             {
                 Document document = open.Document(i);
                 float expected = Convert.ToSingle(document.Get(FloatTestField));
-                Assert.Equal(expected, Number.IntBitsToFloat((int)norms.Get(i))); //, 0.0f);
+                assertEquals(expected, Number.IntBitsToFloat((int)norms.Get(i)), 0.0f);
             }
             open.Dispose();
             dir.Dispose();

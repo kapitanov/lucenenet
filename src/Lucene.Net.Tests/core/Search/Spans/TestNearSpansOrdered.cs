@@ -33,7 +33,6 @@ namespace Lucene.Net.Search.Spans
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestNearSpansOrdered : LuceneTestCase
     {
         protected internal IndexSearcher Searcher;
@@ -42,16 +41,14 @@ namespace Lucene.Net.Search.Spans
 
         public const string FIELD = "field";
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
             base.Dispose();
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestNearSpansOrdered() : base()
         {
             
             Directory = NewDirectory();

@@ -87,19 +87,19 @@ namespace Lucene.Net.Search
             wq.Boost = 0.2F;
             q = searcher.Rewrite(wq);
             Assert.True(q is ConstantScoreQuery);
-            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
+            assertEquals(q.Boost, wq.Boost, 0.1);
 
             wq.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT);
             wq.Boost = 0.3F;
             q = searcher.Rewrite(wq);
             Assert.True(q is ConstantScoreQuery);
-            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
+            assertEquals(q.Boost, wq.Boost, 0.1);
 
             wq.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
             wq.Boost = 0.4F;
             q = searcher.Rewrite(wq);
             Assert.True(q is ConstantScoreQuery);
-            Assert.Equal(q.Boost, wq.Boost); //, 0.1);
+            assertEquals(q.Boost, wq.Boost, 0.1);
             reader.Dispose();
             indexStore.Dispose();
         }

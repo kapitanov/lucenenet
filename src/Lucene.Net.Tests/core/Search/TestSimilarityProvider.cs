@@ -45,10 +45,8 @@ namespace Lucene.Net.Search
         private DirectoryReader Reader;
         private IndexSearcher Searcher;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSimilarityProvider() : base()
         {
-            
             Directory = NewDirectory();
             PerFieldSimilarityWrapper sim = new ExampleSimilarityProvider(this);
             IndexWriterConfig iwc = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetSimilarity(sim);
@@ -71,8 +69,7 @@ namespace Lucene.Net.Search
             Searcher.Similarity = sim;
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();

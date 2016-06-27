@@ -220,13 +220,9 @@ namespace Lucene.Net.Search
             {
                 Assert.Equal(4, h.Length); //, "all docs should match " + q.ToString());
 
-                float score = h[0].Score;
-                float min = score - SCORE_COMP_THRESH;
-                float max = score + SCORE_COMP_THRESH;
-
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
+                    assertEquals(h[0].Score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -250,12 +246,10 @@ namespace Lucene.Net.Search
             {
                 Assert.Equal(3, h.Length); //, "3 docs should match " + q.ToString());
                 float score = h[0].Score;
-                float min = score - SCORE_COMP_THRESH;
-                float max = score + SCORE_COMP_THRESH;
 
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
+                    assertEquals(score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -281,11 +275,10 @@ namespace Lucene.Net.Search
             {
                 Assert.Equal(4, h.Length); //, "all docs should match " + q.ToString());
                 float score = h[0].Score;
-                float min = score - SCORE_COMP_THRESH;
-                float max = score + SCORE_COMP_THRESH;
+
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.InRange(score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
+                    assertEquals(score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -313,11 +306,8 @@ namespace Lucene.Net.Search
                 float score1 = h[1].Score;
                 float score2 = h[2].Score;
 
-                float min = score1 - SCORE_COMP_THRESH;
-                float max = score1 + SCORE_COMP_THRESH;
-
                 Assert.True(score0 > score1, "d2 does not have better score then others: " + score0 + " >? " + score1);
-                Assert.InRange(score2, min, max); //, "d4 and d1 don't have equal scores");
+                assertEquals(score1, score2, SCORE_COMP_THRESH); //, "d4 and d1 don't have equal scores");
             }
             catch (Exception e)
             {
@@ -352,13 +342,10 @@ namespace Lucene.Net.Search
             try
             {
                 Assert.Equal(3, h.Length); //, "3 docs should match " + q.ToString());
-                float score = h[0].Score;
-                float min = score - SCORE_COMP_THRESH;
-                float max = score + SCORE_COMP_THRESH;
 
                 for (int i = 1; i < h.Length; i++)
                 {
-                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
+                    assertEquals(h[0].Score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
             }
             catch (Exception e)
@@ -392,11 +379,9 @@ namespace Lucene.Net.Search
             {
                 Assert.Equal(4, h.Length); //, "4 docs should match " + q.ToString());
                 float score = h[0].Score;
-                float min = score - SCORE_COMP_THRESH;
-                float max = score + SCORE_COMP_THRESH;
                 for (int i = 1; i < h.Length - 1; i++) // note: -1
                 {
-                    Assert.InRange(h[i].Score, min, max); //, "score #" + i + " is not the same");
+                    assertEquals(score, h[i].Score, SCORE_COMP_THRESH); //, "score #" + i + " is not the same");
                 }
                 Assert.Equal("d1", s.Doc(h[h.Length - 1].Doc).Get("id")); //, "wrong last");
                 float score1 = h[h.Length - 1].Score;
@@ -446,10 +431,7 @@ namespace Lucene.Net.Search
                 Assert.True(doc0.Equals("d2") || doc0.Equals("d4"), "doc0 should be d2 or d4: " + doc0);
                 Assert.True(doc1.Equals("d2") || doc1.Equals("d4"), "doc1 should be d2 or d4: " + doc0);
 
-                float min = score0 - SCORE_COMP_THRESH;
-                float max = score0 + SCORE_COMP_THRESH;
-
-                Assert.InRange(score1, min, max); //, "score0 and score1 should match");
+                assertEquals(score0, score1, SCORE_COMP_THRESH); //, "score0 and score1 should match");
                 Assert.Equal("d3", doc2);
                 Assert.True(score1 > score2, "d3 does not have worse score then d2 and d4: " + score1 + " >? " + score2);
 

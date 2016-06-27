@@ -34,7 +34,6 @@ namespace Lucene.Net.Document
     /// <summary>
     /// Tests <seealso cref="Document"/> class.
     /// </summary>
-    [TestFixture]
     public class TestBinaryDocument : LuceneTestCase
     {
         internal string BinaryValStored = "this text will be stored as a byte array in the index";

@@ -2,14 +2,13 @@ using Lucene.Net.Documents;
 using Lucene.Net.Support;
 using System;
 using System.Diagnostics;
+using System.IO;
 using System.Text;
 using System.Threading;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    
-    
-    using System.IO;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using English = Lucene.Net.Util.English;
@@ -45,10 +44,8 @@ namespace Lucene.Net.Search
         public int NumDocs = 100;
         public int NumThreads = 3;
 
-        [SetUp]
-        public override void SetUp()
+        public TestMultiThreadTermVectors() : base()
         {
-            
             Directory = NewDirectory();
             IndexWriter writer = new IndexWriter(Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
             //writer.setNoCFSRatio(0.0);
@@ -66,8 +63,7 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Directory.Dispose();
             base.Dispose();

@@ -52,7 +52,6 @@ namespace Lucene.Net.Search
     ///
     /// @since   1.4
     /// </summary>
-    [TestFixture]
     public class TestFilteredQuery : LuceneTestCase
     {
         private IndexSearcher Searcher;
@@ -61,10 +60,8 @@ namespace Lucene.Net.Search
         private Query Query;
         private Filter Filter;
 
-        [SetUp]
-        public override void SetUp()
+        public TestFilteredQuery() : base()
         {
-            
             Directory = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
 
@@ -133,8 +130,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Directory.Dispose();
@@ -219,7 +215,7 @@ namespace Lucene.Net.Search
 
             public override DocIdSet GetDocIdSet(AtomicReaderContext context, Bits acceptDocs)
             {
-                Assert.Null(acceptDocs, "acceptDocs should be null, as we have an index without deletions");
+                Assert.Null(acceptDocs); //, "acceptDocs should be null, as we have an index without deletions");
                 BitArray bitset = new BitArray(5, true);
                 return new DocIdBitSet(bitset);
             }
@@ -237,7 +233,7 @@ namespace Lucene.Net.Search
 
             for (int i = 0; i < hits1.Length; i++)
             {
-                Assert.Equal(hits1[i].Score, hits2[i].Score, 0.000001f);
+                assertEquals(hits1[i].Score, hits2[i].Score, 0.000001f);
             }
         }
 
@@ -418,18 +414,18 @@ namespace Lucene.Net.Search
             Assert.True(clazz.IsInstanceOfType(rewritten), "is not instance of " + clazz.Name);
             if (rewritten is FilteredQuery)
             {
-                Assert.Equal(boost, rewritten.Boost, 1E-5f);
-                Assert.Equal(innerBoost, ((FilteredQuery)rewritten).Query.Boost, 1E-5f);
+                assertEquals(boost, rewritten.Boost, 1E-5f);
+                assertEquals(innerBoost, ((FilteredQuery)rewritten).Query.Boost, 1E-5f);
                 Assert.Equal(fq.Strategy, ((FilteredQuery)rewritten).Strategy);
             }
             else
             {
-                Assert.Equal(boost * innerBoost, rewritten.Boost, 1E-5f);
+                assertEquals(boost * innerBoost, rewritten.Boost, 1E-5f);
             }
 
             // check that the original query was not modified
-            Assert.Equal(boost, fq.Boost, 1E-5f);
-            Assert.Equal(innerBoost, fq.Query.Boost, 1E-5f);
+            assertEquals(boost, fq.Boost, 1E-5f);
+            assertEquals(innerBoost, fq.Query.Boost, 1E-5f);
         }
 
         [Fact]

@@ -2,7 +2,7 @@
 
 namespace Lucene.Net.Codecs.Lucene42
 {
-    /*
+    using Tests.Codecs;    /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
          * this work for additional information regarding copyright ownership.
@@ -18,20 +18,20 @@ namespace Lucene.Net.Codecs.Lucene42
          * See the License for the specific language governing permissions and
          * limitations under the License.
          */
-
+    using Xunit;
     using BaseCompressingDocValuesFormatTestCase = Lucene.Net.Index.BaseCompressingDocValuesFormatTestCase;
 
     /// <summary>
     /// Tests Lucene42DocValuesFormat
     /// </summary>
-    public class TestLucene42DocValuesFormat : BaseCompressingDocValuesFormatTestCase
+    public class TestLucene42DocValuesFormat : BaseCompressingDocValuesFormatTestCase, IClassFixture<OldFormatCodecFixture>
     {
         private readonly Codec Codec_Renamed = new Lucene42RWCodec();
+        private readonly OldFormatCodecFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestLucene42DocValuesFormat(OldFormatCodecFixture fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixture = fixture;
         }
 
         protected override Codec Codec

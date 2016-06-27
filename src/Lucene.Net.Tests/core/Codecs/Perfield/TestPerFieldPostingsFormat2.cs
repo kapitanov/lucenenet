@@ -51,7 +51,6 @@ namespace Lucene.Net.Codecs.Perfield
     //TODO: would be better in this test to pull termsenums and instanceof or something?
     // this way we can verify PFPF is doing the right thing.
     // for now we do termqueries.
-    [TestFixture]
     public class TestPerFieldPostingsFormat2 : LuceneTestCase
     {
         private IndexWriter NewWriter(Directory dir, IndexWriterConfig conf)

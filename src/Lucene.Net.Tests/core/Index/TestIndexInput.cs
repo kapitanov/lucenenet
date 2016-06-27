@@ -31,50 +31,13 @@ namespace Lucene.Net.Index
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    public class TestIndexInput : LuceneTestCase
+    public class TestIndexInput : LuceneTestCase, IClassFixture<TestIndexInputFixture>
     {
-        internal static readonly byte[] READ_TEST_BYTES = new byte[] { unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), 0x7F, unchecked((byte)(sbyte)0x80), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0x81), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x0F, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x7F, 0x06, (byte)'L', (byte)'u', (byte)'c', (byte)'e', (byte)'n', (byte)'e', 0x02, unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), 0x0A, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)(sbyte)'c', (byte)'e', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)'n', (byte)'e', 0x03, unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), 0x0C, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x04, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), 0x08, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), 0x0E, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x01, 0x00, 0x08, (byte)'L', (byte)'u', 0x00, (byte)'c', (byte)'e', 0x00, (byte)'n', (byte)'e', unchecked((byte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x17, (byte)0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x01 };
+        private readonly TestIndexInputFixture _fixture;
 
-        internal static readonly int COUNT = RANDOM_MULTIPLIER * 65536;
-        internal static int[] INTS;
-        internal static long[] LONGS;
-        internal static byte[] RANDOM_TEST_BYTES;
-
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestIndexInput(TestIndexInputFixture fixture)
         {
-            Random random = Random();
-            INTS = new int[COUNT];
-            LONGS = new long[COUNT];
-            RANDOM_TEST_BYTES = new byte[COUNT * (5 + 4 + 9 + 8)];
-            ByteArrayDataOutput bdo = new ByteArrayDataOutput(RANDOM_TEST_BYTES);
-            for (int i = 0; i < COUNT; i++)
-            {
-                int i1 = INTS[i] = random.Next();
-                bdo.WriteVInt(i1);
-                bdo.WriteInt(i1);
-
-                long l1;
-                if (Rarely())
-                {
-                    // a long with lots of zeroes at the end
-                    l1 = LONGS[i] = TestUtil.NextLong(random, 0, int.MaxValue) << 32;
-                }
-                else
-                {
-                    l1 = LONGS[i] = TestUtil.NextLong(random, 0, long.MaxValue);
-                }
-                bdo.WriteVLong(l1);
-                bdo.WriteLong(l1);
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            INTS = null;
-            LONGS = null;
-            RANDOM_TEST_BYTES = null;
+            _fixture = fixture;
         }
 
         private void CheckReads(DataInput @is, Type expectedEx)
@@ -129,12 +92,12 @@ namespace Lucene.Net.Index
 
         private void CheckRandomReads(DataInput @is)
         {
-            for (int i = 0; i < COUNT; i++)
+            for (int i = 0; i < TestIndexInputFixture.COUNT; i++)
             {
-                Assert.Equal(INTS[i], @is.ReadVInt());
-                Assert.Equal(INTS[i], @is.ReadInt());
-                Assert.Equal(LONGS[i], @is.ReadVLong());
-                Assert.Equal(LONGS[i], @is.ReadLong());
+                Assert.Equal(_fixture.INTS[i], @is.ReadVInt());
+                Assert.Equal(_fixture.INTS[i], @is.ReadInt());
+                Assert.Equal(_fixture.LONGS[i], @is.ReadVLong());
+                Assert.Equal(_fixture.LONGS[i], @is.ReadLong());
             }
         }
 
@@ -142,10 +105,10 @@ namespace Lucene.Net.Index
         [Fact]
         public virtual void TestBufferedIndexInputRead()
         {
-            IndexInput @is = new MockIndexInput(READ_TEST_BYTES);
+            IndexInput @is = new MockIndexInput(TestIndexInputFixture.READ_TEST_BYTES);
             CheckReads(@is, typeof(IOException));
             @is.Dispose();
-            @is = new MockIndexInput(RANDOM_TEST_BYTES);
+            @is = new MockIndexInput(_fixture.RANDOM_TEST_BYTES);
             CheckRandomReads(@is);
             @is.Dispose();
         }
@@ -157,14 +120,14 @@ namespace Lucene.Net.Index
             Random random = Random();
             RAMDirectory dir = new RAMDirectory();
             IndexOutput os = dir.CreateOutput("foo", NewIOContext(random));
-            os.WriteBytes(READ_TEST_BYTES, READ_TEST_BYTES.Length);
+            os.WriteBytes(TestIndexInputFixture.READ_TEST_BYTES, TestIndexInputFixture.READ_TEST_BYTES.Length);
             os.Dispose();
             IndexInput @is = dir.OpenInput("foo", NewIOContext(random));
             CheckReads(@is, typeof(IOException));
             @is.Dispose();
 
             os = dir.CreateOutput("bar", NewIOContext(random));
-            os.WriteBytes(RANDOM_TEST_BYTES, RANDOM_TEST_BYTES.Length);
+            os.WriteBytes(_fixture.RANDOM_TEST_BYTES, _fixture.RANDOM_TEST_BYTES.Length);
             os.Dispose();
             @is = dir.OpenInput("bar", NewIOContext(random));
             CheckRandomReads(@is);
@@ -175,10 +138,56 @@ namespace Lucene.Net.Index
         [Fact]
         public virtual void TestByteArrayDataInput()
         {
-            ByteArrayDataInput @is = new ByteArrayDataInput((byte[])(Array)READ_TEST_BYTES);
+            ByteArrayDataInput @is = new ByteArrayDataInput((byte[])(Array)TestIndexInputFixture.READ_TEST_BYTES);
             CheckReads(@is, typeof(Exception));
-            @is = new ByteArrayDataInput(RANDOM_TEST_BYTES);
+            @is = new ByteArrayDataInput(_fixture.RANDOM_TEST_BYTES);
             CheckRandomReads(@is);
+        }
+    }
+
+    public class TestIndexInputFixture : IDisposable
+    {
+        internal static readonly byte[] READ_TEST_BYTES = new byte[] { unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), 0x7F, unchecked((byte)(sbyte)0x80), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0x81), unchecked((byte)(sbyte)0x80), 0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x0F, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x07, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x7F, 0x06, (byte)'L', (byte)'u', (byte)'c', (byte)'e', (byte)'n', (byte)'e', 0x02, unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), 0x0A, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)(sbyte)'c', (byte)'e', unchecked((byte)(sbyte)0xC2), unchecked((byte)(sbyte)0xBF), (byte)'n', (byte)'e', 0x03, unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), 0x0C, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xE2), unchecked((byte)(sbyte)0x98), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x04, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), 0x08, unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), 0x0E, (byte)'L', (byte)'u', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x84), unchecked((byte)(sbyte)0x9E), (byte)'c', (byte)'e', unchecked((byte)(sbyte)0xF0), unchecked((byte)(sbyte)0x9D), unchecked((byte)(sbyte)0x85), unchecked((byte)(sbyte)0xA0), (byte)'n', (byte)'e', 0x01, 0x00, 0x08, (byte)'L', (byte)'u', 0x00, (byte)'c', (byte)'e', 0x00, (byte)'n', (byte)'e', unchecked((byte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), (byte)0x17, (byte)0x01, unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), unchecked((byte)(sbyte)0xFF), 0x01 };
+
+        internal static readonly int COUNT = LuceneTestCase.RANDOM_MULTIPLIER * 65536;
+
+        internal int[] INTS { get; private set; }
+        internal long[] LONGS { get; private set; }
+        internal byte[] RANDOM_TEST_BYTES { get; private set; }
+
+        public TestIndexInputFixture()
+        {
+            Random random = LuceneTestCase.Random();
+            INTS = new int[COUNT];
+            LONGS = new long[COUNT];
+            RANDOM_TEST_BYTES = new byte[COUNT * (5 + 4 + 9 + 8)];
+            ByteArrayDataOutput bdo = new ByteArrayDataOutput(RANDOM_TEST_BYTES);
+            for (int i = 0; i < COUNT; i++)
+            {
+                int i1 = INTS[i] = random.Next();
+                bdo.WriteVInt(i1);
+                bdo.WriteInt(i1);
+
+                long l1;
+                if (LuceneTestCase.Rarely())
+                {
+                    // a long with lots of zeroes at the end
+                    l1 = LONGS[i] = TestUtil.NextLong(random, 0, int.MaxValue) << 32;
+                }
+                else
+                {
+                    l1 = LONGS[i] = TestUtil.NextLong(random, 0, long.MaxValue);
+                }
+                bdo.WriteVLong(l1);
+                bdo.WriteLong(l1);
+            }
+        }
+
+        public void Dispose()
+        {
+            INTS = null;
+            LONGS = null;
+            RANDOM_TEST_BYTES = null;
         }
     }
 }

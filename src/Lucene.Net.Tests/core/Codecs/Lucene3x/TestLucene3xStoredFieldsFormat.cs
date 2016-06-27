@@ -20,13 +20,10 @@ namespace Lucene.Net.Codecs.Lucene3x
      */
 
     using BaseStoredFieldsFormatTestCase = Lucene.Net.Index.BaseStoredFieldsFormatTestCase;
-    using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestLucene3xStoredFieldsFormat : BaseStoredFieldsFormatTestCase
     {
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestLucene3xStoredFieldsFormat() : base()
         {
             OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
         }
@@ -46,6 +43,12 @@ namespace Lucene.Net.Codecs.Lucene3x
             // this test tries to switch up between the codec and another codec.
             // for 3.x: we currently cannot take an index with existing 4.x segments
             // and merge into newly formed 3.x segments.
+        }
+
+        public override void Dispose()
+        {
+            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = false;
+            base.Dispose();
         }
     }
 }

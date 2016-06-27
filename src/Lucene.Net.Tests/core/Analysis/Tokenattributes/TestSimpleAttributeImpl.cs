@@ -1,10 +1,9 @@
+using Lucene.Net.Support;
 using System.Collections.Generic;
 using Xunit;
 
 namespace Lucene.Net.Analysis.Tokenattributes
 {
-    using Lucene.Net.Support;
-    
     using Attribute = Lucene.Net.Util.Attribute;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
@@ -27,7 +26,6 @@ namespace Lucene.Net.Analysis.Tokenattributes
 
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestSimpleAttributeImpl : LuceneTestCase
     {
         // this checks using reflection API if the defaults are correct

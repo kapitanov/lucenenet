@@ -33,44 +33,35 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
-    public class BaseTestRangeFilter : LuceneTestCase
+    public class BaseTestRangeFilter : LuceneTestCase, IClassFixture<BaseTestRangeFilterFixture>
     {
         public const bool F = false;
         public const bool T = true;
 
-        /// <summary>
-        /// Collation interacts badly with hyphens -- collation produces different
-        /// ordering than Unicode code-point ordering -- so two indexes are created:
-        /// one which can't have negative random integers, for testing collated ranges,
-        /// and the other which can have negative random integers, for all other tests.
-        /// </summary>
-        internal class TestIndex
-        {
-            internal int MaxR;
-            internal int MinR;
-            internal bool AllowNegativeRandomInts;
-            internal Directory Index;
+        internal static readonly int IntLength = Convert.ToString(int.MaxValue).Length;
 
-            internal TestIndex(Random random, int minR, int maxR, bool allowNegativeRandomInts)
-            {
-                this.MinR = minR;
-                this.MaxR = maxR;
-                this.AllowNegativeRandomInts = allowNegativeRandomInts;
-                Index = NewDirectory(random);
-            }
+        protected readonly BaseTestRangeFilterFixture _fixture;
+
+        public BaseTestRangeFilter(BaseTestRangeFilterFixture fixture)
+        {
+            _fixture = fixture;
         }
 
-        internal static IndexReader SignedIndexReader;
-        internal static IndexReader UnsignedIndexReader;
-
-        internal static TestIndex SignedIndexDir;
-        internal static TestIndex UnsignedIndexDir;
-
-        internal static int MinId = 0;
-        internal static int MaxId;
-
-        internal static readonly int IntLength = Convert.ToString(int.MaxValue).Length;
+        [Fact]
+        public virtual void TestPad()
+        {
+            int[] tests = new int[] { -9999999, -99560, -100, -3, -1, 0, 3, 9, 10, 1000, 999999999 };
+            for (int i = 0; i < tests.Length - 1; i++)
+            {
+                int a = tests[i];
+                int b = tests[i + 1];
+                string aa = Pad(a);
+                string bb = Pad(b);
+                string label = a + ":" + aa + " vs " + b + ":" + bb;
+                Assert.Equal(aa.Length, bb.Length); //, "i=" + i + ": length of " + label);
+                Assert.True(System.String.Compare(aa, bb, System.StringComparison.Ordinal) < 0, "i=" + i + ": compare less than " + label);
+            }
+        }
 
         /// <summary>
         /// a simple padding function that should work with any int
@@ -94,43 +85,49 @@ namespace Lucene.Net.Search
 
             return b.ToString();
         }
+    }
 
-        [TestFixtureSetUp]
-        public static void BeforeClassBaseTestRangeFilter()
+    public class BaseTestRangeFilterFixture : IDisposable
+    {
+        internal IndexReader SignedIndexReader { get; private set; }
+        internal IndexReader UnsignedIndexReader { get; private set; }
+
+        internal TestIndex SignedIndexDir { get; private set; }
+        internal TestIndex UnsignedIndexDir { get; private set; }
+
+        internal int MinId { get; private set; }
+        internal int MaxId { get; private set; }
+
+        public BaseTestRangeFilterFixture()
         {
-            MaxId = AtLeast(500);
-            SignedIndexDir = new TestIndex(Random(), int.MaxValue, int.MinValue, true);
-            UnsignedIndexDir = new TestIndex(Random(), int.MaxValue, 0, false);
-            SignedIndexReader = Build(Random(), SignedIndexDir);
-            UnsignedIndexReader = Build(Random(), UnsignedIndexDir);
+            var random = LuceneTestCase.Random();
+
+            MinId = 0;
+            MaxId = LuceneTestCase.AtLeast(500);
+
+            SignedIndexDir = new TestIndex(random, int.MaxValue, int.MinValue, true);
+            UnsignedIndexDir = new TestIndex(random, int.MaxValue, 0, false);
+            SignedIndexReader = Build(random, SignedIndexDir);
+            UnsignedIndexReader = Build(random, UnsignedIndexDir);
         }
 
-        [TestFixtureTearDown]
-        public static void AfterClassBaseTestRangeFilter()
-        {
-            SignedIndexReader.Dispose();
-            UnsignedIndexReader.Dispose();
-            SignedIndexDir.Index.Dispose();
-            UnsignedIndexDir.Index.Dispose();
-            SignedIndexReader = null;
-            UnsignedIndexReader = null;
-            SignedIndexDir = null;
-            UnsignedIndexDir = null;
-        }
-
-        private static IndexReader Build(Random random, TestIndex index)
+        private IndexReader Build(Random random, TestIndex index)
         {
             /* build an index */
 
             Document doc = new Document();
-            Field idField = NewStringField(random, "id", "", Field.Store.YES);
-            Field randField = NewStringField(random, "rand", "", Field.Store.YES);
-            Field bodyField = NewStringField(random, "body", "", Field.Store.NO);
+            Field idField = LuceneTestCase.NewStringField(random, "id", "", Field.Store.YES);
+            Field randField = LuceneTestCase.NewStringField(random, "rand", "", Field.Store.YES);
+            Field bodyField = LuceneTestCase.NewStringField(random, "body", "", Field.Store.NO);
             doc.Add(idField);
             doc.Add(randField);
             doc.Add(bodyField);
 
-            RandomIndexWriter writer = new RandomIndexWriter(random, index.Index, NewIndexWriterConfig(random, TEST_VERSION_CURRENT, new MockAnalyzer(random)).SetOpenMode(OpenMode.CREATE).SetMaxBufferedDocs(TestUtil.NextInt(random, 50, 1000)).SetMergePolicy(NewLogMergePolicy()));
+            RandomIndexWriter writer = new RandomIndexWriter(random, index.Index, LuceneTestCase.NewIndexWriterConfig(random, LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random))
+                .SetOpenMode(OpenMode.CREATE)
+                .SetMaxBufferedDocs(TestUtil.NextInt(random, 50, 1000))
+                .SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
             TestUtil.ReduceOpenFiles(writer.w);
 
             while (true)
@@ -140,7 +137,7 @@ namespace Lucene.Net.Search
 
                 for (int d = MinId; d <= MaxId; d++)
                 {
-                    idField.StringValue = Pad(d);
+                    idField.StringValue = BaseTestRangeFilter.Pad(d);
                     int r = index.AllowNegativeRandomInts ? random.Next() : random.Next(int.MaxValue);
                     if (index.MaxR < r)
                     {
@@ -161,7 +158,7 @@ namespace Lucene.Net.Search
                     {
                         minCount++;
                     }
-                    randField.StringValue = Pad(r);
+                    randField.StringValue = BaseTestRangeFilter.Pad(r);
                     bodyField.StringValue = "body";
                     writer.AddDocument(doc);
                 }
@@ -182,20 +179,38 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Fact]
-        public virtual void TestPad()
+        public void Dispose()
         {
-            int[] tests = new int[] { -9999999, -99560, -100, -3, -1, 0, 3, 9, 10, 1000, 999999999 };
-            for (int i = 0; i < tests.Length - 1; i++)
-            {
-                int a = tests[i];
-                int b = tests[i + 1];
-                string aa = Pad(a);
-                string bb = Pad(b);
-                string label = a + ":" + aa + " vs " + b + ":" + bb;
-                Assert.Equal(aa.Length, bb.Length, "i=" + i + ": length of " + label);
-                Assert.True(System.String.Compare(aa, bb, System.StringComparison.Ordinal) < 0, "i=" + i + ": compare less than " + label);
-            }
+            SignedIndexReader.Dispose();
+            UnsignedIndexReader.Dispose();
+            SignedIndexDir.Index.Dispose();
+            UnsignedIndexDir.Index.Dispose();
+            SignedIndexReader = null;
+            UnsignedIndexReader = null;
+            SignedIndexDir = null;
+            UnsignedIndexDir = null;
+        }
+    }
+
+    /// <summary>
+    /// Collation interacts badly with hyphens -- collation produces different
+    /// ordering than Unicode code-point ordering -- so two indexes are created:
+    /// one which can't have negative random integers, for testing collated ranges,
+    /// and the other which can have negative random integers, for all other tests.
+    /// </summary>
+    internal class TestIndex
+    {
+        internal int MaxR;
+        internal int MinR;
+        internal bool AllowNegativeRandomInts;
+        internal Directory Index;
+
+        internal TestIndex(Random random, int minR, int maxR, bool allowNegativeRandomInts)
+        {
+            this.MinR = minR;
+            this.MaxR = maxR;
+            this.AllowNegativeRandomInts = allowNegativeRandomInts;
+            Index = LuceneTestCase.NewDirectory(random);
         }
     }
 }

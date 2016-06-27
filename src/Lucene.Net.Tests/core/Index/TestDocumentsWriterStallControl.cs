@@ -29,7 +29,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Tests for <seealso cref="DocumentsWriterStallControl"/>
     /// </summary>
-    [TestFixture]
     public class TestDocumentsWriterStallControl : LuceneTestCase
     {
         [Fact]

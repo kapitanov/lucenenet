@@ -79,7 +79,7 @@ namespace Lucene.Net.Search
             bq.Add(new TermQuery(new Term(F2, "is")), BooleanClause.Occur.MUST);
             TopDocs td = Searcher.Search(bq, 3);
             Assert.Equal(1, td.TotalHits);
-            Assert.Equal(3F, td.ScoreDocs[0].Score); //, 0.001F); // f1:nutch + f2:is + f2:is
+            assertEquals(3F, td.ScoreDocs[0].Score, 0.001F); // f1:nutch + f2:is + f2:is
         }
 
         public override void Dispose()

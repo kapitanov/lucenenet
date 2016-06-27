@@ -38,7 +38,6 @@ namespace Lucene.Net.Index
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestMixedDocValuesUpdates : LuceneTestCase
     {
         [Fact]
@@ -203,7 +202,7 @@ namespace Lucene.Net.Index
                                     }
                                     else
                                     {
-                                        Assert.Equal(fieldValues[field], TestBinaryDocValuesUpdates.GetValue(bdv, doc, scratch), "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
+                                        Assert.Equal(fieldValues[field], TestBinaryDocValuesUpdates.GetValue(bdv, doc, scratch)); //, "invalid value for doc=" + doc + ", field=" + f + ", reader=" + r);
                                     }
                                 }
                                 else
@@ -557,7 +556,7 @@ namespace Lucene.Net.Index
                     NumericDocValues cf = r.GetNumericDocValues("cf" + i);
                     for (int j = 0; j < r.MaxDoc; j++)
                     {
-                        Assert.Equal(cf.Get(j), TestBinaryDocValuesUpdates.GetValue(f, j, scratch) * 2, "reader=" + r + ", field=f" + i + ", doc=" + j);
+                        Assert.Equal(cf.Get(j), TestBinaryDocValuesUpdates.GetValue(f, j, scratch) * 2); //, "reader=" + r + ", field=f" + i + ", doc=" + j);
                     }
                 }
             }

@@ -43,106 +43,29 @@ namespace Lucene.Net.Search
     /// Test BooleanQuery2 against BooleanQuery by overriding the standard query parser.
     /// this also tests the scoring order of BooleanQuery.
     /// </summary>
-    public class TestBoolean2 : LuceneTestCase
+    public class TestBoolean2 : LuceneTestCase, IClassFixture<TestBoolean2Fixture>
     {
-        private static IndexSearcher Searcher;
-        private static IndexSearcher BigSearcher;
-        private static IndexReader Reader;
-        private static IndexReader LittleReader;
-        private static int NUM_EXTRA_DOCS = 6000;
+        internal const string field = "field";
+        internal const int NUM_EXTRA_DOCS = 6000;
 
-        public const string field = "field";
-        private static Directory Directory;
-        private static Directory Dir2;
-        private static int MulFactor;
+        private readonly TestBoolean2Fixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestBoolean2(TestBoolean2Fixture fixture) : base()
         {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
-            for (int i = 0; i < DocFields.Length; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewTextField(field, DocFields[i], Field.Store.NO));
-                writer.AddDocument(doc);
-            }
-            writer.Dispose();
-            LittleReader = DirectoryReader.Open(Directory);
-            Searcher = NewSearcher(LittleReader);
-            // this is intentionally using the baseline sim, because it compares against bigSearcher (which uses a random one)
-            Searcher.Similarity = new DefaultSimilarity();
-
-            // Make big index
-            Dir2 = new MockDirectoryWrapper(Random(), new RAMDirectory(Directory, IOContext.DEFAULT));
-
-            // First multiply small test index:
-            MulFactor = 1;
-            int docCount = 0;
-            if (VERBOSE)
-            {
-                Console.WriteLine("\nTEST: now copy index...");
-            }
-            do
-            {
-                if (VERBOSE)
-                {
-                    Console.WriteLine("\nTEST: cycle...");
-                }
-                Directory copy = new MockDirectoryWrapper(Random(), new RAMDirectory(Dir2, IOContext.DEFAULT));
-                RandomIndexWriter w = new RandomIndexWriter(Random(), Dir2);
-                w.AddIndexes(copy);
-                docCount = w.MaxDoc();
-                w.Dispose();
-                MulFactor *= 2;
-            } while (docCount < 3000);
-
-            RandomIndexWriter riw = new RandomIndexWriter(Random(), Dir2, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
-            Document doc_ = new Document();
-            doc_.Add(NewTextField("field2", "xxx", Field.Store.NO));
-            for (int i = 0; i < NUM_EXTRA_DOCS / 2; i++)
-            {
-                riw.AddDocument(doc_);
-            }
-            doc_ = new Document();
-            doc_.Add(NewTextField("field2", "big bad bug", Field.Store.NO));
-            for (int i = 0; i < NUM_EXTRA_DOCS / 2; i++)
-            {
-                riw.AddDocument(doc_);
-            }
-            Reader = riw.Reader;
-            BigSearcher = NewSearcher(Reader);
-            riw.Dispose();
+            _fixture = fixture;
         }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Reader.Dispose();
-            LittleReader.Dispose();
-            Dir2.Dispose();
-            Directory.Dispose();
-            Searcher = null;
-            Reader = null;
-            LittleReader = null;
-            Dir2 = null;
-            Directory = null;
-            BigSearcher = null;
-        }
-
-        private static string[] DocFields = new string[] { "w1 w2 w3 w4 w5", "w1 w3 w2 w3", "w1 xx w2 yy w3", "w1 w3 xx w2 yy w3" };
 
         public virtual void QueriesTest(Query query, int[] expDocNrs)
         {
             TopScoreDocCollector collector = TopScoreDocCollector.Create(1000, false);
-            Searcher.Search(query, null, collector);
+            _fixture.Searcher.Search(query, null, collector);
             ScoreDoc[] hits1 = collector.TopDocs().ScoreDocs;
 
             collector = TopScoreDocCollector.Create(1000, true);
-            Searcher.Search(query, null, collector);
+            _fixture.Searcher.Search(query, null, collector);
             ScoreDoc[] hits2 = collector.TopDocs().ScoreDocs;
 
-            Assert.Equal(MulFactor * collector.TotalHits, BigSearcher.Search(query, 1).TotalHits);
+            Assert.Equal(_fixture.MulFactor * collector.TotalHits, _fixture.BigSearcher.Search(query, 1).TotalHits);
 
             CheckHits.CheckHitsQuery(query, hits1, hits2, expDocNrs);
         }
@@ -252,15 +175,15 @@ namespace Lucene.Net.Search
             query.Add(new TermQuery(new Term(field, "zz")), BooleanClause.Occur.SHOULD);
 
             int[] expDocNrs = new int[] { 2, 3 };
-            Similarity oldSimilarity = Searcher.Similarity;
+            Similarity oldSimilarity = _fixture.Searcher.Similarity;
             try
             {
-                Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
+                _fixture.Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
                 QueriesTest(query, expDocNrs);
             }
             finally
             {
-                Searcher.Similarity = oldSimilarity;
+                _fixture.Searcher.Similarity = oldSimilarity;
             }
         }
 
@@ -279,8 +202,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [Ignore("Ignored test")]
-        [Fact]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestRandomQueries()
         {
             string[] vals = new string[] { "w1", "w2", "w3", "w4", "w5", "xx", "yy", "zzz" };
@@ -301,26 +223,26 @@ namespace Lucene.Net.Search
                     // match up.
                     Sort sort = Sort.INDEXORDER;
 
-                    QueryUtils.Check(Random(), q1, Searcher); // baseline sim
+                    QueryUtils.Check(Random(), q1, _fixture.Searcher); // baseline sim
                     try
                     {
-                        // a little hackish, QueryUtils.check is too costly to do on bigSearcher in this loop.
-                        Searcher.Similarity = BigSearcher.Similarity; // random sim
-                        QueryUtils.Check(Random(), q1, Searcher);
+                        // a little hackish, QueryUtils.check is too costly to do on big_fixture.Searcher in this loop.
+                        _fixture.Searcher.Similarity = _fixture.BigSearcher.Similarity; // random sim
+                        QueryUtils.Check(Random(), q1, _fixture.Searcher);
                     }
                     finally
                     {
-                        Searcher.Similarity = new DefaultSimilarity(); // restore
+                        _fixture.Searcher.Similarity = new DefaultSimilarity(); // restore
                     }
 
                     TopFieldCollector collector = TopFieldCollector.Create(sort, 1000, false, true, true, true);
 
-                    Searcher.Search(q1, null, collector);
+                    _fixture.Searcher.Search(q1, null, collector);
                     ScoreDoc[] hits1 = collector.TopDocs().ScoreDocs;
 
                     collector = TopFieldCollector.Create(sort, 1000, false, true, true, false);
 
-                    Searcher.Search(q1, null, collector);
+                    _fixture.Searcher.Search(q1, null, collector);
                     ScoreDoc[] hits2 = collector.TopDocs().ScoreDocs;
                     tot += hits2.Length;
                     CheckHits.CheckEqual(q1, hits1, hits2);
@@ -328,8 +250,8 @@ namespace Lucene.Net.Search
                     BooleanQuery q3 = new BooleanQuery();
                     q3.Add(q1, BooleanClause.Occur.SHOULD);
                     q3.Add(new PrefixQuery(new Term("field2", "b")), BooleanClause.Occur.SHOULD);
-                    TopDocs hits4 = BigSearcher.Search(q3, 1);
-                    Assert.Equal(MulFactor * collector.TotalHits + NUM_EXTRA_DOCS / 2, hits4.TotalHits);
+                    TopDocs hits4 = _fixture.BigSearcher.Search(q3, 1);
+                    Assert.Equal(_fixture.MulFactor * collector.TotalHits + NUM_EXTRA_DOCS / 2, hits4.TotalHits);
                 }
             }
             catch (Exception)
@@ -414,6 +336,95 @@ namespace Lucene.Net.Search
                 cb.PostCreate(current);
             }
             return current;
+        }
+    }
+
+    public class TestBoolean2Fixture : IDisposable
+    {
+        private static readonly string[] DocFields = new string[] { "w1 w2 w3 w4 w5", "w1 w3 w2 w3", "w1 xx w2 yy w3", "w1 w3 xx w2 yy w3" };
+
+        internal IndexSearcher Searcher { get; private set; }
+        internal IndexSearcher BigSearcher { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal IndexReader LittleReader { get; private set; }
+
+        internal Directory Directory { get; private set; }
+        internal Directory Dir2 { get; private set; }
+        internal int MulFactor { get; private set; }
+
+        public TestBoolean2Fixture()
+        {
+            var random = LuceneTestCase.Random();
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(random, Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random))
+                .SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
+            for (int i = 0; i < DocFields.Length; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewTextField(TestBoolean2.field, DocFields[i], Field.Store.NO));
+                writer.AddDocument(doc);
+            }
+            writer.Dispose();
+            LittleReader = DirectoryReader.Open(Directory);
+            Searcher = LuceneTestCase.NewSearcher(LittleReader);
+            // this is intentionally using the baseline sim, because it compares against bigSearcher (which uses a random one)
+            Searcher.Similarity = new DefaultSimilarity();
+
+            // Make big index
+            Dir2 = new MockDirectoryWrapper(random, new RAMDirectory(Directory, IOContext.DEFAULT));
+
+            // First multiply small test index:
+            MulFactor = 1;
+            int docCount = 0;
+            if (LuceneTestCase.VERBOSE)
+            {
+                Console.WriteLine("\nTEST: now copy index...");
+            }
+            do
+            {
+                if (LuceneTestCase.VERBOSE)
+                {
+                    Console.WriteLine("\nTEST: cycle...");
+                }
+                Directory copy = new MockDirectoryWrapper(random, new RAMDirectory(Dir2, IOContext.DEFAULT));
+                RandomIndexWriter w = new RandomIndexWriter(random, Dir2);
+                w.AddIndexes(copy);
+                docCount = w.MaxDoc();
+                w.Dispose();
+                MulFactor *= 2;
+            } while (docCount < 3000);
+
+            RandomIndexWriter riw = new RandomIndexWriter(random, Dir2, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random)).SetMaxBufferedDocs(TestUtil.NextInt(random, 50, 1000)));
+            Document doc_ = new Document();
+            doc_.Add(LuceneTestCase.NewTextField("field2", "xxx", Field.Store.NO));
+            for (int i = 0; i < TestBoolean2.NUM_EXTRA_DOCS / 2; i++)
+            {
+                riw.AddDocument(doc_);
+            }
+            doc_ = new Document();
+            doc_.Add(LuceneTestCase.NewTextField("field2", "big bad bug", Field.Store.NO));
+            for (int i = 0; i < TestBoolean2.NUM_EXTRA_DOCS / 2; i++)
+            {
+                riw.AddDocument(doc_);
+            }
+            Reader = riw.Reader;
+            BigSearcher = LuceneTestCase.NewSearcher(Reader);
+            riw.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            LittleReader.Dispose();
+            Dir2.Dispose();
+            Directory.Dispose();
+            Searcher = null;
+            Reader = null;
+            LittleReader = null;
+            Dir2 = null;
+            Directory = null;
+            BigSearcher = null;
         }
     }
 }

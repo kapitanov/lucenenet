@@ -22,13 +22,11 @@ namespace Lucene.Net.Analysis
      */
 
     using Lucene.Net.Analysis.Tokenattributes;
-    
     using Attribute = Lucene.Net.Util.Attribute;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestToken : LuceneTestCase
     {
         [Fact]

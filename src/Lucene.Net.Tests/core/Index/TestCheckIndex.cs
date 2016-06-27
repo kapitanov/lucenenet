@@ -36,7 +36,6 @@ namespace Lucene.Net.Index
     using TextField = TextField;
     using Token = Lucene.Net.Analysis.Token;
 
-    [TestFixture]
     public class TestCheckIndex : LuceneTestCase
     {
         [Fact]

@@ -258,7 +258,7 @@ namespace Lucene.Net.Index
                                 open.Dispose();
                                 open = reader;
                             }
-                            Assert.Equal(1, open.NumDocs, "iter: " + i + " numDocs: " + open.NumDocs + " del: " + open.NumDeletedDocs + " max: " + open.MaxDoc);
+                            Assert.Equal(1, open.NumDocs); //, "iter: " + i + " numDocs: " + open.NumDocs + " del: " + open.NumDeletedDocs + " max: " + open.MaxDoc);
                         }
                     }
                     if (open != null)

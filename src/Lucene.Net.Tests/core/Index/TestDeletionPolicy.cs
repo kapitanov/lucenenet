@@ -42,7 +42,6 @@ namespace Lucene.Net.Index
       against it, and add documents to it.
     */
 
-    [TestFixture]
     public class TestDeletionPolicy : LuceneTestCase
     {
         private void VerifyCommitOrder<T>(IList<T> commits)
@@ -664,7 +663,8 @@ namespace Lucene.Net.Index
          * around, through creates.
          */
 
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestKeepLastNDeletionPolicyWithCreates()
         {

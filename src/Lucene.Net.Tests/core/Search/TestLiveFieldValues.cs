@@ -39,7 +39,6 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestLiveFieldValues : LuceneTestCase
     {
         [Fact]
@@ -230,7 +229,7 @@ namespace Lucene.Net.Search
                             {
                                 expected = null;
                             }
-                            Assert.Equal(expected, Rt.Get(randomID), "id=" + randomID);
+                            Assert.Equal(expected, Rt.Get(randomID));
                         }
                     }
                 }

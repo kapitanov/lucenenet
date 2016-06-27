@@ -34,7 +34,6 @@ namespace Lucene.Net.Index
     using TextField = TextField;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestForTooMuchCloning : LuceneTestCase
     {
         // Make sure we don't clone IndexInputs too frequently

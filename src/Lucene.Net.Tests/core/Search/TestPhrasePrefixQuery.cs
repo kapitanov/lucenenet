@@ -37,7 +37,6 @@ namespace Lucene.Net.Search
     /// <summary>
     /// this class tests PhrasePrefixQuery class.
     /// </summary>
-    [TestFixture]
     public class TestPhrasePrefixQuery : LuceneTestCase
     {
         ///

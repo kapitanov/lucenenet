@@ -557,7 +557,7 @@ namespace Lucene.Net.Index
             }
             // No changes still should generate a commit, because it's a new index.
             writer.Dispose();
-            Assert.Equal(1, DirectoryReader.ListCommits(dir).Count, "expected 1 commits!");
+            Assert.Equal(1, DirectoryReader.ListCommits(dir).Count);
             dir.Dispose();
         }
 

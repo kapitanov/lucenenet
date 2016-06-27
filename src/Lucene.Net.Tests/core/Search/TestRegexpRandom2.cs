@@ -59,10 +59,8 @@ namespace Lucene.Net.Search
         private Directory Dir;
         protected internal string FieldName;
 
-        [SetUp]
-        public override void SetUp()
+        public TestRegexpRandom2() : base()
         {
-            
             Dir = NewDirectory();
             FieldName = Random().NextBoolean() ? "field" : ""; // sometimes use an empty string as field name
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
@@ -96,8 +94,7 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();

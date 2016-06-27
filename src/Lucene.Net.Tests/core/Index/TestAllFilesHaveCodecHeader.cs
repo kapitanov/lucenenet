@@ -39,7 +39,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Test that a plain default puts codec headers in all files.
     /// </summary>
-    [TestFixture]
     public class TestAllFilesHaveCodecHeader : LuceneTestCase
     {
         [Fact]

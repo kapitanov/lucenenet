@@ -1,10 +1,10 @@
 using Lucene.Net.Documents;
+using Lucene.Net.Randomized.Generators;
+using Xunit;
 using Field = Lucene.Net.Documents.Field;
 
 namespace Lucene.Net.Codecs.Compressing
 {
-    using Lucene.Net.Randomized.Generators;
-    using Xunit;
     using BaseStoredFieldsFormatTestCase = Lucene.Net.Index.BaseStoredFieldsFormatTestCase;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -33,7 +33,6 @@ namespace Lucene.Net.Codecs.Compressing
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestCompressingStoredFieldsFormat : BaseStoredFieldsFormatTestCase
     {
         protected override Codec Codec

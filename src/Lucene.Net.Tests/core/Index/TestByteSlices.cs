@@ -24,7 +24,8 @@ namespace Lucene.Net.Index
     /// </summary>
     public class TestByteSlices : LuceneTestCase
     {
-        ////[Test, Timeout(300000)]
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestBasic()
         {

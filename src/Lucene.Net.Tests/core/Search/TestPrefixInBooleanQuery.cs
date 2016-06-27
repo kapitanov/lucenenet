@@ -2,6 +2,7 @@ using Lucene.Net.Documents;
 
 namespace Lucene.Net.Search
 {
+    using System;
     using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
@@ -38,21 +39,62 @@ namespace Lucene.Net.Search
     ///
     /// Line 273, end=8192, subScorerDocID=11378, then more got false?
     /// </summary>
-    public class TestPrefixInBooleanQuery : LuceneTestCase
+    public class TestPrefixInBooleanQuery : LuceneTestCase, IClassFixture<TestPrefixInBooleanQueryFixture>
     {
-        private const string FIELD = "name";
-        private static Directory Directory;
-        private static IndexReader Reader;
-        private static IndexSearcher Searcher;
+        internal const string FIELD = "name";
+        private readonly TestPrefixInBooleanQueryFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestPrefixInBooleanQuery(TestPrefixInBooleanQueryFixture fixture)
         {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
+            _fixture = fixture;
+        }
+
+        [Fact]
+        public virtual void TestPrefixQuery()
+        {
+            Query query = new PrefixQuery(new Term(FIELD, "tang"));
+            Assert.Equal(2, _fixture.Searcher.Search(query, null, 1000).TotalHits); //, "Number of matched documents");
+        }
+
+        [Fact]
+        public virtual void TestTermQuery()
+        {
+            Query query = new TermQuery(new Term(FIELD, "tangfulin"));
+            Assert.Equal(2, _fixture.Searcher.Search(query, null, 1000).TotalHits); //, "Number of matched documents");
+        }
+
+        [Fact]
+        public virtual void TestTermBooleanQuery()
+        {
+            BooleanQuery query = new BooleanQuery();
+            query.Add(new TermQuery(new Term(FIELD, "tangfulin")), BooleanClause.Occur.SHOULD);
+            query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
+            Assert.Equal(2, _fixture.Searcher.Search(query, null, 1000).TotalHits); //, "Number of matched documents");
+        }
+
+        [Fact]
+        public virtual void TestPrefixBooleanQuery()
+        {
+            BooleanQuery query = new BooleanQuery();
+            query.Add(new PrefixQuery(new Term(FIELD, "tang")), BooleanClause.Occur.SHOULD);
+            query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
+            Assert.Equal(2, _fixture.Searcher.Search(query, null, 1000).TotalHits); //, "Number of matched documents");
+        }
+    }
+
+    public class TestPrefixInBooleanQueryFixture : IDisposable
+    {
+        internal Directory Directory { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal IndexSearcher Searcher { get; private set; }
+
+        public TestPrefixInBooleanQueryFixture()
+        {
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(LuceneTestCase.Random(), Directory);
 
             Document doc = new Document();
-            Field field = NewStringField(FIELD, "meaninglessnames", Field.Store.NO);
+            Field field = LuceneTestCase.NewStringField(TestPrefixInBooleanQuery.FIELD, "meaninglessnames", Field.Store.NO);
             doc.Add(field);
 
             for (int i = 0; i < 5137; ++i)
@@ -73,50 +115,17 @@ namespace Lucene.Net.Search
             writer.AddDocument(doc);
 
             Reader = writer.Reader;
-            Searcher = NewSearcher(Reader);
+            Searcher = LuceneTestCase.NewSearcher(Reader);
             writer.Dispose();
         }
 
-        [TestFixtureTearDown]
-        public static void AfterClass()
+        public void Dispose()
         {
             Searcher = null;
             Reader.Dispose();
             Reader = null;
             Directory.Dispose();
             Directory = null;
-        }
-
-        [Fact]
-        public virtual void TestPrefixQuery()
-        {
-            Query query = new PrefixQuery(new Term(FIELD, "tang"));
-            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
-        }
-
-        [Fact]
-        public virtual void TestTermQuery()
-        {
-            Query query = new TermQuery(new Term(FIELD, "tangfulin"));
-            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
-        }
-
-        [Fact]
-        public virtual void TestTermBooleanQuery()
-        {
-            BooleanQuery query = new BooleanQuery();
-            query.Add(new TermQuery(new Term(FIELD, "tangfulin")), BooleanClause.Occur.SHOULD);
-            query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
-            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
-        }
-
-        [Fact]
-        public virtual void TestPrefixBooleanQuery()
-        {
-            BooleanQuery query = new BooleanQuery();
-            query.Add(new PrefixQuery(new Term(FIELD, "tang")), BooleanClause.Occur.SHOULD);
-            query.Add(new TermQuery(new Term(FIELD, "notexistnames")), BooleanClause.Occur.SHOULD);
-            Assert.Equal(2, Searcher.Search(query, null, 1000).TotalHits, "Number of matched documents");
         }
     }
 }

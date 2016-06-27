@@ -1,11 +1,9 @@
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
 using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene41
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Support;
-    
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -31,7 +29,6 @@ namespace Lucene.Net.Codecs.Lucene41
     using PackedInts = Lucene.Net.Util.Packed.PackedInts;
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
 
-    [TestFixture]
     public class TestForUtil : LuceneTestCase
     {
         [Fact]

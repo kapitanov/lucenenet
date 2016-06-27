@@ -272,7 +272,7 @@ namespace Lucene.Net.Search
                         br2 = new BytesRef();
                     }
 
-                    Assert.Equal(br, br2, "hit=" + hitIDX + " has wrong sort value");
+                    Assert.Equal(br, br2); //, "hit=" + hitIDX + " has wrong sort value");
                 }
             }
 

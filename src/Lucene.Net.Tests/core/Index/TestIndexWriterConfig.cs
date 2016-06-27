@@ -69,7 +69,7 @@ namespace Lucene.Net.Index
             Assert.Equal(IndexWriterConfig.DefaultWriteLockTimeout, conf.WriteLockTimeout);
             Assert.Equal(IndexWriterConfig.WRITE_LOCK_TIMEOUT, IndexWriterConfig.DefaultWriteLockTimeout);
             Assert.Equal(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS, conf.MaxBufferedDeleteTerms);
-            Assert.Equal(IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, conf.RAMBufferSizeMB, 0.0);
+            assertEquals(IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, conf.RAMBufferSizeMB, 0.0);
             Assert.Equal(IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS, conf.MaxBufferedDocs);
             Assert.Equal(IndexWriterConfig.DEFAULT_READER_POOLING, conf.ReaderPooling);
             Assert.True(DocumentsWriterPerThread.DefaultIndexingChain == conf.IndexingChain);
@@ -223,7 +223,7 @@ namespace Lucene.Net.Index
             Assert.Equal(-1, IndexWriterConfig.DISABLE_AUTO_FLUSH);
             Assert.Equal(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DELETE_TERMS);
             Assert.Equal(IndexWriterConfig.DISABLE_AUTO_FLUSH, IndexWriterConfig.DEFAULT_MAX_BUFFERED_DOCS);
-            Assert.Equal(16.0, IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, 0.0);
+            assertEquals(16.0, IndexWriterConfig.DEFAULT_RAM_BUFFER_SIZE_MB, 0.0);
             Assert.Equal(false, IndexWriterConfig.DEFAULT_READER_POOLING);
             Assert.Equal(true, IndexWriterConfig.DEFAULT_USE_COMPOUND_FILE_SYSTEM);
             Assert.Equal(DirectoryReader.DEFAULT_TERMS_INDEX_DIVISOR, IndexWriterConfig.DEFAULT_READER_TERMS_INDEX_DIVISOR);

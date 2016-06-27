@@ -30,16 +30,13 @@ namespace Lucene.Net.Search
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestIndexSearcher : LuceneTestCase
     {
         internal Directory Dir;
         internal IndexReader Reader;
 
-        [SetUp]
-        public override void SetUp()
+        public TestIndexSearcher() : base()
         {
-            
             Dir = NewDirectory();
             RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
             for (int i = 0; i < 100; i++)
@@ -53,8 +50,7 @@ namespace Lucene.Net.Search
             iw.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             base.Dispose();
             Reader.Dispose();

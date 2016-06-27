@@ -33,17 +33,13 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Tests MatchAllDocsQuery.
-    ///
     /// </summary>
-    [TestFixture]
     public class TestMatchAllDocsQuery : LuceneTestCase
     {
         private Analyzer Analyzer;
 
-        [SetUp]
-        public override void SetUp()
+        public TestMatchAllDocsQuery() : base()
         {
-            
             Analyzer = new MockAnalyzer(Random());
         }
 

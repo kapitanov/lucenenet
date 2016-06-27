@@ -137,7 +137,7 @@ namespace Lucene.Net.Search
                             TopDocs actual = s.Search(new TermQuery(new Term("body", ent.Key)), 100);
                             TopDocs expected = ent.Value;
                             Assert.Equal(expected.TotalHits, actual.TotalHits);
-                            Assert.Equal(expected.ScoreDocs.Length, actual.ScoreDocs.Length, "query=" + ent.Key.Utf8ToString());
+                            Assert.Equal(expected.ScoreDocs.Length, actual.ScoreDocs.Length); //, "query=" + ent.Key.Utf8ToString());
                             for (int hit = 0; hit < expected.ScoreDocs.Length; hit++)
                             {
                                 Assert.Equal(expected.ScoreDocs[hit].Doc, actual.ScoreDocs[hit].Doc);

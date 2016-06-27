@@ -45,10 +45,8 @@ namespace Lucene.Net.Search
         private IndexReader Reader;
         private Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestRegexpRandom() : base()
         {
-            
             Dir = NewDirectory();
             RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 50, 1000)));
 
@@ -97,11 +95,10 @@ namespace Lucene.Net.Search
         {
             Query wq = new RegexpQuery(new Term("field", FillPattern(pattern)));
             TopDocs docs = Searcher.Search(wq, 25);
-            Assert.Equal(numHits, docs.TotalHits, "Incorrect hits for pattern: " + pattern);
+            Assert.Equal(numHits, docs.TotalHits); //, "Incorrect hits for pattern: " + pattern);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();

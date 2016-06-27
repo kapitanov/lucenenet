@@ -4,6 +4,7 @@ using Xunit;
 
 namespace Lucene.Net.Search
 {
+    using Util;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using DefaultSimilarity = Lucene.Net.Search.Similarities.DefaultSimilarity;
     using Directory = Lucene.Net.Store.Directory;
@@ -35,54 +36,22 @@ namespace Lucene.Net.Search
     using Term = Lucene.Net.Index.Term;
     using TextField = TextField;
 
-    [TestFixture]
-    public class TestMultiTermConstantScore : BaseTestRangeFilter
+    public class TestMultiTermConstantScore : BaseTestRangeFilter, IClassFixture<TestMultiTermConstantScoreFixture>
     {
         /// <summary>
         /// threshold for comparing floats </summary>
         public const float SCORE_COMP_THRESH = 1e-6f;
 
-        internal static Directory Small;
-        internal static IndexReader Reader;
+        private readonly TestMultiTermConstantScoreFixture _multiTermFixture;
+
+        public TestMultiTermConstantScore(BaseTestRangeFilterFixture fixture, TestMultiTermConstantScoreFixture multiTermFixture) : base(fixture)
+        {
+            _multiTermFixture = multiTermFixture;
+        }
 
         public static void AssertEquals(string m, int e, int a)
         {
-            Assert.Equal(e, a, m);
-        }
-
-        [TestFixtureSetUp]
-        public static void BeforeClass()
-        {
-            string[] data = new string[] { "A 1 2 3 4 5 6", "Z       4 5 6", null, "B   2   4 5 6", "Y     3   5 6", null, "C     3     6", "X       4 5 6" };
-
-            Small = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Small, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false)).SetMergePolicy(NewLogMergePolicy()));
-
-            FieldType customType = new FieldType(TextField.TYPE_STORED);
-            customType.Tokenized = false;
-            for (int i = 0; i < data.Length; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewField("id", Convert.ToString(i), customType)); // Field.Keyword("id",String.valueOf(i)));
-                doc.Add(NewField("all", "all", customType)); // Field.Keyword("all","all"));
-                if (null != data[i])
-                {
-                    doc.Add(NewTextField("data", data[i], Field.Store.YES)); // Field.Text("data",data[i]));
-                }
-                writer.AddDocument(doc);
-            }
-
-            Reader = writer.Reader;
-            writer.Dispose();
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Reader.Dispose();
-            Small.Dispose();
-            Reader = null;
-            Small = null;
+            Assert.Equal(e, a); //, m);
         }
 
         /// <summary>
@@ -127,8 +96,7 @@ namespace Lucene.Net.Search
             return query;
         }
 
-        [Ignore("Ignored test")]
-        [Fact]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestBasics()
         {
             QueryUtils.Check(Csrq("data", "1", "6", T, T));
@@ -147,7 +115,7 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *this* setUp
 
-            IndexSearcher search = NewSearcher(Reader);
+            IndexSearcher search = NewSearcher(_multiTermFixture.Reader);
 
             ScoreDoc[] result;
 
@@ -159,7 +127,7 @@ namespace Lucene.Net.Search
             float score = result[0].Score;
             for (int i = 1; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
 
             result = search.Search(Csrq("data", "1", "6", T, T, MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE), null, 1000).ScoreDocs;
@@ -167,7 +135,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 6, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
 
             result = search.Search(Csrq("data", "1", "6", T, T, MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT), null, 1000).ScoreDocs;
@@ -175,7 +143,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 6, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
         }
 
@@ -184,7 +152,7 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *this* setUp
 
-            IndexSearcher search = NewSearcher(Reader);
+            IndexSearcher search = NewSearcher(_multiTermFixture.Reader);
 
             ScoreDoc[] result;
 
@@ -199,7 +167,7 @@ namespace Lucene.Net.Search
             float score = result[0].Score;
             for (int i = 1; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
 
             bq = new BooleanQuery();
@@ -210,7 +178,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 1, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
 
             bq = new BooleanQuery();
@@ -221,7 +189,7 @@ namespace Lucene.Net.Search
             AssertEquals("wrong number of results", 1, numHits);
             for (int i = 0; i < numHits; i++)
             {
-                Assert.Equal(score, result[i].Score, SCORE_COMP_THRESH, "score for " + i + " was not the same");
+                assertEquals(score, result[i].Score, SCORE_COMP_THRESH); //, "score for " + i + " was not the same");
             }
         }
 
@@ -230,7 +198,7 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *this* setUp
 
-            IndexSearcher search = NewSearcher(Reader);
+            IndexSearcher search = NewSearcher(_multiTermFixture.Reader);
 
             // test for correct application of query normalization
             // must use a non score normalizing method for this.
@@ -304,7 +272,7 @@ namespace Lucene.Net.Search
 
             public override void Collect(int doc)
             {
-                Assert.Equal(1.0f, scorer.Score(), SCORE_COMP_THRESH, "score for doc " + (doc + @base) + " was not correct");
+                assertEquals(1.0f, scorer.Score(), SCORE_COMP_THRESH); //, "score for doc " + (doc + @base) + " was not correct");
             }
 
             public override AtomicReaderContext NextReader
@@ -326,7 +294,7 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *this* setUp
 
-            IndexSearcher search = NewSearcher(Reader);
+            IndexSearcher search = NewSearcher(_multiTermFixture.Reader);
 
             // first do a regular TermRangeQuery which uses term expansion so
             // docs with more terms in range get higher scores
@@ -357,7 +325,7 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *super* setUp
 
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
             if (VERBOSE)
@@ -365,15 +333,15 @@ namespace Lucene.Net.Search
                 Console.WriteLine("TEST: reader=" + reader);
             }
 
-            int medId = ((MaxId - MinId) / 2);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
 
-            string minIP = Pad(MinId);
-            string maxIP = Pad(MaxId);
+            string minIP = Pad(_fixture.MinId);
+            string maxIP = Pad(_fixture.MaxId);
             string medIP = Pad(medId);
 
             int numDocs = reader.NumDocs;
 
-            AssertEquals("num of docs", numDocs, 1 + MaxId - MinId);
+            AssertEquals("num of docs", numDocs, 1 + _fixture.MaxId - _fixture.MinId);
 
             ScoreDoc[] result;
 
@@ -404,16 +372,16 @@ namespace Lucene.Net.Search
             AssertEquals("all but ends", numDocs - 2, result.Length);
 
             result = search.Search(Csrq("id", medIP, maxIP, T, T), null, numDocs).ScoreDocs;
-            AssertEquals("med and up", 1 + MaxId - medId, result.Length);
+            AssertEquals("med and up", 1 + _fixture.MaxId - medId, result.Length);
 
             result = search.Search(Csrq("id", medIP, maxIP, T, T, MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT), null, numDocs).ScoreDocs;
-            AssertEquals("med and up", 1 + MaxId - medId, result.Length);
+            AssertEquals("med and up", 1 + _fixture.MaxId - medId, result.Length);
 
             result = search.Search(Csrq("id", minIP, medIP, T, T), null, numDocs).ScoreDocs;
-            AssertEquals("up to med", 1 + medId - MinId, result.Length);
+            AssertEquals("up to med", 1 + medId - _fixture.MinId, result.Length);
 
             result = search.Search(Csrq("id", minIP, medIP, T, T, MultiTermQuery.CONSTANT_SCORE_AUTO_REWRITE_DEFAULT), null, numDocs).ScoreDocs;
-            AssertEquals("up to med", 1 + medId - MinId, result.Length);
+            AssertEquals("up to med", 1 + medId - _fixture.MinId, result.Length);
 
             // unbounded id
 
@@ -430,10 +398,10 @@ namespace Lucene.Net.Search
             AssertEquals("not max, but down", numDocs - 1, result.Length);
 
             result = search.Search(Csrq("id", medIP, maxIP, T, F), null, numDocs).ScoreDocs;
-            AssertEquals("med and up, not max", MaxId - medId, result.Length);
+            AssertEquals("med and up, not max", _fixture.MaxId - medId, result.Length);
 
             result = search.Search(Csrq("id", minIP, medIP, F, T), null, numDocs).ScoreDocs;
-            AssertEquals("not min, up to med", medId - MinId, result.Length);
+            AssertEquals("not min, up to med", medId - _fixture.MinId, result.Length);
 
             // very small sets
 
@@ -491,15 +459,15 @@ namespace Lucene.Net.Search
         {
             // NOTE: uses index build in *super* setUp
 
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
-            string minRP = Pad(SignedIndexDir.MinR);
-            string maxRP = Pad(SignedIndexDir.MaxR);
+            string minRP = Pad(_fixture.SignedIndexDir.MinR);
+            string maxRP = Pad(_fixture.SignedIndexDir.MaxR);
 
             int numDocs = reader.NumDocs;
 
-            AssertEquals("num of docs", numDocs, 1 + MaxId - MinId);
+            AssertEquals("num of docs", numDocs, 1 + _fixture.MaxId - _fixture.MinId);
 
             ScoreDoc[] result;
 
@@ -548,5 +516,45 @@ namespace Lucene.Net.Search
             result = search.Search(Csrq("rand", maxRP, null, T, F), null, numDocs).ScoreDocs;
             AssertEquals("max,nul,T,T", 1, result.Length);
         }
+    }
+
+    public class TestMultiTermConstantScoreFixture : IDisposable
+    {
+        internal Directory Small { get; private set; }
+        internal IndexReader Reader { get; private set; }
+
+        public TestMultiTermConstantScoreFixture()
+        {
+            string[] data = new string[] { "A 1 2 3 4 5 6", "Z       4 5 6", null, "B   2   4 5 6", "Y     3   5 6", null, "C     3     6", "X       4 5 6" };
+            var random = LuceneTestCase.Random();
+            Small = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(random, Small, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(random, MockTokenizer.WHITESPACE, false)).SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
+            FieldType customType = new FieldType(TextField.TYPE_STORED);
+            customType.Tokenized = false;
+            for (int i = 0; i < data.Length; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewField("id", Convert.ToString(i), customType)); // Field.Keyword("id",String.valueOf(i)));
+                doc.Add(LuceneTestCase.NewField("all", "all", customType)); // Field.Keyword("all","all"));
+                if (null != data[i])
+                {
+                    doc.Add(LuceneTestCase.NewTextField("data", data[i], Field.Store.YES)); // Field.Text("data",data[i]));
+                }
+                writer.AddDocument(doc);
+            }
+
+            Reader = writer.Reader;
+            writer.Dispose();
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            Small.Dispose();
+            Reader = null;
+            Small = null;
+        }
+
     }
 }

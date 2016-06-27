@@ -38,47 +38,21 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
-    public class TestFieldsReader : LuceneTestCase
+    public class TestFieldsReader : LuceneTestCase, IClassFixture<TestFieldsReaderFixture>
     {
-        private static Directory Dir;
-        private static Document TestDoc;
-        private static FieldInfos.Builder FieldInfos = null;
+        private readonly TestFieldsReaderFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestFieldsReader(TestFieldsReaderFixture fixture)
         {
-            TestDoc = new Document();
-            FieldInfos = new FieldInfos.Builder();
-            DocHelper.SetupDoc(TestDoc);
-            foreach (IndexableField field in TestDoc)
-            {
-                FieldInfos.AddOrUpdate(field.Name(), field.FieldType());
-            }
-            Dir = NewDirectory();
-            IndexWriterConfig conf = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy());
-            conf.MergePolicy.NoCFSRatio = 0.0;
-            IndexWriter writer = new IndexWriter(Dir, conf);
-            writer.AddDocument(TestDoc);
-            writer.Dispose();
-            FaultyIndexInput.DoFail = false;
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Dir.Dispose();
-            Dir = null;
-            FieldInfos = null;
-            TestDoc = null;
+            _fixture = fixture;
         }
 
         [Fact]
         public virtual void Test()
         {
-            Assert.True(Dir != null);
-            Assert.True(FieldInfos != null);
-            IndexReader reader = DirectoryReader.Open(Dir);
+            Assert.True(_fixture.Dir != null);
+            Assert.True(_fixture.FieldInfos != null);
+            IndexReader reader = DirectoryReader.Open(_fixture.Dir);
             Document doc = reader.Document(0);
             Assert.True(doc != null);
             Assert.True(doc.GetField(DocHelper.TEXT_FIELD_1_KEY) != null);
@@ -161,63 +135,6 @@ namespace Lucene.Net.Index
             }
         }
 
-        private class FaultyIndexInput : BufferedIndexInput
-        {
-            internal IndexInput @delegate;
-            internal static bool DoFail;
-            internal int Count;
-
-            internal FaultyIndexInput(IndexInput @delegate)
-                : base("FaultyIndexInput(" + @delegate + ")", BufferedIndexInput.BUFFER_SIZE)
-            {
-                this.@delegate = @delegate;
-            }
-
-            internal virtual void SimOutage()
-            {
-                if (DoFail && Count++ % 2 == 1)
-                {
-                    throw new IOException("Simulated network outage");
-                }
-            }
-
-            protected override void ReadInternal(byte[] b, int offset, int length)
-            {
-                SimOutage();
-                @delegate.Seek(FilePointer);
-                @delegate.ReadBytes(b, offset, length);
-            }
-
-            protected override void SeekInternal(long pos)
-            {
-            }
-
-            public override long Length()
-            {
-                return @delegate.Length();
-            }
-
-            public override void Dispose()
-            {
-                @delegate.Dispose();
-            }
-
-            public override object Clone()
-            {
-                FaultyIndexInput i = new FaultyIndexInput((IndexInput)@delegate.Clone());
-                // seek the clone to our current position
-                try
-                {
-                    i.Seek(FilePointer);
-                }
-                catch (IOException e)
-                {
-                    throw new Exception();
-                }
-                return i;
-            }
-        }
-
         // LUCENE-1262
         [Fact]
         public virtual void TestExceptions()
@@ -231,7 +148,7 @@ namespace Lucene.Net.Index
                 IndexWriter writer = new IndexWriter(dir, iwc);
                 for (int i = 0; i < 2; i++)
                 {
-                    writer.AddDocument(TestDoc);
+                    writer.AddDocument(_fixture.TestDoc);
                 }
                 writer.ForceMerge(1);
                 writer.Dispose();
@@ -271,6 +188,96 @@ namespace Lucene.Net.Index
             {
                 System.IO.Directory.Delete(indexDir.FullName, true);
             }
+        }
+    }
+
+    public class TestFieldsReaderFixture : IDisposable
+    {
+        internal Directory Dir { get; private set; }
+        internal Document TestDoc { get; private set; }
+        internal FieldInfos.Builder FieldInfos { get; private set; }
+
+        public TestFieldsReaderFixture()
+        {
+            TestDoc = new Document();
+            FieldInfos = new FieldInfos.Builder();
+            DocHelper.SetupDoc(TestDoc);
+            foreach (IndexableField field in TestDoc)
+            {
+                FieldInfos.AddOrUpdate(field.Name(), field.FieldType());
+            }
+            Dir = LuceneTestCase.NewDirectory();
+            IndexWriterConfig conf = LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(LuceneTestCase.Random())).SetMergePolicy(LuceneTestCase.NewLogMergePolicy());
+            conf.MergePolicy.NoCFSRatio = 0.0;
+            IndexWriter writer = new IndexWriter(Dir, conf);
+            writer.AddDocument(TestDoc);
+            writer.Dispose();
+            FaultyIndexInput.DoFail = false;
+        }
+
+        public void Dispose()
+        {
+            Dir.Dispose();
+            Dir = null;
+            FieldInfos = null;
+            TestDoc = null;
+        }
+    }
+
+    internal class FaultyIndexInput : BufferedIndexInput
+    {
+        internal IndexInput @delegate;
+        internal static bool DoFail;
+        internal int Count;
+
+        internal FaultyIndexInput(IndexInput @delegate)
+            : base("FaultyIndexInput(" + @delegate + ")", BufferedIndexInput.BUFFER_SIZE)
+        {
+            this.@delegate = @delegate;
+        }
+
+        internal virtual void SimOutage()
+        {
+            if (DoFail && Count++ % 2 == 1)
+            {
+                throw new IOException("Simulated network outage");
+            }
+        }
+
+        protected override void ReadInternal(byte[] b, int offset, int length)
+        {
+            SimOutage();
+            @delegate.Seek(FilePointer);
+            @delegate.ReadBytes(b, offset, length);
+        }
+
+        protected override void SeekInternal(long pos)
+        {
+        }
+
+        public override long Length()
+        {
+            return @delegate.Length();
+        }
+
+        public override void Dispose()
+        {
+            @delegate.Dispose();
+        }
+
+        public override object Clone()
+        {
+            FaultyIndexInput i = new FaultyIndexInput((IndexInput)@delegate.Clone());
+            // seek the clone to our current position
+            try
+            {
+                i.Seek(FilePointer);
+            }
+            catch (IOException)
+            {
+                throw new Exception();
+            }
+            return i;
         }
     }
 }

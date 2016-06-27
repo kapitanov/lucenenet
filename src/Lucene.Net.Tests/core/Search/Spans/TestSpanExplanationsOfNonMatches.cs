@@ -32,7 +32,7 @@ namespace Lucene.Net.Search.Spans
         /// <seealso> cref= CheckHits#checkNoMatchExplanations </seealso>
         public override void Qtest(Query q, int[] expDocNrs)
         {
-            CheckHits.CheckNoMatchExplanations(q, TestExplanationsFixture.FIELD, _fixture.Searcher, expDocNrs);
+            CheckHits.CheckNoMatchExplanations(q, FIELD, _fixture.Searcher, expDocNrs);
         }
     }
 }

@@ -1,8 +1,8 @@
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using Xunit;
 using System;
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Compressing
 {
@@ -23,7 +23,6 @@ namespace Lucene.Net.Codecs.Compressing
      * limitations under the License.
      */
 
-    [TestFixture]
     public abstract class AbstractTestLZ4CompressionMode : AbstractTestCompressionMode
     {
         public override byte[] Test(byte[] decompressed)

@@ -34,7 +34,6 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestIndexWriterNRTIsCurrent : LuceneTestCase
     {
         public class ReaderHolder

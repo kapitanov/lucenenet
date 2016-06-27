@@ -37,69 +37,36 @@ namespace Lucene.Net.Search
     /// <summary>
     /// Test that BooleanQuery.setMinimumNumberShouldMatch works.
     /// </summary>
-    public class TestBooleanMinShouldMatch : LuceneTestCase
+    public class TestBooleanMinShouldMatch : LuceneTestCase, IClassFixture<TestBooleanMinShouldMatchFixture>
     {
-        private static Directory Index;
-        private static IndexReader r;
-        private static IndexSearcher s;
+        private readonly TestBooleanMinShouldMatchFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestBooleanMinShouldMatch(TestBooleanMinShouldMatchFixture fixture)
         {
-            string[] data = new string[] { "A 1 2 3 4 5 6", "Z       4 5 6", null, "B   2   4 5 6", "Y     3   5 6", null, "C     3     6", "X       4 5 6" };
-
-            Index = NewDirectory();
-            RandomIndexWriter w = new RandomIndexWriter(Random(), Index);
-
-            for (int i = 0; i < data.Length; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewStringField("id", Convert.ToString(i), Field.Store.YES)); //Field.Keyword("id",String.valueOf(i)));
-                doc.Add(NewStringField("all", "all", Field.Store.YES)); //Field.Keyword("all","all"));
-                if (null != data[i])
-                {
-                    doc.Add(NewTextField("data", data[i], Field.Store.YES)); //Field.Text("data",data[i]));
-                }
-                w.AddDocument(doc);
-            }
-
-            r = w.Reader;
-            s = NewSearcher(r);
-            w.Dispose();
-            //System.out.println("Set up " + getName());
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            s = null;
-            r.Dispose();
-            r = null;
-            Index.Dispose();
-            Index = null;
+            _fixture = fixture;
         }
 
         public virtual void VerifyNrHits(Query q, int expected)
         {
             // bs1
-            ScoreDoc[] h = s.Search(q, null, 1000).ScoreDocs;
+            ScoreDoc[] h = _fixture.IndexSearcher.Search(q, null, 1000).ScoreDocs;
             if (expected != h.Length)
             {
-                PrintHits(TestName, h, s);
+                PrintHits(TestName, h, _fixture.IndexSearcher);
             }
-            Assert.Equal(expected, h.Length, "result count");
+            Assert.Equal(expected, h.Length); //, "result count");
             //System.out.println("TEST: now check");
             // bs2
             TopScoreDocCollector collector = TopScoreDocCollector.Create(1000, true);
-            s.Search(q, collector);
+            _fixture.IndexSearcher.Search(q, collector);
             ScoreDoc[] h2 = collector.TopDocs().ScoreDocs;
             if (expected != h2.Length)
             {
-                PrintHits(TestName, h2, s);
+                PrintHits(TestName, h2, _fixture.IndexSearcher);
             }
-            Assert.Equal(expected, h2.Length, "result count (bs2)");
+            Assert.Equal(expected, h2.Length); //, "result count (bs2)");
 
-            QueryUtils.Check(Random(), q, s);
+            QueryUtils.Check(Random(), q, _fixture.IndexSearcher);
         }
 
         [Fact]
@@ -347,12 +314,12 @@ namespace Lucene.Net.Search
                 // Can't use Hits because normalized scores will mess things
                 // up.  The non-sorting version of search() that returns TopDocs
                 // will not normalize scores.
-                TopDocs top1 = s.Search(q1, null, 100);
-                TopDocs top2 = s.Search(q2, null, 100);
+                TopDocs top1 = _fixture.IndexSearcher.Search(q1, null, 100);
+                TopDocs top2 = _fixture.IndexSearcher.Search(q2, null, 100);
                 if (i < 100)
                 {
-                    QueryUtils.Check(Random(), q1, s);
-                    QueryUtils.Check(Random(), q2, s);
+                    QueryUtils.Check(Random(), q1, _fixture.IndexSearcher);
+                    QueryUtils.Check(Random(), q2, _fixture.IndexSearcher);
                 }
                 AssertSubsetOfSameScores(q2, top1, top2);
             }
@@ -416,7 +383,7 @@ namespace Lucene.Net.Search
                         found = true;
                         float otherScore = top1.ScoreDocs[other].Score;
                         // check if scores match
-                        Assert.Equal(score, otherScore, CheckHits.ExplainToleranceDelta(score, otherScore), "Doc " + id + " scores don't match\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
+                        assertEquals(score, otherScore, CheckHits.ExplainToleranceDelta(score, otherScore)); //, "Doc " + id + " scores don't match\n" + CheckHits.TopdocsString(top1, 0, 0) + CheckHits.TopdocsString(top2, 0, 0) + "for query:" + q.ToString());
                     }
                 }
 
@@ -431,22 +398,22 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestRewriteCoord1()
         {
-            Similarity oldSimilarity = s.Similarity;
+            Similarity oldSimilarity = _fixture.IndexSearcher.Similarity;
             try
             {
-                s.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
+                _fixture.IndexSearcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
                 BooleanQuery q1 = new BooleanQuery();
                 q1.Add(new TermQuery(new Term("data", "1")), BooleanClause.Occur.SHOULD);
                 BooleanQuery q2 = new BooleanQuery();
                 q2.Add(new TermQuery(new Term("data", "1")), BooleanClause.Occur.SHOULD);
                 q2.MinimumNumberShouldMatch = 1;
-                TopDocs top1 = s.Search(q1, null, 100);
-                TopDocs top2 = s.Search(q2, null, 100);
+                TopDocs top1 = _fixture.IndexSearcher.Search(q1, null, 100);
+                TopDocs top2 = _fixture.IndexSearcher.Search(q2, null, 100);
                 AssertSubsetOfSameScores(q2, top1, top2);
             }
             finally
             {
-                s.Similarity = oldSimilarity;
+                _fixture.IndexSearcher.Similarity = oldSimilarity;
             }
         }
 
@@ -468,22 +435,22 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestRewriteNegate()
         {
-            Similarity oldSimilarity = s.Similarity;
+            Similarity oldSimilarity = _fixture.IndexSearcher.Similarity;
             try
             {
-                s.Similarity = new DefaultSimilarityAnonymousInnerClassHelper2(this);
+                _fixture.IndexSearcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper2(this);
                 BooleanQuery q1 = new BooleanQuery();
                 q1.Add(new TermQuery(new Term("data", "1")), BooleanClause.Occur.SHOULD);
                 BooleanQuery q2 = new BooleanQuery();
                 q2.Add(new TermQuery(new Term("data", "1")), BooleanClause.Occur.SHOULD);
                 q2.Add(new TermQuery(new Term("data", "Z")), BooleanClause.Occur.MUST_NOT);
-                TopDocs top1 = s.Search(q1, null, 100);
-                TopDocs top2 = s.Search(q2, null, 100);
+                TopDocs top1 = _fixture.IndexSearcher.Search(q1, null, 100);
+                TopDocs top2 = _fixture.IndexSearcher.Search(q2, null, 100);
                 AssertSubsetOfSameScores(q2, top1, top2);
             }
             finally
             {
-                s.Similarity = oldSimilarity;
+                _fixture.IndexSearcher.Similarity = oldSimilarity;
             }
         }
 
@@ -517,6 +484,48 @@ namespace Lucene.Net.Search
                 decimal score = (decimal)h[i].Score;
                 Console.Error.WriteLine("#" + i + ": " + score.ToString(f) + " - " + d.Get("id") + " - " + d.Get("data"));
             }
+        }
+    }
+
+    public class TestBooleanMinShouldMatchFixture : IDisposable
+    {
+        private Directory _directory;
+
+        internal IndexReader IndexReader { get; private set; }
+        internal IndexSearcher IndexSearcher { get; private set; }
+
+        public TestBooleanMinShouldMatchFixture()
+        {
+            string[] data = new string[] { "A 1 2 3 4 5 6", "Z       4 5 6", null, "B   2   4 5 6", "Y     3   5 6", null, "C     3     6", "X       4 5 6" };
+
+            _directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter w = new RandomIndexWriter(LuceneTestCase.Random(), _directory);
+
+            for (int i = 0; i < data.Length; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewStringField("id", Convert.ToString(i), Field.Store.YES)); //Field.Keyword("id",String.valueOf(i)));
+                doc.Add(LuceneTestCase.NewStringField("all", "all", Field.Store.YES)); //Field.Keyword("all","all"));
+                if (null != data[i])
+                {
+                    doc.Add(LuceneTestCase.NewTextField("data", data[i], Field.Store.YES)); //Field.Text("data",data[i]));
+                }
+                w.AddDocument(doc);
+            }
+
+            IndexReader = w.Reader;
+            IndexSearcher = LuceneTestCase.NewSearcher(IndexReader);
+            w.Dispose();
+            //System.out.println("Set up " + getName());
+        }
+
+        public void Dispose()
+        {
+            IndexSearcher = null;
+            IndexReader.Dispose();
+            IndexReader = null;
+            _directory.Dispose();
+            _directory = null;
         }
     }
 }

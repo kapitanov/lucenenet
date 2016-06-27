@@ -31,7 +31,6 @@ namespace Lucene.Net.Document
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestDateTools : LuceneTestCase
     {
         //public TestRule TestRules = RuleChain.outerRule(new SystemPropertiesRestoreRule());

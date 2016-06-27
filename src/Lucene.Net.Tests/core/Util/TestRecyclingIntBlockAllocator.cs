@@ -25,15 +25,8 @@ namespace Lucene.Net.Util
     /// <summary>
     /// Testcase for <seealso cref="RecyclingIntBlockAllocator"/>
     /// </summary>
-    [TestFixture]
     public class TestRecyclingIntBlockAllocator : LuceneTestCase
     {
-        [SetUp]
-        public override void SetUp()
-        {
-            
-        }
-
         private RecyclingIntBlockAllocator NewAllocator()
         {
             return new RecyclingIntBlockAllocator(1 << (2 + Random().Next(15)), Random().Next(97), Util.Counter.NewCounter());
@@ -125,7 +118,7 @@ namespace Lucene.Net.Util
                     Assert.NotNull(block);
                     Assert.Equal(size, block.Length);
                     Assert.True(allocated.Add(block), "block is returned twice");
-                    Assert.Equal(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed(), "" + (4 * size * (allocated.Count + allocator.NumBufferedBlocks()) - allocator.BytesUsed()));
+                    Assert.Equal(4 * size * (allocated.Count + allocator.NumBufferedBlocks()), allocator.BytesUsed()); //, "" + (4 * size * (allocated.Count + allocator.NumBufferedBlocks()) - allocator.BytesUsed()));
                 }
 
                 int[][] array = allocated.ToArray(/*new int[0][]*/);

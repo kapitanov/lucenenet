@@ -1,11 +1,9 @@
 using Lucene.Net.Analysis.Tokenattributes;
+using System;
 using Xunit;
 
 namespace Lucene.Net.Analysis
 {
-    
-    using System;
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -28,13 +26,12 @@ namespace Lucene.Net.Analysis
     using ICharTermAttribute = Lucene.Net.Analysis.Tokenattributes.ICharTermAttribute;
     using NumericUtils = Lucene.Net.Util.NumericUtils;
 
-    [TestFixture]
     public class TestNumericTokenStream : BaseTokenStreamTestCase
     {
         internal const long Lvalue = 4573245871874382L;
         internal const int Ivalue = 123456;
 
-        [NUnit.Framework.Test]
+        [Fact]
         public virtual void TestLongStream()
         {
             using (NumericTokenStream stream = (new NumericTokenStream()).SetLongValue(Lvalue)) {
@@ -59,7 +56,7 @@ namespace Lucene.Net.Analysis
             }
         }
 
-        [NUnit.Framework.Test]
+        [Fact]
         public virtual void TestIntStream()
         {
             NumericTokenStream stream = (new NumericTokenStream()).SetIntValue(Ivalue);
@@ -84,7 +81,7 @@ namespace Lucene.Net.Analysis
             stream.Dispose();
         }
 
-        [NUnit.Framework.Test]
+        [Fact]
         public virtual void TestNotInitialized()
         {
             NumericTokenStream stream = new NumericTokenStream();
@@ -118,7 +115,7 @@ namespace Lucene.Net.Analysis
         {
         }
 
-        [NUnit.Framework.Test]
+        [Fact]
         public virtual void TestCTA()
         {
             NumericTokenStream stream = new NumericTokenStream();

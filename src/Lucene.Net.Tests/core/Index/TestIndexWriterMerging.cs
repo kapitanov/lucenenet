@@ -35,7 +35,6 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestIndexWriterMerging : LuceneTestCase
     {
         /// <summary>

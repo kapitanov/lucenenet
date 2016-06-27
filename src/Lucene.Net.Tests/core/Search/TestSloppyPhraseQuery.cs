@@ -171,7 +171,7 @@ namespace Lucene.Net.Search
             IndexSearcher searcher = NewSearcher(reader);
             MaxFreqCollector c = new MaxFreqCollector();
             searcher.Search(query, c);
-            Assert.Equal(expectedNumResults, c.TotalHits, "slop: " + slop + "  query: " + query + "  doc: " + doc + "  Wrong number of hits");
+            Assert.Equal(expectedNumResults, c.TotalHits); //, "slop: " + slop + "  query: " + query + "  doc: " + doc + "  Wrong number of hits");
 
             //QueryUtils.Check(query,searcher);
             writer.Dispose();

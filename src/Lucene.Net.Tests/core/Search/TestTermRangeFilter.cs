@@ -32,21 +32,25 @@ namespace Lucene.Net.Search
     /// </summary>
     public class TestTermRangeFilter : BaseTestRangeFilter
     {
+        public TestTermRangeFilter(BaseTestRangeFilterFixture fixture) : base(fixture)
+        {
+        }
+
         [Fact]
         public virtual void TestRangeFilterId()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
-            int medId = ((MaxId - MinId) / 2);
+            int medId = ((_fixture.MaxId - _fixture.MinId) / 2);
 
-            string minIP = Pad(MinId);
-            string maxIP = Pad(MaxId);
+            string minIP = Pad(_fixture.MinId);
+            string maxIP = Pad(_fixture.MaxId);
             string medIP = Pad(medId);
 
             int numDocs = reader.NumDocs;
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));
@@ -66,10 +70,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 2, result.Length); //, "all but ends");
 
             result = search.Search(q, TermRangeFilter.NewStringRange("id", medIP, maxIP, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + MaxId - medId, result.Length); //, "med and up");
+            Assert.Equal(1 + _fixture.MaxId - medId, result.Length); //, "med and up");
 
             result = search.Search(q, TermRangeFilter.NewStringRange("id", minIP, medIP, T, T), numDocs).ScoreDocs;
-            Assert.Equal(1 + medId - MinId, result.Length); //, "up to med");
+            Assert.Equal(1 + medId - _fixture.MinId, result.Length); //, "up to med");
 
             // unbounded id
 
@@ -86,10 +90,10 @@ namespace Lucene.Net.Search
             Assert.Equal(numDocs - 1, result.Length); //, "not max, but down");
 
             result = search.Search(q, TermRangeFilter.NewStringRange("id", medIP, maxIP, T, F), numDocs).ScoreDocs;
-            Assert.Equal(MaxId - medId, result.Length); //, "med and up, not max");
+            Assert.Equal(_fixture.MaxId - medId, result.Length); //, "med and up, not max");
 
             result = search.Search(q, TermRangeFilter.NewStringRange("id", minIP, medIP, F, T), numDocs).ScoreDocs;
-            Assert.Equal(medId - MinId, result.Length); //, "not min, up to med");
+            Assert.Equal(medId - _fixture.MinId, result.Length); //, "not min, up to med");
 
             // very small sets
 
@@ -117,15 +121,15 @@ namespace Lucene.Net.Search
         [Fact]
         public virtual void TestRangeFilterRand()
         {
-            IndexReader reader = SignedIndexReader;
+            IndexReader reader = _fixture.SignedIndexReader;
             IndexSearcher search = NewSearcher(reader);
 
-            string minRP = Pad(SignedIndexDir.MinR);
-            string maxRP = Pad(SignedIndexDir.MaxR);
+            string minRP = Pad(_fixture.SignedIndexDir.MinR);
+            string maxRP = Pad(_fixture.SignedIndexDir.MaxR);
 
             int numDocs = reader.NumDocs;
 
-            Assert.Equal(numDocs, 1 + MaxId - MinId); //, "num of docs");
+            Assert.Equal(numDocs, 1 + _fixture.MaxId - _fixture.MinId); //, "num of docs");
 
             ScoreDoc[] result;
             Query q = new TermQuery(new Term("body", "body"));

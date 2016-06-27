@@ -1,11 +1,12 @@
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene40
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Support;
-    
+    using Tests.Codecs;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using Bits = Lucene.Net.Util.Bits;
@@ -43,13 +44,13 @@ namespace Lucene.Net.Codecs.Lucene40
     using TestUtil = Lucene.Net.Util.TestUtil;
 
     // TODO: really this should be in BaseTestPF or somewhere else? useful test!
-    [TestFixture]
-    public class TestReuseDocsEnum : LuceneTestCase
+    public class TestReuseDocsEnum : LuceneTestCase, IClassFixture<OldFormatCodecFixture>
     {
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        private readonly OldFormatCodecFixture _fixture;
+
+        public TestReuseDocsEnum(OldFormatCodecFixture fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixture = fixture;
         }
 
         [Fact]

@@ -1,6 +1,7 @@
 namespace Lucene.Net.Search
 {
-    
+    using System;
+    using Xunit;
     using Directory = Lucene.Net.Store.Directory;
 
     /*
@@ -26,27 +27,13 @@ namespace Lucene.Net.Search
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using Term = Lucene.Net.Index.Term;
 
-    public class TestNGramPhraseQuery : LuceneTestCase
+    public class TestNGramPhraseQuery : LuceneTestCase, IClassFixture<TestNGramPhraseQueryFixture>
     {
-        private static IndexReader Reader;
-        private static Directory Directory;
+        private readonly TestNGramPhraseQueryFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestNGramPhraseQuery(TestNGramPhraseQueryFixture fixture)
         {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory);
-            writer.Dispose();
-            Reader = DirectoryReader.Open(Directory);
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Reader.Dispose();
-            Reader = null;
-            Directory.Dispose();
-            Directory = null;
+            _fixture = fixture;
         }
 
         [Fact]
@@ -57,7 +44,7 @@ namespace Lucene.Net.Search
             pq1.Add(new Term("f", "AB"));
             pq1.Add(new Term("f", "BC"));
 
-            Query q = pq1.Rewrite(Reader);
+            Query q = pq1.Rewrite(_fixture.Reader);
             Assert.True(q is NGramPhraseQuery);
             Assert.Same(pq1, q);
             pq1 = (NGramPhraseQuery)q;
@@ -70,7 +57,7 @@ namespace Lucene.Net.Search
             pq2.Add(new Term("f", "BC"));
             pq2.Add(new Term("f", "CD"));
 
-            q = pq2.Rewrite(Reader);
+            q = pq2.Rewrite(_fixture.Reader);
             Assert.True(q is PhraseQuery);
             Assert.NotSame(pq2, q);
             pq2 = (PhraseQuery)q;
@@ -86,7 +73,7 @@ namespace Lucene.Net.Search
             pq3.Add(new Term("f", "EFG"));
             pq3.Add(new Term("f", "FGH"));
 
-            q = pq3.Rewrite(Reader);
+            q = pq3.Rewrite(_fixture.Reader);
             Assert.True(q is PhraseQuery);
             Assert.NotSame(pq3, q);
             pq3 = (PhraseQuery)q;
@@ -100,9 +87,32 @@ namespace Lucene.Net.Search
             pq4.Add(new Term("f", "CD"));
             pq4.Boost = 100.0F;
 
-            q = pq4.Rewrite(Reader);
+            q = pq4.Rewrite(_fixture.Reader);
             Assert.NotSame(pq4, q);
-            Assert.Equal(pq4.Boost, q.Boost, 0.1f);
+            assertEquals(pq4.Boost, q.Boost, 0.1f);
         }
+    }
+
+    public class TestNGramPhraseQueryFixture : IDisposable
+    {
+        internal IndexReader Reader { get; private set; }
+        internal Directory Directory { get; private set; }
+
+        public TestNGramPhraseQueryFixture()
+        {
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(LuceneTestCase.Random(), Directory);
+            writer.Dispose();
+            Reader = DirectoryReader.Open(Directory);
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            Reader = null;
+            Directory.Dispose();
+            Directory = null;
+        }
+
     }
 }

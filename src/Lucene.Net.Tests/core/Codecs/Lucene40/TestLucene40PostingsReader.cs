@@ -41,22 +41,17 @@ namespace Lucene.Net.Codecs.Lucene40
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestLucene40PostingsReader : LuceneTestCase
     {
-        internal static readonly string[] Terms = new string[100];
+        internal readonly string[] Terms = new string[100];
 
-        static TestLucene40PostingsReader()
+        public TestLucene40PostingsReader()
         {
             for (int i = 0; i < Terms.Length; i++)
             {
                 Terms[i] = Convert.ToString(i + 1);
             }
-        }
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
-        {
             OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
         }
 
@@ -158,6 +153,12 @@ namespace Lucene.Net.Codecs.Lucene40
                 sb.Append(' ');
             }
             return sb.ToString();
+        }
+
+        public override void Dispose()
+        {
+            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = false;
+            base.Dispose();
         }
     }
 }

@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestForceMergeForever : LuceneTestCase
     {
         // Just counts how many merges are done

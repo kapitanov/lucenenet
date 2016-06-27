@@ -1,7 +1,5 @@
 namespace Lucene.Net.Codecs.Lucene40
 {
-    
-
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -20,13 +18,16 @@ namespace Lucene.Net.Codecs.Lucene40
          */
 
     using BaseStoredFieldsFormatTestCase = Lucene.Net.Index.BaseStoredFieldsFormatTestCase;
+    using Tests.Codecs;
+    using Xunit;
 
-    public class TestLucene40StoredFieldsFormat : BaseStoredFieldsFormatTestCase
+    public class TestLucene40StoredFieldsFormat : BaseStoredFieldsFormatTestCase, IClassFixture<OldFormatCodecFixture>
     {
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        private readonly OldFormatCodecFixture _fixture;
+
+        public TestLucene40StoredFieldsFormat(OldFormatCodecFixture fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixture = fixture;
         }
 
         protected override Codec Codec

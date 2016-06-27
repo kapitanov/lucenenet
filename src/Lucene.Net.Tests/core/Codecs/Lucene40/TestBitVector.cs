@@ -30,7 +30,6 @@ namespace Lucene.Net.Codecs.Lucene40
     /// <summary>
     /// <code>TestBitVector</code> tests the <code>BitVector</code>, obviously.
     /// </summary>
-    [TestFixture]
     public class TestBitVector : LuceneTestCase
     {
         /// <summary>

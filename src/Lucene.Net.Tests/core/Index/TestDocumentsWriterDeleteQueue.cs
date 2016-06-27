@@ -34,7 +34,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Unit test for <seealso cref="DocumentsWriterDeleteQueue"/>
     /// </summary>
-    [TestFixture]
     public class TestDocumentsWriterDeleteQueue : LuceneTestCase
     {
         [Fact]

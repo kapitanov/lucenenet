@@ -66,7 +66,6 @@ namespace Lucene.Net.Codecs.Lucene41
     /// <summary>
     /// Tests partial enumeration (only pulling a subset of the indexed data)
     /// </summary>
-    [TestFixture]
     public class TestBlockPostingsFormat3 : LuceneTestCase
     {
         internal static readonly int MAXDOC = Lucene41PostingsFormat.BLOCK_SIZE * 20;

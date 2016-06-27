@@ -28,7 +28,6 @@ namespace Lucene.Net.Index
     /// other specific instantiations since we want to test some test-only impls
     /// like Asserting, as well as make it easy to write a codec and pass -Dtests.codec
     /// </summary>
-    [TestFixture]
     public class TestTermVectorsFormat : BaseTermVectorsFormatTestCase
     {
         protected override Codec Codec

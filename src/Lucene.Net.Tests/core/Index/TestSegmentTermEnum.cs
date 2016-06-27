@@ -31,20 +31,16 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestSegmentTermEnum : LuceneTestCase
     {
         internal Directory Dir;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSegmentTermEnum() : base()
         {
-            
             Dir = NewDirectory();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
             base.Dispose();

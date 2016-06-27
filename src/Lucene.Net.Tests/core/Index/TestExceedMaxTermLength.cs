@@ -36,7 +36,6 @@ namespace Lucene.Net.Index
     /// too large
     /// </summary>
     /// <seealso cref= IndexWriter#MAX_TERM_LENGTH </seealso>
-    [TestFixture]
     public class TestExceedMaxTermLength : LuceneTestCase
     {
         private static readonly int MinTestTermLength = IndexWriter.MAX_TERM_LENGTH + 1;
@@ -44,14 +43,12 @@ namespace Lucene.Net.Index
 
         internal Directory Dir = null;
 
-        [SetUp]
-        public virtual void CreateDir()
+        public TestExceedMaxTermLength() : base()
         {
             Dir = NewDirectory();
         }
 
-        [TearDown]
-        public virtual void DestroyDir()
+        public override void Dispose()
         {
             Dir.Dispose();
             Dir = null;

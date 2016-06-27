@@ -39,7 +39,6 @@ namespace Lucene.Net.Store
     /// JUnit testcase to test RAMDirectory. RAMDirectory itself is used in many testcases,
     /// but not one of them uses an different constructor other than the default constructor.
     /// </summary>
-    [TestFixture]
     public class TestRAMDirectory : LuceneTestCase
     {
         private DirectoryInfo IndexDir = null;
@@ -48,10 +47,8 @@ namespace Lucene.Net.Store
         private readonly int DocsToAdd = 500;
 
         // setup the index
-        [SetUp]
-        public override void SetUp()
+        public TestRAMDirectory() : base()
         {
-            
             //IndexDir = CreateTempDir("RAMDirIndex");
             string tempDir = Path.GetTempPath();
             if (tempDir == null)
@@ -171,8 +168,7 @@ namespace Lucene.Net.Store
             }
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             // cleanup
             if (IndexDir != null && IndexDir.Exists)

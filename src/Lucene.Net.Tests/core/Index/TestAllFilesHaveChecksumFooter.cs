@@ -38,7 +38,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Test that a plain default puts CRC32 footers in all files.
     /// </summary>
-    [TestFixture]
     public class TestAllFilesHaveChecksumFooter : LuceneTestCase
     {
         [Fact]

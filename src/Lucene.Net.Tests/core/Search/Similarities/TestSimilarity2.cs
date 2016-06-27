@@ -38,15 +38,12 @@ namespace Lucene.Net.Search.Similarities
     /// <summary>
     /// Tests against all the similarities we have
     /// </summary>
-    [TestFixture]
     public class TestSimilarity2 : LuceneTestCase
     {
         internal IList<Similarity> Sims;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSimilarity2() : base()
         {
-            
             Sims = new List<Similarity>();
             Sims.Add(new DefaultSimilarity());
             Sims.Add(new BM25Similarity());

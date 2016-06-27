@@ -544,6 +544,7 @@ namespace Lucene.Net.Util
 
         //[Test, Timeout(0)]
         [Fact]
+        [Trait("Category", "Unstable-HasTimeout")]
         public static void TestStress()
         {
             int atLeast = 1000000;

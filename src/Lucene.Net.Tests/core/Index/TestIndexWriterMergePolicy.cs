@@ -285,24 +285,20 @@ namespace Lucene.Net.Index
 
         private void AssertSetters(MergePolicy lmp)
         {
+            var expected = 2.0;
+            var expected2 = long.MaxValue / 1024 / 1024.0;
+            var delta = EPSILON * long.MaxValue;
+
             lmp.MaxCFSSegmentSizeMB = 2.0;
-            Assert.Equal(2.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON);
+            assertEquals(expected, lmp.MaxCFSSegmentSizeMB, EPSILON);
 
             lmp.MaxCFSSegmentSizeMB = double.PositiveInfinity;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON * long.MaxValue);
+            assertEquals(expected2, lmp.MaxCFSSegmentSizeMB, delta);
 
             lmp.MaxCFSSegmentSizeMB = long.MaxValue / 1024 / 1024.0;
-            Assert.Equal(long.MaxValue / 1024 / 1024.0, lmp.MaxCFSSegmentSizeMB); //, EPSILON * long.MaxValue);
+            assertEquals(expected2, lmp.MaxCFSSegmentSizeMB, delta);
 
-            try
-            {
-                lmp.MaxCFSSegmentSizeMB = -2.0;
-                Assert.True(false, "Didn't throw IllegalArgumentException");
-            }
-            catch (System.ArgumentException)
-            {
-                // pass
-            }
+            Assert.Throws<System.ArgumentException>(() => lmp.MaxCFSSegmentSizeMB = -2.0);
 
             // TODO: Add more checks for other non-double setters!
         }

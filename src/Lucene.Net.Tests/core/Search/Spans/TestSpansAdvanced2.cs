@@ -36,7 +36,6 @@ namespace Lucene.Net.Search.Spans
     /// functionality.
     ///
     /// </summary>
-    [TestFixture]
     public class TestSpansAdvanced2 : TestSpansAdvanced
     {
         internal IndexSearcher Searcher2;
@@ -45,11 +44,8 @@ namespace Lucene.Net.Search.Spans
         /// <summary>
         /// Initializes the tests by adding documents to the index.
         /// </summary>
-        [SetUp]
-        public override void SetUp()
+        public TestSpansAdvanced2() : base()
         {
-            
-
             // create test index
             RandomIndexWriter writer = new RandomIndexWriter(Random(), MDirectory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET)).SetOpenMode(OpenMode.APPEND).SetMergePolicy(NewLogMergePolicy()).SetSimilarity(new DefaultSimilarity()));
             AddDocument(writer, "A", "Should we, could we, would we?");
@@ -64,8 +60,7 @@ namespace Lucene.Net.Search.Spans
             Searcher2.Similarity = new DefaultSimilarity();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader2.Dispose();
             base.Dispose();

@@ -486,7 +486,7 @@ namespace Lucene.Net.Index
             Assert.Equal(parallelHits.Length, singleHits.Length);
             for (int i = 0; i < parallelHits.Length; i++)
             {
-                Assert.Equal(parallelHits[i].Score, singleHits[i].Score); //, 0.001f);
+                assertEquals(parallelHits[i].Score, singleHits[i].Score, 0.001f);
                 Document docParallel = Parallel_Renamed.Doc(parallelHits[i].Doc);
                 Document docSingle = Single_Renamed.Doc(singleHits[i].Doc);
                 Assert.Equal(docParallel.Get("f1"), docSingle.Get("f1"));

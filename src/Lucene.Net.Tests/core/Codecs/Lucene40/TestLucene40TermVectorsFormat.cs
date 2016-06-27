@@ -1,6 +1,7 @@
 namespace Lucene.Net.Codecs.Lucene40
 {
-    
+    using Tests.Codecs;
+    using Xunit;
 
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
@@ -21,12 +22,13 @@ namespace Lucene.Net.Codecs.Lucene40
 
     using BaseTermVectorsFormatTestCase = Lucene.Net.Index.BaseTermVectorsFormatTestCase;
 
-    public class TestLucene40TermVectorsFormat : BaseTermVectorsFormatTestCase
+    public class TestLucene40TermVectorsFormat : BaseTermVectorsFormatTestCase, IClassFixture<OldFormatCodecFixture>
     {
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        private readonly OldFormatCodecFixture _fixture;
+
+        public TestLucene40TermVectorsFormat(OldFormatCodecFixture fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixture = fixture;
         }
 
         protected override Codec Codec

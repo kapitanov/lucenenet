@@ -30,7 +30,6 @@ namespace Lucene.Net.Index
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
 
-    [TestFixture]
     public class TestAtomicUpdate : LuceneTestCase
     {
         private abstract class TimedThread : ThreadClass

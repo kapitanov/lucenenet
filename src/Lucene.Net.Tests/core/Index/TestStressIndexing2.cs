@@ -80,8 +80,7 @@ namespace Lucene.Net.Index
             dir.Dispose();
         }
 
-        [Ignore("Ignored test")]
-        [Fact]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestRandom()
         {
             Directory dir1 = NewDirectory();
@@ -653,7 +652,7 @@ namespace Lucene.Net.Index
                     Assert.Equal(termsEnum1.DocFreq(), termsEnum2.DocFreq());
                 }
 
-                Assert.Equal(term1, term2, "len1=" + len1 + " len2=" + len2 + " deletes?=" + hasDeletes);
+                Assert.Equal(term1, term2); //, "len1=" + len1 + " len2=" + len2 + " deletes?=" + hasDeletes);
 
                 // sort info2 to get it into ascending docid
                 Array.Sort(info2, 0, len2);
@@ -661,7 +660,7 @@ namespace Lucene.Net.Index
                 // now compare
                 for (int i = 0; i < len1; i++)
                 {
-                    Assert.Equal(info1[i], info2[i], "i=" + i + " len=" + len1 + " d1=" + ((long)((ulong)info1[i] >> 32)) + " f1=" + (info1[i] & int.MaxValue) + " d2=" + ((long)((ulong)info2[i] >> 32)) + " f2=" + (info2[i] & int.MaxValue) + " field=" + field1 + " term=" + term1.Utf8ToString());
+                    Assert.Equal(info1[i], info2[i]); //, "i=" + i + " len=" + len1 + " d1=" + ((long)((ulong)info1[i] >> 32)) + " f1=" + (info1[i] & int.MaxValue) + " d2=" + ((long)((ulong)info2[i] >> 32)) + " f2=" + (info2[i] & int.MaxValue) + " field=" + field1 + " term=" + term1.Utf8ToString());
                 }
             }
         }
@@ -674,7 +673,7 @@ namespace Lucene.Net.Index
             ff1.Sort(fieldNameComparator);
             ff2.Sort(fieldNameComparator);
 
-            Assert.Equal(ff1.Count, ff2.Count, ff1 + " : " + ff2);
+            Assert.Equal(ff1.Count, ff2.Count); //, ff1 + " : " + ff2);
 
             for (int i = 0; i < ff1.Count; i++)
             {
@@ -688,7 +687,7 @@ namespace Lucene.Net.Index
                 {
                     string s1 = f1.StringValue;
                     string s2 = f2.StringValue;
-                    Assert.Equal(s1, s2, ff1 + " : " + ff2);
+                    Assert.Equal(s1, s2); //, ff1 + " : " + ff2);
                 }
             }
         }

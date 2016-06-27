@@ -214,6 +214,7 @@ namespace Lucene.Net.Index
 
         //[Test, Timeout(300000)]
         [Fact]
+        [Trait("Category", "Unstable-HasTimeout")]
         public virtual void TestNoExtraFiles()
         {
             Directory directory = NewDirectory();
@@ -246,6 +247,8 @@ namespace Lucene.Net.Index
         }
 
         //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
+        [Fact]
         public virtual void TestNoWaitClose()
         {
             Directory directory = NewDirectory();
@@ -408,6 +411,8 @@ namespace Lucene.Net.Index
         }
 
         //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
+        [Fact]
         public virtual void TestTotalBytesSize()
         {
             Directory d = NewDirectory();

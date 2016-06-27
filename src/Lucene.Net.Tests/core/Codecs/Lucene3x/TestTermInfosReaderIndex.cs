@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Lucene.Net.Support;
 using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene3x
 {
-    using Lucene.Net.Support;
-    
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
@@ -51,37 +50,106 @@ namespace Lucene.Net.Codecs.Lucene3x
     using TestUtil = Lucene.Net.Util.TestUtil;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
-    public class TestTermInfosReaderIndex : LuceneTestCase
+    public class TestTermInfosReaderIndex : LuceneTestCase, IClassFixture<TestTermInfosReaderIndexFixture>
     {
-        private static int NUMBER_OF_DOCUMENTS;
-        private static int NUMBER_OF_FIELDS;
-        private static TermInfosReaderIndex Index;
-        private static Directory Directory;
-        private static SegmentTermEnum TermEnum;
-        private static int IndexDivisor;
-        private static int TermIndexInterval;
-        private static IndexReader Reader;
-        private static IList<Term> SampleTerms;
+        private readonly TestTermInfosReaderIndexFixture _fixture;
+
+        public TestTermInfosReaderIndex(TestTermInfosReaderIndexFixture fixture)
+        {
+            _fixture = fixture;
+        }
+
+        [Fact]
+        public virtual void TestSeekEnum()
+        {
+            int indexPosition = 3;
+            SegmentTermEnum clone = (SegmentTermEnum)_fixture.TermEnum.Clone();
+            Term term = FindTermThatWouldBeAtIndex(clone, indexPosition);
+            SegmentTermEnum enumerator = clone;
+            _fixture.Index.SeekEnum(enumerator, indexPosition);
+            Assert.Equal(term, enumerator.Term());
+            clone.Dispose();
+        }
+
+        [Fact]
+        public virtual void TestCompareTo()
+        {
+            var text = Convert.ToString(Random().Next());
+            Term term = new Term("field" + Random().Next(_fixture.NUMBER_OF_FIELDS), text);
+            for (int i = 0; i < _fixture.Index.Length(); i++)
+            {
+                Term t = _fixture.Index.GetTerm(i);
+                int compareTo = term.CompareTo(t);
+                Assert.Equal(compareTo, _fixture.Index.CompareTo(term, i));
+            }
+        }
+
+        [Fact]
+        public virtual void TestRandomSearchPerformance()
+        {
+            IndexSearcher searcher = new IndexSearcher(_fixture.Reader);
+            foreach (Term t in _fixture.SampleTerms)
+            {
+                TermQuery query = new TermQuery(t);
+                TopDocs topDocs = searcher.Search(query, 10);
+                Assert.True(topDocs.TotalHits > 0);
+            }
+        }
+
+        private Term FindTermThatWouldBeAtIndex(SegmentTermEnum termEnum, int index)
+        {
+            int termPosition = index * _fixture.TermIndexInterval * _fixture.IndexDivisor;
+            for (int i = 0; i < termPosition; i++)
+            {
+                // TODO: this test just uses random terms, so this is always possible
+                AssumeTrue("ran out of terms", termEnum.Next());
+            }
+            Term term = termEnum.Term();
+            // An indexed term is only written when the term after
+            // it exists, so, if the number of terms is 0 mod
+            // termIndexInterval, the last index term will not be
+            // written; so we require a term after this term
+            // as well:
+            AssumeTrue("ran out of terms", termEnum.Next());
+            return term;
+        }
+    }
+
+    public class TestTermInfosReaderIndexFixture : IDisposable
+    {
+        private readonly Random _random;
+
+        internal readonly int NUMBER_OF_DOCUMENTS;
+        internal readonly int NUMBER_OF_FIELDS;
+
+        internal TermInfosReaderIndex Index { get; private set; }
+        internal Directory Directory { get; private set; }
+        internal SegmentTermEnum TermEnum { get; private set; }
+        internal int IndexDivisor { get; private set; }
+        internal int TermIndexInterval { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal IList<Term> SampleTerms { get; private set; }
 
         /// <summary>
         /// we will manually instantiate preflex-rw here </summary>
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestTermInfosReaderIndexFixture()
         {
+            _random = LuceneTestCase.Random();
+
             // NOTE: turn off compound file, this test will open some index files directly.
             LuceneTestCase.OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true;
-            IndexWriterConfig config = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random(), MockTokenizer.KEYWORD, false)).SetUseCompoundFile(false);
+
+            IndexWriterConfig config = LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(_random, MockTokenizer.KEYWORD, false)).SetUseCompoundFile(false);
 
             TermIndexInterval = config.TermIndexInterval;
-            IndexDivisor = TestUtil.NextInt(Random(), 1, 10);
-            NUMBER_OF_DOCUMENTS = AtLeast(100);
-            NUMBER_OF_FIELDS = AtLeast(Math.Max(10, 3 * TermIndexInterval * IndexDivisor / NUMBER_OF_DOCUMENTS));
+            IndexDivisor = TestUtil.NextInt(_random, 1, 10);
+            NUMBER_OF_DOCUMENTS = LuceneTestCase.AtLeast(100);
+            NUMBER_OF_FIELDS = LuceneTestCase.AtLeast(Math.Max(10, 3 * TermIndexInterval * IndexDivisor / NUMBER_OF_DOCUMENTS));
 
-            Directory = NewDirectory();
+            Directory = LuceneTestCase.NewDirectory();
 
             config.SetCodec(new PreFlexRWCodec());
-            LogMergePolicy mp = NewLogMergePolicy();
+            LogMergePolicy mp = LuceneTestCase.NewLogMergePolicy();
             // NOTE: turn off compound file, this test will open some index files directly.
             mp.NoCFSRatio = 0.0;
             config.SetMergePolicy(mp);
@@ -97,8 +165,8 @@ namespace Lucene.Net.Codecs.Lucene3x
             FieldInfos fieldInfos = infosReader.Read(Directory, segment, "", IOContext.READONCE);
             string segmentFileName = IndexFileNames.SegmentFileName(segment, "", Lucene3xPostingsFormat.TERMS_INDEX_EXTENSION);
             long tiiFileLength = Directory.FileLength(segmentFileName);
-            IndexInput input = Directory.OpenInput(segmentFileName, NewIOContext(Random()));
-            TermEnum = new SegmentTermEnum(Directory.OpenInput(IndexFileNames.SegmentFileName(segment, "", Lucene3xPostingsFormat.TERMS_EXTENSION), NewIOContext(Random())), fieldInfos, false);
+            IndexInput input = Directory.OpenInput(segmentFileName, LuceneTestCase.NewIOContext(_random));
+            TermEnum = new SegmentTermEnum(Directory.OpenInput(IndexFileNames.SegmentFileName(segment, "", Lucene3xPostingsFormat.TERMS_EXTENSION), LuceneTestCase.NewIOContext(_random)), fieldInfos, false);
             int totalIndexInterval = TermEnum.IndexInterval * IndexDivisor;
 
             SegmentTermEnum indexEnum = new SegmentTermEnum(input, fieldInfos, true);
@@ -107,56 +175,7 @@ namespace Lucene.Net.Codecs.Lucene3x
             input.Dispose();
 
             Reader = IndexReader.Open(Directory);
-            SampleTerms = Sample(Random(), Reader, 1000);
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            TermEnum.Dispose();
-            Reader.Dispose();
-            Directory.Dispose();
-            TermEnum = null;
-            Reader = null;
-            Directory = null;
-            Index = null;
-            SampleTerms = null;
-        }
-
-        [Fact]
-        public virtual void TestSeekEnum()
-        {
-            int indexPosition = 3;
-            SegmentTermEnum clone = (SegmentTermEnum)TermEnum.Clone();
-            Term term = FindTermThatWouldBeAtIndex(clone, indexPosition);
-            SegmentTermEnum enumerator = clone;
-            Index.SeekEnum(enumerator, indexPosition);
-            Assert.Equal(term, enumerator.Term());
-            clone.Dispose();
-        }
-
-        [Fact]
-        public virtual void TestCompareTo()
-        {
-            Term term = new Term("field" + Random().Next(NUMBER_OF_FIELDS), Text);
-            for (int i = 0; i < Index.Length(); i++)
-            {
-                Term t = Index.GetTerm(i);
-                int compareTo = term.CompareTo(t);
-                Assert.Equal(compareTo, Index.CompareTo(term, i));
-            }
-        }
-
-        [Fact]
-        public virtual void TestRandomSearchPerformance()
-        {
-            IndexSearcher searcher = new IndexSearcher(Reader);
-            foreach (Term t in SampleTerms)
-            {
-                TermQuery query = new TermQuery(t);
-                TopDocs topDocs = searcher.Search(query, 10);
-                Assert.True(topDocs.TotalHits > 0);
-            }
+            SampleTerms = Sample(_random, Reader, 1000);
         }
 
         private static IList<Term> Sample(Random random, IndexReader reader, int size)
@@ -185,33 +204,16 @@ namespace Lucene.Net.Codecs.Lucene3x
             return sample;
         }
 
-        private Term FindTermThatWouldBeAtIndex(SegmentTermEnum termEnum, int index)
+        private void Populate(Directory directory, IndexWriterConfig config)
         {
-            int termPosition = index * TermIndexInterval * IndexDivisor;
-            for (int i = 0; i < termPosition; i++)
-            {
-                // TODO: this test just uses random terms, so this is always possible
-                AssumeTrue("ran out of terms", termEnum.Next());
-            }
-            Term term = termEnum.Term();
-            // An indexed term is only written when the term after
-            // it exists, so, if the number of terms is 0 mod
-            // termIndexInterval, the last index term will not be
-            // written; so we require a term after this term
-            // as well:
-            AssumeTrue("ran out of terms", termEnum.Next());
-            return term;
-        }
-
-        private static void Populate(Directory directory, IndexWriterConfig config)
-        {
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), directory, config);
+            RandomIndexWriter writer = new RandomIndexWriter(_random, directory, config);
             for (int i = 0; i < NUMBER_OF_DOCUMENTS; i++)
             {
                 Document document = new Document();
                 for (int f = 0; f < NUMBER_OF_FIELDS; f++)
                 {
-                    document.Add(NewStringField("field" + f, Text, Field.Store.NO));
+                    var text = Convert.ToString(_random.Next());
+                    document.Add(LuceneTestCase.NewStringField("field" + f, text, Field.Store.NO));
                 }
                 writer.AddDocument(document);
             }
@@ -219,12 +221,18 @@ namespace Lucene.Net.Codecs.Lucene3x
             writer.Dispose();
         }
 
-        private static string Text
+        public void Dispose()
         {
-            get
-            {
-                return Convert.ToString(Random().Next());
-            }
+            LuceneTestCase.OLD_FORMAT_IMPERSONATION_IS_ACTIVE = false;
+
+            TermEnum.Dispose();
+            Reader.Dispose();
+            Directory.Dispose();
+            TermEnum = null;
+            Reader = null;
+            Directory = null;
+            Index = null;
+            SampleTerms = null;
         }
     }
 }

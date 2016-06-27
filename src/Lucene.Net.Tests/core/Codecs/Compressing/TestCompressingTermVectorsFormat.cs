@@ -3,7 +3,6 @@ using Xunit;
 
 namespace Lucene.Net.Codecs.Compressing
 {
-    
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using BaseTermVectorsFormatTestCase = Lucene.Net.Index.BaseTermVectorsFormatTestCase;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -35,7 +34,6 @@ namespace Lucene.Net.Codecs.Compressing
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestCompressingTermVectorsFormat : BaseTermVectorsFormatTestCase
     {
         protected override Codec Codec

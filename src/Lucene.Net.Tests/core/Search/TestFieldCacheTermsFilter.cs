@@ -58,18 +58,18 @@ namespace Lucene.Net.Search
             List<string> terms = new List<string>();
             terms.Add("5");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.Equal(0, results.Length, "Must match nothing");
+            Assert.Equal(0, results.Length);
 
             terms = new List<string>();
             terms.Add("10");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.Equal(1, results.Length, "Must match 1");
+            Assert.Equal(1, results.Length);
 
             terms = new List<string>();
             terms.Add("10");
             terms.Add("20");
             results = searcher.Search(q, new FieldCacheTermsFilter(fieldName, terms.ToArray()), numDocs).ScoreDocs;
-            Assert.Equal(2, results.Length, "Must match 2");
+            Assert.Equal(2, results.Length);
 
             reader.Dispose();
             rd.Dispose();

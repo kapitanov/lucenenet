@@ -36,7 +36,6 @@ namespace Lucene.Net.Index
 
     /// <summary>
     /// Tests MultiDocValues versus ordinary segment merging </summary>
-    [TestFixture]
     public class TestMultiDocValues : LuceneTestCase
     {
         [Fact]

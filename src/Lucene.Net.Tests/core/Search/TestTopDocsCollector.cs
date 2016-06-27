@@ -26,7 +26,6 @@ namespace Lucene.Net.Search
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
 
-    [TestFixture]
     public class TestTopDocsCollector : LuceneTestCase
     {
         private sealed class MyTopsDocCollector : TopDocsCollector<ScoreDoc>
@@ -109,11 +108,8 @@ namespace Lucene.Net.Search
             return tdc;
         }
 
-        [SetUp]
-        public override void SetUp()
+        public TestTopDocsCollector() : base()
         {
-            
-
             // populate an index with 30 documents, this should be enough for the test.
             // The documents have no content - the test uses MatchAllDocsQuery().
             Dir = NewDirectory();
@@ -126,8 +122,7 @@ namespace Lucene.Net.Search
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
@@ -212,12 +207,12 @@ namespace Lucene.Net.Search
             // ask for all results
             TopDocsCollector<ScoreDoc> tdc = DoSearch(15);
             TopDocs td = tdc.TopDocs();
-            Assert.Equal(MAX_SCORE, td.MaxScore, 0f);
+            assertEquals(MAX_SCORE, td.MaxScore, 0f);
 
             // ask for 5 last results
             tdc = DoSearch(15);
             td = tdc.TopDocs(10);
-            Assert.Equal(MAX_SCORE, td.MaxScore, 0f);
+            assertEquals(MAX_SCORE, td.MaxScore, 0f);
         }
 
         // this does not test the PQ's correctness, but whether topDocs()
@@ -228,7 +223,7 @@ namespace Lucene.Net.Search
             TopDocsCollector<ScoreDoc> tdc = DoSearch(15);
             ScoreDoc[] sd = tdc.TopDocs().ScoreDocs;
 
-            Assert.Equal(MAX_SCORE, sd[0].Score, 0f);
+            assertEquals(MAX_SCORE, sd[0].Score, 0f);
             for (int i = 1; i < sd.Length; i++)
             {
                 Assert.True(sd[i - 1].Score >= sd[i].Score);

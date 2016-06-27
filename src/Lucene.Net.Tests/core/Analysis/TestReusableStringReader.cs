@@ -1,8 +1,8 @@
 using System.Text;
+using Xunit;
 
 namespace Lucene.Net.Analysis
 {
-    using Xunit;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
     /*
@@ -22,7 +22,6 @@ namespace Lucene.Net.Analysis
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestReusableStringReader : LuceneTestCase
     {
         [Fact]

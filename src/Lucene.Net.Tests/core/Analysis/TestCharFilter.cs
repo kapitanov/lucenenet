@@ -1,10 +1,8 @@
+using System.IO;
 using Xunit;
 
 namespace Lucene.Net.Analysis
 {
-    
-    using System.IO;
-
     /*
              * Licensed to the Apache Software Foundation (ASF) under one or more
              * contributor license agreements.  See the NOTICE file distributed with
@@ -24,35 +22,34 @@ namespace Lucene.Net.Analysis
 
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestCharFilter : LuceneTestCase
     {
         [Fact]
         public virtual void TestCharFilter1()
         {
             CharFilter cs = new CharFilter1(new StringReader(""));
-            Assert.Equal(1, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(1, cs.CorrectOffset(0)); // , "corrected offset is invalid");
         }
 
         [Fact]
         public virtual void TestCharFilter2()
         {
             CharFilter cs = new CharFilter2(new StringReader(""));
-            Assert.Equal(2, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(2, cs.CorrectOffset(0)); //, "corrected offset is invalid");
         }
 
         [Fact]
         public virtual void TestCharFilter12()
         {
             CharFilter cs = new CharFilter2(new CharFilter1(new StringReader("")));
-            Assert.Equal(3, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(3, cs.CorrectOffset(0)); //, "corrected offset is invalid");
         }
 
         [Fact]
         public virtual void TestCharFilter11()
         {
             CharFilter cs = new CharFilter1(new CharFilter1(new StringReader("")));
-            Assert.Equal(2, cs.CorrectOffset(0), "corrected offset is invalid");
+            Assert.Equal(2, cs.CorrectOffset(0)); //, "corrected offset is invalid");
         }
 
         internal class CharFilter1 : CharFilter

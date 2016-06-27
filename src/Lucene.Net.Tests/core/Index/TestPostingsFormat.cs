@@ -27,6 +27,10 @@ namespace Lucene.Net.Index
     /// </summary>
     public class TestPostingsFormat : BasePostingsFormatTestCase
     {
+        public TestPostingsFormat(BasePostingsFormatTestCaseFixture fixture) : base(fixture)
+        {
+        }
+
         protected override Codec Codec
         {
             get

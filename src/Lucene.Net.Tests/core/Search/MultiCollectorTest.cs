@@ -20,7 +20,6 @@ namespace Lucene.Net.Search
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class MultiCollectorTest : LuceneTestCase
     {
         private class DummyCollector : Collector

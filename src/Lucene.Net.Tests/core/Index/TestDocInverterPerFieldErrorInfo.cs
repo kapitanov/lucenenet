@@ -37,7 +37,6 @@ namespace Lucene.Net.Index
     /// <summary>
     /// Test adding to the info stream when there's an exception thrown during field analysis.
     /// </summary>
-    [TestFixture]
     public class TestDocInverterPerFieldErrorInfo : LuceneTestCase
     {
         private static readonly FieldType StoredTextType = new FieldType(TextField.TYPE_NOT_STORED);

@@ -40,8 +40,7 @@ namespace Lucene.Net.Util.Automaton
 
         /// <summary>
         /// test against a simple, unoptimized det </summary>
-        [Ignore("Ignored test")]
-        [Fact]
+        [Fact(Skip = "Ignored test")]
         public virtual void TestAgainstSimple()
         {
             int num = AtLeast(200);

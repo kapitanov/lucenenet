@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -47,86 +48,18 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// tests BooleanScorer2's minShouldMatch </summary>
-    [TestFixture]
-    public class TestMinShouldMatch2 : LuceneTestCase
+    public class TestMinShouldMatch2 : LuceneTestCase, IClassFixture<TestMinShouldMatch2Fixture>
     {
-        internal static Directory Dir;
-        internal static DirectoryReader r;
-        internal static AtomicReader atomicReader;
-        internal static IndexSearcher Searcher;
+        private readonly TestMinShouldMatch2Fixture _fixture;
 
         internal static readonly string[] AlwaysTerms = new string[] { "a" };
         internal static readonly string[] CommonTerms = new string[] { "b", "c", "d" };
         internal static readonly string[] MediumTerms = new string[] { "e", "f", "g" };
         internal static readonly string[] RareTerms = new string[] { "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z" };
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestMinShouldMatch2(TestMinShouldMatch2Fixture fixture)
         {
-            Dir = NewDirectory();
-            RandomIndexWriter iw = new RandomIndexWriter(Random(), Dir);
-            int numDocs = AtLeast(300);
-            for (int i = 0; i < numDocs; i++)
-            {
-                Document doc = new Document();
-
-                AddSome(doc, AlwaysTerms);
-
-                if (Random().Next(100) < 90)
-                {
-                    AddSome(doc, CommonTerms);
-                }
-                if (Random().Next(100) < 50)
-                {
-                    AddSome(doc, MediumTerms);
-                }
-                if (Random().Next(100) < 10)
-                {
-                    AddSome(doc, RareTerms);
-                }
-                iw.AddDocument(doc);
-            }
-            iw.ForceMerge(1);
-            iw.Dispose();
-            r = DirectoryReader.Open(Dir);
-            atomicReader = GetOnlySegmentReader(r);
-            Searcher = new IndexSearcher(atomicReader);
-            Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper();
-        }
-
-        private class DefaultSimilarityAnonymousInnerClassHelper : DefaultSimilarity
-        {
-            public DefaultSimilarityAnonymousInnerClassHelper()
-            {
-            }
-
-            public override float QueryNorm(float sumOfSquaredWeights)
-            {
-                return 1; // we disable queryNorm, both for debugging and ease of impl
-            }
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            atomicReader.Dispose();
-            Dir.Dispose();
-            Searcher = null;
-            atomicReader = null;
-            r = null;
-            Dir = null;
-        }
-
-        private static void AddSome(Document doc, string[] values)
-        {
-            IList<string> list = Arrays.AsList(values);
-            list = CollectionsHelper.Shuffle(list);
-            int howMany = TestUtil.NextInt(Random(), 1, list.Count);
-            for (int i = 0; i < howMany; i++)
-            {
-                doc.Add(new StringField("field", list[i], Field.Store.NO));
-                doc.Add(new SortedSetDocValuesField("dv", new BytesRef(list[i])));
-            }
+            _fixture = fixture;
         }
 
         private Scorer Scorer(string[] values, int minShouldMatch, bool slow)
@@ -138,15 +71,15 @@ namespace Lucene.Net.Search
             }
             bq.MinimumNumberShouldMatch = minShouldMatch;
 
-            BooleanWeight weight = (BooleanWeight)Searcher.CreateNormalizedWeight(bq);
+            BooleanWeight weight = (BooleanWeight)_fixture.Searcher.CreateNormalizedWeight(bq);
 
             if (slow)
             {
-                return new SlowMinShouldMatchScorer(weight, atomicReader, Searcher);
+                return new SlowMinShouldMatchScorer(weight, _fixture.atomicReader, _fixture.Searcher);
             }
             else
             {
-                return weight.Scorer((AtomicReaderContext)atomicReader.Context, null);
+                return weight.Scorer((AtomicReaderContext)_fixture.atomicReader.Context, null);
             }
         }
 
@@ -164,7 +97,7 @@ namespace Lucene.Net.Search
                 Assert.Equal(expected.Freq(), actual.Freq());
                 float expectedScore = expected.Score();
                 float actualScore = actual.Score();
-                Assert.Equal(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
+                assertEquals(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
             }
             Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, actual.NextDoc());
         }
@@ -184,7 +117,7 @@ namespace Lucene.Net.Search
                 Assert.Equal(expected.Freq(), actual.Freq());
                 float expectedScore = expected.Score();
                 float actualScore = actual.Score();
-                Assert.Equal(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
+                assertEquals(expectedScore, actualScore, CheckHits.ExplainToleranceDelta(expectedScore, actualScore));
                 prevDoc = doc;
             }
             Assert.Equal(DocIdSetIterator.NO_MORE_DOCS, actual.Advance(prevDoc + amount));
@@ -420,6 +353,84 @@ namespace Lucene.Net.Search
             public override long Cost()
             {
                 return MaxDoc;
+            }
+        }
+    }
+
+    public class TestMinShouldMatch2Fixture : IDisposable
+    {
+        private readonly Random _random;
+
+        internal Directory Dir { get; private set; }
+        internal DirectoryReader r { get; private set; }
+        internal AtomicReader atomicReader { get; private set; }
+        internal IndexSearcher Searcher { get; private set; }
+
+        public TestMinShouldMatch2Fixture()
+        {
+            _random = LuceneTestCase.Random();
+            Dir = LuceneTestCase.NewDirectory();
+            RandomIndexWriter iw = new RandomIndexWriter(_random, Dir);
+            int numDocs = LuceneTestCase.AtLeast(300);
+            for (int i = 0; i < numDocs; i++)
+            {
+                Document doc = new Document();
+
+                AddSome(doc, TestMinShouldMatch2.AlwaysTerms);
+
+                if (_random.Next(100) < 90)
+                {
+                    AddSome(doc, TestMinShouldMatch2.CommonTerms);
+                }
+                if (_random.Next(100) < 50)
+                {
+                    AddSome(doc, TestMinShouldMatch2.MediumTerms);
+                }
+                if (_random.Next(100) < 10)
+                {
+                    AddSome(doc, TestMinShouldMatch2.RareTerms);
+                }
+                iw.AddDocument(doc);
+            }
+            iw.ForceMerge(1);
+            iw.Dispose();
+            r = DirectoryReader.Open(Dir);
+            atomicReader = LuceneTestCase.GetOnlySegmentReader(r);
+            Searcher = new IndexSearcher(atomicReader);
+            Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper();
+        }
+
+        private void AddSome(Document doc, string[] values)
+        {
+            IList<string> list = Arrays.AsList(values);
+            list = CollectionsHelper.Shuffle(list);
+            int howMany = TestUtil.NextInt(_random, 1, list.Count);
+            for (int i = 0; i < howMany; i++)
+            {
+                doc.Add(new StringField("field", list[i], Field.Store.NO));
+                doc.Add(new SortedSetDocValuesField("dv", new BytesRef(list[i])));
+            }
+        }
+
+        public void Dispose()
+        {
+            atomicReader.Dispose();
+            Dir.Dispose();
+            Searcher = null;
+            atomicReader = null;
+            r = null;
+            Dir = null;
+        }
+
+        private class DefaultSimilarityAnonymousInnerClassHelper : DefaultSimilarity
+        {
+            public DefaultSimilarityAnonymousInnerClassHelper()
+            {
+            }
+
+            public override float QueryNorm(float sumOfSquaredWeights)
+            {
+                return 1; // we disable queryNorm, both for debugging and ease of impl
             }
         }
     }

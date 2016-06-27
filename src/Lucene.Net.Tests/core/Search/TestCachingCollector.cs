@@ -22,7 +22,6 @@ namespace Lucene.Net.Search
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
-    [TestFixture]
     public class TestCachingCollector : LuceneTestCase
     {
         private const double ONE_BYTE = 1.0 / (1024 * 1024); // 1 byte out of MB

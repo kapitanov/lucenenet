@@ -1,7 +1,7 @@
 using Lucene.Net.Documents;
-
 using System;
 using System.Collections.Generic;
+using Xunit;
 
 namespace Lucene.Net.Search
 {

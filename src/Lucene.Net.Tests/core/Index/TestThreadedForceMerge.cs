@@ -35,7 +35,6 @@ namespace Lucene.Net.Index
     using OpenMode_e = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using StringField = StringField;
 
-    [TestFixture]
     public class TestThreadedForceMerge : LuceneTestCase
     {
         private static Analyzer ANALYZER;
@@ -49,8 +48,7 @@ namespace Lucene.Net.Index
 
         private volatile bool Failed;
 
-        [SetUp]
-        public static void Setup()
+        public TestThreadedForceMerge() : base()
         {
             ANALYZER = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
         }
@@ -106,14 +104,14 @@ namespace Lucene.Net.Index
 
                 int expectedDocCount = (int)((1 + iter) * (200 + 8 * NUM_ITER2 * (NUM_THREADS / 2.0) * (1 + NUM_THREADS)));
 
-                Assert.Equal(expectedDocCount, writer.NumDocs(), "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
-                Assert.Equal(expectedDocCount, writer.MaxDoc, "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
+                Assert.Equal(expectedDocCount, writer.NumDocs()); //, "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
+                Assert.Equal(expectedDocCount, writer.MaxDoc); //, "index=" + writer.SegString() + " numDocs=" + writer.NumDocs() + " maxDoc=" + writer.MaxDoc + " config=" + writer.Config);
 
                 writer.Dispose();
                 writer = new IndexWriter(directory, (IndexWriterConfig)NewIndexWriterConfig(TEST_VERSION_CURRENT, ANALYZER).SetOpenMode(OpenMode_e.APPEND).SetMaxBufferedDocs(2));
 
                 DirectoryReader reader = DirectoryReader.Open(directory);
-                Assert.Equal(1, reader.Leaves.Count, "reader=" + reader);
+                Assert.Equal(1, reader.Leaves.Count); //, "reader=" + reader);
                 Assert.Equal(expectedDocCount, reader.NumDocs);
                 reader.Dispose();
             }

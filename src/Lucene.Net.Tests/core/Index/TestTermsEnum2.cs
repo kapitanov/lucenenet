@@ -39,7 +39,6 @@ namespace Lucene.Net.Index
     using SeekStatus = Lucene.Net.Index.TermsEnum.SeekStatus;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestTermsEnum2 : LuceneTestCase
     {
         private Directory Dir;
@@ -49,10 +48,8 @@ namespace Lucene.Net.Index
         private Automaton TermsAutomaton; // automata of the same
         internal int NumIterations;
 
-        [SetUp]
-        public override void SetUp()
+        public TestTermsEnum2() : base()
         {
-            
             // we generate aweful regexps: good for testing.
             // but for preflex codec, the test can be very slow, so use less iterations.
             NumIterations = Codec.Default.Name.Equals("Lucene3x") ? 10 * RANDOM_MULTIPLIER : AtLeast(50);
@@ -79,8 +76,7 @@ namespace Lucene.Net.Index
             writer.Dispose();
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();

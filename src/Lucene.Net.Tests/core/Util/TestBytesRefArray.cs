@@ -50,7 +50,7 @@ namespace Lucene.Net.Util
                 for (int i = 0; i < entries; i++)
                 {
                     Assert.NotNull(list.Get(spare, i));
-                    Assert.Equal(stringList[i], spare.Utf8ToString(), "entry " + i + " doesn't match");
+                    Assert.Equal(stringList[i], spare.Utf8ToString()); //, "entry " + i + " doesn't match");
                 }
 
                 // check random
@@ -58,7 +58,7 @@ namespace Lucene.Net.Util
                 {
                     int e = random.Next(entries);
                     Assert.NotNull(list.Get(spare, e));
-                    Assert.Equal(stringList[e], spare.Utf8ToString(), "entry " + i + " doesn't match");
+                    Assert.Equal(stringList[e], spare.Utf8ToString()); //, "entry " + i + " doesn't match");
                 }
                 for (int i = 0; i < 2; i++)
                 {
@@ -101,7 +101,7 @@ namespace Lucene.Net.Util
                 int a = 0;
                 while ((spare = iter.Next()) != null)
                 {
-                    Assert.Equal(stringList[a], spare.Utf8ToString(), "entry " + a + " doesn't match");
+                    Assert.Equal(stringList[a], spare.Utf8ToString()); //, "entry " + a + " doesn't match");
                     a++;
                 }
                 Assert.Null(iter.Next());

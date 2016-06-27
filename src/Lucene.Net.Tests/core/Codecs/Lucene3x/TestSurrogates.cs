@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
+using Lucene.Net.Tests.Codecs;
 using Xunit;
 
 namespace Lucene.Net.Codecs.Lucene3x
@@ -29,16 +30,8 @@ namespace Lucene.Net.Codecs.Lucene3x
     using Lucene.Net.Store;
     using Lucene.Net.Util;
 
-    public class TestSurrogates : LuceneTestCase
+    public class TestSurrogates : LuceneTestCase, IClassFixture<OldFormatCodecFixture>
     {
-        /// <summary>
-        /// we will manually instantiate preflex-rw here </summary>
-        [TestFixtureSetUp]
-        public static void BeforeClass()
-        {
-            LuceneTestCase.OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true;
-        }
-
         private static string MakeDifficultRandomUnicodeString(Random r)
         {
             int end = r.Next(20);
@@ -116,6 +109,7 @@ namespace Lucene.Net.Codecs.Lucene3x
         }
 
         private static readonly SortTermAsUTF16Comparator TermAsUTF16Comparator = new SortTermAsUTF16Comparator();
+        private readonly OldFormatCodecFixture _fixture;
 
         // single straight enum
         private void DoTestStraightEnum(IList<Term> fieldTerms, IndexReader reader, int uniqueTermCount)
@@ -335,7 +329,13 @@ namespace Lucene.Net.Codecs.Lucene3x
             }
         }
 
-        ////[Test, Timeout(300000)]
+        public TestSurrogates(OldFormatCodecFixture fixture) : base()
+        {
+            _fixture = fixture;
+        }
+
+        //[Test, Timeout(300000)]
+        [Trait("Category", "Unstable-HasTimeout")]
         [Fact]
         public virtual void TestSurrogatesOrder()
         {

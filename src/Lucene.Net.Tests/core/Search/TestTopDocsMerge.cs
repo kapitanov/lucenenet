@@ -347,7 +347,7 @@ namespace Lucene.Net.Search
                     for (int hitIDX = 0; hitIDX < mergedHits.ScoreDocs.Length; hitIDX++)
                     {
                         ScoreDoc sd = mergedHits.ScoreDocs[hitIDX];
-                        Assert.Equal(ReaderUtil.SubIndex(sd.Doc, docStarts), sd.ShardIndex, "doc=" + sd.Doc + " wrong shard");
+                        Assert.Equal(ReaderUtil.SubIndex(sd.Doc, docStarts), sd.ShardIndex); //, "doc=" + sd.Doc + " wrong shard");
                     }
                 }
 

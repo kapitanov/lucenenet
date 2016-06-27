@@ -108,7 +108,7 @@ namespace Lucene.Net.Util
                 if (t.Success)
                 {
                     int expectedVal = Convert.ToInt32(t.Name.Substring(2));
-                    Assert.Equal(expectedVal, t.Set.Get(), "thread " + t.Name);
+                    Assert.Equal(expectedVal, t.Set.Get()); //, "thread " + t.Name);
                 }
             }
         }

@@ -1,11 +1,10 @@
 using System;
 using System.Diagnostics;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Lucene.Net.Index;
-    
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -45,29 +44,628 @@ namespace Lucene.Net.Search
     using TestNumericUtils = Lucene.Net.Util.TestNumericUtils; // NaN arrays
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
-    public class TestNumericRangeQuery64 : LuceneTestCase
+    public class TestNumericRangeQuery64 : LuceneTestCase, IClassFixture<TestNumericRangeQuery64Fixture>
+    {
+        private readonly TestNumericRangeQuery64Fixture _fixture;
+
+        public TestNumericRangeQuery64(TestNumericRangeQuery64Fixture fixture) : base()
+        {
+            _fixture = fixture;
+
+            // set the theoretical maximum term count for 8bit (see docs for the number)
+            // super.tearDown will restore the default
+            BooleanQuery.MaxClauseCount = 7 * 255 * 2 + 255;
+        }
+
+        /// <summary>
+        /// test for constant score + boolean query + filter, the other tests only use the constant score mode </summary>
+        private void TestRange(int precisionStep)
+        {
+            string field = "field" + precisionStep;
+            int count = 3000;
+            long lower = (_fixture.Distance * 3 / 2) + _fixture.StartOffset, upper = lower + count * _fixture.Distance + (_fixture.Distance / 3);
+            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
+            NumericRangeFilter<long> f = NumericRangeFilter.NewLongRange(field, precisionStep, lower, upper, true, true);
+            for (sbyte i = 0; i < 3; i++)
+            {
+                TopDocs topDocs;
+                string type;
+                switch (i)
+                {
+                    case 0:
+                        type = " (constant score filter rewrite)";
+                        q.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
+                        topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+                        break;
+
+                    case 1:
+                        type = " (constant score boolean rewrite)";
+                        q.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
+                        topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+                        break;
+
+                    case 2:
+                        type = " (filter)";
+                        topDocs = _fixture.Searcher.Search(new MatchAllDocsQuery(), f, _fixture.NoDocs, Sort.INDEXORDER);
+                        break;
+
+                    default:
+                        return;
+                }
+                ScoreDoc[] sd = topDocs.ScoreDocs;
+                Assert.NotNull(sd);
+                Assert.Equal(count, sd.Length); //, "Score doc count" + type);
+                Document doc = _fixture.Searcher.Doc(sd[0].Doc);
+                Assert.Equal(2 * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "First doc" + type);
+                doc = _fixture.Searcher.Doc(sd[sd.Length - 1].Doc);
+                Assert.Equal((1 + count) * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "Last doc" + type);
+            }
+        }
+
+        [Fact]
+        public virtual void TestRange_8bit()
+        {
+            TestRange(8);
+        }
+
+        [Fact]
+        public virtual void TestRange_6bit()
+        {
+            TestRange(6);
+        }
+
+        [Fact]
+        public virtual void TestRange_4bit()
+        {
+            TestRange(4);
+        }
+
+        [Fact]
+        public virtual void TestRange_2bit()
+        {
+            TestRange(2);
+        }
+
+        [Fact]
+        public virtual void TestInverseRange()
+        {
+            AtomicReaderContext context = (AtomicReaderContext)SlowCompositeReaderWrapper.Wrap(_fixture.Searcher.IndexReader).Context;
+            NumericRangeFilter<long> f = NumericRangeFilter.NewLongRange("field8", 8, 1000L, -1000L, true, true);
+            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs)); //, "A inverse range should return the null instance");
+            f = NumericRangeFilter.NewLongRange("field8", 8, long.MaxValue, null, false, false);
+            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs)); //, "A exclusive range starting with Long.MAX_VALUE should return the null instance");
+            f = NumericRangeFilter.NewLongRange("field8", 8, null, long.MinValue, false, false);
+            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs)); //, "A exclusive range ending with Long.MIN_VALUE should return the null instance");
+        }
+
+        [Fact]
+        public virtual void TestOneMatchQuery()
+        {
+            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange("ascfield8", 8, 1000L, 1000L, true, true);
+            TopDocs topDocs = _fixture.Searcher.Search(q, _fixture.NoDocs);
+            ScoreDoc[] sd = topDocs.ScoreDocs;
+            Assert.NotNull(sd);
+            Assert.Equal(1, sd.Length); //, "Score doc count");
+        }
+
+        private void TestLeftOpenRange(int precisionStep)
+        {
+            string field = "field" + precisionStep;
+            int count = 3000;
+            long upper = (count - 1) * _fixture.Distance + (_fixture.Distance / 3) + _fixture.StartOffset;
+            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, null, upper, true, true);
+            TopDocs topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+            ScoreDoc[] sd = topDocs.ScoreDocs;
+            Assert.NotNull(sd);
+            Assert.Equal(count, sd.Length); //, "Score doc count");
+            Document doc = _fixture.Searcher.Doc(sd[0].Doc);
+            Assert.Equal(_fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "First doc");
+            doc = _fixture.Searcher.Doc(sd[sd.Length - 1].Doc);
+            Assert.Equal((count - 1) * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "Last doc");
+
+            q = NumericRangeQuery.NewLongRange(field, precisionStep, null, upper, false, true);
+            topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+            sd = topDocs.ScoreDocs;
+            Assert.NotNull(sd);
+            Assert.Equal(count, sd.Length); //, "Score doc count");
+            doc = _fixture.Searcher.Doc(sd[0].Doc);
+            Assert.Equal(_fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "First doc");
+            doc = _fixture.Searcher.Doc(sd[sd.Length - 1].Doc);
+            Assert.Equal((count - 1) * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "Last doc");
+        }
+
+        [Fact]
+        public virtual void TestLeftOpenRange_8bit()
+        {
+            TestLeftOpenRange(8);
+        }
+
+        [Fact]
+        public virtual void TestLeftOpenRange_6bit()
+        {
+            TestLeftOpenRange(6);
+        }
+
+        [Fact]
+        public virtual void TestLeftOpenRange_4bit()
+        {
+            TestLeftOpenRange(4);
+        }
+
+        [Fact]
+        public virtual void TestLeftOpenRange_2bit()
+        {
+            TestLeftOpenRange(2);
+        }
+
+        private void TestRightOpenRange(int precisionStep)
+        {
+            string field = "field" + precisionStep;
+            int count = 3000;
+            long lower = (count - 1) * _fixture.Distance + (_fixture.Distance / 3) + _fixture.StartOffset;
+            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, null, true, true);
+            TopDocs topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+            ScoreDoc[] sd = topDocs.ScoreDocs;
+            Assert.NotNull(sd);
+            Assert.Equal(_fixture.NoDocs - count, sd.Length); //, "Score doc count");
+            Document doc = _fixture.Searcher.Doc(sd[0].Doc);
+            Assert.Equal(count * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "First doc");
+            doc = _fixture.Searcher.Doc(sd[sd.Length - 1].Doc);
+            Assert.Equal((_fixture.NoDocs - 1) * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "Last doc");
+
+            q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, null, true, false);
+            topDocs = _fixture.Searcher.Search(q, null, _fixture.NoDocs, Sort.INDEXORDER);
+            sd = topDocs.ScoreDocs;
+            Assert.NotNull(sd);
+            Assert.Equal(_fixture.NoDocs - count, sd.Length); //, "Score doc count");
+            doc = _fixture.Searcher.Doc(sd[0].Doc);
+            Assert.Equal(count * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "First doc");
+            doc = _fixture.Searcher.Doc(sd[sd.Length - 1].Doc);
+            Assert.Equal((_fixture.NoDocs - 1) * _fixture.Distance + _fixture.StartOffset, (long)doc.GetField(field).NumericValue); //, "Last doc");
+        }
+
+        [Fact]
+        public virtual void TestRightOpenRange_8bit()
+        {
+            TestRightOpenRange(8);
+        }
+
+        [Fact]
+        public virtual void TestRightOpenRange_6bit()
+        {
+            TestRightOpenRange(6);
+        }
+
+        [Fact]
+        public virtual void TestRightOpenRange_4bit()
+        {
+            TestRightOpenRange(4);
+        }
+
+        [Fact]
+        public virtual void TestRightOpenRange_2bit()
+        {
+            TestRightOpenRange(2);
+        }
+
+        [Fact]
+        public virtual void TestInfiniteValues()
+        {
+            Directory dir = NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(Random(), dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
+            Document doc = new Document();
+            doc.Add(new DoubleField("double", double.NegativeInfinity, Field.Store.NO));
+            doc.Add(new LongField("long", long.MinValue, Field.Store.NO));
+            writer.AddDocument(doc);
+
+            doc = new Document();
+            doc.Add(new DoubleField("double", double.PositiveInfinity, Field.Store.NO));
+            doc.Add(new LongField("long", long.MaxValue, Field.Store.NO));
+            writer.AddDocument(doc);
+
+            doc = new Document();
+            doc.Add(new DoubleField("double", 0.0, Field.Store.NO));
+            doc.Add(new LongField("long", 0L, Field.Store.NO));
+            writer.AddDocument(doc);
+
+            foreach (double d in TestNumericUtils.DOUBLE_NANs)
+            {
+                doc = new Document();
+                doc.Add(new DoubleField("double", d, Field.Store.NO));
+                writer.AddDocument(doc);
+            }
+
+            writer.Dispose();
+
+            IndexReader r = DirectoryReader.Open(dir);
+            IndexSearcher s = NewSearcher(r);
+
+            Query q = NumericRangeQuery.NewLongRange("long", null, null, true, true);
+            TopDocs topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewLongRange("long", null, null, false, false);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewLongRange("long", long.MinValue, long.MaxValue, true, true);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewLongRange("long", long.MinValue, long.MaxValue, false, false);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(1, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewDoubleRange("double", null, null, true, true);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewDoubleRange("double", null, null, false, false);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewDoubleRange("double", double.NegativeInfinity, double.PositiveInfinity, true, true);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(3, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewDoubleRange("double", double.NegativeInfinity, double.PositiveInfinity, false, false);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(1, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            q = NumericRangeQuery.NewDoubleRange("double", double.NaN, double.NaN, true, true);
+            topDocs = s.Search(q, 10);
+            Assert.Equal(TestNumericUtils.DOUBLE_NANs.Length, topDocs.ScoreDocs.Length); //, "Score doc count");
+
+            r.Dispose();
+            dir.Dispose();
+        }
+
+        private void TestRandomTrieAndClassicRangeQuery(int precisionStep)
+        {
+            string field = "field" + precisionStep;
+            int totalTermCountT = 0, totalTermCountC = 0, termCountT, termCountC;
+            int num = TestUtil.NextInt(Random(), 10, 20);
+            for (int i = 0; i < num; i++)
+            {
+                long lower = (long)(Random().NextDouble() * _fixture.NoDocs * _fixture.Distance) + _fixture.StartOffset;
+                long upper = (long)(Random().NextDouble() * _fixture.NoDocs * _fixture.Distance) + _fixture.StartOffset;
+                if (lower > upper)
+                {
+                    long a = lower;
+                    lower = upper;
+                    upper = a;
+                }
+                BytesRef lowerBytes = new BytesRef(NumericUtils.BUF_SIZE_LONG), upperBytes = new BytesRef(NumericUtils.BUF_SIZE_LONG);
+                NumericUtils.LongToPrefixCodedBytes(lower, 0, lowerBytes);
+                NumericUtils.LongToPrefixCodedBytes(upper, 0, upperBytes);
+
+                // test inclusive range
+                NumericRangeQuery<long> tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
+                TermRangeQuery cq = new TermRangeQuery(field, lowerBytes, upperBytes, true, true);
+                TopDocs tTopDocs = _fixture.Searcher.Search(tq, 1);
+                TopDocs cTopDocs = _fixture.Searcher.Search(cq, 1);
+                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits); //, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                totalTermCountT += termCountT = CountTerms(tq);
+                totalTermCountC += termCountC = CountTerms(cq);
+                CheckTermCounts(precisionStep, termCountT, termCountC);
+                // test exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, false);
+                cq = new TermRangeQuery(field, lowerBytes, upperBytes, false, false);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                cTopDocs = _fixture.Searcher.Search(cq, 1);
+                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits); //, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                totalTermCountT += termCountT = CountTerms(tq);
+                totalTermCountC += termCountC = CountTerms(cq);
+                CheckTermCounts(precisionStep, termCountT, termCountC);
+                // test left exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, true);
+                cq = new TermRangeQuery(field, lowerBytes, upperBytes, false, true);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                cTopDocs = _fixture.Searcher.Search(cq, 1);
+                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits); //, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                totalTermCountT += termCountT = CountTerms(tq);
+                totalTermCountC += termCountC = CountTerms(cq);
+                CheckTermCounts(precisionStep, termCountT, termCountC);
+                // test right exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, false);
+                cq = new TermRangeQuery(field, lowerBytes, upperBytes, true, false);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                cTopDocs = _fixture.Searcher.Search(cq, 1);
+                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits); //, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                totalTermCountT += termCountT = CountTerms(tq);
+                totalTermCountC += termCountC = CountTerms(cq);
+                CheckTermCounts(precisionStep, termCountT, termCountC);
+            }
+
+            CheckTermCounts(precisionStep, totalTermCountT, totalTermCountC);
+            if (VERBOSE && precisionStep != int.MaxValue)
+            {
+                Console.WriteLine("Average number of terms during random search on '" + field + "':");
+                Console.WriteLine(" Numeric query: " + (((double)totalTermCountT) / (num * 4)));
+                Console.WriteLine(" Classical query: " + (((double)totalTermCountC) / (num * 4)));
+            }
+        }
+
+        [Fact]
+        public virtual void TestEmptyEnums()
+        {
+            int count = 3000;
+            long lower = (_fixture.Distance * 3 / 2) + _fixture.StartOffset, upper = lower + count * _fixture.Distance + (_fixture.Distance / 3);
+            // test empty enum
+            Debug.Assert(lower < upper);
+            Assert.True(0 < CountTerms(NumericRangeQuery.NewLongRange("field4", 4, lower, upper, true, true)));
+            Assert.Equal(0, CountTerms(NumericRangeQuery.NewLongRange("field4", 4, upper, lower, true, true)));
+            // test empty enum outside of bounds
+            lower = _fixture.Distance * _fixture.NoDocs + _fixture.StartOffset;
+            upper = 2L * lower;
+            Debug.Assert(lower < upper);
+            Assert.Equal(0, CountTerms(NumericRangeQuery.NewLongRange("field4", 4, lower, upper, true, true)));
+        }
+
+        private int CountTerms(MultiTermQuery q)
+        {
+            Terms terms = MultiFields.GetTerms(_fixture.Reader, q.Field);
+            if (terms == null)
+            {
+                return 0;
+            }
+            TermsEnum termEnum = q.GetTermsEnum(terms);
+            Assert.NotNull(termEnum);
+            int count = 0;
+            BytesRef cur, last = null;
+            while ((cur = termEnum.Next()) != null)
+            {
+                count++;
+                if (last != null)
+                {
+                    Assert.True(last.CompareTo(cur) < 0);
+                }
+                last = BytesRef.DeepCopyOf(cur);
+            }
+            // LUCENE-3314: the results after next() already returned null are undefined,
+            // Assert.Null(termEnum.Next());
+            return count;
+        }
+
+        private void CheckTermCounts(int precisionStep, int termCountT, int termCountC)
+        {
+            if (precisionStep == int.MaxValue)
+            {
+                Assert.Equal(termCountC, termCountT); //, "Number of terms should be equal for unlimited precStep");
+            }
+            else
+            {
+                Assert.True(termCountT <= termCountC, "Number of terms for NRQ should be <= compared to classical TRQ");
+            }
+        }
+
+        [Fact]
+        public virtual void TestRandomTrieAndClassicRangeQuery_8bit()
+        {
+            TestRandomTrieAndClassicRangeQuery(8);
+        }
+
+        [Fact]
+        public virtual void TestRandomTrieAndClassicRangeQuery_6bit()
+        {
+            TestRandomTrieAndClassicRangeQuery(6);
+        }
+
+        [Fact]
+        public virtual void TestRandomTrieAndClassicRangeQuery_4bit()
+        {
+            TestRandomTrieAndClassicRangeQuery(4);
+        }
+
+        [Fact]
+        public virtual void TestRandomTrieAndClassicRangeQuery_2bit()
+        {
+            TestRandomTrieAndClassicRangeQuery(2);
+        }
+
+        [Fact]
+        public virtual void TestRandomTrieAndClassicRangeQuery_NoTrie()
+        {
+            TestRandomTrieAndClassicRangeQuery(int.MaxValue);
+        }
+
+        private void TestRangeSplit(int precisionStep)
+        {
+            string field = "ascfield" + precisionStep;
+            // 10 random tests
+            int num = TestUtil.NextInt(Random(), 10, 20);
+            for (int i = 0; i < num; i++)
+            {
+                long lower = (long)(Random().NextDouble() * _fixture.NoDocs - _fixture.NoDocs / 2);
+                long upper = (long)(Random().NextDouble() * _fixture.NoDocs - _fixture.NoDocs / 2);
+                if (lower > upper)
+                {
+                    long a = lower;
+                    lower = upper;
+                    upper = a;
+                }
+                // test inclusive range
+                Query tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
+                TopDocs tTopDocs = _fixture.Searcher.Search(tq, 1);
+                Assert.Equal(upper - lower + 1, tTopDocs.TotalHits); //, "Returned count of range query must be equal to inclusive range length");
+                // test exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, false);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                Assert.Equal(Math.Max(upper - lower - 1, 0), tTopDocs.TotalHits); //, "Returned count of range query must be equal to exclusive range length");
+                // test left exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, true);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                Assert.Equal(upper - lower, tTopDocs.TotalHits); //, "Returned count of range query must be equal to half exclusive range length");
+                // test right exclusive range
+                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, false);
+                tTopDocs = _fixture.Searcher.Search(tq, 1);
+                Assert.Equal(upper - lower, tTopDocs.TotalHits); //, "Returned count of range query must be equal to half exclusive range length");
+            }
+        }
+
+        [Fact]
+        public virtual void TestRangeSplit_8bit()
+        {
+            TestRangeSplit(8);
+        }
+
+        [Fact]
+        public virtual void TestRangeSplit_6bit()
+        {
+            TestRangeSplit(6);
+        }
+
+        [Fact]
+        public virtual void TestRangeSplit_4bit()
+        {
+            TestRangeSplit(4);
+        }
+
+        [Fact]
+        public virtual void TestRangeSplit_2bit()
+        {
+            TestRangeSplit(2);
+        }
+
+        /// <summary>
+        /// we fake a double test using long2double conversion of NumericUtils </summary>
+        private void TestDoubleRange(int precisionStep)
+        {
+            string field = "ascfield" + precisionStep;
+            const long lower = -1000L, upper = +2000L;
+
+            Query tq = NumericRangeQuery.NewDoubleRange(field, precisionStep, NumericUtils.SortableLongToDouble(lower), NumericUtils.SortableLongToDouble(upper), true, true);
+            TopDocs tTopDocs = _fixture.Searcher.Search(tq, 1);
+            Assert.Equal(upper - lower + 1, tTopDocs.TotalHits); //, "Returned count of range query must be equal to inclusive range length");
+
+            Filter tf = NumericRangeFilter.NewDoubleRange(field, precisionStep, NumericUtils.SortableLongToDouble(lower), NumericUtils.SortableLongToDouble(upper), true, true);
+            tTopDocs = _fixture.Searcher.Search(new MatchAllDocsQuery(), tf, 1);
+            Assert.Equal(upper - lower + 1, tTopDocs.TotalHits); //, "Returned count of range filter must be equal to inclusive range length");
+        }
+
+        [Fact]
+        public virtual void TestDoubleRange_8bit()
+        {
+            TestDoubleRange(8);
+        }
+
+        [Fact]
+        public virtual void TestDoubleRange_6bit()
+        {
+            TestDoubleRange(6);
+        }
+
+        [Fact]
+        public virtual void TestDoubleRange_4bit()
+        {
+            TestDoubleRange(4);
+        }
+
+        [Fact]
+        public virtual void TestDoubleRange_2bit()
+        {
+            TestDoubleRange(2);
+        }
+
+        private void TestSorting(int precisionStep)
+        {
+            string field = "field" + precisionStep;
+            // 10 random tests, the index order is ascending,
+            // so using a reverse sort field should retun descending documents
+            int num = TestUtil.NextInt(Random(), 10, 20);
+            for (int i = 0; i < num; i++)
+            {
+                long lower = (long)(Random().NextDouble() * _fixture.NoDocs * _fixture.Distance) + _fixture.StartOffset;
+                long upper = (long)(Random().NextDouble() * _fixture.NoDocs * _fixture.Distance) + _fixture.StartOffset;
+                if (lower > upper)
+                {
+                    long a = lower;
+                    lower = upper;
+                    upper = a;
+                }
+                Query tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
+                TopDocs topDocs = _fixture.Searcher.Search(tq, null, _fixture.NoDocs, new Sort(new SortField(field, SortField.Type_e.LONG, true)));
+                if (topDocs.TotalHits == 0)
+                {
+                    continue;
+                }
+                ScoreDoc[] sd = topDocs.ScoreDocs;
+                Assert.NotNull(sd);
+                long last = (long)_fixture.Searcher.Doc(sd[0].Doc).GetField(field).NumericValue;
+                for (int j = 1; j < sd.Length; j++)
+                {
+                    long act = (long)_fixture.Searcher.Doc(sd[j].Doc).GetField(field).NumericValue;
+                    Assert.True(last > act, "Docs should be sorted backwards");
+                    last = act;
+                }
+            }
+        }
+
+        [Fact]
+        public virtual void TestSorting_8bit()
+        {
+            TestSorting(8);
+        }
+
+        [Fact]
+        public virtual void TestSorting_6bit()
+        {
+            TestSorting(6);
+        }
+
+        [Fact]
+        public virtual void TestSorting_4bit()
+        {
+            TestSorting(4);
+        }
+
+        [Fact]
+        public virtual void TestSorting_2bit()
+        {
+            TestSorting(2);
+        }
+
+        [Fact]
+        public virtual void TestEqualsAndHash()
+        {
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test1", 4, 10L, 20L, true, true));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test2", 4, 10L, 20L, false, true));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test3", 4, 10L, 20L, true, false));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test4", 4, 10L, 20L, false, false));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test5", 4, 10L, null, true, true));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test6", 4, null, 20L, true, true));
+            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test7", 4, null, null, true, true));
+            QueryUtils.CheckEqual(NumericRangeQuery.NewLongRange("test8", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test8", 4, 10L, 20L, true, true));
+            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test9", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test9", 8, 10L, 20L, true, true));
+            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test10a", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test10b", 4, 10L, 20L, true, true));
+            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test11", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test11", 4, 20L, 10L, true, true));
+            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test12", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test12", 4, 10L, 20L, false, true));
+            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test13", 4, 10L, 20L, true, true), NumericRangeQuery.NewFloatRange("test13", 4, 10f, 20f, true, true));
+            // difference to int range is tested in TestNumericRangeQuery32
+        }
+    }
+
+    public class TestNumericRangeQuery64Fixture : IDisposable
     {
         // distance of entries
-        private static long Distance;
+        internal long Distance { get; private set; }
 
         // shift the starting of the values to the left, to also have negative values:
-        private static readonly long StartOffset = -1L << 31;
+        internal readonly long StartOffset = -1L << 31;
 
         // number of docs to generate for testing
-        private static int NoDocs;
+        internal int NoDocs { get; private set; }
 
-        private static Directory Directory = null;
-        private static IndexReader Reader = null;
-        private static IndexSearcher Searcher = null;
+        internal Directory Directory { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal IndexSearcher Searcher { get; private set; }
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestNumericRangeQuery64Fixture()
         {
-            NoDocs = AtLeast(4096);
+            NoDocs = LuceneTestCase.AtLeast(4096);
             Distance = (1L << 60) / NoDocs;
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMaxBufferedDocs(TestUtil.NextInt(Random(), 100, 1000)).SetMergePolicy(NewLogMergePolicy()));
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(LuceneTestCase.Random(), Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(LuceneTestCase.Random())).SetMaxBufferedDocs(TestUtil.NextInt(LuceneTestCase.Random(), 100, 1000)).SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
 
             FieldType storedLong = new FieldType(LongField.TYPE_NOT_STORED);
             storedLong.Stored = true;
@@ -134,615 +732,19 @@ namespace Lucene.Net.Search
                 ascfield2.LongValue = val;
                 writer.AddDocument(doc);
             }
+
             Reader = writer.Reader;
-            Searcher = NewSearcher(Reader);
+            Searcher = LuceneTestCase.NewSearcher(Reader);
             writer.Dispose();
         }
 
-        [TestFixtureTearDown]
-        public static void AfterClass()
+        public void Dispose()
         {
             Searcher = null;
             Reader.Dispose();
             Reader = null;
             Directory.Dispose();
             Directory = null;
-        }
-
-        [SetUp]
-        public override void SetUp()
-        {
-            
-            // set the theoretical maximum term count for 8bit (see docs for the number)
-            // super.tearDown will restore the default
-            BooleanQuery.MaxClauseCount = 7 * 255 * 2 + 255;
-        }
-
-        /// <summary>
-        /// test for constant score + boolean query + filter, the other tests only use the constant score mode </summary>
-        private void TestRange(int precisionStep)
-        {
-            string field = "field" + precisionStep;
-            int count = 3000;
-            long lower = (Distance * 3 / 2) + StartOffset, upper = lower + count * Distance + (Distance / 3);
-            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
-            NumericRangeFilter<long> f = NumericRangeFilter.NewLongRange(field, precisionStep, lower, upper, true, true);
-            for (sbyte i = 0; i < 3; i++)
-            {
-                TopDocs topDocs;
-                string type;
-                switch (i)
-                {
-                    case 0:
-                        type = " (constant score filter rewrite)";
-                        q.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_FILTER_REWRITE);
-                        topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-                        break;
-
-                    case 1:
-                        type = " (constant score boolean rewrite)";
-                        q.SetRewriteMethod(MultiTermQuery.CONSTANT_SCORE_BOOLEAN_QUERY_REWRITE);
-                        topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-                        break;
-
-                    case 2:
-                        type = " (filter)";
-                        topDocs = Searcher.Search(new MatchAllDocsQuery(), f, NoDocs, Sort.INDEXORDER);
-                        break;
-
-                    default:
-                        return;
-                }
-                ScoreDoc[] sd = topDocs.ScoreDocs;
-                Assert.NotNull(sd);
-                Assert.Equal(count, sd.Length, "Score doc count" + type);
-                Document doc = Searcher.Doc(sd[0].Doc);
-                Assert.Equal(2 * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "First doc" + type);
-                doc = Searcher.Doc(sd[sd.Length - 1].Doc);
-                Assert.Equal((1 + count) * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "Last doc" + type);
-            }
-        }
-
-        [Fact]
-        public virtual void TestRange_8bit()
-        {
-            TestRange(8);
-        }
-
-        [Fact]
-        public virtual void TestRange_6bit()
-        {
-            TestRange(6);
-        }
-
-        [Fact]
-        public virtual void TestRange_4bit()
-        {
-            TestRange(4);
-        }
-
-        [Fact]
-        public virtual void TestRange_2bit()
-        {
-            TestRange(2);
-        }
-
-        [Fact]
-        public virtual void TestInverseRange()
-        {
-            AtomicReaderContext context = (AtomicReaderContext)SlowCompositeReaderWrapper.Wrap(Searcher.IndexReader).Context;
-            NumericRangeFilter<long> f = NumericRangeFilter.NewLongRange("field8", 8, 1000L, -1000L, true, true);
-            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs), "A inverse range should return the null instance");
-            f = NumericRangeFilter.NewLongRange("field8", 8, long.MaxValue, null, false, false);
-            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs), "A exclusive range starting with Long.MAX_VALUE should return the null instance");
-            f = NumericRangeFilter.NewLongRange("field8", 8, null, long.MinValue, false, false);
-            Assert.Null(f.GetDocIdSet(context, (context.AtomicReader).LiveDocs), "A exclusive range ending with Long.MIN_VALUE should return the null instance");
-        }
-
-        [Fact]
-        public virtual void TestOneMatchQuery()
-        {
-            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange("ascfield8", 8, 1000L, 1000L, true, true);
-            TopDocs topDocs = Searcher.Search(q, NoDocs);
-            ScoreDoc[] sd = topDocs.ScoreDocs;
-            Assert.NotNull(sd);
-            Assert.Equal(1, sd.Length, "Score doc count");
-        }
-
-        private void TestLeftOpenRange(int precisionStep)
-        {
-            string field = "field" + precisionStep;
-            int count = 3000;
-            long upper = (count - 1) * Distance + (Distance / 3) + StartOffset;
-            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, null, upper, true, true);
-            TopDocs topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-            ScoreDoc[] sd = topDocs.ScoreDocs;
-            Assert.NotNull(sd);
-            Assert.Equal(count, sd.Length, "Score doc count");
-            Document doc = Searcher.Doc(sd[0].Doc);
-            Assert.Equal(StartOffset, (long)doc.GetField(field).NumericValue, "First doc");
-            doc = Searcher.Doc(sd[sd.Length - 1].Doc);
-            Assert.Equal((count - 1) * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "Last doc");
-
-            q = NumericRangeQuery.NewLongRange(field, precisionStep, null, upper, false, true);
-            topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-            sd = topDocs.ScoreDocs;
-            Assert.NotNull(sd);
-            Assert.Equal(count, sd.Length, "Score doc count");
-            doc = Searcher.Doc(sd[0].Doc);
-            Assert.Equal(StartOffset, (long)doc.GetField(field).NumericValue, "First doc");
-            doc = Searcher.Doc(sd[sd.Length - 1].Doc);
-            Assert.Equal((count - 1) * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "Last doc");
-        }
-
-        [Fact]
-        public virtual void TestLeftOpenRange_8bit()
-        {
-            TestLeftOpenRange(8);
-        }
-
-        [Fact]
-        public virtual void TestLeftOpenRange_6bit()
-        {
-            TestLeftOpenRange(6);
-        }
-
-        [Fact]
-        public virtual void TestLeftOpenRange_4bit()
-        {
-            TestLeftOpenRange(4);
-        }
-
-        [Fact]
-        public virtual void TestLeftOpenRange_2bit()
-        {
-            TestLeftOpenRange(2);
-        }
-
-        private void TestRightOpenRange(int precisionStep)
-        {
-            string field = "field" + precisionStep;
-            int count = 3000;
-            long lower = (count - 1) * Distance + (Distance / 3) + StartOffset;
-            NumericRangeQuery<long> q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, null, true, true);
-            TopDocs topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-            ScoreDoc[] sd = topDocs.ScoreDocs;
-            Assert.NotNull(sd);
-            Assert.Equal(NoDocs - count, sd.Length, "Score doc count");
-            Document doc = Searcher.Doc(sd[0].Doc);
-            Assert.Equal(count * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "First doc");
-            doc = Searcher.Doc(sd[sd.Length - 1].Doc);
-            Assert.Equal((NoDocs - 1) * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "Last doc");
-
-            q = NumericRangeQuery.NewLongRange(field, precisionStep, lower, null, true, false);
-            topDocs = Searcher.Search(q, null, NoDocs, Sort.INDEXORDER);
-            sd = topDocs.ScoreDocs;
-            Assert.NotNull(sd);
-            Assert.Equal(NoDocs - count, sd.Length, "Score doc count");
-            doc = Searcher.Doc(sd[0].Doc);
-            Assert.Equal(count * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "First doc");
-            doc = Searcher.Doc(sd[sd.Length - 1].Doc);
-            Assert.Equal((NoDocs - 1) * Distance + StartOffset, (long)doc.GetField(field).NumericValue, "Last doc");
-        }
-
-        [Fact]
-        public virtual void TestRightOpenRange_8bit()
-        {
-            TestRightOpenRange(8);
-        }
-
-        [Fact]
-        public virtual void TestRightOpenRange_6bit()
-        {
-            TestRightOpenRange(6);
-        }
-
-        [Fact]
-        public virtual void TestRightOpenRange_4bit()
-        {
-            TestRightOpenRange(4);
-        }
-
-        [Fact]
-        public virtual void TestRightOpenRange_2bit()
-        {
-            TestRightOpenRange(2);
-        }
-
-        [Fact]
-        public virtual void TestInfiniteValues()
-        {
-            Directory dir = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), dir, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())));
-            Document doc = new Document();
-            doc.Add(new DoubleField("double", double.NegativeInfinity, Field.Store.NO));
-            doc.Add(new LongField("long", long.MinValue, Field.Store.NO));
-            writer.AddDocument(doc);
-
-            doc = new Document();
-            doc.Add(new DoubleField("double", double.PositiveInfinity, Field.Store.NO));
-            doc.Add(new LongField("long", long.MaxValue, Field.Store.NO));
-            writer.AddDocument(doc);
-
-            doc = new Document();
-            doc.Add(new DoubleField("double", 0.0, Field.Store.NO));
-            doc.Add(new LongField("long", 0L, Field.Store.NO));
-            writer.AddDocument(doc);
-
-            foreach (double d in TestNumericUtils.DOUBLE_NANs)
-            {
-                doc = new Document();
-                doc.Add(new DoubleField("double", d, Field.Store.NO));
-                writer.AddDocument(doc);
-            }
-
-            writer.Dispose();
-
-            IndexReader r = DirectoryReader.Open(dir);
-            IndexSearcher s = NewSearcher(r);
-
-            Query q = NumericRangeQuery.NewLongRange("long", null, null, true, true);
-            TopDocs topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewLongRange("long", null, null, false, false);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewLongRange("long", long.MinValue, long.MaxValue, true, true);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewLongRange("long", long.MinValue, long.MaxValue, false, false);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(1, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewDoubleRange("double", null, null, true, true);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewDoubleRange("double", null, null, false, false);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewDoubleRange("double", double.NegativeInfinity, double.PositiveInfinity, true, true);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(3, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewDoubleRange("double", double.NegativeInfinity, double.PositiveInfinity, false, false);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(1, topDocs.ScoreDocs.Length, "Score doc count");
-
-            q = NumericRangeQuery.NewDoubleRange("double", double.NaN, double.NaN, true, true);
-            topDocs = s.Search(q, 10);
-            Assert.Equal(TestNumericUtils.DOUBLE_NANs.Length, topDocs.ScoreDocs.Length, "Score doc count");
-
-            r.Dispose();
-            dir.Dispose();
-        }
-
-        private void TestRandomTrieAndClassicRangeQuery(int precisionStep)
-        {
-            string field = "field" + precisionStep;
-            int totalTermCountT = 0, totalTermCountC = 0, termCountT, termCountC;
-            int num = TestUtil.NextInt(Random(), 10, 20);
-            for (int i = 0; i < num; i++)
-            {
-                long lower = (long)(Random().NextDouble() * NoDocs * Distance) + StartOffset;
-                long upper = (long)(Random().NextDouble() * NoDocs * Distance) + StartOffset;
-                if (lower > upper)
-                {
-                    long a = lower;
-                    lower = upper;
-                    upper = a;
-                }
-                BytesRef lowerBytes = new BytesRef(NumericUtils.BUF_SIZE_LONG), upperBytes = new BytesRef(NumericUtils.BUF_SIZE_LONG);
-                NumericUtils.LongToPrefixCodedBytes(lower, 0, lowerBytes);
-                NumericUtils.LongToPrefixCodedBytes(upper, 0, upperBytes);
-
-                // test inclusive range
-                NumericRangeQuery<long> tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
-                TermRangeQuery cq = new TermRangeQuery(field, lowerBytes, upperBytes, true, true);
-                TopDocs tTopDocs = Searcher.Search(tq, 1);
-                TopDocs cTopDocs = Searcher.Search(cq, 1);
-                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
-                totalTermCountT += termCountT = CountTerms(tq);
-                totalTermCountC += termCountC = CountTerms(cq);
-                CheckTermCounts(precisionStep, termCountT, termCountC);
-                // test exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, false);
-                cq = new TermRangeQuery(field, lowerBytes, upperBytes, false, false);
-                tTopDocs = Searcher.Search(tq, 1);
-                cTopDocs = Searcher.Search(cq, 1);
-                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
-                totalTermCountT += termCountT = CountTerms(tq);
-                totalTermCountC += termCountC = CountTerms(cq);
-                CheckTermCounts(precisionStep, termCountT, termCountC);
-                // test left exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, true);
-                cq = new TermRangeQuery(field, lowerBytes, upperBytes, false, true);
-                tTopDocs = Searcher.Search(tq, 1);
-                cTopDocs = Searcher.Search(cq, 1);
-                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
-                totalTermCountT += termCountT = CountTerms(tq);
-                totalTermCountC += termCountC = CountTerms(cq);
-                CheckTermCounts(precisionStep, termCountT, termCountC);
-                // test right exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, false);
-                cq = new TermRangeQuery(field, lowerBytes, upperBytes, true, false);
-                tTopDocs = Searcher.Search(tq, 1);
-                cTopDocs = Searcher.Search(cq, 1);
-                Assert.Equal(cTopDocs.TotalHits, tTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
-                totalTermCountT += termCountT = CountTerms(tq);
-                totalTermCountC += termCountC = CountTerms(cq);
-                CheckTermCounts(precisionStep, termCountT, termCountC);
-            }
-
-            CheckTermCounts(precisionStep, totalTermCountT, totalTermCountC);
-            if (VERBOSE && precisionStep != int.MaxValue)
-            {
-                Console.WriteLine("Average number of terms during random search on '" + field + "':");
-                Console.WriteLine(" Numeric query: " + (((double)totalTermCountT) / (num * 4)));
-                Console.WriteLine(" Classical query: " + (((double)totalTermCountC) / (num * 4)));
-            }
-        }
-
-        [Fact]
-        public virtual void TestEmptyEnums()
-        {
-            int count = 3000;
-            long lower = (Distance * 3 / 2) + StartOffset, upper = lower + count * Distance + (Distance / 3);
-            // test empty enum
-            Debug.Assert(lower < upper);
-            Assert.True(0 < CountTerms(NumericRangeQuery.NewLongRange("field4", 4, lower, upper, true, true)));
-            Assert.Equal(0, CountTerms(NumericRangeQuery.NewLongRange("field4", 4, upper, lower, true, true)));
-            // test empty enum outside of bounds
-            lower = Distance * NoDocs + StartOffset;
-            upper = 2L * lower;
-            Debug.Assert(lower < upper);
-            Assert.Equal(0, CountTerms(NumericRangeQuery.NewLongRange("field4", 4, lower, upper, true, true)));
-        }
-
-        private int CountTerms(MultiTermQuery q)
-        {
-            Terms terms = MultiFields.GetTerms(Reader, q.Field);
-            if (terms == null)
-            {
-                return 0;
-            }
-            TermsEnum termEnum = q.GetTermsEnum(terms);
-            Assert.NotNull(termEnum);
-            int count = 0;
-            BytesRef cur, last = null;
-            while ((cur = termEnum.Next()) != null)
-            {
-                count++;
-                if (last != null)
-                {
-                    Assert.True(last.CompareTo(cur) < 0);
-                }
-                last = BytesRef.DeepCopyOf(cur);
-            }
-            // LUCENE-3314: the results after next() already returned null are undefined,
-            // Assert.Null(termEnum.Next());
-            return count;
-        }
-
-        private void CheckTermCounts(int precisionStep, int termCountT, int termCountC)
-        {
-            if (precisionStep == int.MaxValue)
-            {
-                Assert.Equal(termCountC, termCountT, "Number of terms should be equal for unlimited precStep");
-            }
-            else
-            {
-                Assert.True(termCountT <= termCountC, "Number of terms for NRQ should be <= compared to classical TRQ");
-            }
-        }
-
-        [Fact]
-        public virtual void TestRandomTrieAndClassicRangeQuery_8bit()
-        {
-            TestRandomTrieAndClassicRangeQuery(8);
-        }
-
-        [Fact]
-        public virtual void TestRandomTrieAndClassicRangeQuery_6bit()
-        {
-            TestRandomTrieAndClassicRangeQuery(6);
-        }
-
-        [Fact]
-        public virtual void TestRandomTrieAndClassicRangeQuery_4bit()
-        {
-            TestRandomTrieAndClassicRangeQuery(4);
-        }
-
-        [Fact]
-        public virtual void TestRandomTrieAndClassicRangeQuery_2bit()
-        {
-            TestRandomTrieAndClassicRangeQuery(2);
-        }
-
-        [Fact]
-        public virtual void TestRandomTrieAndClassicRangeQuery_NoTrie()
-        {
-            TestRandomTrieAndClassicRangeQuery(int.MaxValue);
-        }
-
-        private void TestRangeSplit(int precisionStep)
-        {
-            string field = "ascfield" + precisionStep;
-            // 10 random tests
-            int num = TestUtil.NextInt(Random(), 10, 20);
-            for (int i = 0; i < num; i++)
-            {
-                long lower = (long)(Random().NextDouble() * NoDocs - NoDocs / 2);
-                long upper = (long)(Random().NextDouble() * NoDocs - NoDocs / 2);
-                if (lower > upper)
-                {
-                    long a = lower;
-                    lower = upper;
-                    upper = a;
-                }
-                // test inclusive range
-                Query tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
-                TopDocs tTopDocs = Searcher.Search(tq, 1);
-                Assert.Equal(upper - lower + 1, tTopDocs.TotalHits, "Returned count of range query must be equal to inclusive range length");
-                // test exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, false);
-                tTopDocs = Searcher.Search(tq, 1);
-                Assert.Equal(Math.Max(upper - lower - 1, 0), tTopDocs.TotalHits, "Returned count of range query must be equal to exclusive range length");
-                // test left exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, false, true);
-                tTopDocs = Searcher.Search(tq, 1);
-                Assert.Equal(upper - lower, tTopDocs.TotalHits, "Returned count of range query must be equal to half exclusive range length");
-                // test right exclusive range
-                tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, false);
-                tTopDocs = Searcher.Search(tq, 1);
-                Assert.Equal(upper - lower, tTopDocs.TotalHits, "Returned count of range query must be equal to half exclusive range length");
-            }
-        }
-
-        [Fact]
-        public virtual void TestRangeSplit_8bit()
-        {
-            TestRangeSplit(8);
-        }
-
-        [Fact]
-        public virtual void TestRangeSplit_6bit()
-        {
-            TestRangeSplit(6);
-        }
-
-        [Fact]
-        public virtual void TestRangeSplit_4bit()
-        {
-            TestRangeSplit(4);
-        }
-
-        [Fact]
-        public virtual void TestRangeSplit_2bit()
-        {
-            TestRangeSplit(2);
-        }
-
-        /// <summary>
-        /// we fake a double test using long2double conversion of NumericUtils </summary>
-        private void TestDoubleRange(int precisionStep)
-        {
-            string field = "ascfield" + precisionStep;
-            const long lower = -1000L, upper = +2000L;
-
-            Query tq = NumericRangeQuery.NewDoubleRange(field, precisionStep, NumericUtils.SortableLongToDouble(lower), NumericUtils.SortableLongToDouble(upper), true, true);
-            TopDocs tTopDocs = Searcher.Search(tq, 1);
-            Assert.Equal(upper - lower + 1, tTopDocs.TotalHits, "Returned count of range query must be equal to inclusive range length");
-
-            Filter tf = NumericRangeFilter.NewDoubleRange(field, precisionStep, NumericUtils.SortableLongToDouble(lower), NumericUtils.SortableLongToDouble(upper), true, true);
-            tTopDocs = Searcher.Search(new MatchAllDocsQuery(), tf, 1);
-            Assert.Equal(upper - lower + 1, tTopDocs.TotalHits, "Returned count of range filter must be equal to inclusive range length");
-        }
-
-        [Fact]
-        public virtual void TestDoubleRange_8bit()
-        {
-            TestDoubleRange(8);
-        }
-
-        [Fact]
-        public virtual void TestDoubleRange_6bit()
-        {
-            TestDoubleRange(6);
-        }
-
-        [Fact]
-        public virtual void TestDoubleRange_4bit()
-        {
-            TestDoubleRange(4);
-        }
-
-        [Fact]
-        public virtual void TestDoubleRange_2bit()
-        {
-            TestDoubleRange(2);
-        }
-
-        private void TestSorting(int precisionStep)
-        {
-            string field = "field" + precisionStep;
-            // 10 random tests, the index order is ascending,
-            // so using a reverse sort field should retun descending documents
-            int num = TestUtil.NextInt(Random(), 10, 20);
-            for (int i = 0; i < num; i++)
-            {
-                long lower = (long)(Random().NextDouble() * NoDocs * Distance) + StartOffset;
-                long upper = (long)(Random().NextDouble() * NoDocs * Distance) + StartOffset;
-                if (lower > upper)
-                {
-                    long a = lower;
-                    lower = upper;
-                    upper = a;
-                }
-                Query tq = NumericRangeQuery.NewLongRange(field, precisionStep, lower, upper, true, true);
-                TopDocs topDocs = Searcher.Search(tq, null, NoDocs, new Sort(new SortField(field, SortField.Type_e.LONG, true)));
-                if (topDocs.TotalHits == 0)
-                {
-                    continue;
-                }
-                ScoreDoc[] sd = topDocs.ScoreDocs;
-                Assert.NotNull(sd);
-                long last = (long)Searcher.Doc(sd[0].Doc).GetField(field).NumericValue;
-                for (int j = 1; j < sd.Length; j++)
-                {
-                    long act = (long)Searcher.Doc(sd[j].Doc).GetField(field).NumericValue;
-                    Assert.True(last > act, "Docs should be sorted backwards");
-                    last = act;
-                }
-            }
-        }
-
-        [Fact]
-        public virtual void TestSorting_8bit()
-        {
-            TestSorting(8);
-        }
-
-        [Fact]
-        public virtual void TestSorting_6bit()
-        {
-            TestSorting(6);
-        }
-
-        [Fact]
-        public virtual void TestSorting_4bit()
-        {
-            TestSorting(4);
-        }
-
-        [Fact]
-        public virtual void TestSorting_2bit()
-        {
-            TestSorting(2);
-        }
-
-        [Fact]
-        public virtual void TestEqualsAndHash()
-        {
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test1", 4, 10L, 20L, true, true));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test2", 4, 10L, 20L, false, true));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test3", 4, 10L, 20L, true, false));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test4", 4, 10L, 20L, false, false));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test5", 4, 10L, null, true, true));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test6", 4, null, 20L, true, true));
-            QueryUtils.CheckHashEquals(NumericRangeQuery.NewLongRange("test7", 4, null, null, true, true));
-            QueryUtils.CheckEqual(NumericRangeQuery.NewLongRange("test8", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test8", 4, 10L, 20L, true, true));
-            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test9", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test9", 8, 10L, 20L, true, true));
-            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test10a", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test10b", 4, 10L, 20L, true, true));
-            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test11", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test11", 4, 20L, 10L, true, true));
-            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test12", 4, 10L, 20L, true, true), NumericRangeQuery.NewLongRange("test12", 4, 10L, 20L, false, true));
-            QueryUtils.CheckUnequal(NumericRangeQuery.NewLongRange("test13", 4, 10L, 20L, true, true), NumericRangeQuery.NewFloatRange("test13", 4, 10f, 20f, true, true));
-            // difference to int range is tested in TestNumericRangeQuery32
         }
     }
 }

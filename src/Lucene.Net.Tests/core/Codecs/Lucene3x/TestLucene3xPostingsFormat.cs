@@ -2,6 +2,7 @@
 
 namespace Lucene.Net.Codecs.Lucene3x
 {
+    using Index;
     using BasePostingsFormatTestCase = Lucene.Net.Index.BasePostingsFormatTestCase;
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
 
@@ -29,8 +30,7 @@ namespace Lucene.Net.Codecs.Lucene3x
     {
         private readonly Codec Codec_Renamed = new PreFlexRWCodec();
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestLucene3xPostingsFormat(BasePostingsFormatTestCaseFixture fixture) : base(fixture)
         {
             OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
         }
@@ -41,6 +41,12 @@ namespace Lucene.Net.Codecs.Lucene3x
             {
                 return Codec_Renamed;
             }
+        }
+
+        public override void Dispose()
+        {
+            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = false;
+            base.Dispose();
         }
     }
 }

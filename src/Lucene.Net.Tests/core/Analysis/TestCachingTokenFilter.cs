@@ -5,7 +5,6 @@ using Xunit;
 namespace Lucene.Net.Analysis
 {
     using Lucene.Net.Store;
-    
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
     using DocIdSetIterator = Lucene.Net.Search.DocIdSetIterator;
@@ -34,7 +33,6 @@ namespace Lucene.Net.Analysis
     using RandomIndexWriter = Lucene.Net.Index.RandomIndexWriter;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestCachingTokenFilter : BaseTokenStreamTestCase
     {
         private string[] Tokens = new string[] { "term1", "term2", "term3", "term2" };

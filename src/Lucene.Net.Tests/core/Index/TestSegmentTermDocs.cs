@@ -36,18 +36,15 @@ namespace Lucene.Net.Index
         private Directory Dir;
         private SegmentCommitInfo Info;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSegmentTermDocs() : base()
         {
-            
             TestDoc = new Document();
             Dir = NewDirectory();
             DocHelper.SetupDoc(TestDoc);
             Info = DocHelper.WriteDoc(Random(), Dir, TestDoc);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Dir.Dispose();
             base.Dispose();

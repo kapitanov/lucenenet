@@ -1,7 +1,9 @@
 namespace Lucene.Net.Codecs.Lucene40
 {
-    
-
+    using Index;
+    using Tests.Codecs;
+    using Util;
+    using Xunit;
     /*
          * Licensed to the Apache Software Foundation (ASF) under one or more
          * contributor license agreements.  See the NOTICE file distributed with
@@ -24,14 +26,16 @@ namespace Lucene.Net.Codecs.Lucene40
     /// <summary>
     /// Tests Lucene40PostingsFormat
     /// </summary>
-    public class TestLucene40PostingsFormat : BasePostingsFormatTestCase
+    public class TestLucene40PostingsFormat : BasePostingsFormatTestCase, IClassFixture<OldFormatCodecFixture>
     {
+        private readonly OldFormatCodecFixture _fixtureCodec;
+
         private readonly Codec Codec_Renamed = new Lucene40RWCodec();
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestLucene40PostingsFormat(OldFormatCodecFixture oldFixture, BasePostingsFormatTestCaseFixture fixture) 
+            : base(fixture)
         {
-            OLD_FORMAT_IMPERSONATION_IS_ACTIVE = true; // explicitly instantiates ancient codec
+            _fixtureCodec = oldFixture;
         }
 
         protected override Codec Codec

@@ -1,9 +1,8 @@
 using Lucene.Net.Documents;
-using Lucene.Net.Support;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Xunit;
 
 namespace Lucene.Net.Store
 {
@@ -40,7 +39,6 @@ namespace Lucene.Net.Store
     using TermQuery = Lucene.Net.Search.TermQuery;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestBufferedIndexInput : LuceneTestCase
     {
         private static void WriteBytes(FileInfo aFile, long size)
@@ -167,7 +165,7 @@ namespace Lucene.Net.Store
             Assert.Equal(pos + size, input.FilePointer);
             for (int i = 0; i < size; i++)
             {
-                Assert.Equal(Byten(pos + i), (byte)Buffer[offset + i], "pos=" + i + " filepos=" + (pos + i));
+                Assert.Equal(Byten(pos + i), (byte)Buffer[offset + i]); //, "pos=" + i + " filepos=" + (pos + i));
             }
         }
 

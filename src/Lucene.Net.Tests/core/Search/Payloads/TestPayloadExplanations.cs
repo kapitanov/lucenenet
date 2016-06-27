@@ -27,16 +27,13 @@ namespace Lucene.Net.Search.Payloads
     /// <summary>
     /// TestExplanations subclass focusing on payload queries
     /// </summary>
-    [TestFixture]
     public class TestPayloadExplanations : TestExplanations
     {
         private PayloadFunction[] Functions = new PayloadFunction[] { new AveragePayloadFunction(), new MinPayloadFunction(), new MaxPayloadFunction() };
 
-        [SetUp]
-        public override void SetUp()
+        public TestPayloadExplanations(TestExplanationsFixture fixture) : base(fixture)
         {
-            
-            Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
+            _fixture.Searcher.Similarity = new DefaultSimilarityAnonymousInnerClassHelper(this);
         }
 
         private class DefaultSimilarityAnonymousInnerClassHelper : DefaultSimilarity

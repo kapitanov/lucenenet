@@ -51,6 +51,14 @@ namespace Lucene.Net.Search
     /// <seealso cref= "Subclasses for actual tests" </seealso>
     public class TestExplanations : LuceneTestCaseWithReducedFloatPrecision, IClassFixture<TestExplanationsFixture>
     {
+        public const string KEY = "KEY";
+
+        // boost on this field is the same as the iterator for the doc
+        public const string FIELD = "field";
+
+        // same contents, but no field boost
+        public const string ALTFIELD = "alt";
+
         protected readonly TestExplanationsFixture _fixture;
 
         public TestExplanations(TestExplanationsFixture fixture)
@@ -62,7 +70,7 @@ namespace Lucene.Net.Search
         /// check the expDocNrs first, then check the query (and the explanations) </summary>
         public virtual void Qtest(Query q, int[] expDocNrs)
         {
-            CheckHits.CheckHitCollector(Random(), q, TestExplanationsFixture.FIELD, _fixture.Searcher, expDocNrs);
+            CheckHits.CheckHitCollector(Random(), q, FIELD, _fixture.Searcher, expDocNrs);
         }
 
         /// <summary>
@@ -97,7 +105,7 @@ namespace Lucene.Net.Search
             }
 
             public ItemizedFilter(int[] keys)
-                : base(TestExplanationsFixture.KEY, Int2str(keys))
+                : base(KEY, Int2str(keys))
             {
             }
         }
@@ -109,7 +117,7 @@ namespace Lucene.Net.Search
             Term[] t = new Term[s.Length];
             for (int i = 0; i < s.Length; i++)
             {
-                t[i] = new Term(TestExplanationsFixture.FIELD, s[i]);
+                t[i] = new Term(FIELD, s[i]);
             }
             return t;
         }
@@ -118,7 +126,7 @@ namespace Lucene.Net.Search
         /// MACRO for SpanTermQuery </summary>
         public virtual SpanTermQuery St(string s)
         {
-            return new SpanTermQuery(new Term(TestExplanationsFixture.FIELD, s));
+            return new SpanTermQuery(new Term(FIELD, s));
         }
 
         /// <summary>
@@ -211,7 +219,7 @@ namespace Lucene.Net.Search
         {
             BooleanQuery bq = new BooleanQuery(true);
             bq.Add(q, BooleanClause.Occur.MUST);
-            bq.Add(new TermQuery(new Term(TestExplanationsFixture.FIELD, "w1")), BooleanClause.Occur.SHOULD);
+            bq.Add(new TermQuery(new Term(FIELD, "w1")), BooleanClause.Occur.SHOULD);
             return bq;
         }
 
@@ -234,14 +242,6 @@ namespace Lucene.Net.Search
         internal IndexReader Reader;
         internal Directory Directory;
 
-        public const string KEY = "KEY";
-
-        // boost on this field is the same as the iterator for the doc
-        public const string FIELD = "field";
-
-        // same contents, but no field boost
-        public const string ALTFIELD = "alt";
-
         public TestExplanationsFixture()
         {
             var random = LuceneTestCase.Random();
@@ -250,11 +250,11 @@ namespace Lucene.Net.Search
             for (int i = 0; i < DocFields.Length; i++)
             {
                 Document doc = new Document();
-                doc.Add(LuceneTestCase.NewStringField(KEY, "" + i, Field.Store.NO));
-                Field f = LuceneTestCase.NewTextField(FIELD, DocFields[i], Field.Store.NO);
+                doc.Add(LuceneTestCase.NewStringField(TestExplanations.KEY, "" + i, Field.Store.NO));
+                Field f = LuceneTestCase.NewTextField(TestExplanations.FIELD, DocFields[i], Field.Store.NO);
                 f.Boost = i;
                 doc.Add(f);
-                doc.Add(LuceneTestCase.NewTextField(ALTFIELD, DocFields[i], Field.Store.NO));
+                doc.Add(LuceneTestCase.NewTextField(TestExplanations.ALTFIELD, DocFields[i], Field.Store.NO));
                 writer.AddDocument(doc);
             }
             Reader = writer.Reader;

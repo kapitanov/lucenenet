@@ -26,7 +26,6 @@ namespace Lucene.Net.Search.Spans
     /// <summary>
     /// Basic equivalence tests for span queries
     /// </summary>
-    [TestFixture]
     public class TestSpanSearchEquivalence : SearchEquivalenceTestBase
     {
         // TODO: we could go a little crazy for a lot of these,

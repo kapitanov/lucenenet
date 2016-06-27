@@ -5,7 +5,6 @@ using Xunit;
 namespace Lucene.Net.Document
 {
     using Lucene.Net.Support;
-    
     using System;
     using System.IO;
     using BytesRef = Lucene.Net.Util.BytesRef;
@@ -54,7 +53,7 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.Equal(6d, (double)field.NumericValue); //, 0.0d);
+                assertEquals(6d, (double)field.NumericValue, 0.0d);
             }
         }
 
@@ -76,7 +75,7 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.Equal(6d, BitConverter.Int64BitsToDouble((long)field.NumericValue)); //, 0.0d);
+            assertEquals(6d, BitConverter.Int64BitsToDouble((long)field.NumericValue), 0.0d);
         }
 
         [Fact]
@@ -97,7 +96,7 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.Equal(6f, Number.IntBitsToFloat(Convert.ToInt32(field.NumericValue))); //, 0.0f);
+            assertEquals(6f, Number.IntBitsToFloat(Convert.ToInt32(field.NumericValue)), 0.0f);
         }
 
         [Fact]
@@ -120,7 +119,7 @@ namespace Lucene.Net.Document
                 TrySetStringValue(field);
                 TrySetTokenStreamValue(field);
 
-                Assert.Equal(6f, (float)field.NumericValue); //, 0.0f);
+                assertEquals(6f, (float)field.NumericValue, 0.0f);
             }
         }
 
@@ -280,7 +279,8 @@ namespace Lucene.Net.Document
                 field.TokenStream = new CannedTokenStream(new Token("foo", 0, 3));
 
                 Assert.Equal("baz", field.StringValue);
-                Assert.Equal(5f, field.GetBoost()); //, 0f);
+
+                assertEquals(5f, field.GetBoost(), 0f);
             }
         }
 
@@ -303,7 +303,8 @@ namespace Lucene.Net.Document
             field.TokenStream = new CannedTokenStream(new Token("foo", 0, 3));
 
             Assert.NotNull(field.ReaderValue);
-            Assert.Equal(5f, field.GetBoost()); //, 0f);
+
+            assertEquals(5f, field.GetBoost(), 0f);
         }
 
         /* TODO: this is pretty expert and crazy
@@ -393,7 +394,7 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.Equal(5D, (double)field.NumericValue); //, 0.0D);
+            assertEquals(5D, (double)field.NumericValue, 0.0d);
         }
 
         [Fact]
@@ -413,7 +414,7 @@ namespace Lucene.Net.Document
             TrySetStringValue(field);
             TrySetTokenStreamValue(field);
 
-            Assert.Equal(5f, (float)field.NumericValue); //, 0.0f);
+            assertEquals(5f, (float)field.NumericValue, 0.0f);
         }
 
         [Fact]

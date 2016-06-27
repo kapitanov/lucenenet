@@ -1,8 +1,8 @@
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
 

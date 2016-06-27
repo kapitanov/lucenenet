@@ -1,9 +1,8 @@
-using System.Globalization;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
     using Field = Field;
@@ -78,7 +77,7 @@ namespace Lucene.Net.Search
                 NumericRangeQuery<int> tq = NumericRangeQuery.NewIntRange("trie", lower, upper, true, true);
                 TopDocs trTopDocs = searcher.Search(cq, 1);
                 TopDocs nrTopDocs = searcher.Search(tq, 1);
-                Assert.Equal(trTopDocs.TotalHits, nrTopDocs.TotalHits, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
+                Assert.Equal(trTopDocs.TotalHits, nrTopDocs.TotalHits); //, "Returned count for NumericRangeQuery and TermRangeQuery must be equal");
             }
             reader.Dispose();
             directory.Dispose();

@@ -22,7 +22,6 @@ namespace Lucene.Net.Util
      * limitations under the License.
      */
 
-    [TestFixture]
     public class TestIOUtils : LuceneTestCase
     {
         internal sealed class BrokenIDisposable : IDisposable

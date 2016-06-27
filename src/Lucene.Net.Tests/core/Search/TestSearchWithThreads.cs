@@ -39,10 +39,8 @@ namespace Lucene.Net.Search
         internal readonly int NUM_SEARCH_THREADS = 5;
         internal int RUN_TIME_MSEC;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSearchWithThreads() : base()
         {
-            
             NUM_DOCS = AtLeast(10000);
             RUN_TIME_MSEC = AtLeast(1000);
         }

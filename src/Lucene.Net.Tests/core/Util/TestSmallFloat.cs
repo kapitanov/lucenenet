@@ -107,12 +107,12 @@ namespace Lucene.Net.Util
                 float f1 = Orig_byteToFloat((sbyte)i);
                 float f2 = SmallFloat.ByteToFloat((sbyte)i, 3, 15);
                 float f3 = SmallFloat.Byte315ToFloat((sbyte)i);
-                Assert.Equal(f1, f2, 0.0);
-                Assert.Equal(f2, f3, 0.0);
+                assertEquals(f1, f2, 0.0);
+                assertEquals(f2, f3, 0.0);
 
                 float f4 = SmallFloat.ByteToFloat((sbyte)i, 5, 2);
                 float f5 = SmallFloat.Byte52ToFloat((sbyte)i);
-                Assert.Equal(f4, f5, 0.0);
+                assertEquals(f4, f5, 0.0);
             }
         }
 

@@ -44,7 +44,6 @@ namespace Lucene.Net.Index
     using TokenStream = Lucene.Net.Analysis.TokenStream;
     using TopDocs = Lucene.Net.Search.TopDocs;
 
-    [TestFixture]
     public class TestIndexableField : LuceneTestCase
     {
         private class MyField : IndexableField

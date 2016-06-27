@@ -33,7 +33,6 @@ namespace Lucene.Net.Search.Spans
     using RegExp = Lucene.Net.Util.Automaton.RegExp;
     using Term = Lucene.Net.Index.Term;
 
-    [TestFixture]
     public class TestSpanFirstQuery : LuceneTestCase
     {
         [Fact]

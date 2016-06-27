@@ -40,10 +40,8 @@ namespace Lucene.Net.Search
     /// </summary>
     public class TestSortDocValues : LuceneTestCase
     {
-        [SetUp]
-        public override void SetUp()
+        public TestSortDocValues() : base()
         {
-            
             // ensure there is nothing in fieldcache before test starts
             FieldCache.DEFAULT.PurgeAllCaches();
         }

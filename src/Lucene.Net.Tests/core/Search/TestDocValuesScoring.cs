@@ -41,7 +41,6 @@ namespace Lucene.Net.Search
     /// In the example, a docvalues field is used as a per-document boost (separate from the norm)
     /// @lucene.experimental
     /// </summary>
-    [TestFixture]
     public class TestDocValuesScoring : LuceneTestCase
     {
         private const float SCORE_EPSILON = 0.001f; // for comparing floats
@@ -88,7 +87,7 @@ namespace Lucene.Net.Search
             Assert.Equal(1, boost.TotalHits);
 
             //System.out.println(searcher2.Explain(tq, boost.ScoreDocs[0].Doc));
-            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 2f, SCORE_EPSILON);
+            assertEquals(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 2f, SCORE_EPSILON);
 
             // this query matches only the second document, which should have 4x the score.
             tq = new TermQuery(new Term("foo", "jumps"));
@@ -100,7 +99,7 @@ namespace Lucene.Net.Search
             Assert.Equal(1, noboost.TotalHits);
             Assert.Equal(1, boost.TotalHits);
 
-            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 4f, SCORE_EPSILON);
+            assertEquals(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score * 4f, SCORE_EPSILON);
 
             // search on on field bar just for kicks, nothing should happen, since we setup
             // our sim provider to only use foo_boost for field foo.
@@ -113,7 +112,7 @@ namespace Lucene.Net.Search
             Assert.Equal(1, noboost.TotalHits);
             Assert.Equal(1, boost.TotalHits);
 
-            Assert.Equal(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score, SCORE_EPSILON);
+            assertEquals(boost.ScoreDocs[0].Score, noboost.ScoreDocs[0].Score, SCORE_EPSILON);
 
             ir.Dispose();
             dir.Dispose();

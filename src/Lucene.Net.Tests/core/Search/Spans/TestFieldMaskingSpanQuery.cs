@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Lucene.Net.Documents;
 using Xunit;
@@ -32,61 +33,18 @@ namespace Lucene.Net.Search.Spans
     using Term = Lucene.Net.Index.Term;
     using TFIDFSimilarity = Lucene.Net.Search.Similarities.TFIDFSimilarity;
 
-    [TestFixture]
-    public class TestFieldMaskingSpanQuery : LuceneTestCase
+    public class TestFieldMaskingSpanQuery : LuceneTestCase, IClassFixture<TestFieldMaskingSpanQueryFixture>
     {
-        protected internal static Document Doc(Field[] fields)
+        private TestFieldMaskingSpanQueryFixture _fixture;
+
+        public TestFieldMaskingSpanQuery(TestFieldMaskingSpanQueryFixture fixture)
         {
-            Document doc = new Document();
-            for (int i = 0; i < fields.Length; i++)
-            {
-                doc.Add(fields[i]);
-            }
-            return doc;
-        }
-
-        protected internal static Field GetField(string name, string value)
-        {
-            return NewTextField(name, value, Field.Store.NO);
-        }
-
-        protected internal static IndexSearcher Searcher;
-        protected internal static Directory Directory;
-        protected internal static IndexReader Reader;
-
-        [TestFixtureSetUp]
-        public static void BeforeClass()
-        {
-            Directory = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Directory, NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random())).SetMergePolicy(NewLogMergePolicy()));
-
-            writer.AddDocument(Doc(new Field[] { GetField("id", "0"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "jones") }));
-
-            writer.AddDocument(Doc(new Field[] { GetField("id", "1"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "smith"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "jones") }));
-
-            writer.AddDocument(Doc(new Field[] { GetField("id", "2"), GetField("gender", "female"), GetField("first", "greta"), GetField("last", "jones"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "smith"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "jones") }));
-
-            writer.AddDocument(Doc(new Field[] { GetField("id", "3"), GetField("gender", "female"), GetField("first", "lisa"), GetField("last", "jones"), GetField("gender", "male"), GetField("first", "bob"), GetField("last", "costas") }));
-
-            writer.AddDocument(Doc(new Field[] { GetField("id", "4"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "smith"), GetField("gender", "female"), GetField("first", "linda"), GetField("last", "dixit"), GetField("gender", "male"), GetField("first", "bubba"), GetField("last", "jones") }));
-            Reader = writer.Reader;
-            writer.Dispose();
-            Searcher = NewSearcher(Reader);
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Searcher = null;
-            Reader.Dispose();
-            Reader = null;
-            Directory.Dispose();
-            Directory = null;
+            _fixture = fixture;
         }
 
         protected internal virtual void Check(SpanQuery q, int[] docs)
         {
-            CheckHits.CheckHitCollector(Random(), q, null, Searcher, docs);
+            CheckHits.CheckHitCollector(Random(), q, null, _fixture.Searcher, docs);
         }
 
         [Fact]
@@ -94,7 +52,7 @@ namespace Lucene.Net.Search.Spans
         {
             SpanQuery q = new FieldMaskingSpanQuery(new SpanTermQuery(new Term("last", "sally")), "first");
             q.Boost = 8.7654321f;
-            SpanQuery qr = (SpanQuery)Searcher.Rewrite(q);
+            SpanQuery qr = (SpanQuery)_fixture.Searcher.Rewrite(q);
 
             QueryUtils.CheckEqual(q, qr);
 
@@ -109,7 +67,7 @@ namespace Lucene.Net.Search.Spans
             // mask an anon SpanQuery class that rewrites to something else.
             SpanQuery q = new FieldMaskingSpanQuery(new SpanTermQueryAnonymousInnerClassHelper(this, new Term("last", "sally")), "first");
 
-            SpanQuery qr = (SpanQuery)Searcher.Rewrite(q);
+            SpanQuery qr = (SpanQuery)_fixture.Searcher.Rewrite(q);
 
             QueryUtils.CheckUnequal(q, qr);
 
@@ -140,7 +98,7 @@ namespace Lucene.Net.Search.Spans
             SpanQuery q1 = new SpanTermQuery(new Term("last", "smith"));
             SpanQuery q2 = new SpanTermQuery(new Term("last", "jones"));
             SpanQuery q = new SpanNearQuery(new SpanQuery[] { q1, new FieldMaskingSpanQuery(q2, "last") }, 1, true);
-            Query qr = Searcher.Rewrite(q);
+            Query qr = _fixture.Searcher.Rewrite(q);
 
             QueryUtils.CheckEqual(q, qr);
 
@@ -207,7 +165,7 @@ namespace Lucene.Net.Search.Spans
         [Fact]
         public virtual void TestSimple2()
         {
-            AssumeTrue("Broken scoring: LUCENE-3723", Searcher.Similarity is TFIDFSimilarity);
+            AssumeTrue("Broken scoring: LUCENE-3723", _fixture.Searcher.Similarity is TFIDFSimilarity);
             SpanQuery q1 = new SpanTermQuery(new Term("gender", "female"));
             SpanQuery q2 = new SpanTermQuery(new Term("last", "smith"));
             SpanQuery q = new SpanNearQuery(new SpanQuery[] { q1, new FieldMaskingSpanQuery(q2, "gender") }, -1, false);
@@ -224,7 +182,7 @@ namespace Lucene.Net.Search.Spans
             SpanQuery q = new SpanOrQuery(q1, new FieldMaskingSpanQuery(q2, "gender"));
             Check(q, new int[] { 0, 1, 2, 3, 4 });
 
-            Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
+            Spans span = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, q);
 
             Assert.Equal(true, span.Next());
             Assert.Equal(s(0, 0, 1), s(span));
@@ -267,13 +225,13 @@ namespace Lucene.Net.Search.Spans
             Check(qA, new int[] { 0, 1, 2, 4 });
             Check(qB, new int[] { 0, 1, 2, 4 });
 
-            Spans spanA = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, qA);
-            Spans spanB = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, qB);
+            Spans spanA = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, qA);
+            Spans spanB = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, qB);
 
             while (spanA.Next())
             {
                 Assert.True(spanB.Next(), "spanB not still going");
-                Assert.Equal(s(spanA), s(spanB), "spanA not equal spanB");
+                Assert.Equal(s(spanA), s(spanB)); //, "spanA not equal spanB");
             }
             Assert.True(!(spanB.Next()), "spanB still going even tough spanA is done");
         }
@@ -281,7 +239,7 @@ namespace Lucene.Net.Search.Spans
         [Fact]
         public virtual void TestSpans2()
         {
-            AssumeTrue("Broken scoring: LUCENE-3723", Searcher.Similarity is TFIDFSimilarity);
+            AssumeTrue("Broken scoring: LUCENE-3723", _fixture.Searcher.Similarity is TFIDFSimilarity);
             SpanQuery qA1 = new SpanTermQuery(new Term("gender", "female"));
             SpanQuery qA2 = new SpanTermQuery(new Term("first", "james"));
             SpanQuery qA = new SpanOrQuery(qA1, new FieldMaskingSpanQuery(qA2, "gender"));
@@ -289,7 +247,7 @@ namespace Lucene.Net.Search.Spans
             SpanQuery q = new SpanNearQuery(new SpanQuery[] { new FieldMaskingSpanQuery(qA, "id"), new FieldMaskingSpanQuery(qB, "id") }, -1, false);
             Check(q, new int[] { 0, 1, 2, 3 });
 
-            Spans span = MultiSpansWrapper.Wrap(Searcher.TopReaderContext, q);
+            Spans span = MultiSpansWrapper.Wrap(_fixture.Searcher.TopReaderContext, q);
 
             Assert.Equal(true, span.Next());
             Assert.Equal(s(0, 0, 1), s(span));
@@ -317,6 +275,56 @@ namespace Lucene.Net.Search.Spans
         public virtual string s(int doc, int start, int end)
         {
             return "s(" + doc + "," + start + "," + end + ")";
+        }
+    }
+
+    public class TestFieldMaskingSpanQueryFixture : IDisposable
+    {
+        internal Document Doc(Field[] fields)
+        {
+            Document doc = new Document();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                doc.Add(fields[i]);
+            }
+            return doc;
+        }
+
+        internal Field GetField(string name, string value)
+        {
+            return LuceneTestCase.NewTextField(name, value, Field.Store.NO);
+        }
+
+        internal IndexSearcher Searcher { get; private set; }
+        internal Directory Directory { get; private set; }
+        internal IndexReader Reader { get; private set; }
+
+        public TestFieldMaskingSpanQueryFixture()
+        {
+            Directory = LuceneTestCase.NewDirectory();
+            RandomIndexWriter writer = new RandomIndexWriter(LuceneTestCase.Random(), Directory, LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(LuceneTestCase.Random())).SetMergePolicy(LuceneTestCase.NewLogMergePolicy()));
+
+            writer.AddDocument(Doc(new Field[] { GetField("id", "0"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "jones") }));
+
+            writer.AddDocument(Doc(new Field[] { GetField("id", "1"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "smith"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "jones") }));
+
+            writer.AddDocument(Doc(new Field[] { GetField("id", "2"), GetField("gender", "female"), GetField("first", "greta"), GetField("last", "jones"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "smith"), GetField("gender", "male"), GetField("first", "james"), GetField("last", "jones") }));
+
+            writer.AddDocument(Doc(new Field[] { GetField("id", "3"), GetField("gender", "female"), GetField("first", "lisa"), GetField("last", "jones"), GetField("gender", "male"), GetField("first", "bob"), GetField("last", "costas") }));
+
+            writer.AddDocument(Doc(new Field[] { GetField("id", "4"), GetField("gender", "female"), GetField("first", "sally"), GetField("last", "smith"), GetField("gender", "female"), GetField("first", "linda"), GetField("last", "dixit"), GetField("gender", "male"), GetField("first", "bubba"), GetField("last", "jones") }));
+            Reader = writer.Reader;
+            writer.Dispose();
+            Searcher = LuceneTestCase.NewSearcher(Reader);
+        }
+
+        public void Dispose()
+        {
+            Searcher = null;
+            Reader.Dispose();
+            Reader = null;
+            Directory.Dispose();
+            Directory = null;
         }
     }
 }

@@ -60,11 +60,8 @@ namespace Lucene.Net.Search
         private int Iter;
         private IList<SortField> AllSortFields;
 
-        [SetUp]
-        public override void SetUp()
+        public TestSearchAfter() : base()
         {
-            
-
             AllSortFields = new List<SortField>(Arrays.AsList(new SortField[] { new SortField("byte", SortField.Type_e.BYTE, false), new SortField("short", SortField.Type_e.SHORT, false), new SortField("int", SortField.Type_e.INT, false), new SortField("long", SortField.Type_e.LONG, false), new SortField("float", SortField.Type_e.FLOAT, false), new SortField("double", SortField.Type_e.DOUBLE, false), new SortField("bytes", SortField.Type_e.STRING, false), new SortField("bytesval", SortField.Type_e.STRING_VAL, false), new SortField("byte", SortField.Type_e.BYTE, true), new SortField("short", SortField.Type_e.SHORT, true), new SortField("int", SortField.Type_e.INT, true), new SortField("long", SortField.Type_e.LONG, true), new SortField("float", SortField.Type_e.FLOAT, true), new SortField("double", SortField.Type_e.DOUBLE, true), new SortField("bytes", SortField.Type_e.STRING, true), new SortField("bytesval", SortField.Type_e.STRING_VAL, true), SortField.FIELD_SCORE, SortField.FIELD_DOC }));
 
             if (SupportsDocValues)
@@ -180,8 +177,7 @@ namespace Lucene.Net.Search
             }
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             Reader.Dispose();
             Dir.Dispose();
@@ -328,7 +324,9 @@ namespace Lucene.Net.Search
                     Console.WriteLine("        actual id=" + Searcher.Doc(sd2.Doc).Get("id") + " " + sd2);
                 }
                 Assert.Equal(sd1.Doc, sd2.Doc);
-                Assert.Equal(sd1.Score, sd2.Score, 0f);
+
+                assertEquals(sd1.Score, sd2.Score, 0f);
+
                 if (sd1 is FieldDoc)
                 {
                     Assert.True(sd2 is FieldDoc);

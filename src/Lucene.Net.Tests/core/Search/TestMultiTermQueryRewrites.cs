@@ -1,10 +1,10 @@
 using System;
 using System.Diagnostics;
 using Lucene.Net.Documents;
+using Xunit;
 
 namespace Lucene.Net.Search
 {
-    using Xunit;
     using AttributeSource = Lucene.Net.Util.AttributeSource;
     using BytesRef = Lucene.Net.Util.BytesRef;
     using Directory = Lucene.Net.Store.Directory;
@@ -38,58 +38,13 @@ namespace Lucene.Net.Search
     using Terms = Lucene.Net.Index.Terms;
     using TermsEnum = Lucene.Net.Index.TermsEnum;
 
-    public class TestMultiTermQueryRewrites : LuceneTestCase
+    public class TestMultiTermQueryRewrites : LuceneTestCase, IClassFixture<TestMultiTermQueryRewritesFixture>
     {
-        internal static Directory Dir, Sdir1, Sdir2;
-        internal static IndexReader Reader, MultiReader, MultiReaderDupls;
-        internal static IndexSearcher Searcher, MultiSearcher, MultiSearcherDupls;
+        private readonly TestMultiTermQueryRewritesFixture _fixture;
 
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestMultiTermQueryRewrites(TestMultiTermQueryRewritesFixture fixture)
         {
-            Dir = NewDirectory();
-            Sdir1 = NewDirectory();
-            Sdir2 = NewDirectory();
-            RandomIndexWriter writer = new RandomIndexWriter(Random(), Dir, new MockAnalyzer(Random()));
-            RandomIndexWriter swriter1 = new RandomIndexWriter(Random(), Sdir1, new MockAnalyzer(Random()));
-            RandomIndexWriter swriter2 = new RandomIndexWriter(Random(), Sdir2, new MockAnalyzer(Random()));
-
-            for (int i = 0; i < 10; i++)
-            {
-                Document doc = new Document();
-                doc.Add(NewStringField("data", Convert.ToString(i), Field.Store.NO));
-                writer.AddDocument(doc);
-                ((i % 2 == 0) ? swriter1 : swriter2).AddDocument(doc);
-            }
-            writer.ForceMerge(1);
-            swriter1.ForceMerge(1);
-            swriter2.ForceMerge(1);
-            writer.Dispose();
-            swriter1.Dispose();
-            swriter2.Dispose();
-
-            Reader = DirectoryReader.Open(Dir);
-            Searcher = NewSearcher(Reader);
-
-            MultiReader = new MultiReader(new IndexReader[] { DirectoryReader.Open(Sdir1), DirectoryReader.Open(Sdir2) }, true);
-            MultiSearcher = NewSearcher(MultiReader);
-
-            MultiReaderDupls = new MultiReader(new IndexReader[] { DirectoryReader.Open(Sdir1), DirectoryReader.Open(Dir) }, true);
-            MultiSearcherDupls = NewSearcher(MultiReaderDupls);
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            Reader.Dispose();
-            MultiReader.Dispose();
-            MultiReaderDupls.Dispose();
-            Dir.Dispose();
-            Sdir1.Dispose();
-            Sdir2.Dispose();
-            Reader = MultiReader = MultiReaderDupls = null;
-            Searcher = MultiSearcher = MultiSearcherDupls = null;
-            Dir = Sdir1 = Sdir2 = null;
+            _fixture = fixture;
         }
 
         private Query ExtractInnerQuery(Query q)
@@ -128,9 +83,9 @@ namespace Lucene.Net.Search
         {
             MultiTermQuery mtq = TermRangeQuery.NewStringRange("data", "2", "7", true, true);
             mtq.SetRewriteMethod(method);
-            Query q1 = Searcher.Rewrite(mtq);
-            Query q2 = MultiSearcher.Rewrite(mtq);
-            Query q3 = MultiSearcherDupls.Rewrite(mtq);
+            Query q1 = _fixture.Searcher.Rewrite(mtq);
+            Query q2 = _fixture.MultiSearcher.Rewrite(mtq);
+            Query q3 = _fixture.MultiSearcherDupls.Rewrite(mtq);
             if (VERBOSE)
             {
                 Console.WriteLine();
@@ -168,7 +123,7 @@ namespace Lucene.Net.Search
             foreach (BooleanClause clause in bq.Clauses)
             {
                 TermQuery mtq = (TermQuery)clause.Query;
-                Assert.Equal(Convert.ToSingle(mtq.Term.Text()), mtq.Boost, 0, "Parallel sorting of boosts in rewrite mode broken");
+                assertEquals(Convert.ToSingle(mtq.Term.Text()), mtq.Boost, 0); //, "Parallel sorting of boosts in rewrite mode broken");
             }
         }
 
@@ -176,9 +131,9 @@ namespace Lucene.Net.Search
         {
             MultiTermQuery mtq = new MultiTermQueryAnonymousInnerClassHelper(this);
             mtq.SetRewriteMethod(method);
-            Query q1 = Searcher.Rewrite(mtq);
-            Query q2 = MultiSearcher.Rewrite(mtq);
-            Query q3 = MultiSearcherDupls.Rewrite(mtq);
+            Query q1 = _fixture.Searcher.Rewrite(mtq);
+            Query q2 = _fixture.MultiSearcher.Rewrite(mtq);
+            Query q3 = _fixture.MultiSearcherDupls.Rewrite(mtq);
             if (VERBOSE)
             {
                 Console.WriteLine();
@@ -252,13 +207,13 @@ namespace Lucene.Net.Search
             mtq.SetRewriteMethod(method);
             try
             {
-                MultiSearcherDupls.Rewrite(mtq);
+                _fixture.MultiSearcherDupls.Rewrite(mtq);
                 Assert.True(false, "Should throw BooleanQuery.TooManyClauses");
             }
             catch (BooleanQuery.TooManyClauses e)
             {
                 //  Maybe remove this assert in later versions, when internal API changes:
-                Assert.Equals("CheckMaxClauseCount", new StackTrace(e).GetFrames()[0].GetMethod().Name, "Should throw BooleanQuery.TooManyClauses with a stacktrace containing checkMaxClauseCount()");
+                Assert.Equal("CheckMaxClauseCount", new StackTrace(e).GetFrames()[0].GetMethod().Name); //, "Should throw BooleanQuery.TooManyClauses with a stacktrace containing checkMaxClauseCount()");
             }
             finally
             {
@@ -275,7 +230,7 @@ namespace Lucene.Net.Search
             mtq.SetRewriteMethod(method);
             try
             {
-                MultiSearcherDupls.Rewrite(mtq);
+                _fixture.MultiSearcherDupls.Rewrite(mtq);
             }
             finally
             {
@@ -294,5 +249,73 @@ namespace Lucene.Net.Search
             CheckNoMaxClauseLimitation(new MultiTermQuery.TopTermsScoringBooleanQueryRewrite(1024));
             CheckNoMaxClauseLimitation(new MultiTermQuery.TopTermsBoostOnlyBooleanQueryRewrite(1024));
         }
+    }
+
+    public class TestMultiTermQueryRewritesFixture
+    {
+        private readonly Random _random;
+
+        internal Directory Dir { get; private set; }
+        internal Directory Sdir1 { get; private set; }
+        internal Directory Sdir2 { get; private set; }
+
+        internal IndexReader Reader { get; private set; }
+        internal IndexReader MultiReader { get; private set; }
+        internal IndexReader MultiReaderDupls { get; private set; }
+
+        internal IndexSearcher Searcher { get; private set; }
+        internal IndexSearcher MultiSearcher { get; private set; }
+        internal IndexSearcher MultiSearcherDupls { get; private set; }
+
+        public TestMultiTermQueryRewritesFixture()
+        {
+            _random = LuceneTestCase.Random();
+
+            Dir = LuceneTestCase.NewDirectory();
+            Sdir1 = LuceneTestCase.NewDirectory();
+            Sdir2 = LuceneTestCase.NewDirectory();
+
+            RandomIndexWriter writer = new RandomIndexWriter(_random, Dir, new MockAnalyzer(_random));
+            RandomIndexWriter swriter1 = new RandomIndexWriter(_random, Sdir1, new MockAnalyzer(_random));
+            RandomIndexWriter swriter2 = new RandomIndexWriter(_random, Sdir2, new MockAnalyzer(_random));
+
+            for (int i = 0; i < 10; i++)
+            {
+                Document doc = new Document();
+                doc.Add(LuceneTestCase.NewStringField("data", Convert.ToString(i), Field.Store.NO));
+                writer.AddDocument(doc);
+                ((i % 2 == 0) ? swriter1 : swriter2).AddDocument(doc);
+            }
+
+            writer.ForceMerge(1);
+            swriter1.ForceMerge(1);
+            swriter2.ForceMerge(1);
+            writer.Dispose();
+            swriter1.Dispose();
+            swriter2.Dispose();
+
+            Reader = DirectoryReader.Open(Dir);
+            Searcher = LuceneTestCase.NewSearcher(Reader);
+
+            MultiReader = new MultiReader(new IndexReader[] { DirectoryReader.Open(Sdir1), DirectoryReader.Open(Sdir2) }, true);
+            MultiSearcher = LuceneTestCase.NewSearcher(MultiReader);
+
+            MultiReaderDupls = new MultiReader(new IndexReader[] { DirectoryReader.Open(Sdir1), DirectoryReader.Open(Dir) }, true);
+            MultiSearcherDupls = LuceneTestCase.NewSearcher(MultiReaderDupls);
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            MultiReader.Dispose();
+            MultiReaderDupls.Dispose();
+            Dir.Dispose();
+            Sdir1.Dispose();
+            Sdir2.Dispose();
+            Reader = MultiReader = MultiReaderDupls = null;
+            Searcher = MultiSearcher = MultiSearcherDupls = null;
+            Dir = Sdir1 = Sdir2 = null;
+        }
+
     }
 }

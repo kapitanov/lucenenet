@@ -34,7 +34,6 @@ namespace Lucene.Net.Index
     using StringField = StringField;
     using TextField = TextField;
 
-    [TestFixture]
     public class TestConsistentFieldNumbers : LuceneTestCase
     {
         [Fact]

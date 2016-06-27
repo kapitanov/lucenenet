@@ -1,8 +1,7 @@
-using Lucene.Net.Index;
 using Lucene.Net.Support;
-
 using System.Collections.Generic;
 using System.IO;
+using Xunit;
 
 namespace Lucene.Net.Store
 {
@@ -33,9 +32,7 @@ namespace Lucene.Net.Store
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using TestIndexWriterReader = Lucene.Net.Index.TestIndexWriterReader;
-    using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestFileSwitchDirectory : LuceneTestCase
     {
         /// <summary>

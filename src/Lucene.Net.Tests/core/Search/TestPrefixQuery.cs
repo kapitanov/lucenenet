@@ -33,9 +33,7 @@ namespace Lucene.Net.Search
 
     /// <summary>
     /// Tests <seealso cref="PrefixQuery"/> class.
-    ///
     /// </summary>
-    [TestFixture]
     public class TestPrefixQuery : LuceneTestCase
     {
         [Fact]
@@ -56,17 +54,17 @@ namespace Lucene.Net.Search
             PrefixQuery query = new PrefixQuery(new Term("category", "/Computers"));
             IndexSearcher searcher = NewSearcher(reader);
             ScoreDoc[] hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.Equal(3, hits.Length, "All documents in /Computers category and below");
+            Assert.Equal(3, hits.Length); //, "All documents in /Computers category and below");
 
             query = new PrefixQuery(new Term("category", "/Computers/Mac"));
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.Equal(1, hits.Length, "One in /Computers/Mac");
+            Assert.Equal(1, hits.Length); //, "One in /Computers/Mac");
 
             query = new PrefixQuery(new Term("category", ""));
             Terms terms = MultiFields.GetTerms(searcher.IndexReader, "category");
             Assert.False(query.GetTermsEnum(terms) is PrefixTermsEnum);
             hits = searcher.Search(query, null, 1000).ScoreDocs;
-            Assert.Equal(3, hits.Length, "everything");
+            Assert.Equal(3, hits.Length); //, "everything");
             writer.Dispose();
             reader.Dispose();
             directory.Dispose();

@@ -1,13 +1,10 @@
-using System;
+using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
 using Lucene.Net.Util;
 using Xunit;
 
 namespace Lucene.Net.Codecs.Compressing
 {
-    using Lucene.Net.Randomized.Generators;
-    using Lucene.Net.Support;
-    
-
     /*
                  * Licensed to the Apache Software Foundation (ASF) under one or more
                  * contributor license agreements.  See the NOTICE file distributed with
@@ -31,7 +28,6 @@ namespace Lucene.Net.Codecs.Compressing
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public abstract class AbstractTestCompressionMode : LuceneTestCase
     {
         internal CompressionMode Mode;
