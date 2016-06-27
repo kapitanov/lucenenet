@@ -19,6 +19,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
+using Xunit;
 
 namespace Lucene.Net.Classification
 {
@@ -43,8 +44,7 @@ namespace Lucene.Net.Classification
             CheckCorrectClassification(new SimpleNaiveBayesClassifier(), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new MockAnalyzer(Random()), textFieldName, categoryFieldName, new TermQuery(new Term(textFieldName, "it")));
         }
 
-        [Fact]
-        [Ignore("Need to figure out what to do with NGramAnalyzer, issues with things in Analysis.Common project")]
+        [Fact(Skip = "Need to figure out what to do with NGramAnalyzer, issues with things in Analysis.Common project")]
         public void TestNGramUsage()
         {
             //CheckCorrectClassification(new SimpleNaiveBayesClassifier(), TECHNOLOGY_INPUT, TECHNOLOGY_RESULT, new NGramAnalyzer(), textFieldName, categoryFieldName);

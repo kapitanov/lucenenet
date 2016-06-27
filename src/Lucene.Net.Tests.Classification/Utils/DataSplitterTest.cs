@@ -23,7 +23,7 @@ using Lucene.Net.Classification.Utils;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using Lucene.Net.Store;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Classification
 {
@@ -40,10 +40,8 @@ namespace Lucene.Net.Classification
         private String _classFieldName = "class";
         private String _idFieldName = "id";
 
-        [SetUp]
-        public override void SetUp()
+        public DataSplitterTest() : base()
         {
-            
             _dir = NewDirectory();
             _indexWriter = new RandomIndexWriter(Random(), _dir, new MockAnalyzer(Random()));
 
@@ -70,8 +68,7 @@ namespace Lucene.Net.Classification
             _originalIndex = SlowCompositeReaderWrapper.Wrap(_indexWriter.Reader);
         }
 
-        [TearDown]
-        public override void TearDown()
+        public override void Dispose()
         {
             _originalIndex.Dispose();
             _indexWriter.Dispose();

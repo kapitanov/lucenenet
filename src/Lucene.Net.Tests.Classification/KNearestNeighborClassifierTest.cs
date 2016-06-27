@@ -19,6 +19,7 @@ using Lucene.Net.Analysis;
 using Lucene.Net.Index;
 using Lucene.Net.Search;
 using Lucene.Net.Util;
+using Xunit;
 
 namespace Lucene.Net.Classification
 {
