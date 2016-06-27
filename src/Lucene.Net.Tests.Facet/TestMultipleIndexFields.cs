@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet
 {
@@ -20,7 +20,6 @@ namespace Lucene.Net.Facet
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using MockTokenizer = Lucene.Net.Analysis.MockTokenizer;

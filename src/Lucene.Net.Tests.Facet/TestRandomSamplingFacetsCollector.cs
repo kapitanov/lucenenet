@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Lucene.Net.Randomized.Generators;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet
 {

@@ -1,5 +1,5 @@
 ﻿using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet
 {

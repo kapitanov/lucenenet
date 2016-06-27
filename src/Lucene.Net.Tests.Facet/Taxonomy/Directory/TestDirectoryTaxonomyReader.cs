@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
-
-
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using ChildrenIterator = Lucene.Net.Facet.Taxonomy.TaxonomyReader.ChildrenIterator;
     using IndexWriter = Lucene.Net.Index.IndexWriter;
@@ -18,7 +17,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
     using Directory = Lucene.Net.Store.Directory;
     using RAMDirectory = Lucene.Net.Store.RAMDirectory;
     using IOUtils = Lucene.Net.Util.IOUtils;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -35,7 +33,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
     public class TestDirectoryTaxonomyReader : FacetTestCase
     {
 
@@ -89,14 +86,14 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 ltw.Commit();
 
                 ltr = new DirectoryTaxonomyReader(dir);
-                Assert.Null(TaxonomyReader.OpenIfChanged(ltr), "Nothing has changed");
+                Assert.Null(TaxonomyReader.OpenIfChanged(ltr)); //, "Nothing has changed");
 
                 ltw.AddCategory(new FacetLabel("b"));
                 ltw.Commit();
 
                 DirectoryTaxonomyReader newtr = TaxonomyReader.OpenIfChanged(ltr);
-                Assert.NotNull(newtr, "changes were committed");
-                Assert.Null(TaxonomyReader.OpenIfChanged(newtr), "Nothing has changed");
+                Assert.NotNull(newtr); //, "changes were committed");
+                Assert.Null(TaxonomyReader.OpenIfChanged(newtr)); //, "Nothing has changed");
                 (newtr).Dispose();
             }
             finally
@@ -188,7 +185,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                         tr.Dispose(true);
                         tr = newtr;
                     }
-                    Assert.Equal(baseNumCategories + 1 + k, tr.Size, "Wrong #categories in taxonomy (i=" + i + ", k=" + k + ")");
+                    Assert.Equal(baseNumCategories + 1 + k, tr.Size); //, "Wrong #categories in taxonomy (i=" + i + ", k=" + k + ")");
                 }
             }
             finally
@@ -207,10 +204,10 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.Commit();
 
             var taxoReader = new DirectoryTaxonomyReader(dir);
-            Assert.Equal(1, taxoReader.RefCount, "wrong refCount");
+            Assert.Equal(1, taxoReader.RefCount); //, "wrong refCount");
 
             taxoReader.IncRef();
-            Assert.Equal(2, taxoReader.RefCount, "wrong refCount");
+            Assert.Equal(2, taxoReader.RefCount); //, "wrong refCount");
 
             taxoWriter.AddCategory(new FacetLabel("a", "b"));
             taxoWriter.Commit();
@@ -218,7 +215,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             Assert.NotNull(newtr);
             taxoReader.Dispose();
             taxoReader = newtr;
-            Assert.Equal(1, taxoReader.RefCount, "wrong refCount");
+            Assert.Equal(1, taxoReader.RefCount); //, "wrong refCount");
 
             taxoWriter.Dispose();
             taxoReader.Dispose();
@@ -611,7 +608,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                     ++numChildren;
                 }
                 int expected = i == 0 ? numA : numB;
-                Assert.Equal(expected, numChildren, "invalid num children");
+                Assert.Equal(expected, numChildren); //, "invalid num children");
             }
             taxoReader.Dispose();
 

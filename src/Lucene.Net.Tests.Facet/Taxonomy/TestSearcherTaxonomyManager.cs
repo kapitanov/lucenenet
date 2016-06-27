@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -38,10 +38,9 @@ namespace Lucene.Net.Facet.Taxonomy
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
-    [TestFixture]
+
     public class TestSearcherTaxonomyManager : FacetTestCase
     {
-
         private class IndexerThread : ThreadClass
         {
 

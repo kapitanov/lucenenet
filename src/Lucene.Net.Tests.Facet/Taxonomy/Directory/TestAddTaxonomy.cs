@@ -1,22 +1,18 @@
-﻿using System;
+﻿using Lucene.Net.Randomized.Generators;
+using Lucene.Net.Support;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
-using Lucene.Net.Randomized.Generators;
-using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
-
-
+    using Directory = Lucene.Net.Store.Directory;
     using DiskOrdinalMap = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter.DiskOrdinalMap;
+    using IOUtils = Lucene.Net.Util.IOUtils;
     using MemoryOrdinalMap = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter.MemoryOrdinalMap;
     using OrdinalMap = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter.OrdinalMap;
-    using Directory = Lucene.Net.Store.Directory;
-    using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -33,7 +29,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    [TestFixture]
     public class TestAddTaxonomy : FacetTestCase
     {
         private void Dotest(int ncats, int range)
@@ -262,7 +257,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             // again, in parallel -- in the end, no duplicate categories should exist.
             Directory dest = NewDirectory();
             var destTw = new DirectoryTaxonomyWriter(dest);
-            ThreadClass t = new ThreadAnonymousInnerClassHelper2(this, numCategories, destTw);
+            ThreadClass t = new ThreadAnonymousInnerClassHelper2(numCategories, destTw);
             t.Start();
 
             OrdinalMap map = new MemoryOrdinalMap();
@@ -288,14 +283,11 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
         private class ThreadAnonymousInnerClassHelper2 : ThreadClass
         {
-            private readonly TestAddTaxonomy outerInstance;
+            private readonly int numCategories;
+            private DirectoryTaxonomyWriter destTW;
 
-            private int numCategories;
-            private Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter destTW;
-
-            public ThreadAnonymousInnerClassHelper2(TestAddTaxonomy outerInstance, int numCategories, Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter destTW)
+            public ThreadAnonymousInnerClassHelper2(int numCategories, DirectoryTaxonomyWriter destTW)
             {
-                this.outerInstance = outerInstance;
                 this.numCategories = numCategories;
                 this.destTW = destTW;
             }
@@ -316,7 +308,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 }
             }
         }
-
     }
 
 }

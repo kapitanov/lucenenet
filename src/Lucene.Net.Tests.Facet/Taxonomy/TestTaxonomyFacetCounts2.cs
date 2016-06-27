@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -25,7 +25,6 @@ namespace Lucene.Net.Facet.Taxonomy
      * limitations under the License.
      */
 
-
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using Document = Lucene.Net.Documents.Document;
     using Store = Lucene.Net.Documents.Field.Store;
@@ -40,20 +39,165 @@ namespace Lucene.Net.Facet.Taxonomy
     using IndexSearcher = Lucene.Net.Search.IndexSearcher;
     using MatchAllDocsQuery = Lucene.Net.Search.MatchAllDocsQuery;
     using TermQuery = Lucene.Net.Search.TermQuery;
-    using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
-    [TestFixture]
-    public class TestTaxonomyFacetCounts2 : FacetTestCase
-    {
+    using Util;
 
-        private static readonly Term A = new Term("f", "a");
-        private const string CP_A = "A", CP_B = "B";
-        private const string CP_C = "C", CP_D = "D"; // indexed w/ NO_PARENTS
-        private const int NUM_CHILDREN_CP_A = 5, NUM_CHILDREN_CP_B = 3;
-        private const int NUM_CHILDREN_CP_C = 5, NUM_CHILDREN_CP_D = 5;
-        private static readonly FacetField[] CATEGORIES_A, CATEGORIES_B;
-        private static readonly FacetField[] CATEGORIES_C, CATEGORIES_D;
-        static TestTaxonomyFacetCounts2()
+    public class TestTaxonomyFacetCounts2 : FacetTestCase, IClassFixture<TestTaxonomyFacetCounts2Fixture>
+    {
+        private readonly TestTaxonomyFacetCounts2Fixture _fixture;
+
+        private const string CP_A = TestTaxonomyFacetCounts2Fixture.CP_A;
+        private const string CP_B = TestTaxonomyFacetCounts2Fixture.CP_B;
+        private const string CP_C = TestTaxonomyFacetCounts2Fixture.CP_C;
+        private const string CP_D = TestTaxonomyFacetCounts2Fixture.CP_D;
+        private const int NUM_CHILDREN_CP_A = TestTaxonomyFacetCounts2Fixture.NUM_CHILDREN_CP_A;
+        private const int NUM_CHILDREN_CP_B = TestTaxonomyFacetCounts2Fixture.NUM_CHILDREN_CP_B;
+        private const int NUM_CHILDREN_CP_C = TestTaxonomyFacetCounts2Fixture.NUM_CHILDREN_CP_C;
+        private const int NUM_CHILDREN_CP_D = TestTaxonomyFacetCounts2Fixture.NUM_CHILDREN_CP_D;
+
+        public TestTaxonomyFacetCounts2(TestTaxonomyFacetCounts2Fixture fixture) : base()
+        {
+            _fixture = fixture;
+        }
+
+        [Fact]
+        public virtual void TestDifferentNumResults()
+        {
+            // test the collector w/ FacetRequests and different numResults
+            DirectoryReader indexReader = DirectoryReader.Open(_fixture.indexDir);
+            var taxoReader = new DirectoryTaxonomyReader(_fixture.taxoDir);
+            IndexSearcher searcher = NewSearcher(indexReader);
+
+            FacetsCollector sfc = new FacetsCollector();
+            TermQuery q = new TermQuery(_fixture.A);
+            searcher.Search(q, sfc);
+            Facets facets = GetTaxonomyFacetCounts(taxoReader, _fixture.Config, sfc);
+            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
+            Assert.Equal(-1, (int)result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                var expected = _fixture.termExpectedCounts[CP_A + "/" + labelValue.label].Value;
+                Assert.Equal(expected, labelValue.value);
+            }
+            result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
+            Assert.Equal(_fixture.termExpectedCounts[CP_B].Value, result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.termExpectedCounts[CP_B + "/" + labelValue.label].Value, labelValue.value);
+            }
+
+            IOUtils.Close(indexReader, taxoReader);
+        }
+
+        [Fact]
+        public virtual void TestAllCounts()
+        {
+            DirectoryReader indexReader = DirectoryReader.Open(_fixture.indexDir);
+            var taxoReader = new DirectoryTaxonomyReader(_fixture.taxoDir);
+            IndexSearcher searcher = NewSearcher(indexReader);
+
+            FacetsCollector sfc = new FacetsCollector();
+            searcher.Search(new MatchAllDocsQuery(), sfc);
+
+            Facets facets = GetTaxonomyFacetCounts(taxoReader, _fixture.Config, sfc);
+
+            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
+            Assert.Equal(-1, (int)result.Value);
+            int prevValue = int.MaxValue;
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_A + "/" + labelValue.label].Value, labelValue.value);
+                Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
+                prevValue = (int)labelValue.value;
+            }
+
+            result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
+            Assert.Equal(_fixture.allExpectedCounts[CP_B].Value, result.Value);
+            prevValue = int.MaxValue;
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_B + "/" + labelValue.label].Value, labelValue.value);
+                Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
+                prevValue = (int)labelValue.value;
+            }
+
+            IOUtils.Close(indexReader, taxoReader);
+        }
+
+        [Fact]
+        public virtual void TestBigNumResults()
+        {
+            DirectoryReader indexReader = DirectoryReader.Open(_fixture.indexDir);
+            var taxoReader = new DirectoryTaxonomyReader(_fixture.taxoDir);
+            IndexSearcher searcher = NewSearcher(indexReader);
+
+            FacetsCollector sfc = new FacetsCollector();
+            searcher.Search(new MatchAllDocsQuery(), sfc);
+
+            Facets facets = GetTaxonomyFacetCounts(taxoReader, _fixture.Config, sfc);
+
+            FacetResult result = facets.GetTopChildren(int.MaxValue, CP_A);
+            Assert.Equal(-1, (int)result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_A + "/" + labelValue.label].Value, labelValue.value);
+            }
+            result = facets.GetTopChildren(int.MaxValue, CP_B);
+            Assert.Equal(_fixture.allExpectedCounts[CP_B].Value, result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_B + "/" + labelValue.label].Value, labelValue.value);
+            }
+
+            IOUtils.Close(indexReader, taxoReader);
+        }
+
+        [Fact]
+        public virtual void TestNoParents()
+        {
+            DirectoryReader indexReader = DirectoryReader.Open(_fixture.indexDir);
+            var taxoReader = new DirectoryTaxonomyReader(_fixture.taxoDir);
+            IndexSearcher searcher = NewSearcher(indexReader);
+
+            var sfc = new FacetsCollector();
+            searcher.Search(new MatchAllDocsQuery(), sfc);
+
+            Facets facets = GetTaxonomyFacetCounts(taxoReader, _fixture.Config, sfc);
+            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_C, CP_C);
+            Assert.Equal(_fixture.allExpectedCounts[CP_C].Value, result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_C + "/" + labelValue.label].Value, labelValue.value);
+            }
+            result = facets.GetTopChildren(NUM_CHILDREN_CP_D, CP_D);
+            Assert.Equal(_fixture.allExpectedCounts[CP_C].Value, result.Value);
+            foreach (LabelAndValue labelValue in result.LabelValues)
+            {
+                Assert.Equal(_fixture.allExpectedCounts[CP_D + "/" + labelValue.label].Value, labelValue.value);
+            }
+
+            IOUtils.Close(indexReader, taxoReader);
+        }
+    }
+
+    public class TestTaxonomyFacetCounts2Fixture : IDisposable
+    {
+        internal const string CP_A = "A", CP_B = "B";
+        internal const string CP_C = "C", CP_D = "D"; // indexed w/ NO_PARENTS
+        internal const int NUM_CHILDREN_CP_A = 5, NUM_CHILDREN_CP_B = 3;
+        internal const int NUM_CHILDREN_CP_C = 5, NUM_CHILDREN_CP_D = 5;
+
+        internal readonly FacetField[] CATEGORIES_A, CATEGORIES_B;
+        internal readonly FacetField[] CATEGORIES_C, CATEGORIES_D;
+        internal readonly Term A = new Term("f", "a");
+
+        internal Net.Store.Directory indexDir { get; private set; }
+        internal Net.Store.Directory taxoDir { get; private set; }
+
+        internal IDictionary<string, int?> allExpectedCounts { get; private set; }
+        internal IDictionary<string, int?> termExpectedCounts { get; private set; }
+
+        public TestTaxonomyFacetCounts2Fixture()
         {
             CATEGORIES_A = new FacetField[NUM_CHILDREN_CP_A];
             for (int i = 0; i < NUM_CHILDREN_CP_A; i++)
@@ -80,72 +224,11 @@ namespace Lucene.Net.Facet.Taxonomy
                 string val = Convert.ToString(i);
                 CATEGORIES_D[i] = new FacetField(CP_D, val, val + val); // e.g. D/1/11, D/2/22...
             }
+
+            BeforeClassCountingFacetsAggregatorTest();
         }
 
-        private static Net.Store.Directory indexDir, taxoDir;
-        private static IDictionary<string, int?> allExpectedCounts, termExpectedCounts;
-
-        [TestFixtureTearDown]
-        public static void AfterClassCountingFacetsAggregatorTest()
-        {
-            IOUtils.Close(indexDir, taxoDir);
-        }
-
-        private static IList<FacetField> RandomCategories(Random random)
-        {
-            // add random categories from the two dimensions, ensuring that the same
-            // category is not added twice.
-            int numFacetsA = random.Next(3) + 1; // 1-3
-            int numFacetsB = random.Next(2) + 1; // 1-2
-            List<FacetField> categories_a = new List<FacetField>();
-            categories_a.AddRange(Arrays.AsList(CATEGORIES_A));
-            List<FacetField> categories_b = new List<FacetField>();
-            categories_b.AddRange(Arrays.AsList(CATEGORIES_B));
-            categories_a = CollectionsHelper.Shuffle(categories_a).ToList();
-            categories_b = CollectionsHelper.Shuffle(categories_b).ToList();
-
-            List<FacetField> categories = new List<FacetField>();
-            categories.AddRange(categories_a.SubList(0, numFacetsA));
-            categories.AddRange(categories_b.SubList(0, numFacetsB));
-
-            // add the NO_PARENT categories
-            categories.Add(CATEGORIES_C[Random().Next(NUM_CHILDREN_CP_C)]);
-            categories.Add(CATEGORIES_D[Random().Next(NUM_CHILDREN_CP_D)]);
-
-            return categories;
-        }
-
-        private static void AddField(Document doc)
-        {
-            doc.Add(new StringField(A.Field, A.Text(), Store.NO));
-        }
-
-        private static void AddFacets(Document doc, FacetsConfig config, bool updateTermExpectedCounts)
-        {
-            IList<FacetField> docCategories = RandomCategories(Random());
-            foreach (FacetField ff in docCategories)
-            {
-                doc.Add(ff);
-                string cp = ff.dim + "/" + ff.path[0];
-                allExpectedCounts[cp] = allExpectedCounts[cp] + 1;
-                if (updateTermExpectedCounts)
-                {
-                    termExpectedCounts[cp] = termExpectedCounts[cp] + 1;
-                }
-            }
-            // add 1 to each NO_PARENTS dimension
-            allExpectedCounts[CP_B] = allExpectedCounts[CP_B] + 1;
-            allExpectedCounts[CP_C] = allExpectedCounts[CP_C] + 1;
-            allExpectedCounts[CP_D] = allExpectedCounts[CP_D] + 1;
-            if (updateTermExpectedCounts)
-            {
-                termExpectedCounts[CP_B] = termExpectedCounts[CP_B] + 1;
-                termExpectedCounts[CP_C] = termExpectedCounts[CP_C] + 1;
-                termExpectedCounts[CP_D] = termExpectedCounts[CP_D] + 1;
-            }
-        }
-
-        private static FacetsConfig Config
+        internal FacetsConfig Config
         {
             get
             {
@@ -158,68 +241,42 @@ namespace Lucene.Net.Facet.Taxonomy
             }
         }
 
-        private static void IndexDocsNoFacets(IndexWriter indexWriter)
+        private void BeforeClassCountingFacetsAggregatorTest()
         {
-            int numDocs = AtLeast(2);
-            for (int i = 0; i < numDocs; i++)
-            {
-                Document doc = new Document();
-                AddField(doc);
-                indexWriter.AddDocument(doc);
-            }
-            indexWriter.Commit(); // flush a segment
-        }
+            indexDir = LuceneTestCase.NewDirectory();
+            taxoDir = LuceneTestCase.NewDirectory();
 
-        private static void IndexDocsWithFacetsNoTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
-        {
-            Random random = Random();
-            int numDocs = AtLeast(random, 2);
-            FacetsConfig config = Config;
-            for (int i = 0; i < numDocs; i++)
-            {
-                Document doc = new Document();
-                AddFacets(doc, config, false);
-                indexWriter.AddDocument(config.Build(taxoWriter, doc));
-            }
-            indexWriter.Commit(); // flush a segment
-        }
+            // create an index which has:
+            // 1. Segment with no categories, but matching results
+            // 2. Segment w/ categories, but no results
+            // 3. Segment w/ categories and results
+            // 4. Segment w/ categories, but only some results
 
-        private static void IndexDocsWithFacetsAndTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
-        {
-            Random random = Random();
-            int numDocs = AtLeast(random, 2);
-            FacetsConfig config = Config;
-            for (int i = 0; i < numDocs; i++)
-            {
-                Document doc = new Document();
-                AddFacets(doc, config, true);
-                AddField(doc);
-                indexWriter.AddDocument(config.Build(taxoWriter, doc));
-            }
-            indexWriter.Commit(); // flush a segment
-        }
+            IndexWriterConfig conf = LuceneTestCase.NewIndexWriterConfig(LuceneTestCase.TEST_VERSION_CURRENT, new MockAnalyzer(LuceneTestCase.Random()));
+            //conf.MergePolicy = NoMergePolicy.INSTANCE; // prevent merges, so we can control the index segments
+            IndexWriter indexWriter = new IndexWriter(indexDir, conf);
+            TaxonomyWriter taxoWriter = new DirectoryTaxonomyWriter(taxoDir);
 
-        private static void IndexDocsWithFacetsAndSomeTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
-        {
-            Random random = Random();
-            int numDocs = AtLeast(random, 2);
-            FacetsConfig config = Config;
-            for (int i = 0; i < numDocs; i++)
-            {
-                Document doc = new Document();
-                bool hasContent = random.NextBoolean();
-                if (hasContent)
-                {
-                    AddField(doc);
-                }
-                AddFacets(doc, config, hasContent);
-                indexWriter.AddDocument(config.Build(taxoWriter, doc));
-            }
-            indexWriter.Commit(); // flush a segment
+            allExpectedCounts = newCounts();
+            termExpectedCounts = newCounts();
+
+            // segment w/ no categories
+            IndexDocsNoFacets(indexWriter);
+
+            // segment w/ categories, no content
+            IndexDocsWithFacetsNoTerms(indexWriter, taxoWriter, allExpectedCounts);
+
+            // segment w/ categories and content
+            IndexDocsWithFacetsAndTerms(indexWriter, taxoWriter, allExpectedCounts);
+
+            // segment w/ categories and some content
+            IndexDocsWithFacetsAndSomeTerms(indexWriter, taxoWriter, allExpectedCounts);
+
+            IOUtils.Close(indexWriter, taxoWriter);
         }
 
         // initialize expectedCounts w/ 0 for all categories
-        private static IDictionary<string, int?> newCounts()
+        private IDictionary<string, int?> newCounts()
         {
             IDictionary<string, int?> counts = new Dictionary<string, int?>();
             counts[CP_A] = 0;
@@ -245,159 +302,123 @@ namespace Lucene.Net.Facet.Taxonomy
             return counts;
         }
 
-        [TestFixtureSetUp]
-        public static void BeforeClassCountingFacetsAggregatorTest()
+        private IList<FacetField> RandomCategories(Random random)
         {
-            indexDir = NewDirectory();
-            taxoDir = NewDirectory();
+            // add random categories from the two dimensions, ensuring that the same
+            // category is not added twice.
+            int numFacetsA = random.Next(3) + 1; // 1-3
+            int numFacetsB = random.Next(2) + 1; // 1-2
+            List<FacetField> categories_a = new List<FacetField>();
+            categories_a.AddRange(Arrays.AsList(CATEGORIES_A));
+            List<FacetField> categories_b = new List<FacetField>();
+            categories_b.AddRange(Arrays.AsList(CATEGORIES_B));
+            categories_a = CollectionsHelper.Shuffle(categories_a).ToList();
+            categories_b = CollectionsHelper.Shuffle(categories_b).ToList();
 
-            // create an index which has:
-            // 1. Segment with no categories, but matching results
-            // 2. Segment w/ categories, but no results
-            // 3. Segment w/ categories and results
-            // 4. Segment w/ categories, but only some results
+            List<FacetField> categories = new List<FacetField>();
+            categories.AddRange(categories_a.SubList(0, numFacetsA));
+            categories.AddRange(categories_b.SubList(0, numFacetsB));
 
-            IndexWriterConfig conf = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
-            //conf.MergePolicy = NoMergePolicy.INSTANCE; // prevent merges, so we can control the index segments
-            IndexWriter indexWriter = new IndexWriter(indexDir, conf);
-            TaxonomyWriter taxoWriter = new DirectoryTaxonomyWriter(taxoDir);
+            // add the NO_PARENT categories
+            categories.Add(CATEGORIES_C[random.Next(NUM_CHILDREN_CP_C)]);
+            categories.Add(CATEGORIES_D[random.Next(NUM_CHILDREN_CP_D)]);
 
-            allExpectedCounts = newCounts();
-            termExpectedCounts = newCounts();
-
-            // segment w/ no categories
-            IndexDocsNoFacets(indexWriter);
-
-            // segment w/ categories, no content
-            IndexDocsWithFacetsNoTerms(indexWriter, taxoWriter, allExpectedCounts);
-
-            // segment w/ categories and content
-            IndexDocsWithFacetsAndTerms(indexWriter, taxoWriter, allExpectedCounts);
-
-            // segment w/ categories and some content
-            IndexDocsWithFacetsAndSomeTerms(indexWriter, taxoWriter, allExpectedCounts);
-
-            IOUtils.Close(indexWriter, taxoWriter);
+            return categories;
         }
 
-        [Fact]
-        public virtual void TestDifferentNumResults()
+        private void AddField(Document doc)
         {
-            // test the collector w/ FacetRequests and different numResults
-            DirectoryReader indexReader = DirectoryReader.Open(indexDir);
-            var taxoReader = new DirectoryTaxonomyReader(taxoDir);
-            IndexSearcher searcher = NewSearcher(indexReader);
-
-            FacetsCollector sfc = new FacetsCollector();
-            TermQuery q = new TermQuery(A);
-            searcher.Search(q, sfc);
-            Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
-            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
-            Assert.Equal(-1, (int)result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
-            {
-                Assert.Equal(termExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
-            }
-            result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
-            Assert.Equal(termExpectedCounts[CP_B], result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
-            {
-                Assert.Equal(termExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
-            }
-
-            IOUtils.Close(indexReader, taxoReader);
+            doc.Add(new StringField(A.Field, A.Text(), Store.NO));
         }
 
-        [Fact]
-        public virtual void TestAllCounts()
+        private void AddFacets(Document doc, FacetsConfig config, bool updateTermExpectedCounts)
         {
-            DirectoryReader indexReader = DirectoryReader.Open(indexDir);
-            var taxoReader = new DirectoryTaxonomyReader(taxoDir);
-            IndexSearcher searcher = NewSearcher(indexReader);
-
-            FacetsCollector sfc = new FacetsCollector();
-            searcher.Search(new MatchAllDocsQuery(), sfc);
-
-            Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
-
-            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_A, CP_A);
-            Assert.Equal(-1, (int)result.Value);
-            int prevValue = int.MaxValue;
-            foreach (LabelAndValue labelValue in result.LabelValues)
+            IList<FacetField> docCategories = RandomCategories(LuceneTestCase.Random());
+            foreach (FacetField ff in docCategories)
             {
-                Assert.Equal(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
-                Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
-                prevValue = (int)labelValue.value;
+                doc.Add(ff);
+                string cp = ff.dim + "/" + ff.path[0];
+                allExpectedCounts[cp] = allExpectedCounts[cp] + 1;
+                if (updateTermExpectedCounts)
+                {
+                    termExpectedCounts[cp] = termExpectedCounts[cp] + 1;
+                }
             }
-
-            result = facets.GetTopChildren(NUM_CHILDREN_CP_B, CP_B);
-            Assert.Equal(allExpectedCounts[CP_B], result.Value);
-            prevValue = int.MaxValue;
-            foreach (LabelAndValue labelValue in result.LabelValues)
+            // add 1 to each NO_PARENTS dimension
+            allExpectedCounts[CP_B] = allExpectedCounts[CP_B] + 1;
+            allExpectedCounts[CP_C] = allExpectedCounts[CP_C] + 1;
+            allExpectedCounts[CP_D] = allExpectedCounts[CP_D] + 1;
+            if (updateTermExpectedCounts)
             {
-                Assert.Equal(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
-                Assert.True((int)labelValue.value <= prevValue, "wrong sort order of sub results: labelValue.value=" + labelValue.value + " prevValue=" + prevValue);
-                prevValue = (int)labelValue.value;
+                termExpectedCounts[CP_B] = termExpectedCounts[CP_B] + 1;
+                termExpectedCounts[CP_C] = termExpectedCounts[CP_C] + 1;
+                termExpectedCounts[CP_D] = termExpectedCounts[CP_D] + 1;
             }
-
-            IOUtils.Close(indexReader, taxoReader);
         }
 
-        [Fact]
-        public virtual void TestBigNumResults()
+        private void IndexDocsNoFacets(IndexWriter indexWriter)
         {
-            DirectoryReader indexReader = DirectoryReader.Open(indexDir);
-            var taxoReader = new DirectoryTaxonomyReader(taxoDir);
-            IndexSearcher searcher = NewSearcher(indexReader);
-
-            FacetsCollector sfc = new FacetsCollector();
-            searcher.Search(new MatchAllDocsQuery(), sfc);
-
-            Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
-
-            FacetResult result = facets.GetTopChildren(int.MaxValue, CP_A);
-            Assert.Equal(-1, (int)result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
+            int numDocs = LuceneTestCase.AtLeast(2);
+            for (int i = 0; i < numDocs; i++)
             {
-                Assert.Equal(allExpectedCounts[CP_A + "/" + labelValue.label], labelValue.value);
+                Document doc = new Document();
+                AddField(doc);
+                indexWriter.AddDocument(doc);
             }
-            result = facets.GetTopChildren(int.MaxValue, CP_B);
-            Assert.Equal(allExpectedCounts[CP_B], result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
-            {
-                Assert.Equal(allExpectedCounts[CP_B + "/" + labelValue.label], labelValue.value);
-            }
-
-            IOUtils.Close(indexReader, taxoReader);
+            indexWriter.Commit(); // flush a segment
         }
 
-        [Fact]
-        public virtual void TestNoParents()
+        private void IndexDocsWithFacetsNoTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
         {
-            DirectoryReader indexReader = DirectoryReader.Open(indexDir);
-            var taxoReader = new DirectoryTaxonomyReader(taxoDir);
-            IndexSearcher searcher = NewSearcher(indexReader);
-
-            var sfc = new FacetsCollector();
-            searcher.Search(new MatchAllDocsQuery(), sfc);
-
-            Facets facets = GetTaxonomyFacetCounts(taxoReader, Config, sfc);
-
-            FacetResult result = facets.GetTopChildren(NUM_CHILDREN_CP_C, CP_C);
-            Assert.Equal(allExpectedCounts[CP_C], result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
+            Random random = LuceneTestCase.Random();
+            int numDocs = LuceneTestCase.AtLeast(random, 2);
+            FacetsConfig config = Config;
+            for (int i = 0; i < numDocs; i++)
             {
-                Assert.Equal(allExpectedCounts[CP_C + "/" + labelValue.label], labelValue.value);
+                Document doc = new Document();
+                AddFacets(doc, config, false);
+                indexWriter.AddDocument(config.Build(taxoWriter, doc));
             }
-            result = facets.GetTopChildren(NUM_CHILDREN_CP_D, CP_D);
-            Assert.Equal(allExpectedCounts[CP_C], result.Value);
-            foreach (LabelAndValue labelValue in result.LabelValues)
-            {
-                Assert.Equal(allExpectedCounts[CP_D + "/" + labelValue.label], labelValue.value);
-            }
+            indexWriter.Commit(); // flush a segment
+        }
 
-            IOUtils.Close(indexReader, taxoReader);
+        private void IndexDocsWithFacetsAndTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
+        {
+            Random random = LuceneTestCase.Random();
+            int numDocs = LuceneTestCase.AtLeast(random, 2);
+            FacetsConfig config = Config;
+            for (int i = 0; i < numDocs; i++)
+            {
+                Document doc = new Document();
+                AddFacets(doc, config, true);
+                AddField(doc);
+                indexWriter.AddDocument(config.Build(taxoWriter, doc));
+            }
+            indexWriter.Commit(); // flush a segment
+        }
+
+        private void IndexDocsWithFacetsAndSomeTerms(IndexWriter indexWriter, TaxonomyWriter taxoWriter, IDictionary<string, int?> expectedCounts)
+        {
+            Random random = LuceneTestCase.Random();
+            int numDocs = LuceneTestCase.AtLeast(random, 2);
+            FacetsConfig config = Config;
+            for (int i = 0; i < numDocs; i++)
+            {
+                Document doc = new Document();
+                bool hasContent = random.NextBoolean();
+                if (hasContent)
+                {
+                    AddField(doc);
+                }
+                AddFacets(doc, config, hasContent);
+                indexWriter.AddDocument(config.Build(taxoWriter, doc));
+            }
+            indexWriter.Commit(); // flush a segment
+        }
+
+        public void Dispose()
+        {
+            IOUtils.Close(indexDir, taxoDir);
         }
     }
-
 }

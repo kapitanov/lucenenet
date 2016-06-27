@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Threading;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
-
-
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using Document = Lucene.Net.Documents.Document;
     using MemoryOrdinalMap = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter.MemoryOrdinalMap;
@@ -26,7 +24,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -89,7 +86,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             ltw.AddCategory(new FacetLabel("a"));
 
             IndexReader r = DirectoryReader.Open(dir);
-            Assert.Equal(1, r.NumDocs, "No categories should have been committed to the underlying directory");
+            Assert.Equal(1, r.NumDocs); //, "No categories should have been committed to the underlying directory");
             r.Dispose();
             ltw.Dispose();
             dir.Dispose();
@@ -108,10 +105,10 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.CommitData = userCommitData;
             taxoWriter.Dispose();
             var r = DirectoryReader.Open(dir);
-            Assert.Equal(3, r.NumDocs, "2 categories plus root should have been committed to the underlying directory");
+            Assert.Equal(3, r.NumDocs); //, "2 categories plus root should have been committed to the underlying directory");
             var readUserCommitData = r.IndexCommit.UserData;
             Assert.True("1 2 3".Equals(readUserCommitData["testing"]), "wrong value extracted from commit data");
-            Assert.NotNull(DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in commitData", readUserCommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
+            Assert.NotNull(DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in commitData"); //, readUserCommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
             r.Dispose();
 
             // open DirTaxoWriter again and commit, INDEX_EPOCH should still exist
@@ -128,12 +125,12 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.Commit();
 
             // verify taxoWriter.getCommitData()
-            Assert.NotNull(DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in taoxWriter.commitData", taxoWriter.CommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
+            Assert.NotNull(taxoWriter.CommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]); //DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in taoxWriter.commitData", 
             taxoWriter.Dispose();
 
             r = DirectoryReader.Open(dir);
             readUserCommitData = r.IndexCommit.UserData;
-            Assert.NotNull(DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in commitData", readUserCommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]);
+            Assert.NotNull(readUserCommitData[DirectoryTaxonomyWriter.INDEX_EPOCH]); //DirectoryTaxonomyWriter.INDEX_EPOCH + " not found in commitData", 
             r.Dispose();
 
             dir.Dispose();
@@ -337,7 +334,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 {
                     path = cp.Subpath(i + 1);
                     int ord = dtr.GetOrdinal(path);
-                    Assert.Equal(parentOrd, parents[ord], "invalid parent for cp=" + path);
+                    Assert.Equal(parentOrd, parents[ord]); //, "invalid parent for cp=" + path);
                     parentOrd = ord; // next level should have this parent
                 }
             }
@@ -419,13 +416,13 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
 
             // LUCENE-4633: make sure that category "a" is not added again in any case
             taxoWriter.AddTaxonomy(input, new MemoryOrdinalMap());
-            Assert.Equal(2, taxoWriter.Size, "no categories should have been added"); // root + 'a'
-            Assert.Equal(ordA, taxoWriter.AddCategory(new FacetLabel("a")), "category 'a' received new ordinal?");
+            Assert.Equal(2, taxoWriter.Size); //, "no categories should have been added"); // root + 'a'
+            Assert.Equal(ordA, taxoWriter.AddCategory(new FacetLabel("a"))); //, "category 'a' received new ordinal?");
 
             // add the same category again -- it should not receive the same ordinal !
             int newOrdB = taxoWriter.AddCategory(new FacetLabel("b"));
-            Assert.NotSame(ordB, newOrdB, "new ordinal cannot be the original ordinal");
-            Assert.Equal(2, newOrdB, "ordinal should have been 2 since only one category was added by replaceTaxonomy");
+            Assert.NotSame(ordB, newOrdB); //, "new ordinal cannot be the original ordinal");
+            Assert.Equal(2, newOrdB); //, "ordinal should have been 2 since only one category was added by replaceTaxonomy");
 
             taxoWriter.Dispose();
 
@@ -463,7 +460,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             long gen1 = SegmentInfos.GetLastCommitGeneration(dir);
             taxoWriter.Commit();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2); //, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();
@@ -481,7 +478,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             long gen1 = SegmentInfos.GetLastCommitGeneration(dir);
             taxoWriter.Dispose();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2); //, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();
@@ -501,7 +498,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
             taxoWriter.PrepareCommit();
             taxoWriter.Commit();
             long gen2 = SegmentInfos.GetLastCommitGeneration(dir);
-            Assert.Equal(gen1, gen2, "empty commit should not have changed the index");
+            Assert.Equal(gen1, gen2); //, "empty commit should not have changed the index");
 
             taxoWriter.Dispose();
             dir.Dispose();

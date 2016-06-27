@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -59,8 +60,7 @@ namespace Lucene.Net.Facet.Taxonomy
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
-    using NUnit.Framework;
-    [TestFixture]
+
     public class TestTaxonomyFacetSumValueSource : FacetTestCase
     {
 
@@ -487,7 +487,7 @@ namespace Lucene.Net.Facet.Taxonomy
             Facets facets2 = new TaxonomyFacetSumValueSource(new DocValuesOrdinalsReader("$b"), taxoReader, config, fc, new TaxonomyFacetSumValueSource.ScoreValueSource());
 
             Assert.Equal(r.MaxDoc, (int)facets1.GetTopChildren(10, "a").Value);
-            Assert.Equal(r.MaxDoc, (double)facets2.GetTopChildren(10, "b").Value, 1E-10);
+            assertEquals(r.MaxDoc, (double)facets2.GetTopChildren(10, "b").Value, 1E-10);
             IOUtils.Close(taxoWriter, iw, taxoReader, taxoDir, r, indexDir);
         }
 

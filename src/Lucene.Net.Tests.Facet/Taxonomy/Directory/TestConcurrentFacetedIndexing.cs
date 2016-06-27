@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
-using System.Threading;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy.Directory
 {
-
-
     using Document = Lucene.Net.Documents.Document;
     using TaxonomyWriterCache = Lucene.Net.Facet.Taxonomy.WriterCache.TaxonomyWriterCache;
     using Cl2oTaxonomyWriterCache = Lucene.Net.Facet.Taxonomy.WriterCache.Cl2oTaxonomyWriterCache;
@@ -16,7 +14,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
     using OpenMode = Lucene.Net.Index.IndexWriterConfig.OpenMode_e;
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -33,7 +30,6 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    [TestFixture]
     public class TestConcurrentFacetedIndexing : FacetTestCase
     {
 
@@ -159,7 +155,7 @@ namespace Lucene.Net.Facet.Taxonomy.Directory
                 {
                     path = cp.Subpath(i + 1);
                     int ord = tr.GetOrdinal(path);
-                    Assert.Equal(parentOrd, parents[ord], "invalid parent for cp=" + path);
+                    Assert.Equal(parentOrd, parents[ord]); //, "invalid parent for cp=" + path);
                     parentOrd = ord; // next level should have this parent
                 }
             }

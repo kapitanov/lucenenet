@@ -5,6 +5,7 @@ using System.Linq;
 using Lucene.Net.Facet;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet
 {
@@ -38,7 +39,6 @@ namespace Lucene.Net.Facet
     using LuceneTestCase = Lucene.Net.Util.LuceneTestCase;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public abstract class FacetTestCase : LuceneTestCase
     {
         public virtual Facets GetTaxonomyFacetCounts(TaxonomyReader taxoReader, FacetsConfig config, FacetsCollector c)
@@ -277,12 +277,12 @@ namespace Lucene.Net.Facet
             Assert.Equal(a.Dim, b.Dim);
             Assert.True(Arrays.Equals(a.Path, b.Path));
             Assert.Equal(a.ChildCount, b.ChildCount);
-            Assert.Equal((float)a.Value, (float)b.Value, (float)a.Value / 1e5);
+            assertEquals((float)a.Value, (float)b.Value, (float)a.Value / 1e5);
             Assert.Equal(a.LabelValues.Length, b.LabelValues.Length);
             for (int i = 0; i < a.LabelValues.Length; i++)
             {
                 Assert.Equal(a.LabelValues[i].label, b.LabelValues[i].label);
-                Assert.Equal((float)a.LabelValues[i].value, (float)b.LabelValues[i].value, (float)a.LabelValues[i].value / 1e5);
+                assertEquals((float)a.LabelValues[i].value, (float)b.LabelValues[i].value, (float)a.LabelValues[i].value / 1e5);
             }
         }
     }

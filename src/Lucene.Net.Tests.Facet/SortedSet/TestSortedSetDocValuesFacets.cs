@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Randomized;
 using Lucene.Net.Randomized.Generators;
+using Xunit;
 
 namespace Lucene.Net.Facet.SortedSet
 {
@@ -39,8 +39,6 @@ namespace Lucene.Net.Facet.SortedSet
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
-    
-    [TestFixture]
     public class TestSortedSetDocValuesFacets : FacetTestCase
     {
 

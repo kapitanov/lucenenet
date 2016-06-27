@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -20,7 +19,6 @@ namespace Lucene.Net.Facet.Taxonomy
      * limitations under the License.
      */
 
-
     using Document = Lucene.Net.Documents.Document;
     using DirectoryTaxonomyReader = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyReader;
     using DirectoryTaxonomyWriter = Lucene.Net.Facet.Taxonomy.Directory.DirectoryTaxonomyWriter;
@@ -30,91 +28,31 @@ namespace Lucene.Net.Facet.Taxonomy
     using MatchAllDocsQuery = Lucene.Net.Search.MatchAllDocsQuery;
     using Directory = Lucene.Net.Store.Directory;
     using IOUtils = Lucene.Net.Util.IOUtils;
-
-    /// <summary>
-    /// Test for associations 
-    /// </summary>
-    [TestFixture]
-    public class TestTaxonomyFacetAssociations : FacetTestCase
+    using System;
+    using Util;    /// <summary>
+                   /// Test for associations 
+                   /// </summary>
+    public class TestTaxonomyFacetAssociations : FacetTestCase, IClassFixture<TestTaxonomyFacetAssociationsFixture>
     {
+        private readonly TestTaxonomyFacetAssociationsFixture _fixture;
 
-        private static Store.Directory dir;
-        private static IndexReader reader;
-        private static Store.Directory taxoDir;
-        private static TaxonomyReader taxoReader;
-
-        private static FacetsConfig config;
-
-
-        [TestFixtureSetUp]
-        public static void BeforeClass()
+        public TestTaxonomyFacetAssociations(TestTaxonomyFacetAssociationsFixture fixture)
         {
-            dir = NewDirectory();
-            taxoDir = NewDirectory();
-            // preparations - index, taxonomy, content
-
-            var taxoWriter = new DirectoryTaxonomyWriter(taxoDir);
-
-            // Cannot mix ints & floats in the same indexed field:
-            config = new FacetsConfig();
-            config.SetIndexFieldName("int", "$facets.int");
-            config.SetMultiValued("int", true);
-            config.SetIndexFieldName("float", "$facets.float");
-            config.SetMultiValued("float", true);
-
-            var writer = new RandomIndexWriter(Random(), dir);
-
-            // index documents, 50% have only 'b' and all have 'a'
-            for (int i = 0; i < 110; i++)
-            {
-                Document doc = new Document();
-                // every 11th document is added empty, this used to cause the association
-                // aggregators to go into an infinite loop
-                if (i % 11 != 0)
-                {
-                    doc.Add(new IntAssociationFacetField(2, "int", "a"));
-                    doc.Add(new FloatAssociationFacetField(0.5f, "float", "a"));
-                    if (i % 2 == 0) // 50
-                    {
-                        doc.Add(new IntAssociationFacetField(3, "int", "b"));
-                        doc.Add(new FloatAssociationFacetField(0.2f, "float", "b"));
-                    }
-                }
-                writer.AddDocument(config.Build(taxoWriter, doc));
-            }
-
-            taxoWriter.Dispose();
-            reader = writer.Reader;
-            writer.Dispose();
-            taxoReader = new DirectoryTaxonomyReader(taxoDir);
-        }
-
-        [TestFixtureTearDown]
-        public static void AfterClass()
-        {
-            reader.Dispose();
-            reader = null;
-            dir.Dispose();
-            dir = null;
-            taxoReader.Dispose(true);
-            taxoReader = null;
-            taxoDir.Dispose();
-            taxoDir = null;
+            _fixture = fixture;
         }
 
         [Fact]
         public virtual void TestIntSumAssociation()
         {
-
             FacetsCollector fc = new FacetsCollector();
 
-            IndexSearcher searcher = NewSearcher(reader);
+            IndexSearcher searcher = NewSearcher(_fixture.Reader);
             searcher.Search(new MatchAllDocsQuery(), fc);
 
-            Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
+            Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", _fixture.TaxoReader, _fixture.FacetsConfig, fc);
             Assert.Equal("dim=int path=[] value=-1 childCount=2\n  a (200)\n  b (150)\n", facets.GetTopChildren(10, "int").ToString());
-            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a")); //, "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b")); //, "Wrong count for category 'b'!");
         }
 
         [Fact]
@@ -122,13 +60,13 @@ namespace Lucene.Net.Facet.Taxonomy
         {
             FacetsCollector fc = new FacetsCollector();
 
-            IndexSearcher searcher = NewSearcher(reader);
+            IndexSearcher searcher = NewSearcher(_fixture.Reader);
             searcher.Search(new MatchAllDocsQuery(), fc);
 
-            Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", taxoReader, config, fc);
-            Assert.Equal("dim=float path=[] value=-1.0 childCount=2\n  a (50.0)\n  b (9.999995)\n", facets.GetTopChildren(10, "float").ToString());
-            Assert.Equal(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
-            Assert.Equal(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
+            Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", _fixture.TaxoReader, _fixture.FacetsConfig, fc);
+            assertEquals("dim=float path=[] value=-1.0 childCount=2\n  a (50.0)\n  b (9.999995)\n", facets.GetTopChildren(10, "float").ToString());
+            assertEquals(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001); //, "Wrong count for category 'a'!");
+            assertEquals(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001); //, "Wrong count for category 'b'!");
         }
 
         /// <summary>
@@ -140,16 +78,16 @@ namespace Lucene.Net.Facet.Taxonomy
         {
             FacetsCollector fc = new FacetsCollector();
 
-            IndexSearcher searcher = NewSearcher(reader);
+            IndexSearcher searcher = NewSearcher(_fixture.Reader);
             searcher.Search(new MatchAllDocsQuery(), fc);
 
-            Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", taxoReader, config, fc);
-            Assert.Equal(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001, "Wrong count for category 'a'!");
-            Assert.Equal(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001, "Wrong count for category 'b'!");
+            Facets facets = new TaxonomyFacetSumFloatAssociations("$facets.float", _fixture.TaxoReader, _fixture.FacetsConfig, fc);
+            assertEquals(50f, (float)facets.GetSpecificValue("float", "a"), 0.00001); //, "Wrong count for category 'a'!");
+            assertEquals(10f, (float)facets.GetSpecificValue("float", "b"), 0.00001); //, "Wrong count for category 'b'!");
 
-            facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
-            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            facets = new TaxonomyFacetSumIntAssociations("$facets.int", _fixture.TaxoReader, _fixture.FacetsConfig, fc);
+            Assert.Equal(200, (int)facets.GetSpecificValue("int", "a")); //, "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b")); //, "Wrong count for category 'b'!");
         }
 
         
@@ -158,9 +96,9 @@ namespace Lucene.Net.Facet.Taxonomy
         {
             FacetsCollector fc = new FacetsCollector();
 
-            IndexSearcher searcher = NewSearcher(reader);
+            IndexSearcher searcher = NewSearcher(_fixture.Reader);
             searcher.Search(new MatchAllDocsQuery(), fc);
-            Facets facets = new TaxonomyFacetSumFloatAssociations(taxoReader, config, fc);
+            Facets facets = new TaxonomyFacetSumFloatAssociations(_fixture.TaxoReader, _fixture.FacetsConfig, fc);
             try
             {
                 facets.GetSpecificValue("float");
@@ -262,17 +200,79 @@ namespace Lucene.Net.Facet.Taxonomy
         {
             FacetsCollector fc = new FacetsCollector();
 
-            IndexSearcher searcher = NewSearcher(reader);
-            DrillDownQuery q = new DrillDownQuery(config);
+            IndexSearcher searcher = NewSearcher(_fixture.Reader);
+            DrillDownQuery q = new DrillDownQuery(_fixture.FacetsConfig);
             q.Add("int", "b");
             searcher.Search(q, fc);
 
-            Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", taxoReader, config, fc);
+            Facets facets = new TaxonomyFacetSumIntAssociations("$facets.int", _fixture.TaxoReader, _fixture.FacetsConfig, fc);
             Assert.Equal("dim=int path=[] value=-1 childCount=2\n  b (150)\n  a (100)\n", facets.GetTopChildren(10, "int").ToString());
-            Assert.Equal(100, (int)facets.GetSpecificValue("int", "a"), "Wrong count for category 'a'!");
-            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b"), "Wrong count for category 'b'!");
+            Assert.Equal(100, (int)facets.GetSpecificValue("int", "a")); //, "Wrong count for category 'a'!");
+            Assert.Equal(150, (int)facets.GetSpecificValue("int", "b")); //, "Wrong count for category 'b'!");
         }
 
     }
 
+    public class TestTaxonomyFacetAssociationsFixture : IDisposable
+    {
+        internal Store.Directory Directory { get; private set; }
+        internal IndexReader Reader { get; private set; }
+        internal Store.Directory TaxoDirectory { get; private set; }
+        internal TaxonomyReader TaxoReader { get; private set; }
+        internal FacetsConfig FacetsConfig { get; private set; }
+
+        public TestTaxonomyFacetAssociationsFixture()
+        {
+            Directory = LuceneTestCase.NewDirectory();
+            TaxoDirectory = LuceneTestCase.NewDirectory();
+            // preparations - index, taxonomy, content
+
+            var taxoWriter = new DirectoryTaxonomyWriter(TaxoDirectory);
+
+            // Cannot mix ints & floats in the same indexed field:
+            FacetsConfig = new FacetsConfig();
+            FacetsConfig.SetIndexFieldName("int", "$facets.int");
+            FacetsConfig.SetMultiValued("int", true);
+            FacetsConfig.SetIndexFieldName("float", "$facets.float");
+            FacetsConfig.SetMultiValued("float", true);
+
+            var writer = new RandomIndexWriter(LuceneTestCase.Random(), Directory);
+
+            // index documents, 50% have only 'b' and all have 'a'
+            for (int i = 0; i < 110; i++)
+            {
+                Document doc = new Document();
+                // every 11th document is added empty, this used to cause the association
+                // aggregators to go into an infinite loop
+                if (i % 11 != 0)
+                {
+                    doc.Add(new IntAssociationFacetField(2, "int", "a"));
+                    doc.Add(new FloatAssociationFacetField(0.5f, "float", "a"));
+                    if (i % 2 == 0) // 50
+                    {
+                        doc.Add(new IntAssociationFacetField(3, "int", "b"));
+                        doc.Add(new FloatAssociationFacetField(0.2f, "float", "b"));
+                    }
+                }
+                writer.AddDocument(FacetsConfig.Build(taxoWriter, doc));
+            }
+
+            taxoWriter.Dispose();
+            Reader = writer.Reader;
+            writer.Dispose();
+            TaxoReader = new DirectoryTaxonomyReader(TaxoDirectory);
+        }
+
+        public void Dispose()
+        {
+            Reader.Dispose();
+            Reader = null;
+            Directory.Dispose();
+            Directory = null;
+            TaxoReader.Dispose(true);
+            TaxoReader = null;
+            TaxoDirectory.Dispose();
+            TaxoDirectory = null;
+        }
+    }
 }

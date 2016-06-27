@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet
 {
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -24,7 +24,6 @@ namespace Lucene.Net.Facet
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
 
     using MockAnalyzer = Lucene.Net.Analysis.MockAnalyzer;
     using Document = Lucene.Net.Documents.Document;
@@ -62,9 +61,7 @@ namespace Lucene.Net.Facet
     using InPlaceMergeSorter = Lucene.Net.Util.InPlaceMergeSorter;
     using InfoStream = Lucene.Net.Util.InfoStream;
     using TestUtil = Lucene.Net.Util.TestUtil;
-    using NUnit.Framework;
 
-    [TestFixture]
     public class TestDrillSideways : FacetTestCase
     {
 
@@ -1220,7 +1217,7 @@ namespace Lucene.Net.Facet
                             idx++;
                         }
                     }
-                    Assert.Equal(expected.UniqueCounts[dim], fr.ChildCount, "dim=" + dim);
+                    Assert.Equal(expected.UniqueCounts[dim], fr.ChildCount); //, "dim=" + dim);
                 }
 
                 if (topN < dimValues[dim].Length)
@@ -1259,7 +1256,7 @@ namespace Lucene.Net.Facet
                         {
                             // Tie-break facet labels are only in unicode
                             // order with SortedSetDVFacets:
-                            Assert.Equal("value @ idx=" + i, dimValues[dim][expectedOrd], fr.LabelValues[i].label);
+                            Assert.Equal("value @ idx=" + i, dimValues[dim][expectedOrd]); //, fr.LabelValues[i].label);
                         }
                     }
                 }

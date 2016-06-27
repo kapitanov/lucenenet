@@ -2,9 +2,9 @@
 using System.Diagnostics;
 using System.Collections;
 using System.Collections.Generic;
-using Lucene.Net.Facet.Range;
 using Lucene.Net.Randomized.Generators;
 using Lucene.Net.Support;
+using Xunit;
 
 namespace Lucene.Net.Facet.Range
 {
@@ -25,7 +25,6 @@ namespace Lucene.Net.Facet.Range
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-
 
     using Document = Lucene.Net.Documents.Document;
     using DoubleDocValuesField = Lucene.Net.Documents.DoubleDocValuesField;
@@ -63,7 +62,6 @@ namespace Lucene.Net.Facet.Range
     using IOUtils = Lucene.Net.Util.IOUtils;
     using TestUtil = Lucene.Net.Util.TestUtil;
 
-    [TestFixture]
     public class TestRangeFacetCounts : FacetTestCase
     {
 

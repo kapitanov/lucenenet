@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy
 {
@@ -34,8 +34,6 @@ namespace Lucene.Net.Facet.Taxonomy
      * limitations under the License.
      */
 
-
-    [TestFixture]
     [SuppressCodecs]
     public class TestTaxonomyCombined : FacetTestCase
     {
@@ -813,7 +811,7 @@ namespace Lucene.Net.Facet.Taxonomy
             {
                 var cp = new FacetLabel("a", "b", Convert.ToString(i));
                 tw.AddCategory(cp);
-                Assert.Equal(TaxonomyReader.INVALID_ORDINAL, tr.GetOrdinal(cp), "Ordinal of " + cp + " must be invalid until Taxonomy Reader was refreshed");
+                Assert.Equal(TaxonomyReader.INVALID_ORDINAL, tr.GetOrdinal(cp)); //, "Ordinal of " + cp + " must be invalid until Taxonomy Reader was refreshed");
             }
             tw.Dispose();
 
@@ -834,7 +832,7 @@ namespace Lucene.Net.Facet.Taxonomy
 
             stop.Set(true);
             thread.Join();
-            Assert.Null(error[0], "Unexpcted exception at retry " + retry + " retrieval " + retrieval[0] + ": \n" + stackTraceStr(error[0]));
+            Assert.Null(error[0]); //, "Unexpcted exception at retry " + retry + " retrieval " + retrieval[0] + ": \n" + stackTraceStr(error[0]));
 
             tr.Dispose();
         }
@@ -876,7 +874,7 @@ namespace Lucene.Net.Facet.Taxonomy
                     while (!stop.Get())
                     {
                         int lastOrd = tr.ParallelTaxonomyArrays.Parents().Length - 1;
-                        Assert.NotNull(tr.GetPath(lastOrd), "path of last-ord " + lastOrd + " is not found!");
+                        Assert.NotNull(tr.GetPath(lastOrd)); //, "path of last-ord " + lastOrd + " is not found!");
                         AssertChildrenArrays(tr.ParallelTaxonomyArrays, retry, retrieval[0]++);
                         Thread.Sleep(10);// don't starve refresh()'s CPU, which sleeps every 50 bytes for 1 ms
                     }
@@ -1165,7 +1163,7 @@ namespace Lucene.Net.Facet.Taxonomy
             FacetLabel cp = new FacetLabel("a");
             writer.AddCategory(cp);
             var newReader = TaxonomyReader.OpenIfChanged(reader);
-            Assert.NotNull(newReader, "expected a new instance");
+            Assert.NotNull(newReader); //, "expected a new instance");
             Assert.Equal(2, newReader.Size);
             Assert.NotSame(TaxonomyReader.INVALID_ORDINAL, newReader.GetOrdinal(cp));
             reader.Dispose();

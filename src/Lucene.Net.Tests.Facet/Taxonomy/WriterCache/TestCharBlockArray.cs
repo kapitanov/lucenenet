@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using Lucene.Net.Support;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Facet.Taxonomy.WriterCache
 {
@@ -24,7 +24,6 @@ namespace Lucene.Net.Facet.Taxonomy.WriterCache
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    [TestFixture]
     public class TestCharBlockArray : FacetTestCase
     {
 
