@@ -9,7 +9,6 @@ using Xunit;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
-
     /*
      * Licensed to the Apache Software Foundation (ASF) under one or more
      * contributor license agreements.  See the NOTICE file distributed with
@@ -28,7 +27,6 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
      */
     /// <summary>
     /// Basic tests for <seealso cref="SegmentingTokenizerBase"/> </summary>
-    [TestFixture]
     public class TestSegmentingTokenizerBase : BaseTokenStreamTestCase
     {
         private Analyzer sentence = new AnalyzerAnonymousInnerClassHelper();

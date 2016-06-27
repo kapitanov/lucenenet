@@ -1,12 +1,11 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Core;
 using Lucene.Net.Analysis.Tokenattributes;
 using Lucene.Net.Support;
 using Lucene.Net.Util;
-using NUnit.Framework;
+using Xunit;
 
 namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
 {
@@ -30,7 +29,6 @@ namespace Lucene.Net.Tests.Analysis.Common.Analysis.Util
     /// <summary>
     /// Testcase for <seealso cref="CharTokenizer"/> subclasses
     /// </summary>
-    [TestFixture]
     public class TestCharTokenizers : BaseTokenStreamTestCase
     {
 
