@@ -464,7 +464,7 @@ namespace Lucene.Net.Util
         /// Exposed because <see cref="TestRuleSetupAndRestoreClassEnv"/> is
         /// internal and this field is needed by other classes.
         /// </summary>
-        public TimeZone TimeZone { get { return ClassEnvRule.TimeZone; } }
+        public TimeZoneInfo TimeZone { get { return ClassEnvRule.TimeZone; } }
 
         // LUCENENET TODO
         /// <summary>
@@ -893,7 +893,7 @@ namespace Lucene.Net.Util
         /// This is the only static ctor for IndexWriterConfig because it removes the dependency
         /// on ClassEnvRule by using parameters Similarity and TimeZone.
         /// </summary>
-        public static IndexWriterConfig NewIndexWriterConfig(Random r, LuceneVersion v, Analyzer a, Similarity similarity, TimeZone timezone)
+        public static IndexWriterConfig NewIndexWriterConfig(Random r, LuceneVersion v, Analyzer a, Similarity similarity, TimeZoneInfo timezone)
         {
             IndexWriterConfig c = new IndexWriterConfig(v, a);
             c.SetSimilarity(similarity);
@@ -999,7 +999,7 @@ namespace Lucene.Net.Util
         /// LUCENENET specific
         /// Timezone added to remove dependency on the then-static <see cref="ClassEnvRule"/>
         /// </param>
-        public static MergePolicy NewMergePolicy(Random r, TimeZone timezone)
+        public static MergePolicy NewMergePolicy(Random r, TimeZoneInfo timezone)
         {
             if (Rarely(r))
             {
@@ -1020,7 +1020,7 @@ namespace Lucene.Net.Util
         /// LUCENENET specific
         /// Timezone added to remove dependency on the then-static <see cref="ClassEnvRule"/>
         /// </param>
-        public static MergePolicy NewMergePolicy(TimeZone timezone)
+        public static MergePolicy NewMergePolicy(TimeZoneInfo timezone)
         {
             return NewMergePolicy(Random(), timezone);
         }
