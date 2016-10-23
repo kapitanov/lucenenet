@@ -1119,7 +1119,7 @@ namespace Lucene.Net.Util.Packed
         }
 
 
-        [Test, Timeout(80000)]
+        [Test, MaxTime(80000)]
         public virtual void TestAppendingLongBuffer()
         {
 
@@ -1472,7 +1472,7 @@ namespace Lucene.Net.Util.Packed
             }
         }
 
-        [Test, Timeout(180000)]
+        [Test, MaxTime(180000)]
         public virtual void TestBlockReaderOverflow()
         {
             long valueCount = TestUtil.NextLong(Random(), 1L + int.MaxValue, (long)int.MaxValue * 2);
