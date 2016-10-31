@@ -85,7 +85,7 @@ namespace Lucene.Net.Search
             MultiSearcherDupls = NewSearcher(MultiReaderDupls);
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void AfterClass()
         {
             Reader.Dispose();

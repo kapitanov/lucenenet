@@ -49,7 +49,7 @@ namespace Lucene.Net.Index
 
         //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
         //ORIGINAL LINE: @AfterClass public static void afterClass() throws Exception
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void AfterClass()
         {
             LineDocFile.Dispose();

@@ -205,7 +205,7 @@ namespace Lucene.Net.Index
             }
         }
 
-        [TestFixtureTearDown]
+        [OneTimeTearDown]
         public static void AfterClass()
         {
             foreach (Directory d in OldIndexDirs.Values)
