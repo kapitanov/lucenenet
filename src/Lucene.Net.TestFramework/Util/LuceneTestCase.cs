@@ -1011,7 +1011,7 @@ namespace Lucene.Net.Util
             }
             else if (r.Next(5) == 0)
             {
-                return NewAlcoholicMergePolicy(r, timezone);
+                return NewAlcoholicMergePolicy(r);
             }
             return NewLogMergePolicy(r);
         }
