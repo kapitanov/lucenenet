@@ -74,7 +74,7 @@ namespace Lucene.Net.Search
         private static BytesRef[,] MultiValued;
         private static Directory Directory;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void BeforeClass()
         {
             NUM_DOCS = AtLeast(500);

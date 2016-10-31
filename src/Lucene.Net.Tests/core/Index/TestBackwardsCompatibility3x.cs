@@ -115,7 +115,7 @@ namespace Lucene.Net.Index
 
         internal static IDictionary<string, Directory> OldIndexDirs;
 
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void BeforeClass()
         {
             Assert.IsFalse(LuceneTestCase.OLD_FORMAT_IMPERSONATION_IS_ACTIVE, "test infra is broken!");

@@ -41,7 +41,7 @@ namespace Lucene.Net.Index
 
         //JAVA TO C# CONVERTER TODO TASK: Most Java annotations will not have direct .NET equivalent attributes:
         //ORIGINAL LINE: @BeforeClass public static void beforeClass() throws Exception
-        [TestFixtureSetUp]
+        [OneTimeSetUp]
         public static void BeforeClass()
         {
             LineDocFile = new LineFileDocs(Random(), DefaultCodecSupportsDocValues());
