@@ -10,7 +10,6 @@ namespace Lucene.Net.Search
     using Lucene.Net.Support;
     using NUnit.Framework;
     using AlreadyClosedException = Lucene.Net.Store.AlreadyClosedException;
-    using ConcurrentMergeScheduler = Lucene.Net.Index.ConcurrentMergeScheduler;
     using Directory = Lucene.Net.Store.Directory;
     using DirectoryReader = Lucene.Net.Index.DirectoryReader;
     using Document = Documents.Document;
@@ -294,7 +293,7 @@ namespace Lucene.Net.Search
             {
                 Console.WriteLine("THREAD started");
             }
-            awaitEnterWarmWait();
+            awaitEnterWarm.Wait();
             if (VERBOSE)
             {
                 Console.WriteLine("NOW call close");
@@ -343,18 +342,22 @@ namespace Lucene.Net.Search
 
             public override IndexSearcher NewSearcher(IndexReader r)
             {
+#if !NETCORE
                 try
                 {
+#endif
                     if (TriedReopen.Get())
                     {
                         AwaitEnterWarm.Signal();
                         AwaitClose.Wait();
                     }
+#if !NETCORE
                 }
                 catch (ThreadInterruptedException e)
                 {
                     //
                 }
+#endif
                 return new IndexSearcher(r, Es);
             }
         }

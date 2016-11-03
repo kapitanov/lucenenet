@@ -5,6 +5,7 @@ namespace Lucene.Net.Codecs.Compressing
 {
     using Lucene.Net.Randomized.Generators;
     using NUnit.Framework;
+    using System;
     using BaseStoredFieldsFormatTestCase = Lucene.Net.Index.BaseStoredFieldsFormatTestCase;
     using Directory = Lucene.Net.Store.Directory;
     using Document = Documents.Document;
@@ -45,7 +46,6 @@ namespace Lucene.Net.Codecs.Compressing
         }
 
         [Test]
-        [ExpectedException("System.ArgumentException")]
         public virtual void TestDeletePartiallyWrittenFilesIfAbort()
         {
             Directory dir = NewDirectory();
@@ -68,26 +68,29 @@ namespace Lucene.Net.Codecs.Compressing
             fieldType.Stored = true;
             invalidDoc.Add(new FieldAnonymousInnerClassHelper(this, fieldType));
 
-            try
+            Assert.Throws<ArgumentException>(() =>
             {
-                iw.AddDocument(invalidDoc);
-                iw.Commit();
-            }
-            finally
-            {
-                int counter = 0;
-                foreach (string fileName in dir.ListAll())
+                try
                 {
-                    if (fileName.EndsWith(".fdt") || fileName.EndsWith(".fdx"))
-                    {
-                        counter++;
-                    }
+                    iw.AddDocument(invalidDoc);
+                    iw.Commit();
                 }
-                // Only one .fdt and one .fdx files must have been found
-                Assert.AreEqual(2, counter);
-                iw.Dispose();
-                dir.Dispose();
-            }
+                finally
+                {
+                    int counter = 0;
+                    foreach (string fileName in dir.ListAll())
+                    {
+                        if (fileName.EndsWith(".fdt") || fileName.EndsWith(".fdx"))
+                        {
+                            counter++;
+                        }
+                    }
+                    // Only one .fdt and one .fdx files must have been found
+                    Assert.AreEqual(2, counter);
+                    iw.Dispose();
+                    dir.Dispose();
+                }
+            });
         }
 
         private class FieldAnonymousInnerClassHelper : Field

@@ -6,7 +6,7 @@ namespace Lucene.Net.Index
 {
     using Lucene.Net.Analysis;
     using Lucene.Net.Analysis.Tokenattributes;
-    
+
     using Lucene.Net.Search;
     using Lucene.Net.Store;
     using Lucene.Net.Support;
@@ -30,6 +30,7 @@ namespace Lucene.Net.Index
 
     using Lucene.Net.Util;
     using NUnit.Framework;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using Codec = Lucene.Net.Codecs.Codec;
 
@@ -45,7 +46,7 @@ namespace Lucene.Net.Index
     //
     //   java -server -Xmx8g -d64 -cp .:lib/junit-4.10.jar:./build/classes/test:./build/classes/test-framework:./build/classes/java -Dlucene.version=4.0-dev -Dtests.directory=MMapDirectory -DtempDir=build -ea org.junit.runner.JUnitCore Lucene.Net.Index.Test2BTerms
     //
-    [Ignore]
+    [Ignore ("Ignored test")]
     [TestFixture]
     public class Test2BTerms : LuceneTestCase
     {
@@ -156,7 +157,7 @@ namespace Lucene.Net.Index
                     {
                         return new MyTermAttributeImpl();
                     }
-                    if (attClass.IsSubclassOf(typeof(CharTermAttribute)))
+                    if (attClass.GetTypeInfo().IsSubclassOf(typeof(CharTermAttribute)))
                     {
                         throw new System.ArgumentException("no");
                     }
@@ -166,7 +167,7 @@ namespace Lucene.Net.Index
         }
 
         //ORIGINAL LINE: @Ignore("Very slow. Enable manually by removing @Ignore.") public void test2BTerms() throws java.io.IOException
-        [Ignore]
+        [Ignore("long running testcase")]
         [Test]
         public virtual void Test2BTerms_Mem([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
         {

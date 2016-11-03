@@ -381,8 +381,8 @@ namespace Lucene.Net.Search
             IndexWriterConfig conf = NewIndexWriterConfig(TEST_VERSION_CURRENT, new MockAnalyzer(Random()));
             conf.SetMergePolicy(Random().NextBoolean() ? NoMergePolicy.COMPOUND_FILES : NoMergePolicy.NO_COMPOUND_FILES);
             Directory d = NewDirectory();
-            CountDownLatch latch = new CountDownLatch(1);
-            CountDownLatch signal = new CountDownLatch(1);
+            CountdownEvent latch = new CountdownEvent(1);
+            CountdownEvent signal = new CountdownEvent(1);
 
             LatchedIndexWriter _writer = new LatchedIndexWriter(d, conf, latch, signal);
             TrackingIndexWriter writer = new TrackingIndexWriter(_writer);
@@ -433,12 +433,12 @@ namespace Lucene.Net.Search
         {
             private readonly TestControlledRealTimeReopenThread OuterInstance;
 
-            private CountDownLatch Latch;
-            private CountDownLatch Signal;
+            private CountdownEvent Latch;
+            private CountdownEvent Signal;
             private TrackingIndexWriter Writer;
             private SearcherManager Manager;
 
-            public ThreadAnonymousInnerClassHelper(TestControlledRealTimeReopenThread outerInstance, CountDownLatch latch, CountDownLatch signal, TrackingIndexWriter writer, SearcherManager manager)
+            public ThreadAnonymousInnerClassHelper(TestControlledRealTimeReopenThread outerInstance, CountdownEvent latch, CountdownEvent signal, TrackingIndexWriter writer, SearcherManager manager)
             {
                 this.OuterInstance = outerInstance;
                 this.Latch = latch;
@@ -451,7 +451,7 @@ namespace Lucene.Net.Search
             {
                 try
                 {
-                    Signal.@await();
+                    Signal.Wait();
                     Manager.MaybeRefresh();
                     Writer.DeleteDocuments(new TermQuery(new Term("foo", "barista")));
                     Manager.MaybeRefresh(); // kick off another reopen so we inc. the internal gen
@@ -463,7 +463,7 @@ namespace Lucene.Net.Search
                 }
                 finally
                 {
-                    Latch.countDown(); // let the add below finish
+                    Latch.Signal(); // let the add below finish
                 }
             }
         }
@@ -502,11 +502,11 @@ namespace Lucene.Net.Search
         public class LatchedIndexWriter : IndexWriter
         {
 
-            internal CountDownLatch Latch;
+            internal CountdownEvent Latch;
             internal bool WaitAfterUpdate = false;
-            internal CountDownLatch Signal;
+            internal CountdownEvent Signal;
 
-            public LatchedIndexWriter(Directory d, IndexWriterConfig conf, CountDownLatch latch, CountDownLatch signal)
+            public LatchedIndexWriter(Directory d, IndexWriterConfig conf, CountdownEvent latch, CountdownEvent signal)
                 : base(d, conf)
             {
                 this.Latch = latch;
@@ -521,8 +521,8 @@ namespace Lucene.Net.Search
                 {
                     if (WaitAfterUpdate)
                     {
-                        Signal.countDown();
-                        Latch.@await();
+                        Signal.Signal();
+                        Latch.Wait();
                     }
                 }
                 catch (ThreadInterruptedException e)

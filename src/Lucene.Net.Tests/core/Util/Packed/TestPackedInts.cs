@@ -503,7 +503,7 @@ namespace Lucene.Net.Util.Packed
 	    
           NOTE: this test allocates 256 MB
          */
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestIntOverflow()
         {
@@ -911,7 +911,7 @@ namespace Lucene.Net.Util.Packed
         }
 
         // memory hole
-        [Ignore]
+        [Ignore("Ignored test")]
         [Test]
         public virtual void TestPagedGrowableWriterOverflow()
         {

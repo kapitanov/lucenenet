@@ -35,7 +35,7 @@ namespace Lucene.Net.Index
     /// <summary>
     /// this test creates an index with one segment that is a little larger than 4GB.
     /// </summary>
-    [Ignore]
+    [Ignore("long running testcase")]
     [TestFixture]
     public class Test4GBStoredFields : LuceneTestCase
     {
