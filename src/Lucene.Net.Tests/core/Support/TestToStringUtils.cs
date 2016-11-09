@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Util;
+﻿using Lucene.Net.Attributes;
+using Lucene.Net.Util;
 using NUnit.Framework;
 using System;
 using System.Collections.Concurrent;
@@ -34,7 +35,7 @@ namespace Lucene.Net.Core.Support
         /// <summary>
         /// Check to ensure that the Boost function is properly converted in every possible culture.
         /// </summary>
-        [Test]
+        [Test, LuceneNetSpecific]
         public void TestBoost()
         {
             float boostNormal = 1f;

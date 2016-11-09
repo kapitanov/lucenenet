@@ -283,7 +283,6 @@ namespace Lucene.Net.Index
         }
 
         // LUCENE-510
-        [Ignore("Ignored test")]
         [Test]
         public virtual void TestInvalidUTF16()
         {

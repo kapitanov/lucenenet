@@ -49,7 +49,7 @@ namespace Lucene.Net.Codecs.Lucene3x
                 this.OuterInstance = outerInstance;
             }
 
-            protected override bool SortTermsByUnicode()
+            protected internal override bool SortTermsByUnicode()
             {
 
                 // We carefully peek into stack track above us: if

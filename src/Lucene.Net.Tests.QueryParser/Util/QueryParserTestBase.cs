@@ -11,12 +11,7 @@ using Lucene.Net.Util;
 using Lucene.Net.Util.Automaton;
 using NUnit.Framework;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lucene.Net.QueryParsers.Util
 {
@@ -26,7 +21,7 @@ namespace Lucene.Net.QueryParsers.Util
     /// abstract classes.
     /// </summary>
     [TestFixture]
-    public class QueryParserTestBase : AbstractQueryParserTestBase
+    public abstract class QueryParserTestBase : LuceneTestCase
     {
         public static Analyzer qpAnalyzer;
 
@@ -113,82 +108,23 @@ namespace Lucene.Net.QueryParsers.Util
             originalMaxClauses = BooleanQuery.MaxClauseCount;
         }
 
-        // Moved from TestQueryParser
-        public virtual Classic.QueryParser GetParser(Analyzer a)
-        {
-            if (a == null) a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
-            Classic.QueryParser qp = new Classic.QueryParser(TEST_VERSION_CURRENT, DefaultField, a);
-            qp.DefaultOperator = (QueryParserBase.OR_OPERATOR);
-            return qp;
-        }
+        public abstract ICommonQueryParserConfiguration GetParserConfig(Analyzer a);
 
-        // Moved to AbstractQueryParserTestBase
-        public override ICommonQueryParserConfiguration GetParserConfig(Analyzer a)
-        {
-            return GetParser(a);
-        }
+        public abstract void SetDefaultOperatorOR(ICommonQueryParserConfiguration cqpC);
 
-        // Moved to AbstractQueryParserTestBase
-        public override void SetDefaultOperatorOR(ICommonQueryParserConfiguration cqpC)
-        {
-            Debug.Assert(cqpC is Classic.QueryParser);
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            qp.DefaultOperator = QueryParserBase.Operator.OR;
-        }
+        public abstract void SetDefaultOperatorAND(ICommonQueryParserConfiguration cqpC);
 
-        // Moved to AbstractQueryParserTestBase
-        public override void SetDefaultOperatorAND(ICommonQueryParserConfiguration cqpC)
-        {
-            Debug.Assert(cqpC is Classic.QueryParser);
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            qp.DefaultOperator = QueryParserBase.Operator.AND;
-        }
+        public abstract void SetAnalyzeRangeTerms(ICommonQueryParserConfiguration cqpC, bool value);
 
-        // Moved to AbstractQueryParserTestBase
-        public override void SetAnalyzeRangeTerms(ICommonQueryParserConfiguration cqpC, bool value)
-        {
-            Debug.Assert(cqpC is Classic.QueryParser);
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            qp.AnalyzeRangeTerms = (value);
-        }
+        public abstract void SetAutoGeneratePhraseQueries(ICommonQueryParserConfiguration cqpC, bool value);
 
-        // Moved to AbstractQueryParserTestBase
-        public override void SetAutoGeneratePhraseQueries(ICommonQueryParserConfiguration cqpC, bool value)
-        {
-            Debug.Assert(cqpC is Classic.QueryParser);
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            qp.AutoGeneratePhraseQueries = value;
-        }
+        public abstract void SetDateResolution(ICommonQueryParserConfiguration cqpC, string field, DateTools.Resolution value);
 
-        // Moved to AbstractQueryParserTestBase
-        public override void SetDateResolution(ICommonQueryParserConfiguration cqpC, ICharSequence field, DateTools.Resolution value)
-        {
-            Debug.Assert(cqpC is Classic.QueryParser);
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            qp.SetDateResolution(field.toString(), value);
-        }
+        public abstract Query GetQuery(string query, ICommonQueryParserConfiguration cqpC);
 
-        // Moved to AbstractQueryParserTestBase
-        public override Query GetQuery(string query, ICommonQueryParserConfiguration cqpC)
-        {
-            Debug.Assert(cqpC != null, "Parameter must not be null");
-            Debug.Assert(cqpC is Classic.QueryParser, "Parameter must be instance of QueryParser");
-            Classic.QueryParser qp = (Classic.QueryParser)cqpC;
-            return qp.Parse(query);
-        }
+        public abstract Query GetQuery(string query, Analyzer a);
 
-        // Moved to AbstractQueryParserTestBase
-        public override Query GetQuery(string query, Analyzer a)
-        {
-            return GetParser(a).Parse(query);
-        }
-
-
-        // Moved to AbstractQueryParserTestBase
-        public override bool IsQueryParserException(Exception exception)
-        {
-            return exception is ParseException;
-        }
+        public abstract bool IsQueryParserException(Exception exception);
 
         public Query GetQuery(string query)
         {
@@ -278,7 +214,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJK()
+        public virtual void TestCJK()
         {
             // Test Ideographic Space - As wide as a CJK character cell (fullwidth)
             // used google to translate the word "term" to japanese -> 用語
@@ -316,7 +252,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJKTerm()
+        public virtual void TestCJKTerm()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -329,7 +265,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJKBoostedTerm()
+        public virtual void TestCJKBoostedTerm()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -343,7 +279,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJKPhrase()
+        public virtual void TestCJKPhrase()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -356,7 +292,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJKBoostedPhrase()
+        public virtual void TestCJKBoostedPhrase()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -370,7 +306,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCJKSloppyPhrase()
+        public virtual void TestCJKSloppyPhrase()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -384,7 +320,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestAutoGeneratePhraseQueriesOn()
+        public virtual void TestAutoGeneratePhraseQueriesOn()
         {
             // individual CJK chars as terms
             SimpleCJKAnalyzer analyzer = new SimpleCJKAnalyzer();
@@ -398,7 +334,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestSimple()
+        public virtual void TestSimple()
         {
             AssertQueryEquals("term term term", null, "term term term");
             AssertQueryEquals("türm term term", new MockAnalyzer(Random()), "türm term term");
@@ -453,11 +389,7 @@ namespace Lucene.Net.QueryParsers.Util
 
         }
 
-        // Moved to AbstractQueryParserTestBase
-        public override void TestDefaultOperator()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void TestDefaultOperator();
 
         private class OperatorVsWhitespaceAnalyzer : Analyzer
         {
@@ -468,7 +400,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestOperatorVsWhitespace()
+        public virtual void TestOperatorVsWhitespace()
         { //LUCENE-2566
             // +,-,! should be directly adjacent to operand (i.e. not separated by whitespace) to be treated as an operator
             Analyzer a = new OperatorVsWhitespaceAnalyzer();
@@ -478,7 +410,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestPunct()
+        public virtual void TestPunct()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false);
             AssertQueryEquals("a&b", a, "a&b");
@@ -487,7 +419,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestSlop()
+        public virtual void TestSlop()
         {
             AssertQueryEquals("\"term germ\"~2", null, "\"term germ\"~2");
             AssertQueryEquals("\"term germ\"~2 flork", null, "\"term germ\"~2 flork");
@@ -497,7 +429,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestNumber()
+        public virtual void TestNumber()
         {
             // The numbers go away because SimpleAnalzyer ignores them
             AssertQueryEquals("3", null, "");
@@ -511,7 +443,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestWildcard()
+        public virtual void TestWildcard()
         {
             AssertQueryEquals("term*", null, "term*");
             AssertQueryEquals("term*^2", null, "term*^2.0");
@@ -605,7 +537,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestLeadingWildcardType()
+        public virtual void TestLeadingWildcardType()
         {
             ICommonQueryParserConfiguration cqpC = GetParserConfig(null);
             cqpC.AllowLeadingWildcard = (true);
@@ -615,7 +547,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestQPA()
+        public virtual void TestQPA()
         {
             AssertQueryEquals("term term^3.0 term", qpAnalyzer, "term term^3.0 term");
             AssertQueryEquals("term stop^3.0 term", qpAnalyzer, "term term");
@@ -653,7 +585,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestRange()
+        public virtual void TestRange()
         {
             AssertQueryEquals("[ a TO z]", null, "[a TO z]");
             AssertQueryEquals("[ a TO z}", null, "[a TO z}");
@@ -692,7 +624,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestRangeWithPhrase()
+        public virtual void TestRangeWithPhrase()
         {
             AssertQueryEquals("[\\* TO \"*\"]", null, "[\\* TO \\*]");
             AssertQueryEquals("[\"*\" TO *]", null, "[\\* TO *]");
@@ -730,9 +662,8 @@ namespace Lucene.Net.QueryParsers.Util
 
         private string GetLocalizedDate(int year, int month, int day)
         {
-            // TODO: Is this the right way to get the localized date?
             DateTime d = new DateTime(year, month, day, 23, 59, 59, 999);
-            return d.ToString();
+            return d.ToShortDateString();
 
             //// we use the default Locale/TZ since LuceneTestCase randomizes it
             //DateFormat df = DateFormat.getDateInstance(DateFormat.SHORT, Locale.getDefault());
@@ -746,45 +677,46 @@ namespace Lucene.Net.QueryParsers.Util
             //return df.format(calendar.getTime());
         }
 
-        // TODO: Fix this test
         [Test]
-        public void TestDateRange()
+        public virtual void TestDateRange()
         {
-            Assert.Fail("Test is not implemented");
+            string startDate = GetLocalizedDate(2002, 1, 1);
+            string endDate = GetLocalizedDate(2002, 1, 4);
 
-        //    string startDate = GetLocalizedDate(2002, 1, 1);
-        //    string endDate = GetLocalizedDate(2002, 1, 4);
-        //    // we use the default Locale/TZ since LuceneTestCase randomizes it
-        //    Calendar endDateExpected = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
-        //    endDateExpected.clear();
-        //    endDateExpected.set(2002, 1, 4, 23, 59, 59);
-        //    endDateExpected.set(Calendar.MILLISECOND, 999);
-        //    string defaultField = "default";
-        //    string monthField = "month";
-        //    string hourField = "hour";
-        //    Analyzer a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
-        //    CommonQueryParserConfiguration qp = GetParserConfig(a);
+            // we use the default Locale/TZ since LuceneTestCase randomizes it
+            //Calendar endDateExpected = new GregorianCalendar(TimeZone.getDefault(), Locale.getDefault());
+            //endDateExpected.clear();
+            //endDateExpected.set(2002, 1, 4, 23, 59, 59);
+            //endDateExpected.set(Calendar.MILLISECOND, 999);
 
-        //    // set a field specific date resolution
-        //    SetDateResolution(qp, monthField, DateTools.Resolution.MONTH);
+            // we use the default Locale/TZ since LuceneTestCase randomizes it
+            DateTime endDateExpected = new DateTime(2002, 1, 4, 23, 59, 59, 999, new GregorianCalendar());
+            string defaultField = "default";
+            string monthField = "month";
+            string hourField = "hour";
+            Analyzer a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
+            ICommonQueryParserConfiguration qp = GetParserConfig(a);
 
-        //    // set default date resolution to MILLISECOND
-        //    qp.SetDateResolution(DateTools.Resolution.MILLISECOND);
+            // set a field specific date resolution
+            SetDateResolution(qp, monthField, DateTools.Resolution.MONTH);
 
-        //    // set second field specific date resolution    
-        //    SetDateResolution(qp, hourField, DateTools.Resolution.HOUR);
+            // set default date resolution to MILLISECOND
+            qp.SetDateResolution(DateTools.Resolution.MILLISECOND);
 
-        //    // for this field no field specific date resolution has been set,
-        //    // so verify if the default resolution is used
-        //    AssertDateRangeQueryEquals(qp, defaultField, startDate, endDate,
-        //            endDateExpected.getTime(), DateTools.Resolution.MILLISECOND);
+            // set second field specific date resolution    
+            SetDateResolution(qp, hourField, DateTools.Resolution.HOUR);
 
-        //    // verify if field specific date resolutions are used for these two fields
-        //    AssertDateRangeQueryEquals(qp, monthField, startDate, endDate,
-        //            endDateExpected.getTime(), DateTools.Resolution.MONTH);
+            // for this field no field specific date resolution has been set,
+            // so verify if the default resolution is used
+            AssertDateRangeQueryEquals(qp, defaultField, startDate, endDate,
+                    endDateExpected /*.getTime()*/, DateTools.Resolution.MILLISECOND);
 
-        //    AssertDateRangeQueryEquals(qp, hourField, startDate, endDate,
-        //            endDateExpected.getTime(), DateTools.Resolution.HOUR);
+            // verify if field specific date resolutions are used for these two fields
+            AssertDateRangeQueryEquals(qp, monthField, startDate, endDate,
+                    endDateExpected /*.getTime()*/, DateTools.Resolution.MONTH);
+
+            AssertDateRangeQueryEquals(qp, hourField, startDate, endDate,
+                    endDateExpected /*.getTime()*/, DateTools.Resolution.HOUR);
         }
 
         public void AssertDateRangeQueryEquals(ICommonQueryParserConfiguration cqpC, string field, string startDate, string endDate,
@@ -797,7 +729,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestEscaped()
+        public virtual void TestEscaped()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false);
 
@@ -887,7 +819,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestEscapedVsQuestionMarkAsWildcard()
+        public virtual void TestEscapedVsQuestionMarkAsWildcard()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false);
             AssertQueryEquals("a:b\\-?c", a, "a:b\\-?c");
@@ -898,7 +830,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestQueryStringEscaping()
+        public virtual void TestQueryStringEscaping()
         {
             Analyzer a = new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false);
 
@@ -939,7 +871,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestTabNewlineCarriageReturn()
+        public virtual void TestTabNewlineCarriageReturn()
         {
             AssertQueryEqualsDOA("+weltbank +worlbank", null,
               "+weltbank +worlbank");
@@ -976,7 +908,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestSimpleDAO()
+        public virtual void TestSimpleDAO()
         {
             AssertQueryEqualsDOA("term term term", null, "+term +term +term");
             AssertQueryEqualsDOA("term +term term", null, "+term +term +term");
@@ -986,7 +918,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestBoost()
+        public virtual void TestBoost()
         {
             CharacterRunAutomaton stopWords = new CharacterRunAutomaton(BasicAutomata.MakeString("on"));
             Analyzer oneStopAnalyzer = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, stopWords);
@@ -1044,7 +976,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestException()
+        public virtual void TestException()
         {
             AssertParseException("\"some phrase");
             AssertParseException("(foo bar");
@@ -1055,7 +987,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestBooleanQuery()
+        public virtual void TestBooleanQuery()
         {
             BooleanQuery.MaxClauseCount = (2);
             Analyzer purWhitespaceAnalyzer = new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false);
@@ -1063,7 +995,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestPrecedence()
+        public virtual void TestPrecedence()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
             Query query1 = GetQuery("A AND B OR C AND D", qp);
@@ -1099,14 +1031,10 @@ namespace Lucene.Net.QueryParsers.Util
         //    iw.addDocument(d);
         //  }
 
-        // Moved to AbstractQueryParserTestBase
-        public override void TestStarParsing()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void TestStarParsing();
 
         [Test]
-        public void TestEscapedWildcard()
+        public virtual void TestEscapedWildcard()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
             WildcardQuery q = new WildcardQuery(new Term("field", "foo\\?ba?r"));
@@ -1114,7 +1042,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestRegexps()
+        public virtual void TestRegexps()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
             RegexpQuery q = new RegexpQuery(new Term("field", "[a-z][123]"));
@@ -1164,7 +1092,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestStopwords()
+        public virtual void TestStopwords()
         {
             CharacterRunAutomaton stopSet = new CharacterRunAutomaton(new RegExp("the|foo").ToAutomaton());
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, stopSet));
@@ -1183,7 +1111,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestPositionIncrement()
+        public virtual void TestPositionIncrement()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET));
             qp.EnablePositionIncrements = (true);
@@ -1203,7 +1131,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestMatchAllDocs()
+        public virtual void TestMatchAllDocs()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockAnalyzer(Random(), MockTokenizer.WHITESPACE, false));
             assertEquals(new MatchAllDocsQuery(), GetQuery("*:*", qp));
@@ -1235,7 +1163,7 @@ namespace Lucene.Net.QueryParsers.Util
         // enableStopPositionIncr & QueryParser's enablePosIncr
         // "match"
         [Test]
-        public void TestPositionIncrements()
+        public virtual void TestPositionIncrements()
         {
             using (Directory dir = NewDirectory())
             {
@@ -1324,11 +1252,7 @@ namespace Lucene.Net.QueryParsers.Util
             }
         }
 
-        // Moved to AbstractQueryParserTestBase
-        public override void TestNewFieldQuery()
-        {
-            throw new NotImplementedException();
-        }
+        public abstract void TestNewFieldQuery();
 
         /// <summary>
         /// Mock collation analyzer: indexes terms as "collated" + term
@@ -1368,7 +1292,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestCollatedRange()
+        public virtual void TestCollatedRange()
         {
             ICommonQueryParserConfiguration qp = GetParserConfig(new MockCollationAnalyzer());
             SetAnalyzeRangeTerms(qp, true);
@@ -1378,14 +1302,14 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestDistanceAsEditsParsing()
+        public virtual void TestDistanceAsEditsParsing()
         {
             FuzzyQuery q = (FuzzyQuery)GetQuery("foobar~2", new MockAnalyzer(Random()));
             assertEquals(2, q.MaxEdits);
         }
 
         [Test]
-        public void TestPhraseQueryToString()
+        public virtual void TestPhraseQueryToString()
         {
             Analyzer analyzer = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true, MockTokenFilter.ENGLISH_STOPSET);
             ICommonQueryParserConfiguration qp = GetParserConfig(analyzer);
@@ -1395,7 +1319,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestParseWildcardAndPhraseQueries()
+        public virtual void TestParseWildcardAndPhraseQueries()
         {
             string field = "content";
             string oldDefaultField = DefaultField;
@@ -1440,7 +1364,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestPhraseQueryPositionIncrements()
+        public virtual void TestPhraseQueryPositionIncrements()
         {
             CharacterRunAutomaton stopStopList =
             new CharacterRunAutomaton(new RegExp("[sS][tT][oO][pP]").ToAutomaton());
@@ -1458,7 +1382,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestMatchAllQueryParsing()
+        public virtual void TestMatchAllQueryParsing()
         {
             // test simple parsing of MatchAllDocsQuery
             string oldDefaultField = DefaultField;
@@ -1474,7 +1398,7 @@ namespace Lucene.Net.QueryParsers.Util
         }
 
         [Test]
-        public void TestNestedAndClausesFoo()
+        public virtual void TestNestedAndClausesFoo()
         {
             string query = "(field1:[1 TO *] AND field1:[* TO 2]) AND field2:(z)";
             BooleanQuery q = new BooleanQuery();
@@ -1485,39 +1409,5 @@ namespace Lucene.Net.QueryParsers.Util
             q.Add(new TermQuery(new Term("field2", "z")), BooleanClause.Occur.MUST);
             assertEquals(q, GetQuery(query, new MockAnalyzer(Random())));
         }
-    }
-
-
-    /// <summary>
-    /// This class was added in .NET because the Visual Studio test runner
-    /// does not detect tests in abstract classes. Therefore, the abstract members
-    /// of QueryParserTestBase were moved here so the QueryParserTestBase class
-    /// could be made concrete.
-    /// </summary>
-    public abstract class AbstractQueryParserTestBase : LuceneTestCase
-    {
-        public abstract void TestStarParsing();
-
-        public abstract void TestNewFieldQuery();
-
-        public abstract void TestDefaultOperator();
-
-        public abstract ICommonQueryParserConfiguration GetParserConfig(Analyzer a);
-
-        public abstract void SetDefaultOperatorOR(ICommonQueryParserConfiguration cqpC);
-
-        public abstract void SetDefaultOperatorAND(ICommonQueryParserConfiguration cqpC);
-
-        public abstract void SetAnalyzeRangeTerms(ICommonQueryParserConfiguration cqpC, bool value);
-
-        public abstract void SetAutoGeneratePhraseQueries(ICommonQueryParserConfiguration cqpC, bool value);
-
-        public abstract void SetDateResolution(ICommonQueryParserConfiguration cqpC, ICharSequence field, DateTools.Resolution value);
-
-        public abstract Query GetQuery(string query, ICommonQueryParserConfiguration cqpC);
-
-        public abstract Query GetQuery(string query, Analyzer a);
-
-        public abstract bool IsQueryParserException(Exception exception);
     }
 }

@@ -51,81 +51,71 @@ namespace Lucene.Net.QueryParsers.Classic
 
         }
 
-        // Moved to QueryParserTestBase
-        //public QueryParser GetParser(Analyzer a)
-        //{
-        //    if (a == null) a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
-        //    QueryParser qp = new QueryParser(TEST_VERSION_CURRENT, DefaultField, a);
-        //    qp.DefaultOperator = (QueryParserBase.OR_OPERATOR);
-        //    return qp;
-        //}
+        public virtual QueryParser GetParser(Analyzer a)
+        {
+            if (a == null) a = new MockAnalyzer(Random(), MockTokenizer.SIMPLE, true);
+            QueryParser qp = new QueryParser(TEST_VERSION_CURRENT, DefaultField, a);
+            qp.DefaultOperator = (QueryParserBase.OR_OPERATOR);
+            return qp;
+        }
 
-        // Moved to QueryParserTestBase
-        //public override ICommonQueryParserConfiguration GetParserConfig(Analyzer a)
-        //{
-        //    return GetParser(a);
-        //}
+        public override ICommonQueryParserConfiguration GetParserConfig(Analyzer a)
+        {
+            return GetParser(a);
+        }
 
-        // Moved to QueryParserTestBase
-        //public override Query GetQuery(string query, ICommonQueryParserConfiguration cqpC)
-        //{
-        //    Debug.Assert(cqpC != null, "Parameter must not be null");
-        //    Debug.Assert(cqpC is QueryParser, "Parameter must be instance of QueryParser");
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    return qp.Parse(query);
-        //}
+        public override Query GetQuery(string query, ICommonQueryParserConfiguration cqpC)
+        {
+            Debug.Assert(cqpC != null, "Parameter must not be null");
+            Debug.Assert(cqpC is QueryParser, "Parameter must be instance of QueryParser");
+            QueryParser qp = (QueryParser)cqpC;
+            return qp.Parse(query);
+        }
 
-        // Moved to QueryParserTestBase
-        //public override Query GetQuery(string query, Analyzer a)
-        //{
-        //    return GetParser(a).Parse(query);
-        //}
+        public override Query GetQuery(string query, Analyzer a)
+        {
+            return GetParser(a).Parse(query);
+        }
 
-        // Moved to QueryParserTestBase
-        //public override bool IsQueryParserException(Exception exception)
-        //{
-        //    return exception is ParseException;
-        //}
+        public override bool IsQueryParserException(Exception exception)
+        {
+            return exception is ParseException;
+        }
 
-        // Moved to QueryParserTestBase
-        //public override void SetDefaultOperatorOR(ICommonQueryParserConfiguration cqpC)
-        //{
-        //    Debug.Assert(cqpC is QueryParser);
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    qp.DefaultOperator = QueryParserBase.Operator.OR;
-        //}
+        public override void SetDefaultOperatorOR(ICommonQueryParserConfiguration cqpC)
+        {
+            Debug.Assert(cqpC is QueryParser);
+            QueryParser qp = (QueryParser)cqpC;
+            qp.DefaultOperator = QueryParserBase.Operator.OR;
+        }
 
-        // Moved to QueryParserTestBase
-        //public override void SetDefaultOperatorAND(ICommonQueryParserConfiguration cqpC)
-        //{
-        //    Debug.Assert(cqpC is QueryParser);
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    qp.DefaultOperator = QueryParserBase.Operator.AND;
-        //}
+        public override void SetDefaultOperatorAND(ICommonQueryParserConfiguration cqpC)
+        {
+            Debug.Assert(cqpC is QueryParser);
+            QueryParser qp = (QueryParser)cqpC;
+            qp.DefaultOperator = QueryParserBase.Operator.AND;
+        }
 
-        // Moved to QueryParserTestBase
-        //public override void SetAnalyzeRangeTerms(ICommonQueryParserConfiguration cqpC, bool value)
-        //{
-        //    Debug.Assert(cqpC is QueryParser);
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    qp.AnalyzeRangeTerms = (value);
-        //}
+        public override void SetAnalyzeRangeTerms(ICommonQueryParserConfiguration cqpC, bool value)
+        {
+            Debug.Assert(cqpC is QueryParser);
+            QueryParser qp = (QueryParser)cqpC;
+            qp.AnalyzeRangeTerms = (value);
+        }
 
-        // Moved to QueryParserTestBase
-        //public override void SetAutoGeneratePhraseQueries(ICommonQueryParserConfiguration cqpC, bool value)
-        //{
-        //    Debug.Assert(cqpC is QueryParser);
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    qp.AutoGeneratePhraseQueries = value;
-        //}
+        public override void SetAutoGeneratePhraseQueries(ICommonQueryParserConfiguration cqpC, bool value)
+        {
+            Debug.Assert(cqpC is QueryParser);
+            QueryParser qp = (QueryParser)cqpC;
+            qp.AutoGeneratePhraseQueries = value;
+        }
 
-        // Moved to QueryParserTestBase
-        //public override void SetDateResolution(ICommonQueryParserConfiguration cqpC, ICharSequence field, DateTools.Resolution value)
-        //{
-        //    Debug.Assert(cqpC is QueryParser);
-        //    QueryParser qp = (QueryParser)cqpC;
-        //    qp.SetDateResolution(field.toString(), value);
-        //}
+        public override void SetDateResolution(ICommonQueryParserConfiguration cqpC, string field, DateTools.Resolution value)
+        {
+            Debug.Assert(cqpC is QueryParser);
+            QueryParser qp = (QueryParser)cqpC;
+            qp.SetDateResolution(field, value);
+        }
 
         [Test]
         public override void TestDefaultOperator()
@@ -150,7 +140,7 @@ namespace Lucene.Net.QueryParsers.Classic
         // This test is here as a safety, in case that ant step
         // doesn't work for some reason.
         [Test]
-        public void TestProtectedCtors()
+        public virtual void TestProtectedCtors()
         {
             try
             {
@@ -196,7 +186,7 @@ namespace Lucene.Net.QueryParsers.Classic
         }
 
         [Test]
-        public void TestFuzzySlopeExtendability()
+        public virtual void TestFuzzySlopeExtendability()
         {
             QueryParser qp = new TestFuzzySlopeExtendabilityQueryParser();
             assertEquals(qp.Parse("a:[11.95 TO 12.95]"), qp.Parse("12.45~1€"));
@@ -274,7 +264,7 @@ namespace Lucene.Net.QueryParsers.Classic
         }
 
         [Test]
-        public void TestCustomQueryParserWildcard()
+        public virtual void TestCustomQueryParserWildcard()
         {
             try
             {
@@ -289,7 +279,7 @@ namespace Lucene.Net.QueryParsers.Classic
         }
 
         [Test]
-        public void TestCustomQueryParserFuzzy()
+        public virtual void TestCustomQueryParserFuzzy()
         {
             try
             {
@@ -322,6 +312,7 @@ namespace Lucene.Net.QueryParsers.Classic
             }
         }
 
+        [Test]
         public override void TestNewFieldQuery()
         {
             /** ordinary behavior, synonyms form uncoordinated boolean query */
@@ -364,7 +355,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// simple synonyms test
         /// </summary>
         [Test]
-        public void TestSynonyms()
+        public virtual void TestSynonyms()
         {
             BooleanQuery expected = new BooleanQuery(true);
             expected.Add(new TermQuery(new Index.Term("field", "dogs")), BooleanClause.Occur.SHOULD);
@@ -384,7 +375,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// forms multiphrase query
         /// </summary>
         [Test]
-        public void TestSynonymsPhrase()
+        public virtual void TestSynonymsPhrase()
         {
             MultiPhraseQuery expected = new MultiPhraseQuery();
             expected.Add(new Index.Term("field", "old"));
@@ -451,7 +442,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// simple CJK synonym test
         /// </summary>
         [Test]
-        public void TestCJKSynonym()
+        public virtual void TestCJKSynonym()
         {
             BooleanQuery expected = new BooleanQuery(true);
             expected.Add(new TermQuery(new Index.Term("field", "国")), BooleanClause.Occur.SHOULD);
@@ -468,7 +459,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// synonyms with default OR operator 
         /// </summary>
         [Test]
-        public void TestCJKSynonymsOR()
+        public virtual void TestCJKSynonymsOR()
         {
             BooleanQuery expected = new BooleanQuery();
             expected.Add(new TermQuery(new Index.Term("field", "中")), BooleanClause.Occur.SHOULD);
@@ -486,7 +477,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// more complex synonyms with default OR operator
         /// </summary>
         [Test]
-        public void TestCJKSynonymsOR2()
+        public virtual void TestCJKSynonymsOR2()
         {
             BooleanQuery expected = new BooleanQuery();
             expected.Add(new TermQuery(new Index.Term("field", "中")), BooleanClause.Occur.SHOULD);
@@ -508,7 +499,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// synonyms with default AND operator
         /// </summary>
         [Test]
-        public void TestCJKSynonymsAND()
+        public virtual void TestCJKSynonymsAND()
         {
             BooleanQuery expected = new BooleanQuery();
             expected.Add(new TermQuery(new Index.Term("field", "中")), BooleanClause.Occur.MUST);
@@ -527,7 +518,7 @@ namespace Lucene.Net.QueryParsers.Classic
         /// more complex synonyms with default AND operator
         /// </summary>
         [Test]
-        public void TestCJKSynonymsAND2()
+        public virtual void TestCJKSynonymsAND2()
         {
             BooleanQuery expected = new BooleanQuery();
             expected.Add(new TermQuery(new Index.Term("field", "中")), BooleanClause.Occur.MUST);
@@ -547,7 +538,7 @@ namespace Lucene.Net.QueryParsers.Classic
         }
 
         [Test]
-        public void TestCJKSynonymsPhrase()
+        public virtual void TestCJKSynonymsPhrase()
         {
             MultiPhraseQuery expected = new MultiPhraseQuery();
             expected.Add(new Index.Term("field", "中"));
@@ -561,5 +552,255 @@ namespace Lucene.Net.QueryParsers.Classic
             assertEquals(expected, qp.Parse("\"中国\"~3^2"));
         }
 
+
+        #region QueryParserTestBase
+        // LUCENENET NOTE: Tests in a base class are not pulled into the correct
+        // context in Visual Studio. This fixes that with the minimum amount of code necessary
+        // to run them in the correct context without duplicating all of the tests.
+
+        [Test]
+        public override void TestCJK()
+        {
+            base.TestCJK();
+        }
+
+        [Test]
+        public override void TestCJKTerm()
+        {
+            base.TestCJKTerm();
+        }
+
+        [Test]
+        public override void TestCJKBoostedTerm()
+        {
+            base.TestCJKBoostedTerm();
+        }
+
+        [Test]
+        public override void TestCJKPhrase()
+        {
+            base.TestCJKPhrase();
+        }
+
+        [Test]
+        public override void TestCJKBoostedPhrase()
+        {
+            base.TestCJKBoostedPhrase();
+        }
+
+        [Test]
+        public override void TestCJKSloppyPhrase()
+        {
+            base.TestCJKSloppyPhrase();
+        }
+
+        [Test]
+        public override void TestAutoGeneratePhraseQueriesOn()
+        {
+            base.TestAutoGeneratePhraseQueriesOn();
+        }
+
+        [Test]
+        public override void TestSimple()
+        {
+            base.TestSimple();
+        }
+
+        [Test]
+        public override void TestOperatorVsWhitespace()
+        {
+            base.TestOperatorVsWhitespace();
+        }
+
+        [Test]
+        public override void TestPunct()
+        {
+            base.TestPunct();
+        }
+
+        [Test]
+        public override void TestSlop()
+        {
+            base.TestSlop();
+        }
+
+        [Test]
+        public override void TestNumber()
+        {
+            base.TestNumber();
+        }
+
+        [Test]
+        public override void TestWildcard()
+        {
+            base.TestWildcard();
+        }
+
+        [Test]
+        public override void TestLeadingWildcardType()
+        {
+            base.TestLeadingWildcardType();
+        }
+
+        [Test]
+        public override void TestQPA()
+        {
+            base.TestQPA();
+        }
+
+        [Test]
+        public override void TestRange()
+        {
+            base.TestRange();
+        }
+
+        [Test]
+        public override void TestRangeWithPhrase()
+        {
+            base.TestRangeWithPhrase();
+        }
+
+        [Test]
+        public override void TestDateRange()
+        {
+            base.TestDateRange();
+        }
+
+        [Test]
+        public override void TestEscaped()
+        {
+            base.TestEscaped();
+        }
+
+        [Test]
+        public override void TestEscapedVsQuestionMarkAsWildcard()
+        {
+            base.TestEscapedVsQuestionMarkAsWildcard();
+        }
+
+        [Test]
+        public override void TestQueryStringEscaping()
+        {
+            base.TestQueryStringEscaping();
+        }
+
+        [Test]
+        public override void TestTabNewlineCarriageReturn()
+        {
+            base.TestTabNewlineCarriageReturn();
+        }
+
+        [Test]
+        public override void TestSimpleDAO()
+        {
+            base.TestSimpleDAO();
+        }
+
+        [Test]
+        public override void TestBoost()
+        {
+            base.TestBoost();
+        }
+
+        [Test]
+        public override void TestException()
+        {
+            base.TestException();
+        }
+
+        [Test]
+        public override void TestBooleanQuery()
+        {
+            base.TestBooleanQuery();
+        }
+
+        [Test]
+        public override void TestPrecedence()
+        {
+            base.TestPrecedence();
+        }
+
+        [Test]
+        public override void TestEscapedWildcard()
+        {
+            base.TestEscapedWildcard();
+        }
+
+        [Test]
+        public override void TestRegexps()
+        {
+            base.TestRegexps();
+        }
+
+        [Test]
+        public override void TestStopwords()
+        {
+            base.TestStopwords();
+        }
+
+        [Test]
+        public override void TestPositionIncrement()
+        {
+            base.TestPositionIncrement();
+        }
+
+        [Test]
+        public override void TestMatchAllDocs()
+        {
+            base.TestMatchAllDocs();
+        }
+
+        // LUCENE-2002: make sure defaults for StandardAnalyzer's
+        // enableStopPositionIncr & QueryParser's enablePosIncr
+        // "match"
+        [Test]
+        public override void TestPositionIncrements()
+        {
+            base.TestPositionIncrements();
+        }
+
+        [Test]
+        public override void TestCollatedRange()
+        {
+            base.TestCollatedRange();
+        }
+
+        [Test]
+        public override void TestDistanceAsEditsParsing()
+        {
+            base.TestDistanceAsEditsParsing();
+        }
+
+        [Test]
+        public override void TestPhraseQueryToString()
+        {
+            base.TestPhraseQueryToString();
+        }
+
+        [Test]
+        public override void TestParseWildcardAndPhraseQueries()
+        {
+            base.TestParseWildcardAndPhraseQueries();
+        }
+
+        [Test]
+        public override void TestPhraseQueryPositionIncrements()
+        {
+            base.TestPhraseQueryPositionIncrements();
+        }
+
+        [Test]
+        public override void TestMatchAllQueryParsing()
+        {
+            base.TestMatchAllQueryParsing();
+        }
+
+        [Test]
+        public override void TestNestedAndClausesFoo()
+        {
+            base.TestNestedAndClausesFoo();
+        }
+
+        #endregion
     }
 }

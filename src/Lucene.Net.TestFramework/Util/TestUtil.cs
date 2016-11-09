@@ -3,6 +3,7 @@ using Lucene.Net.Documents;
 using Lucene.Net.Index;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,6 +16,7 @@ namespace Lucene.Net.Util
     //using RandomPicks = com.carrotsearch.randomizedtesting.generators.RandomPicks;
     using NUnit.Framework;
     using System.IO;
+    using System.IO.Compression;
     using System.Text.RegularExpressions;
     using AtomicReader = Lucene.Net.Index.AtomicReader;
     using AtomicReaderContext = Lucene.Net.Index.AtomicReaderContext;
@@ -79,6 +81,22 @@ namespace Lucene.Net.Util
     /// </summary>
     public static class TestUtil
     {
+        public static void Rm(params DirectoryInfo[] locations)
+        {
+            HashSet<FileSystemInfo> unremoved = Rm(new HashSet<FileSystemInfo>(), locations);
+            if (unremoved.Any())
+            {
+                StringBuilder b = new StringBuilder("Could not remove the following files (in the order of attempts):\n");
+                foreach (var f in unremoved)
+                {
+                    b.append("   ")
+                     .append(f.FullName)
+                     .append("\n");
+                }
+                throw new IOException(b.toString());
+            }
+        }
+
         private static HashSet<FileSystemInfo> Rm(HashSet<FileSystemInfo> unremoved, params DirectoryInfo[] locations)
         {
             foreach (DirectoryInfo location in locations)
@@ -121,6 +139,28 @@ namespace Lucene.Net.Util
             }
 
             return unremoved;
+        }
+
+        public static void Unzip(Stream zipFileStream, DirectoryInfo destDir)
+        {
+            Rm(destDir);
+            destDir.Create();
+
+            using (ZipArchive zip = new ZipArchive(zipFileStream))
+            {
+                foreach (var entry in zip.Entries)
+                {
+                    using (Stream input = entry.Open())
+                    {
+                        FileInfo targetFile = new FileInfo(Path.Combine(destDir.FullName, entry.FullName));
+
+                        using (Stream output = new FileStream(targetFile.FullName, FileMode.OpenOrCreate, FileAccess.Write))
+                        {
+                            input.CopyTo(output);
+                        }
+                    }
+                }
+            }
         }
 
         public static void SyncConcurrentMerges(IndexWriter writer)
@@ -1207,7 +1247,7 @@ namespace Lucene.Net.Util
             {
             }
 
-            protected override bool UseRandomAccess(Bits bits, int firstFilterDoc)
+            protected internal override bool UseRandomAccess(Bits bits, int firstFilterDoc)
             {
                 return LuceneTestCase.Random().NextBoolean();
             }

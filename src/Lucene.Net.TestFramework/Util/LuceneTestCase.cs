@@ -255,12 +255,11 @@ namespace Lucene.Net.Util
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
         public class SuppressCodecs : System.Attribute
         {
-            private string[] value;
-
-            public string[] Value()
+            public SuppressCodecs(params string[] value)
             {
-                return value;
+                this.Value = value;
             }
+            public string[] Value { get; private set; }
         }
 
         /// <summary>
@@ -1709,25 +1708,26 @@ namespace Lucene.Net.Util
             {
                 int threads = 0;
                 TaskScheduler ex;
-                /*if (random.NextBoolean())
-                {*/
+                if (random.NextBoolean())
+                {
                 ex = null;
-                /*}
+                }
                 else
                 {
                     threads = TestUtil.NextInt(random, 1, 8);
-                    ex = new ThreadPoolExecutor(threads, threads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<IThreadRunnable>(), new NamedThreadFactory("LuceneTestCase"));
+                    ex = new LimitedConcurrencyLevelTaskScheduler(threads);
+                    //ex = new ThreadPoolExecutor(threads, threads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<IThreadRunnable>(), new NamedThreadFactory("LuceneTestCase"));
                     // uncomment to intensify LUCENE-3840
                     // ex.prestartAllCoreThreads();
-                }*/
-                /*if (ex != null)
+                }
+                if (ex != null)
                 {
                     if (VERBOSE)
                     {
                         Console.WriteLine("NOTE: newSearcher using ExecutorService with " + threads + " threads");
                     }
-                    r.AddReaderClosedListener(new ReaderClosedListenerAnonymousInnerClassHelper(ex));
-                }*/
+                    //r.AddReaderClosedListener(new ReaderClosedListenerAnonymousInnerClassHelper(ex));
+                }
                 IndexSearcher ret;
                 if (wrapWithAssertions)
                 {

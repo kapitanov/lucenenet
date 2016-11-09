@@ -39,10 +39,11 @@ namespace Lucene.Net.Index
     /// Test indexes ~82M docs with 26 terms each, so you get > Integer.MAX_VALUE terms/docs pairs
     /// @lucene.experimental
     /// </summary>
-    [Ignore("long running testcase")]
+    [SuppressCodecs("SimpleText", "Memory", "Direct", "Compressing")]
     [TestFixture]
     public class Test2BPostings : LuceneTestCase
     {
+        [Ignore("Very slow. Enable manually by removing Ignore.")]
         [Test, LongRunningTest, MaxTime(int.MaxValue)]
         public virtual void Test([ValueSource(typeof(ConcurrentMergeSchedulers), "Values")]IConcurrentMergeScheduler scheduler)
         {

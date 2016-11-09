@@ -261,10 +261,14 @@ namespace Lucene.Net.Store
                 entry = new FileEntry();
                 entry.Offset = offset;
 
-                FileEntry previous = entries[id] = entry;
-                if (previous != null)
+                FileEntry previous;
+                if (entries.TryGetValue(id, out previous))
                 {
                     throw new CorruptIndexException("Duplicate cfs entry id=" + id + " in CFS: " + stream);
+                }
+                else
+                {
+                    entries[id] = entry;
                 }
             }
 
@@ -325,7 +329,7 @@ namespace Lucene.Net.Store
                 FileEntry entry;
                 if (!Entries.TryGetValue(id, out entry))
                 {
-                    throw new Exception("No sub-file with id " + id + " found (fileName=" + name + " files: " + Entries.Keys + ")");
+                    throw new Exception("No sub-file with id " + id + " found (fileName=" + name + " files: " + Arrays.ToString(Entries.Keys) + ")");
                 }
                 return Handle.OpenSlice(name, entry.Offset, entry.Length);
             }
