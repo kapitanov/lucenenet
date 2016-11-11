@@ -1,4 +1,5 @@
-﻿using Lucene.Net.Util;
+﻿using Lucene.Net.Attributes;
+using Lucene.Net.Util;
 using NUnit.Framework;
 using System;
 using System.IO;
@@ -9,7 +10,7 @@ namespace Lucene.Net.Support
 {
     public class TestDataInputStream : LuceneTestCase
     {
-        [Test]
+        [Test, LuceneNetSpecific]
         public void TestReadFully()
         {
             const string READFULLY_TEST_FILE = "Lucene.Net.Tests.core.Support.ReadFully.txt";
@@ -67,7 +68,7 @@ namespace Lucene.Net.Support
             }
         }
 
-        [Test]
+        [Test, LuceneNetSpecific]
         public void TestReadLinePushback()
         {
             using (MemoryStream pis = new MemoryStream("\r".GetBytes(Encoding.UTF8)))
@@ -92,7 +93,7 @@ namespace Lucene.Net.Support
             }
         }
 
-        [Test]
+        [Test, LuceneNetSpecific]
         public void TestReadUTF()
         {
             for (int i = 0; i < TEST_ITERATIONS; i++)
@@ -156,7 +157,7 @@ namespace Lucene.Net.Support
             dis.ReadUTF();
         }
 
-        [Test]
+        [Test, LuceneNetSpecific]
         public void TestSkipBytes()
         {
             DataInputStream dis = new DataInputStream(new MyInputStream());
